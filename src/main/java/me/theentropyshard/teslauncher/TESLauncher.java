@@ -16,8 +16,8 @@
 
 package me.theentropyshard.teslauncher;
 
-public class Main {
-    public static void main(String[] args) {
-        new TESLauncher(args);
+public class TESLauncher {
+    public TESLauncher(String[] args) {
+        System.out.println("Hello, World!");
     }
 }
