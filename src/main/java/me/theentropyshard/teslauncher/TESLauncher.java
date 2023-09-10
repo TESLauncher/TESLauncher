@@ -35,7 +35,7 @@ public class TESLauncher {
     private boolean darkTheme;
 
     public TESLauncher(String[] args) {
-        this.darkTheme = false;
+        this.darkTheme = true;
 
         SwingUtilities.invokeLater(() -> {
             if (this.darkTheme) {
@@ -54,7 +54,6 @@ public class TESLauncher {
 
             JDialog.setDefaultLookAndFeelDecorated(true);
             JFrame.setDefaultLookAndFeelDecorated(true);
-            FlatIntelliJLaf.setup();
 
             JTabbedPane viewSelector = new JTabbedPane(JTabbedPane.LEFT);
             viewSelector.addTab("Play", new PlayView().getRoot());
