@@ -17,7 +17,11 @@
 package me.theentropyshard.teslauncher;
 
 import com.formdev.flatlaf.FlatIntelliJLaf;
-import me.theentropyshard.teslauncher.gui.*;
+import me.theentropyshard.teslauncher.gui.AboutView;
+import me.theentropyshard.teslauncher.gui.AccountsView;
+import me.theentropyshard.teslauncher.gui.AppWindow;
+import me.theentropyshard.teslauncher.gui.SettingsView;
+import me.theentropyshard.teslauncher.gui.playview.PlayView;
 
 import javax.swing.*;
 
