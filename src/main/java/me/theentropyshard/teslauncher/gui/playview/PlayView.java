@@ -28,6 +28,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class PlayView extends View {
+    public static final String DEFAULT_GROUP_NAME = "<default>";
+
     private final PlayViewHeader header;
     private final JPanel instancesPanelView;
     private final InstancesPanel defaultInstancesPanel;
@@ -47,10 +49,10 @@ public class PlayView extends View {
 
         AddInstanceItem defaultItem = new AddInstanceItem();
         defaultItem.addListener(e -> {
-            new AddInstanceDialog(this, "<default>");
+            new AddInstanceDialog(this, PlayView.DEFAULT_GROUP_NAME);
         }, true);
         this.defaultInstancesPanel = new InstancesPanel(defaultItem);
-        this.groups.put("<default>", this.defaultInstancesPanel);
+        this.groups.put(PlayView.DEFAULT_GROUP_NAME, this.defaultInstancesPanel);
         root.add(this.instancesPanelView, BorderLayout.CENTER);
 
         this.groups.forEach((name, panel) -> {
@@ -58,7 +60,7 @@ public class PlayView extends View {
         });
 
         JComboBox<String> instanceGroups = this.header.getInstanceGroups();
-        String[] items = {"<default>"};
+        String[] items = {PlayView.DEFAULT_GROUP_NAME};
         this.model = new DefaultComboBoxModel<>(items);
 
         instanceGroups.setModel(this.model);
