@@ -16,6 +16,7 @@
 
 package me.theentropyshard.teslauncher;
 
+import com.formdev.flatlaf.FlatDarculaLaf;
 import com.formdev.flatlaf.FlatIntelliJLaf;
 import me.theentropyshard.teslauncher.gui.AboutView;
 import me.theentropyshard.teslauncher.gui.AccountsView;
@@ -24,15 +25,33 @@ import me.theentropyshard.teslauncher.gui.SettingsView;
 import me.theentropyshard.teslauncher.gui.playview.PlayView;
 
 import javax.swing.*;
+import javax.swing.plaf.ColorUIResource;
 
 public class TESLauncher {
     public static final String TITLE = "TESLauncher";
     public static final int WIDTH = 960;
     public static final int HEIGHT = 540;
 
+    private boolean darkTheme;
+
     public TESLauncher(String[] args) {
+        this.darkTheme = false;
 
         SwingUtilities.invokeLater(() -> {
+            if (this.darkTheme) {
+                UIManager.put("InstanceItem.defaultColor", new ColorUIResource(64, 75, 93));
+                UIManager.put("InstanceItem.hoveredColor", new ColorUIResource(70, 80, 100));
+                UIManager.put("InstanceItem.pressedColor", new ColorUIResource(60, 70, 86));
+
+                FlatDarculaLaf.setup();
+            } else {
+                UIManager.put("InstanceItem.defaultColor", new ColorUIResource(222, 230, 237));
+                UIManager.put("InstanceItem.hoveredColor", new ColorUIResource(224, 234, 244));
+                UIManager.put("InstanceItem.pressedColor", new ColorUIResource(216, 224, 240));
+
+                FlatIntelliJLaf.setup();
+            }
+
             JDialog.setDefaultLookAndFeelDecorated(true);
             JFrame.setDefaultLookAndFeelDecorated(true);
             FlatIntelliJLaf.setup();

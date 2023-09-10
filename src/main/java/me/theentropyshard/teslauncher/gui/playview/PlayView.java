@@ -18,7 +18,6 @@ package me.theentropyshard.teslauncher.gui.playview;
 
 import me.theentropyshard.teslauncher.gui.View;
 import me.theentropyshard.teslauncher.gui.components.InstanceItem;
-import me.theentropyshard.teslauncher.utils.SwingUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -66,13 +65,6 @@ public class PlayView extends View {
                 System.out.println(groupName);
             }
         });
-
-        this.addInstanceItem(new InstanceItem(SwingUtils.getIcon("/grass_icon.png"), "Minecraft"), "<default>");
-        this.addInstanceItem(new InstanceItem(SwingUtils.getIcon("/grass_icon.png"), "Minecraft"), "<default>");
-        this.addInstanceItem(new InstanceItem(SwingUtils.getIcon("/grass_icon.png"), "Minecraft"), "<default>");
-        this.addInstanceItem(new InstanceItem(SwingUtils.getIcon("/grass_icon.png"), "Minecraft"), "Modpacks");
-        this.addInstanceItem(new InstanceItem(SwingUtils.getIcon("/grass_icon.png"), "Minecraft"), "Others");
-        this.addInstanceItem(new InstanceItem(SwingUtils.getIcon("/grass_icon.png"), "Minecraft"), "Others");
     }
 
     public void addInstanceItem(InstanceItem item, String groupName) {
