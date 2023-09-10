@@ -34,6 +34,8 @@ public class TESLauncher {
 
     private boolean darkTheme;
 
+    public static AppWindow window;
+
     public TESLauncher(String[] args) {
         this.darkTheme = false;
 
@@ -63,6 +65,8 @@ public class TESLauncher {
 
             AppWindow appWindow = new AppWindow(TESLauncher.TITLE, TESLauncher.WIDTH, TESLauncher.HEIGHT, viewSelector);
             appWindow.setVisible(true);
+
+            TESLauncher.window = appWindow;
         });
     }
 }

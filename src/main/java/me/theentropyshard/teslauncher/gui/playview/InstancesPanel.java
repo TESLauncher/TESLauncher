@@ -28,10 +28,10 @@ public class InstancesPanel extends View {
     private final AddInstanceItem addInstanceItem;
     private final JPanel instancesPanel;
 
-    public InstancesPanel() {
+    public InstancesPanel(AddInstanceItem addInstanceItem) {
         JPanel root = this.getRoot();
 
-        this.addInstanceItem = new AddInstanceItem();
+        this.addInstanceItem = addInstanceItem;
         this.instancesPanel = new JPanel(new WrapLayout(WrapLayout.LEFT, 8, 8));
         this.instancesPanel.add(this.addInstanceItem);
 

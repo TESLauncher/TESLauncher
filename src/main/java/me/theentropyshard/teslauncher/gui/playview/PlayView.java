@@ -17,7 +17,9 @@
 package me.theentropyshard.teslauncher.gui.playview;
 
 import me.theentropyshard.teslauncher.gui.View;
+import me.theentropyshard.teslauncher.gui.components.AddInstanceItem;
 import me.theentropyshard.teslauncher.gui.components.InstanceItem;
+import me.theentropyshard.teslauncher.gui.dialogs.AddInstanceDialog;
 
 import javax.swing.*;
 import java.awt.*;
@@ -43,7 +45,11 @@ public class PlayView extends View {
         this.header = new PlayViewHeader();
         root.add(this.header.getRoot(), BorderLayout.NORTH);
 
-        this.defaultInstancesPanel = new InstancesPanel();
+        AddInstanceItem defaultItem = new AddInstanceItem();
+        defaultItem.addListener(e -> {
+            new AddInstanceDialog(this, "<default>");
+        }, true);
+        this.defaultInstancesPanel = new InstancesPanel(defaultItem);
         this.groups.put("<default>", this.defaultInstancesPanel);
         root.add(this.instancesPanelView, BorderLayout.CENTER);
 
@@ -70,7 +76,12 @@ public class PlayView extends View {
     public void addInstanceItem(InstanceItem item, String groupName) {
         InstancesPanel panel = this.groups.get(groupName);
         if (panel == null) {
-            panel = new InstancesPanel();
+            AddInstanceItem addInstanceItem = new AddInstanceItem();
+            addInstanceItem.addListener(e -> {
+                new AddInstanceDialog(this, groupName);
+            }, true);
+
+            panel = new InstancesPanel(addInstanceItem);
             this.groups.put(groupName, panel);
             this.model.addElement(groupName);
             this.instancesPanelView.add(panel.getRoot(), groupName);

@@ -74,4 +74,8 @@ public class AppWindow {
     public void removeWindowListener(WindowListener listener) {
         this.frame.removeWindowListener(listener);
     }
+
+    public JFrame getFrame() {
+        return this.frame;
+    }
 }
