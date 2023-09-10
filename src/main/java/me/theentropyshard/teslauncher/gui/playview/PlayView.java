@@ -68,7 +68,6 @@ public class PlayView extends View {
                 Object[] selectedObjects = e.getItemSelectable().getSelectedObjects();
                 String groupName = String.valueOf(selectedObjects[0]);
                 this.cardLayout.show(this.instancesPanelView, groupName);
-                System.out.println(groupName);
             }
         });
     }
