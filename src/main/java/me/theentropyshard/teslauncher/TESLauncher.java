@@ -22,19 +22,25 @@ import me.theentropyshard.teslauncher.gui.*;
 import javax.swing.*;
 
 public class TESLauncher {
+    public static final String TITLE = "TESLauncher";
+    public static final int WIDTH = 960;
+    public static final int HEIGHT = 540;
+
     public TESLauncher(String[] args) {
 
-        JDialog.setDefaultLookAndFeelDecorated(true);
-        JFrame.setDefaultLookAndFeelDecorated(true);
-        FlatIntelliJLaf.setup();
+        SwingUtilities.invokeLater(() -> {
+            JDialog.setDefaultLookAndFeelDecorated(true);
+            JFrame.setDefaultLookAndFeelDecorated(true);
+            FlatIntelliJLaf.setup();
 
-        JTabbedPane viewSelector = new JTabbedPane(JTabbedPane.LEFT);
-        viewSelector.addTab("Play", new PlayView().getRoot());
-        viewSelector.addTab("Accounts", new AccountsView().getRoot());
-        viewSelector.addTab("Settings", new SettingsView().getRoot());
-        viewSelector.addTab("About", new AboutView().getRoot());
+            JTabbedPane viewSelector = new JTabbedPane(JTabbedPane.LEFT);
+            viewSelector.addTab("Play", new PlayView().getRoot());
+            viewSelector.addTab("Accounts", new AccountsView().getRoot());
+            viewSelector.addTab("Settings", new SettingsView().getRoot());
+            viewSelector.addTab("About", new AboutView().getRoot());
 
-        AppWindow appWindow = new AppWindow("TESLauncher", 960, 540, viewSelector);
-        appWindow.setVisible(true);
+            AppWindow appWindow = new AppWindow(TESLauncher.TITLE, TESLauncher.WIDTH, TESLauncher.HEIGHT, viewSelector);
+            appWindow.setVisible(true);
+        });
     }
 }
