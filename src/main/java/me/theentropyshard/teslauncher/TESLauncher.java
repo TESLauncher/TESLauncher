@@ -35,7 +35,7 @@ public class TESLauncher {
     private boolean darkTheme;
 
     public TESLauncher(String[] args) {
-        this.darkTheme = true;
+        this.darkTheme = false;
 
         SwingUtilities.invokeLater(() -> {
             if (this.darkTheme) {
