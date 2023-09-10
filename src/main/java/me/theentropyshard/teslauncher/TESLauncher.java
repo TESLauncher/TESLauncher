@@ -16,8 +16,25 @@
 
 package me.theentropyshard.teslauncher;
 
+import com.formdev.flatlaf.FlatIntelliJLaf;
+import me.theentropyshard.teslauncher.gui.*;
+
+import javax.swing.*;
+
 public class TESLauncher {
     public TESLauncher(String[] args) {
-        System.out.println("Hello, World!");
+
+        JDialog.setDefaultLookAndFeelDecorated(true);
+        JFrame.setDefaultLookAndFeelDecorated(true);
+        FlatIntelliJLaf.setup();
+
+        JTabbedPane viewSelector = new JTabbedPane(JTabbedPane.LEFT);
+        viewSelector.addTab("Play", new PlayView().getRoot());
+        viewSelector.addTab("Accounts", new AccountsView().getRoot());
+        viewSelector.addTab("Settings", new SettingsView().getRoot());
+        viewSelector.addTab("About", new AboutView().getRoot());
+
+        AppWindow appWindow = new AppWindow("TESLauncher", 960, 540, viewSelector);
+        appWindow.setVisible(true);
     }
 }
