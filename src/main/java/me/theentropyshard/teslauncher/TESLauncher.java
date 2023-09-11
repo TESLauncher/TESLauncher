@@ -23,20 +23,40 @@ import me.theentropyshard.teslauncher.gui.AccountsView;
 import me.theentropyshard.teslauncher.gui.AppWindow;
 import me.theentropyshard.teslauncher.gui.SettingsView;
 import me.theentropyshard.teslauncher.gui.playview.PlayView;
+import me.theentropyshard.teslauncher.instance.InstanceManager;
 
 import javax.swing.*;
 import javax.swing.plaf.ColorUIResource;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class TESLauncher {
     public static final String TITLE = "TESLauncher";
     public static final int WIDTH = 960;
     public static final int HEIGHT = 540;
 
+    private final Path workDir;
+    private final Path minecraftDir;
+    private final Path instancesDir;
+    private final InstanceManager instanceManager;
+    private final ExecutorService taskPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+
     private boolean darkTheme;
 
+    public static TESLauncher instance;
     public static AppWindow window;
 
     public TESLauncher(String[] args) {
+        TESLauncher.instance = this;
+
+        this.workDir = Paths.get(System.getProperty("user.dir")).resolve("dev");
+        this.minecraftDir = this.workDir.resolve("minecraft");
+        this.instancesDir = this.minecraftDir.resolve("instances");
+        this.instanceManager = new InstanceManager(this.instancesDir);
+        this.instanceManager.loadInstances();
+
         this.darkTheme = false;
 
         SwingUtilities.invokeLater(() -> {
@@ -58,15 +78,27 @@ public class TESLauncher {
             JFrame.setDefaultLookAndFeelDecorated(true);
 
             JTabbedPane viewSelector = new JTabbedPane(JTabbedPane.LEFT);
+            AppWindow appWindow = new AppWindow(TESLauncher.TITLE, TESLauncher.WIDTH, TESLauncher.HEIGHT, viewSelector);
+            TESLauncher.window = appWindow;
+
             viewSelector.addTab("Play", new PlayView().getRoot());
             viewSelector.addTab("Accounts", new AccountsView().getRoot());
             viewSelector.addTab("Settings", new SettingsView().getRoot());
             viewSelector.addTab("About", new AboutView().getRoot());
 
-            AppWindow appWindow = new AppWindow(TESLauncher.TITLE, TESLauncher.WIDTH, TESLauncher.HEIGHT, viewSelector);
             appWindow.setVisible(true);
-
-            TESLauncher.window = appWindow;
         });
+    }
+
+    public void doTask(Runnable r) {
+        this.taskPool.submit(r);
+    }
+
+    public InstanceManager getInstanceManager() {
+        return this.instanceManager;
+    }
+
+    public Path getWorkDir() {
+        return this.workDir;
     }
 }

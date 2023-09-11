@@ -19,6 +19,7 @@ package me.theentropyshard.teslauncher.gui.dialogs;
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.gui.components.InstanceItem;
 import me.theentropyshard.teslauncher.gui.playview.PlayView;
+import me.theentropyshard.teslauncher.instance.InstanceManager;
 import me.theentropyshard.teslauncher.utils.SwingUtils;
 
 import javax.swing.*;
@@ -110,6 +111,10 @@ public class AddInstanceDialog {
             String chosenGroupName = this.groupField.getText();
             playView.addInstanceItem(new InstanceItem(SwingUtils.getIcon("/grass_icon.png"), this.nameField.getText()), chosenGroupName);
             this.getDialog().dispose();
+            TESLauncher.instance.doTask(() -> {
+                InstanceManager instanceManager = TESLauncher.instance.getInstanceManager();
+                instanceManager.createInstance(this.nameField.getText(), chosenGroupName, "1.5.2");
+            });
         });
         buttonsPanel.add(addButton);
         JButton cancelButton = new JButton("Cancel");

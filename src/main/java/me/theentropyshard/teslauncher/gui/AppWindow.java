@@ -16,6 +16,8 @@
 
 package me.theentropyshard.teslauncher.gui;
 
+import me.theentropyshard.teslauncher.TESLauncher;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;

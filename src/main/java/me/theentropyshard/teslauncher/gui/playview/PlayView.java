@@ -16,16 +16,21 @@
 
 package me.theentropyshard.teslauncher.gui.playview;
 
+import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.gui.View;
 import me.theentropyshard.teslauncher.gui.components.AddInstanceItem;
 import me.theentropyshard.teslauncher.gui.components.InstanceItem;
 import me.theentropyshard.teslauncher.gui.dialogs.AddInstanceDialog;
+import me.theentropyshard.teslauncher.instance.Instance;
+import me.theentropyshard.teslauncher.utils.SwingUtils;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 public class PlayView extends View {
     public static final String DEFAULT_GROUP_NAME = "<default>";
@@ -72,6 +77,27 @@ public class PlayView extends View {
                 this.cardLayout.show(this.instancesPanelView, groupName);
             }
         });
+
+        new SwingWorker<List<Instance>, Void>() {
+            @Override
+            protected List<Instance> doInBackground() throws Exception {
+                return TESLauncher.instance.getInstanceManager().getInstances();
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    List<Instance> instances = this.get();
+                    for (Instance instance : instances) {
+                        Icon icon = SwingUtils.getIcon("/grass_icon.png");
+                        InstanceItem item = new InstanceItem(icon, instance.getName());
+                        PlayView.this.addInstanceItem(item, instance.getGroupName());
+                    }
+                } catch (InterruptedException | ExecutionException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }.execute();
     }
 
     public void addInstanceItem(InstanceItem item, String groupName) {
