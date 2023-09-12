@@ -124,6 +124,9 @@ public class AddInstanceDialog {
         });
         buttonsPanel.add(this.addButton);
         JButton cancelButton = new JButton("Cancel");
+        cancelButton.addActionListener(e -> {
+            this.getDialog().dispose();
+        });
         buttonsPanel.add(cancelButton);
         buttonsPanel.setBorder(new EmptyBorder(0, 10, 6, 6));
         root.add(buttonsPanel, BorderLayout.SOUTH);
