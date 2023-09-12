@@ -62,7 +62,7 @@ public class AddInstanceDialog {
 
         root.add(headerPanel, BorderLayout.NORTH);
 
-        JTable versionsTable = new JTable();
+        JTable versionsTable = new JTable(new McVersionsTableModel());
 
         JScrollPane scrollPane = new JScrollPane(versionsTable);
 
