@@ -78,4 +78,9 @@ public class McVersionsTableModel extends DefaultTableModel {
             }
         }.execute();
     }
+
+    @Override
+    public boolean isCellEditable(int row, int column) {
+        return false;
+    }
 }
