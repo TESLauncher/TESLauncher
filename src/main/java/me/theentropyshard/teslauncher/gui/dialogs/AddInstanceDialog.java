@@ -24,12 +24,14 @@ import me.theentropyshard.teslauncher.utils.SwingUtils;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.table.TableModel;
 import java.awt.*;
 
 public class AddInstanceDialog {
     private final JDialog dialog;
     private final JTextField nameField;
     private final JTextField groupField;
+    private final JButton addButton;
 
     public AddInstanceDialog(PlayView playView, String groupName) {
         JPanel root = new JPanel(new BorderLayout());
@@ -62,7 +64,7 @@ public class AddInstanceDialog {
 
         root.add(headerPanel, BorderLayout.NORTH);
 
-        JTable versionsTable = new JTable(new McVersionsTableModel());
+        JTable versionsTable = new JTable(new McVersionsTableModel(this));
 
         JScrollPane scrollPane = new JScrollPane(versionsTable);
 
@@ -106,17 +108,21 @@ public class AddInstanceDialog {
         centerPanel.add(filterPanel, BorderLayout.EAST);
 
         JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        JButton addButton = new JButton("Add");
-        addButton.addActionListener(e -> {
+        this.addButton = new JButton("Add");
+        this.addButton.setEnabled(false);
+        this.addButton.addActionListener(e -> {
             String chosenGroupName = this.groupField.getText();
             playView.addInstanceItem(new InstanceItem(SwingUtils.getIcon("/grass_icon.png"), this.nameField.getText()), chosenGroupName);
             this.getDialog().dispose();
+            TableModel model = versionsTable.getModel();
+            int selectedRow = versionsTable.getSelectedRow();
+            String mcVersion = String.valueOf(model.getValueAt(selectedRow, 0));
             TESLauncher.instance.doTask(() -> {
                 InstanceManager instanceManager = TESLauncher.instance.getInstanceManager();
-                instanceManager.createInstance(this.nameField.getText(), chosenGroupName, "1.5.2");
+                instanceManager.createInstance(this.nameField.getText(), chosenGroupName, mcVersion);
             });
         });
-        buttonsPanel.add(addButton);
+        buttonsPanel.add(this.addButton);
         JButton cancelButton = new JButton("Cancel");
         buttonsPanel.add(cancelButton);
         buttonsPanel.setBorder(new EmptyBorder(0, 10, 6, 6));
@@ -147,6 +153,10 @@ public class AddInstanceDialog {
                 ((bounds.width - window.getWidth()) / 2) + bounds.x,
                 ((bounds.height - window.getHeight()) / 2) + bounds.y
         );
+    }
+
+    public JButton getAddButton() {
+        return this.addButton;
     }
 
     public JDialog getDialog() {

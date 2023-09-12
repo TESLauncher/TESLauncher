@@ -34,7 +34,7 @@ public class McVersionsTableModel extends DefaultTableModel {
 
     public static final String VM_V2 = "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json";
 
-    public McVersionsTableModel() {
+    public McVersionsTableModel(AddInstanceDialog dialog) {
         super(
                 new Object[][]{},
                 new Object[]{"Version", "Date released", "Type"}
@@ -75,6 +75,7 @@ public class McVersionsTableModel extends DefaultTableModel {
                 } catch (InterruptedException | ExecutionException e) {
                     throw new RuntimeException(e);
                 }
+                dialog.getAddButton().setEnabled(true);
             }
         }.execute();
     }
