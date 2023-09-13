@@ -22,6 +22,7 @@ import me.theentropyshard.teslauncher.gui.components.AddInstanceItem;
 import me.theentropyshard.teslauncher.gui.components.InstanceItem;
 import me.theentropyshard.teslauncher.gui.dialogs.AddInstanceDialog;
 import me.theentropyshard.teslauncher.instance.Instance;
+import me.theentropyshard.teslauncher.instance.InstanceManager;
 import me.theentropyshard.teslauncher.utils.SwingUtils;
 
 import javax.swing.*;
@@ -101,6 +102,10 @@ public class PlayView extends View {
     }
 
     public void addInstanceItem(InstanceItem item, String groupName) {
+        if (item instanceof AddInstanceItem) {
+            throw new IllegalArgumentException("Adding AddInstanceItem is not allowed");
+        }
+
         InstancesPanel panel = this.groups.get(groupName);
         if (panel == null) {
             AddInstanceItem addInstanceItem = new AddInstanceItem();
@@ -114,6 +119,13 @@ public class PlayView extends View {
             this.instancesPanelView.add(panel.getRoot(), groupName);
         }
         panel.addInstanceItem(item);
+
+        item.addListener(e -> {
+            InstanceItem clickedItem = (InstanceItem) e.getSource();
+            InstanceManager manager = TESLauncher.instance.getInstanceManager();
+
+            manager.runInstance(clickedItem.getTextLabel().getText());
+        }, true);
     }
 
     public PlayViewHeader getHeader() {

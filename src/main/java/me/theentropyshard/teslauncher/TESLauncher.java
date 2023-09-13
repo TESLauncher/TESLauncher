@@ -24,9 +24,11 @@ import me.theentropyshard.teslauncher.gui.AppWindow;
 import me.theentropyshard.teslauncher.gui.SettingsView;
 import me.theentropyshard.teslauncher.gui.playview.PlayView;
 import me.theentropyshard.teslauncher.instance.InstanceManager;
+import me.theentropyshard.teslauncher.utils.PathUtils;
 
 import javax.swing.*;
 import javax.swing.plaf.ColorUIResource;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.ExecutorService;
@@ -40,6 +42,9 @@ public class TESLauncher {
     private final Path workDir;
     private final Path minecraftDir;
     private final Path instancesDir;
+    private final Path clientsDir;
+    private final Path assetsDir;
+    private final Path librariesDir;
     private final InstanceManager instanceManager;
     private final ExecutorService taskPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
@@ -54,6 +59,16 @@ public class TESLauncher {
         this.workDir = Paths.get(System.getProperty("user.dir")).resolve("dev");
         this.minecraftDir = this.workDir.resolve("minecraft");
         this.instancesDir = this.minecraftDir.resolve("instances");
+        this.clientsDir = this.minecraftDir.resolve("clients");
+        this.assetsDir = this.minecraftDir.resolve("assets");
+        this.librariesDir = this.minecraftDir.resolve("libraries");
+
+        try {
+            this.prepareDirs();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
         this.instanceManager = new InstanceManager(this.instancesDir);
         this.instanceManager.loadInstances();
 
@@ -90,6 +105,15 @@ public class TESLauncher {
         });
     }
 
+    public void prepareDirs() throws IOException {
+        PathUtils.createDirectories(this.workDir);
+        PathUtils.createDirectories(this.minecraftDir);
+        PathUtils.createDirectories(this.clientsDir);
+        PathUtils.createDirectories(this.assetsDir);
+        PathUtils.createDirectories(this.instancesDir);
+        PathUtils.createDirectories(this.librariesDir);
+    }
+
     public void doTask(Runnable r) {
         this.taskPool.submit(r);
     }
@@ -100,5 +124,25 @@ public class TESLauncher {
 
     public Path getWorkDir() {
         return this.workDir;
+    }
+
+    public Path getMinecraftDir() {
+        return this.minecraftDir;
+    }
+
+    public Path getInstancesDir() {
+        return this.instancesDir;
+    }
+
+    public Path getClientsDir() {
+        return this.clientsDir;
+    }
+
+    public Path getAssetsDir() {
+        return this.assetsDir;
+    }
+
+    public Path getLibrariesDir() {
+        return this.librariesDir;
     }
 }

@@ -50,6 +50,10 @@ public class InstancesPanel extends View {
     }
 
     public void addInstanceItem(InstanceItem item) {
+        if (item instanceof AddInstanceItem) {
+            throw new IllegalArgumentException("Adding AddInstanceItem is not allowed");
+        }
+
         int count = this.instancesPanel.getComponentCount();
         this.instancesPanel.add(item, count - 1);
     }

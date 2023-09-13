@@ -98,6 +98,16 @@ public class InstanceManager {
         }
     }
 
+    public void saveInstance(Instance instance) {
+        Path instanceDir = this.workDir.resolve(instance.getName());
+        Path instanceFile = instanceDir.resolve("instance.json");
+        try {
+            Files.write(instanceFile, this.gson.toJson(instance).getBytes(StandardCharsets.UTF_8));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public Path getMcDirOfInstance(String name) {
         Instance instance = this.findInstanceByName(name);
         if (instance == null) {
@@ -125,7 +135,17 @@ public class InstanceManager {
         }
     }
 
-    private Instance findInstanceByName(String name) {
+    public void runInstance(String name) {
+        Instance instance = this.findInstanceByName(name);
+
+        if (instance == null) {
+            throw new InstanceNotFoundException(name);
+        }
+
+        new InstanceRunner(instance).start();
+    }
+
+    public Instance findInstanceByName(String name) {
         Instance instance = null;
         for (Instance inst : this.instances) {
             if (inst.getName().equals(name)) {
