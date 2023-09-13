@@ -111,15 +111,36 @@ public class AddInstanceDialog {
         this.addButton = new JButton("Add");
         this.addButton.setEnabled(false);
         this.addButton.addActionListener(e -> {
+            String instanceName = this.nameField.getText();
+            if (instanceName.trim().isEmpty()) {
+                JOptionPane.showMessageDialog(
+                        AddInstanceDialog.this.getDialog(),
+                        "Instance name cannot be empty",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE
+                );
+                return;
+            }
+
+            if (versionsTable.getSelectedRow() == -1) {
+                JOptionPane.showMessageDialog(
+                        AddInstanceDialog.this.getDialog(),
+                        "Minecraft version is not selected",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE
+                );
+                return;
+            }
+
             String chosenGroupName = this.groupField.getText();
-            playView.addInstanceItem(new InstanceItem(SwingUtils.getIcon("/grass_icon.png"), this.nameField.getText()), chosenGroupName);
+            playView.addInstanceItem(new InstanceItem(SwingUtils.getIcon("/grass_icon.png"), instanceName), chosenGroupName);
             this.getDialog().dispose();
             TableModel model = versionsTable.getModel();
             int selectedRow = versionsTable.getSelectedRow();
             String mcVersion = String.valueOf(model.getValueAt(selectedRow, 0));
             TESLauncher.instance.doTask(() -> {
                 InstanceManager instanceManager = TESLauncher.instance.getInstanceManager();
-                instanceManager.createInstance(this.nameField.getText(), chosenGroupName, mcVersion);
+                instanceManager.createInstance(instanceName, chosenGroupName, mcVersion);
             });
         });
         buttonsPanel.add(this.addButton);
