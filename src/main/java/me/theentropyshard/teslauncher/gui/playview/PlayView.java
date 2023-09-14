@@ -42,6 +42,7 @@ public class PlayView extends View {
     private final Map<String, InstancesPanel> groups;
     private final CardLayout cardLayout;
     private final DefaultComboBoxModel<String> model;
+    private final JProgressBar progressBar;
 
     public PlayView() {
         JPanel root = this.getRoot();
@@ -78,6 +79,11 @@ public class PlayView extends View {
                 this.cardLayout.show(this.instancesPanelView, groupName);
             }
         });
+
+        this.progressBar = new JProgressBar(JProgressBar.HORIZONTAL);
+        this.progressBar.setStringPainted(true);
+        this.progressBar.setVisible(false);
+        root.add(this.progressBar, BorderLayout.SOUTH);
 
         new SwingWorker<List<Instance>, Void>() {
             @Override
@@ -134,5 +140,9 @@ public class PlayView extends View {
 
     public InstancesPanel getDefaultInstancesPanel() {
         return this.defaultInstancesPanel;
+    }
+
+    public JProgressBar getProgressBar() {
+        return this.progressBar;
     }
 }

@@ -19,5 +19,38 @@ package me.theentropyshard.teslauncher;
 public class Main {
     public static void main(String[] args) {
         new TESLauncher(args);
+
+        /*
+        String url = "https://piston-data.mojang.com/v1/objects/0c3ec587af28e5a785c0b4a7b8a30f9a8f78f838/client.jar";
+        HttpClient client = new HttpClient();
+        client.setUserAgent(Http.USER_AGENT);
+
+        HttpRequest request = new HttpRequest();
+        request.setMethod(HttpMethod.GET);
+        request.setUrl(url);
+
+        try (HttpResponse response = client.send(request)) {
+            int contentLength = response.getContentLength();
+            int megs = contentLength / 1024 / 1024;
+            System.out.println("File size in MiB: " + megs);
+
+            InputStream inputStream = response.getInputStream();
+
+            byte[] buffer = new byte[4096];
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            int numRead;
+            long count = 0;
+            while ((numRead = inputStream.read(buffer)) != -1) {
+                baos.write(buffer, 0, numRead);
+                count += numRead;
+                System.out.println("Progress: " + (count / 1024 / 1024) + " / " + megs);
+            }
+            baos.flush();
+
+            System.out.println("Downloaded file");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        */
     }
 }
