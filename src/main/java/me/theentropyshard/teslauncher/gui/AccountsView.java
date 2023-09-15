@@ -16,6 +16,45 @@
 
 package me.theentropyshard.teslauncher.gui;
 
-public class AccountsView extends View {
+import com.formdev.flatlaf.FlatClientProperties;
+import me.theentropyshard.teslauncher.TESLauncher;
+import me.theentropyshard.teslauncher.gui.playview.PlayViewHeader;
 
+import javax.swing.*;
+import java.awt.*;
+
+public class AccountsView extends View {
+    public AccountsView() {
+        JPanel root = this.getRoot();
+
+        JLabel noticeLabel = new JLabel(
+                // @formatter:off
+                "<html>" +
+                    "<strong>Notice</strong>: Only offline accounts supported for now" +
+                "</html>"
+                // @formatter:on
+        );
+        noticeLabel.setHorizontalAlignment(JLabel.CENTER);
+        noticeLabel.setFont(noticeLabel.getFont().deriveFont(14.0f));
+        root.add(noticeLabel, BorderLayout.NORTH);
+
+        JPanel centerPanel = new JPanel();
+
+        JTextField usernameField = new JTextField();
+        Dimension size = usernameField.getPreferredSize();
+        usernameField.setPreferredSize(new Dimension(250, size.height));
+        usernameField.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Your nickname. Default is Player");
+        centerPanel.add(usernameField);
+
+        JButton addButton = new JButton("Add");
+        addButton.addActionListener(e -> {
+            String nickname = usernameField.getText();
+            PlayViewHeader.instance.getAccounts().addItem(nickname);
+            TESLauncher.instance.getAccountsManager().saveAccount(nickname);
+            usernameField.setText("");
+        });
+        centerPanel.add(addButton);
+
+        root.add(centerPanel, BorderLayout.CENTER);
+    }
 }

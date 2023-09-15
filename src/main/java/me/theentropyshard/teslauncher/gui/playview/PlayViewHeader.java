@@ -16,6 +16,7 @@
 
 package me.theentropyshard.teslauncher.gui.playview;
 
+import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.gui.View;
 
 import javax.swing.*;
@@ -25,7 +26,10 @@ public class PlayViewHeader extends View {
     private final JComboBox<String> instanceGroups;
     private final JComboBox<String> accounts;
 
+    public static PlayViewHeader instance;
+
     public PlayViewHeader() {
+        PlayViewHeader.instance = this;
         JPanel root = this.getRoot();
 
         JPanel leftSide = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -41,7 +45,10 @@ public class PlayViewHeader extends View {
         JLabel accountsLabel = new JLabel("Account:");
         rightSide.add(accountsLabel);
 
-        this.accounts = new JComboBox<>(new String[]{"TheEntropyShard", "TestAccount"});
+        this.accounts = new JComboBox<>(
+                TESLauncher.instance.getAccountsManager().getAccounts()
+                        .toArray(new String[0])
+        );
         rightSide.add(this.accounts);
 
         root.add(leftSide, BorderLayout.WEST);

@@ -18,6 +18,7 @@ package me.theentropyshard.teslauncher;
 
 import com.formdev.flatlaf.FlatDarculaLaf;
 import com.formdev.flatlaf.FlatIntelliJLaf;
+import me.theentropyshard.teslauncher.accounts.AccountsManager;
 import me.theentropyshard.teslauncher.gui.AboutView;
 import me.theentropyshard.teslauncher.gui.AccountsView;
 import me.theentropyshard.teslauncher.gui.AppWindow;
@@ -46,7 +47,8 @@ public class TESLauncher {
     private final Path assetsDir;
     private final Path librariesDir;
     private final InstanceManager instanceManager;
-    private final ExecutorService taskPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+    private final AccountsManager accountsManager;
+    private final ExecutorService taskPool;
 
     private boolean darkTheme;
 
@@ -71,6 +73,11 @@ public class TESLauncher {
 
         this.instanceManager = new InstanceManager(this.instancesDir);
         this.instanceManager.loadInstances();
+
+        this.accountsManager = new AccountsManager(this.workDir);
+        this.accountsManager.loadAccounts();
+
+        this.taskPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
         this.darkTheme = false;
 
@@ -120,6 +127,10 @@ public class TESLauncher {
 
     public InstanceManager getInstanceManager() {
         return this.instanceManager;
+    }
+
+    public AccountsManager getAccountsManager() {
+        return this.accountsManager;
     }
 
     public Path getWorkDir() {

@@ -36,4 +36,13 @@ public final class PathUtils {
     private PathUtils() {
         throw new UnsupportedOperationException();
     }
+
+    public static Path createFile(Path file) throws IOException {
+        if (Files.exists(file)) {
+            return file;
+        }
+
+        PathUtils.createDirectories(file.getParent());
+        return Files.createFile(file);
+    }
 }
