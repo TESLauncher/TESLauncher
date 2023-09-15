@@ -32,6 +32,10 @@ public class AddInstanceDialog {
     private final JTextField nameField;
     private final JTextField groupField;
     private final JButton addButton;
+    private final JCheckBox releasesBox;
+    private final JCheckBox snapshotsBox;
+    private final JCheckBox betasBox;
+    private final JCheckBox alphasBox;
 
     public AddInstanceDialog(PlayView playView, String groupName) {
         JPanel root = new JPanel(new BorderLayout());
@@ -64,7 +68,9 @@ public class AddInstanceDialog {
 
         root.add(headerPanel, BorderLayout.NORTH);
 
-        JTable versionsTable = new JTable(new McVersionsTableModel(this));
+        JTable versionsTable = new JTable();
+        McVersionsTableModel tableModel = new McVersionsTableModel(this, versionsTable);
+        versionsTable.setModel(tableModel);
 
         JScrollPane scrollPane = new JScrollPane(versionsTable);
 
@@ -82,20 +88,20 @@ public class AddInstanceDialog {
 
         gbc.anchor = GridBagConstraints.WEST;
 
-        JCheckBox releasesBox = new JCheckBox("Releases");
-        JCheckBox snapshotsBox = new JCheckBox("Snapshots");
-        JCheckBox betasBox = new JCheckBox("Betas");
-        JCheckBox alphasBox = new JCheckBox("Alphas");
+        this.releasesBox = new JCheckBox("Releases", true);
+        this.snapshotsBox = new JCheckBox("Snapshots");
+        this.betasBox = new JCheckBox("Betas");
+        this.alphasBox = new JCheckBox("Alphas");
         JCheckBox experimentsBox = new JCheckBox("Experiments");
 
         gbc.gridy = 1;
-        filterPanel.add(releasesBox, gbc);
+        filterPanel.add(this.releasesBox, gbc);
         gbc.gridy = 2;
-        filterPanel.add(snapshotsBox, gbc);
+        filterPanel.add(this.snapshotsBox, gbc);
         gbc.gridy = 3;
-        filterPanel.add(betasBox, gbc);
+        filterPanel.add(this.betasBox, gbc);
         gbc.gridy = 4;
-        filterPanel.add(alphasBox, gbc);
+        filterPanel.add(this.alphasBox, gbc);
 
         gbc.gridy = 5;
         gbc.anchor = GridBagConstraints.NORTHWEST;
@@ -185,5 +191,21 @@ public class AddInstanceDialog {
 
     public JDialog getDialog() {
         return this.dialog;
+    }
+
+    public JCheckBox getReleasesBox() {
+        return this.releasesBox;
+    }
+
+    public JCheckBox getSnapshotsBox() {
+        return this.snapshotsBox;
+    }
+
+    public JCheckBox getBetasBox() {
+        return this.betasBox;
+    }
+
+    public JCheckBox getAlphasBox() {
+        return this.alphasBox;
     }
 }

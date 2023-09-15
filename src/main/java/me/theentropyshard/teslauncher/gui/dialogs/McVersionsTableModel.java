@@ -24,17 +24,19 @@ import me.theentropyshard.teslauncher.utils.Http;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Function;
 
 public class McVersionsTableModel extends DefaultTableModel {
 
     public static final String VM_V2 = "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json";
 
-    public McVersionsTableModel(AddInstanceDialog dialog) {
+    public McVersionsTableModel(AddInstanceDialog dialog, JTable table) {
         super(
                 new Object[][]{},
                 new Object[]{"Version", "Date released", "Type"}
@@ -72,6 +74,46 @@ public class McVersionsTableModel extends DefaultTableModel {
                                 rowData.get(2)
                         });
                     }
+
+
+                    TableRowSorter<McVersionsTableModel> rowSorter = new TableRowSorter<>(McVersionsTableModel.this);
+
+                    JCheckBox releasesBox = dialog.getReleasesBox();
+                    releasesBox.addActionListener(e -> rowSorter.sort());
+                    JCheckBox snapshotsBox = dialog.getSnapshotsBox();
+                    snapshotsBox.addActionListener(e -> rowSorter.sort());
+                    JCheckBox betasBox = dialog.getBetasBox();
+                    betasBox.addActionListener(e -> rowSorter.sort());
+                    JCheckBox alphasBox = dialog.getAlphasBox();
+                    alphasBox.addActionListener(e -> rowSorter.sort());
+                    rowSorter.setRowFilter(RowFilter.orFilter(Arrays.asList(
+                            new RowFilter<McVersionsTableModel, Integer>() {
+                                @Override
+                                public boolean include(Entry<? extends McVersionsTableModel, ? extends Integer> entry) {
+                                    return releasesBox.isSelected() && entry.getStringValue(2).equals("release");
+                                }
+                            },
+                            new RowFilter<McVersionsTableModel, Integer>() {
+                                @Override
+                                public boolean include(Entry<? extends McVersionsTableModel, ? extends Integer> entry) {
+                                    return snapshotsBox.isSelected() && entry.getStringValue(2).equals("snapshot");
+                                }
+                            },
+                            new RowFilter<McVersionsTableModel, Integer>() {
+                                @Override
+                                public boolean include(Entry<? extends McVersionsTableModel, ? extends Integer> entry) {
+                                    return betasBox.isSelected() && entry.getStringValue(2).equals("old_beta");
+                                }
+                            },
+                            new RowFilter<McVersionsTableModel, Integer>() {
+                                @Override
+                                public boolean include(Entry<? extends McVersionsTableModel, ? extends Integer> entry) {
+                                    return alphasBox.isSelected() && entry.getStringValue(2).equals("old_alpha");
+                                }
+                            }
+                    )));
+
+                    table.setRowSorter(rowSorter);
                 } catch (InterruptedException | ExecutionException e) {
                     throw new RuntimeException(e);
                 }
