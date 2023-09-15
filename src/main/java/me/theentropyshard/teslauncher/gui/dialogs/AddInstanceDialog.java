@@ -143,6 +143,7 @@ public class AddInstanceDialog {
             this.getDialog().dispose();
             TableModel model = versionsTable.getModel();
             int selectedRow = versionsTable.getSelectedRow();
+            selectedRow = versionsTable.convertRowIndexToModel(selectedRow);
             String mcVersion = String.valueOf(model.getValueAt(selectedRow, 0));
             TESLauncher.instance.doTask(() -> {
                 InstanceManager instanceManager = TESLauncher.instance.getInstanceManager();
