@@ -28,4 +28,7 @@ public final class VersionInfo {
     public final List<String> jvmArgs = new ArrayList<>();
     public final List<String> gameArgs = new ArrayList<>();
     public final List<String> librariesPaths = new ArrayList<>();
+    public String logArgument;
+    public String logConfigUrl;
+    public String logConfigId;
 }

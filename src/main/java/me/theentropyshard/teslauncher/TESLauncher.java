@@ -46,6 +46,7 @@ public class TESLauncher {
     private final Path clientsDir;
     private final Path assetsDir;
     private final Path librariesDir;
+    private final Path log4j2ConfigsDir;
     private final InstanceManager instanceManager;
     private final AccountsManager accountsManager;
     private final ExecutorService taskPool;
@@ -64,6 +65,7 @@ public class TESLauncher {
         this.clientsDir = this.minecraftDir.resolve("clients");
         this.assetsDir = this.minecraftDir.resolve("assets");
         this.librariesDir = this.minecraftDir.resolve("libraries");
+        this.log4j2ConfigsDir = this.minecraftDir.resolve("log4j2");
 
         try {
             this.prepareDirs();
@@ -119,6 +121,7 @@ public class TESLauncher {
         PathUtils.createDirectories(this.assetsDir);
         PathUtils.createDirectories(this.instancesDir);
         PathUtils.createDirectories(this.librariesDir);
+        PathUtils.createDirectories(this.log4j2ConfigsDir);
     }
 
     public void doTask(Runnable r) {
@@ -155,5 +158,9 @@ public class TESLauncher {
 
     public Path getLibrariesDir() {
         return this.librariesDir;
+    }
+
+    public Path getLog4j2ConfigsDir() {
+        return this.log4j2ConfigsDir;
     }
 }

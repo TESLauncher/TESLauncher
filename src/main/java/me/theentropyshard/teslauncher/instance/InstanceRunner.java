@@ -24,6 +24,7 @@ import me.theentropyshard.teslauncher.gson.VersionInfoDeserializer;
 import me.theentropyshard.teslauncher.minecraft.MinecraftDownloader;
 import me.theentropyshard.teslauncher.minecraft.models.VersionInfo;
 import me.theentropyshard.teslauncher.utils.EnumOS;
+import me.theentropyshard.teslauncher.utils.Http;
 import me.theentropyshard.teslauncher.utils.PathUtils;
 import org.apache.commons.text.StringSubstitutor;
 
@@ -34,7 +35,10 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class InstanceRunner extends Thread {
     private final Instance instance;
@@ -86,12 +90,20 @@ public class InstanceRunner extends Thread {
             }
             classpath.add(clientsDir.resolve(versionInfo.id).resolve(versionInfo.id + ".jar").toAbsolutePath().toString());
 
+            Path log4j2ConfigsDir = TESLauncher.instance.getLog4j2ConfigsDir();
+            Path log4j2ConfigFile = log4j2ConfigsDir.resolve(versionInfo.logConfigId);
+            if (!Files.exists(log4j2ConfigFile)) {
+                byte[] bytes = Http.get(versionInfo.logConfigUrl);
+                Files.write(log4j2ConfigFile, bytes);
+            }
+
             Map<String, Object> argVars = new HashMap<>();
             // JVM
             argVars.put("natives_directory", tmpNativesDir.toAbsolutePath().toString());
             argVars.put("launcher_name", "TESLauncher");
             argVars.put("launcher_version", "1.0.0");
             argVars.put("classpath", String.join(File.pathSeparator, classpath));
+            argVars.put("path", log4j2ConfigFile.toAbsolutePath().toString());
 
             // Game
             if (versionInfo.newFormat) {
@@ -106,9 +118,7 @@ public class InstanceRunner extends Thread {
                 argVars.put("auth_access_token", "-");
                 argVars.put("user_type", "msa");
                 argVars.put("version_type", versionInfo.type);
-                argVars.put("path", System.getProperty("user.dir"));
             } else {
-                argVars.put("path", System.getProperty("user.dir"));
                 argVars.put("auth_uuid", "-");
                 argVars.put("auth_access_token", "-");
                 argVars.put("auth_session", "-");
@@ -151,6 +161,7 @@ public class InstanceRunner extends Thread {
             System.out.println("Starting Minecraft with the command:\n" + command);
 
             ProcessBuilder processBuilder = new ProcessBuilder(command);
+            processBuilder.directory(instanceManager.getMcDirOfInstance(this.instance.getName()).getParent().toAbsolutePath().toFile());
             processBuilder.redirectErrorStream(true);
             Process process = processBuilder.start();
             InputStream inputStream = process.getInputStream();

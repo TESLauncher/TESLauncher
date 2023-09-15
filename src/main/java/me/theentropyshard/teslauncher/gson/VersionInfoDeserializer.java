@@ -93,6 +93,15 @@ public class VersionInfoDeserializer implements JsonDeserializer<VersionInfo> {
         }
         versionInfo.librariesPaths.addAll(libs);
 
+        if (root.has("logging")) {
+            JsonObject loggingObject = root.getAsJsonObject("logging");
+            JsonObject clientObject = loggingObject.getAsJsonObject("client");
+            versionInfo.logArgument = clientObject.get("argument").getAsString();
+            JsonObject fileObject = clientObject.getAsJsonObject("file");
+            versionInfo.logConfigId = fileObject.get("id").getAsString();
+            versionInfo.logConfigUrl = fileObject.get("url").getAsString();
+        }
+
         return versionInfo;
     }
 }
