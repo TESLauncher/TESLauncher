@@ -92,20 +92,27 @@ public class MinecraftDownloader {
     }
 
     private void downloadClient(String versionId, String url) throws IOException {
-        byte[] bytes = Http.get(url);
-        try (FileOutputStream fos = new FileOutputStream(this.clientsDir.resolve(versionId).resolve(versionId + ".json").toFile())) {
-            fos.write(bytes);
+        File jsonFile = this.clientsDir.resolve(versionId).resolve(versionId + ".json").toFile();
+        if (!jsonFile.exists()) {
+            byte[] bytes = Http.get(url);
+            try (FileOutputStream fos = new FileOutputStream(jsonFile)) {
+                fos.write(bytes);
+            }
         }
 
-        Map<String, Object> map = this.gson.fromJson(MinecraftDownloader.getReader(bytes), Map.class);
+        FileInputStream fileInputStream = new FileInputStream(jsonFile);
+        Map<String, Object> map = this.gson.fromJson(new InputStreamReader(fileInputStream, StandardCharsets.UTF_8), Map.class);
         Map<String, Object> downloads = (Map<String, Object>) map.get("downloads");
         Map<String, Object> client = (Map<String, Object>) downloads.get("client");
         String clientUrl = (String) client.get("url");
-        byte[] clientBytes = Http.get(clientUrl);
-        try (FileOutputStream fos = new FileOutputStream(this.clientsDir.resolve(versionId).resolve(versionId + ".jar").toFile())) {
-            fos.write(clientBytes);
-        }
+        File jarFile = this.clientsDir.resolve(versionId).resolve(versionId + ".jar").toFile();
 
+        if (!jarFile.exists()) {
+            byte[] clientBytes = Http.get(clientUrl);
+            try (FileOutputStream fos = new FileOutputStream(jarFile)) {
+                fos.write(clientBytes);
+            }
+        }
     }
 
     private void downloadLibraries(String versionId, String url) throws IOException {
@@ -119,11 +126,15 @@ public class MinecraftDownloader {
             if (artifact != null) {
                 String path = (String) artifact.get("path");
                 String libraryUrl = (String) artifact.get("url");
-                byte[] libraryBytes = Http.get(libraryUrl);
+
                 Path resolvedPath = this.librariesDir.resolve(path);
                 PathUtils.createDirectories(resolvedPath.getParent());
-                try (FileOutputStream fos = new FileOutputStream(resolvedPath.toFile())) {
-                    fos.write(libraryBytes);
+                File file = resolvedPath.toFile();
+                if (!file.exists()) {
+                    byte[] libraryBytes = Http.get(libraryUrl);
+                    try (FileOutputStream fos = new FileOutputStream(file)) {
+                        fos.write(libraryBytes);
+                    }
                 }
             }
 
@@ -133,11 +144,14 @@ public class MinecraftDownloader {
                 if (classifier != null) {
                     String path = (String) classifier.get("path");
                     String libraryUrl = (String) classifier.get("url");
-                    byte[] libraryBytes = Http.get(libraryUrl);
                     Path resolvedPath = this.nativesDir.resolve(versionId).resolve(path);
                     PathUtils.createDirectories(resolvedPath.getParent());
-                    try (FileOutputStream fos = new FileOutputStream(resolvedPath.toFile())) {
-                        fos.write(libraryBytes);
+                    File file = resolvedPath.toFile();
+                    if (!file.exists()) {
+                        byte[] libraryBytes = Http.get(libraryUrl);
+                        try (FileOutputStream fos = new FileOutputStream(file)) {
+                            fos.write(libraryBytes);
+                        }
                     }
                 }
             }
