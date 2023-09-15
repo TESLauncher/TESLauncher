@@ -107,6 +107,8 @@ public class InstanceRunner extends Thread {
                 argVars.put("user_type", "msa");
                 argVars.put("version_type", versionInfo.type);
             } else {
+                argVars.put("auth_uuid", "-");
+                argVars.put("auth_access_token", "-");
                 argVars.put("auth_session", "-");
                 argVars.put("user_properties", "-");
                 argVars.put("game_directory", mcDirOfInstance.toAbsolutePath().toString());
