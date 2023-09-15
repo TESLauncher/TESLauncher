@@ -106,7 +106,9 @@ public class InstanceRunner extends Thread {
                 argVars.put("auth_access_token", "-");
                 argVars.put("user_type", "msa");
                 argVars.put("version_type", versionInfo.type);
+                argVars.put("path", System.getProperty("user.dir"));
             } else {
+                argVars.put("path", System.getProperty("user.dir"));
                 argVars.put("auth_uuid", "-");
                 argVars.put("auth_access_token", "-");
                 argVars.put("auth_session", "-");
