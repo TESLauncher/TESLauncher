@@ -14,10 +14,25 @@
  * limitations under the License.
  */
 
-package me.theentropyshard.teslauncher;
+package me.theentropyshard.teslauncher.version.list;
 
-public class Main {
-    public static void main(String[] args) {
-        new TESLauncher(args);
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+
+public class LocalVersionList extends AbstractVersionList {
+    private final Path jsonFile;
+
+    public LocalVersionList(Path jsonFile) {
+        this.jsonFile = jsonFile;
+    }
+
+    @Override
+    public String getJson() throws IOException {
+        List<String> lines = Files.readAllLines(this.jsonFile, StandardCharsets.UTF_8);
+
+        return String.join("\n", lines);
     }
 }

@@ -20,7 +20,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.accounts.AccountsManager;
-import me.theentropyshard.teslauncher.gson.VersionInfoDeserializer;
+import me.theentropyshard.teslauncher.gson.DetailedVersionInfoDeserializerOld;
 import me.theentropyshard.teslauncher.minecraft.MinecraftDownloader;
 import me.theentropyshard.teslauncher.minecraft.models.VersionInfo;
 import me.theentropyshard.teslauncher.utils.EnumOS;
@@ -77,7 +77,7 @@ public class InstanceRunner extends Thread {
             Path clientJson = clientsDir.resolve(this.instance.getMinecraftVersion())
                     .resolve(this.instance.getMinecraftVersion() + ".json");
             Gson gson = new GsonBuilder()
-                    .registerTypeAdapter(VersionInfo.class, new VersionInfoDeserializer())
+                    .registerTypeAdapter(VersionInfo.class, new DetailedVersionInfoDeserializerOld())
                     .create();
             VersionInfo versionInfo = gson.fromJson(new InputStreamReader(
                     Files.newInputStream(clientJson),
@@ -90,20 +90,28 @@ public class InstanceRunner extends Thread {
             }
             classpath.add(clientsDir.resolve(versionInfo.id).resolve(versionInfo.id + ".jar").toAbsolutePath().toString());
 
-            Path log4j2ConfigsDir = TESLauncher.instance.getLog4j2ConfigsDir();
-            Path log4j2ConfigFile = log4j2ConfigsDir.resolve(versionInfo.logConfigId);
-            if (!Files.exists(log4j2ConfigFile)) {
-                byte[] bytes = Http.get(versionInfo.logConfigUrl);
-                Files.write(log4j2ConfigFile, bytes);
+            Map<String, Object> argVars = new HashMap<>();
+
+            boolean hasLogInfo = versionInfo.logConfigId != null && versionInfo.logConfigUrl != null &&
+                    versionInfo.logArgument != null;
+
+            if (hasLogInfo) {
+                Path log4j2ConfigsDir = TESLauncher.instance.getLog4j2ConfigsDir();
+
+                Path log4j2ConfigFile = log4j2ConfigsDir.resolve(versionInfo.logConfigId);
+                if (!Files.exists(log4j2ConfigFile)) {
+                    byte[] bytes = Http.get(versionInfo.logConfigUrl);
+                    Files.write(log4j2ConfigFile, bytes);
+                }
+
+                argVars.put("path", log4j2ConfigFile.toAbsolutePath().toString());
             }
 
-            Map<String, Object> argVars = new HashMap<>();
             // JVM
             argVars.put("natives_directory", tmpNativesDir.toAbsolutePath().toString());
             argVars.put("launcher_name", "TESLauncher");
             argVars.put("launcher_version", "1.0.0");
             argVars.put("classpath", String.join(File.pathSeparator, classpath));
-            argVars.put("path", log4j2ConfigFile.toAbsolutePath().toString());
 
             // Game
             if (versionInfo.newFormat) {
@@ -139,6 +147,11 @@ public class InstanceRunner extends Thread {
             StringSubstitutor substitutor = new StringSubstitutor(argVars);
 
             List<String> jvmArgs = new ArrayList<>();
+
+            if (hasLogInfo) {
+                jvmArgs.add(versionInfo.logArgument);
+            }
+
             for (String arg : versionInfo.jvmArgs) {
                 jvmArgs.add(substitutor.replace(arg));
             }

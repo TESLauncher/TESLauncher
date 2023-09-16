@@ -17,25 +17,15 @@
 package me.theentropyshard.teslauncher.gson;
 
 import com.google.gson.JsonObject;
-import me.theentropyshard.teslauncher.version.VersionType;
-import me.theentropyshard.teslauncher.version.model.VersionInfo;
+import me.theentropyshard.teslauncher.version.model.DetailedVersionInfo;
 
-import java.time.OffsetDateTime;
-
-public class VersionInfoDeserializer extends AbstractJsonDeserializer<VersionInfo> {
-    public VersionInfoDeserializer() {
+public class DetailedVersionInfoDeserializer extends AbstractJsonDeserializer<DetailedVersionInfo> {
+    public DetailedVersionInfoDeserializer() {
 
     }
 
     @Override
-    public VersionInfo deserialize(JsonObject root) {
-        return new VersionInfo(
-                root.get("id").getAsString(),
-                VersionType.byJsonName(root.get("type").getAsString()),
-                OffsetDateTime.parse(root.get("releaseTime").getAsString()),
-                root.get("url").getAsString(),
-                root.get("sha1").getAsString(),
-                root.get("complianceLevel").getAsInt() == 1
-        );
+    public DetailedVersionInfo deserialize(JsonObject root) {
+        return null;
     }
 }

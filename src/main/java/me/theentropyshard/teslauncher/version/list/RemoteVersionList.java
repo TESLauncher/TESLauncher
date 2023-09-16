@@ -14,10 +14,22 @@
  * limitations under the License.
  */
 
-package me.theentropyshard.teslauncher;
+package me.theentropyshard.teslauncher.version.list;
 
-public class Main {
-    public static void main(String[] args) {
-        new TESLauncher(args);
+import me.theentropyshard.teslauncher.utils.Http;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+
+public class RemoteVersionList extends AbstractVersionList {
+    private final String url;
+
+    public RemoteVersionList(String url) {
+        this.url = url;
+    }
+
+    @Override
+    public String getJson() throws IOException {
+        return new String(Http.get(this.url), StandardCharsets.UTF_8);
     }
 }

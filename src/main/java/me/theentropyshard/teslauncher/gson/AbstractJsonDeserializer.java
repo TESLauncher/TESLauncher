@@ -14,10 +14,17 @@
  * limitations under the License.
  */
 
-package me.theentropyshard.teslauncher;
+package me.theentropyshard.teslauncher.gson;
 
-public class Main {
-    public static void main(String[] args) {
-        new TESLauncher(args);
+import com.google.gson.*;
+
+import java.lang.reflect.Type;
+
+public abstract class AbstractJsonDeserializer<T> implements JsonDeserializer<T> {
+    public abstract T deserialize(JsonObject root);
+
+    @Override
+    public T deserialize(JsonElement element, Type type, JsonDeserializationContext ctx) throws JsonParseException {
+        return this.deserialize(element.getAsJsonObject());
     }
 }
