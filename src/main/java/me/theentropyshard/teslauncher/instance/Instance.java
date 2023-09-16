@@ -19,12 +19,8 @@ package me.theentropyshard.teslauncher.instance;
 public class Instance {
     private String name;
     private String groupName;
+    private String minecraftVersion;
     private boolean wasEverPlayed;
-    private final String minecraftVersion;
-
-    public Instance(String minecraftVersion) {
-        this.minecraftVersion = minecraftVersion;
-    }
 
     public Instance(String name, String groupName, String minecraftVersion) {
         this.name = name;
@@ -50,6 +46,10 @@ public class Instance {
 
     public String getMinecraftVersion() {
         return this.minecraftVersion;
+    }
+
+    public void setMinecraftVersion(String minecraftVersion) {
+        this.minecraftVersion = minecraftVersion;
     }
 
     public boolean wasEverPlayed() {
