@@ -16,12 +16,14 @@
 
 package me.theentropyshard.teslauncher.version.model;
 
+import java.util.List;
+
 public class VersionManifest {
     private final String latestReleaseId;
     private final String latestSnapshotId;
-    private final VersionInfo[] versions;
+    private final List<VersionInfo> versions;
 
-    public VersionManifest(String latestReleaseId, String latestSnapshotId, VersionInfo[] versions) {
+    public VersionManifest(String latestReleaseId, String latestSnapshotId, List<VersionInfo> versions) {
         this.latestReleaseId = latestReleaseId;
         this.latestSnapshotId = latestSnapshotId;
         this.versions = versions;
@@ -35,7 +37,7 @@ public class VersionManifest {
         return this.latestSnapshotId;
     }
 
-    public VersionInfo[] getVersions() {
+    public List<VersionInfo> getVersions() {
         return this.versions;
     }
 }

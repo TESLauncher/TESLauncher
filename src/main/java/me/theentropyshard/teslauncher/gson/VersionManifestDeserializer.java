@@ -45,7 +45,7 @@ public class VersionManifestDeserializer extends AbstractJsonDeserializer<Versio
         return new VersionManifest(
                 latestObject.get("release").getAsString(),
                 latestObject.get("snapshot").getAsString(),
-                versions.toArray(new VersionInfo[0])
+                versions
         );
     }
 }
