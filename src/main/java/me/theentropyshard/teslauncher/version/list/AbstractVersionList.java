@@ -50,7 +50,7 @@ public abstract class AbstractVersionList implements VersionList {
     public void load() throws IOException {
         String json = this.getJson();
         VersionManifest versionManifest = this.gson.fromJson(json, VersionManifest.class);
-        VersionInfo[] versions = versionManifest.getVersions();
+        List<VersionInfo> versions = versionManifest.getVersions();
 
         for (VersionInfo version : versions) {
             this.versions.add(version);
