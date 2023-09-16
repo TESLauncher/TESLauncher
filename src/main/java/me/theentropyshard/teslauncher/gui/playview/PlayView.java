@@ -130,7 +130,7 @@ public class PlayView extends View {
             InstanceItem clickedItem = (InstanceItem) e.getSource();
             InstanceManager manager = TESLauncher.instance.getInstanceManager();
 
-            manager.runInstance(clickedItem.getTextLabel().getText());
+            // TODO manager.runInstance(clickedItem.getTextLabel().getText());
         }, true);
     }
 

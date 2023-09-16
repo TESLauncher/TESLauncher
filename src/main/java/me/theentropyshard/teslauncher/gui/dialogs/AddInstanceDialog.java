@@ -26,6 +26,7 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableModel;
 import java.awt.*;
+import java.io.IOException;
 
 public class AddInstanceDialog {
     private final JDialog dialog;
@@ -147,7 +148,11 @@ public class AddInstanceDialog {
             String mcVersion = String.valueOf(model.getValueAt(selectedRow, 0));
             TESLauncher.instance.doTask(() -> {
                 InstanceManager instanceManager = TESLauncher.instance.getInstanceManager();
-                instanceManager.createInstance(instanceName, chosenGroupName, mcVersion);
+                try {
+                    instanceManager.createInstance(instanceName, chosenGroupName, mcVersion);
+                } catch (IOException ex) {
+                    throw new RuntimeException("Unable to create new instance", ex);
+                }
             });
         });
         buttonsPanel.add(this.addButton);

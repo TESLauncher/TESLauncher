@@ -25,6 +25,7 @@ import me.theentropyshard.teslauncher.gui.AppWindow;
 import me.theentropyshard.teslauncher.gui.SettingsView;
 import me.theentropyshard.teslauncher.gui.playview.PlayView;
 import me.theentropyshard.teslauncher.instance.InstanceManager;
+import me.theentropyshard.teslauncher.instance.InstanceManagerImpl;
 import me.theentropyshard.teslauncher.utils.PathUtils;
 
 import javax.swing.*;
@@ -70,11 +71,15 @@ public class TESLauncher {
         try {
             this.prepareDirs();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Unable to create launcher directories", e);
         }
 
-        this.instanceManager = new InstanceManager(this.instancesDir);
-        this.instanceManager.loadInstances();
+        this.instanceManager = new InstanceManagerImpl(this.instancesDir);
+        try {
+            this.instanceManager.load();
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to load instances", e);
+        }
 
         this.accountsManager = new AccountsManager(this.workDir);
         this.accountsManager.loadAccounts();

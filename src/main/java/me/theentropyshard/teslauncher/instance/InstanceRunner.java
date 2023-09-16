@@ -52,7 +52,7 @@ public class InstanceRunner extends Thread {
         try {
             TESLauncher launcher = TESLauncher.instance;
             InstanceManager instanceManager = launcher.getInstanceManager();
-            Path mcDirOfInstance = PathUtils.createDirectories(instanceManager.getMcDirOfInstance(this.instance.getName()));
+            Path mcDirOfInstance = PathUtils.createDirectories(instanceManager.getMinecraftDir(this.instance));
             Path tmpNativesDir = PathUtils.createDirectories(
                     launcher.getInstancesDir().resolve(this.instance.getName()).resolve("natives-tmp")
                             .resolve(this.instance.getMinecraftVersion())
@@ -71,7 +71,7 @@ public class InstanceRunner extends Thread {
                 downloader.downloadMinecraft(this.instance.getMinecraftVersion());
 
                 this.instance.setWasEverPlayed(true);
-                instanceManager.saveInstance(this.instance);
+                instanceManager.save(this.instance);
             }
 
             Path clientJson = clientsDir.resolve(this.instance.getMinecraftVersion())
@@ -174,7 +174,7 @@ public class InstanceRunner extends Thread {
             System.out.println("Starting Minecraft with the command:\n" + command);
 
             ProcessBuilder processBuilder = new ProcessBuilder(command);
-            processBuilder.directory(instanceManager.getMcDirOfInstance(this.instance.getName()).getParent().toAbsolutePath().toFile());
+            processBuilder.directory(instanceManager.getMinecraftDir(this.instance).getParent().toAbsolutePath().toFile());
             processBuilder.redirectErrorStream(true);
             Process process = processBuilder.start();
             InputStream inputStream = process.getInputStream();
