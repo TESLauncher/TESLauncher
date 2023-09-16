@@ -16,9 +16,14 @@
 
 package me.theentropyshard.teslauncher.utils;
 
+import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 public final class PathUtils {
     public static Path createDirectories(Path path) throws IOException {
@@ -44,5 +49,26 @@ public final class PathUtils {
 
         PathUtils.createDirectories(file.getParent());
         return Files.createFile(file);
+    }
+
+    // Slightly changed from https://stackoverflow.com/a/54712447/19857533
+    public static String sha1(Path path) throws IOException {
+        if (!Files.isRegularFile(path)) {
+            throw new IllegalArgumentException("Can compute SHA-1 only for files!");
+        }
+
+        MessageDigest digest;
+        try {
+            digest = MessageDigest.getInstance("SHA-1");
+        } catch (NoSuchAlgorithmException e) {
+            throw new IOException("Impossible to get SHA-1 digester", e);
+        }
+
+        try (InputStream input = Files.newInputStream(path);
+             DigestInputStream digestStream = new DigestInputStream(input, digest)) {
+            while (digestStream.read() != -1);
+            digest = digestStream.getMessageDigest();
+            return new HexBinaryAdapter().marshal(digest.digest());
+        }
     }
 }
