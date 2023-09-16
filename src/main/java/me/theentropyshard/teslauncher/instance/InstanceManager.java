@@ -110,6 +110,10 @@ public class InstanceManager {
 
     public Path getMcDirOfInstance(String name) {
         Instance instance = this.findInstanceByName(name);
+        return this.getMinecraftDirectoryOfInstance(instance);
+    }
+
+    public Path getMinecraftDirectoryOfInstance(Instance instance) {
         if (instance == null) {
             return null;
         }
