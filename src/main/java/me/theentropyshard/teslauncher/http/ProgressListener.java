@@ -16,7 +16,7 @@
 
 package me.theentropyshard.teslauncher.http;
 
-public enum HttpMethod {
-    GET,
-    POST
+@FunctionalInterface
+public interface ProgressListener {
+    void onProgress(long bytesRead, long contentLength, boolean done);
 }
