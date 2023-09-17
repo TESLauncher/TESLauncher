@@ -35,9 +35,14 @@ public final class Http {
     }
 
     public static byte[] get(String url) throws IOException {
+        return Http.get(url, new NopProgressListener());
+    }
+
+    public static byte[] get(String url, ProgressListener listener) throws IOException {
         HttpURLConnection c = Http.buildConnection(url, Http.GET_METHOD);
 
-        return Http.inputStreamToByteArray(c.getErrorStream() == null ? c.getInputStream() : c.getErrorStream());
+        return Http.inputStreamToByteArray(c.getErrorStream() == null ? c.getInputStream() : c.getErrorStream(),
+                listener, c);
     }
 
     public static byte[] post(String url, String contentType, byte[] payload) throws IOException {
@@ -45,24 +50,44 @@ public final class Http {
         c.setRequestProperty("Content-Type", contentType);
         c.setRequestProperty("Content-Length", String.valueOf(payload.length));
         c.setDoOutput(true);
+
         OutputStream outputStream = c.getOutputStream();
         outputStream.write(payload);
         outputStream.flush();
 
-        return Http.inputStreamToByteArray(c.getErrorStream() == null ? c.getInputStream() : c.getErrorStream());
+        return Http.inputStreamToByteArray(c.getErrorStream() == null ? c.getInputStream() : c.getErrorStream(),
+                new NopProgressListener(), c);
     }
 
-    private static byte[] inputStreamToByteArray(InputStream inputStream) throws IOException {
+    private static byte[] inputStreamToByteArray(InputStream inputStream, ProgressListener listener, HttpURLConnection c) throws IOException {
+        long contentLengthLong = c.getContentLengthLong();
+
         byte[] buffer = new byte[8192];
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try (BufferedInputStream bis = new BufferedInputStream(inputStream)) {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        try (BufferedInputStream input = new BufferedInputStream(inputStream)) {
+            long count = 0L;
             int numRead;
-            while ((numRead = bis.read(buffer, 0, 8192)) != -1) {
-                baos.write(buffer, 0, numRead);
-            }
+            do {
+                numRead = input.read(buffer, 0, 8192);
+                if (numRead != -1) {
+                    count += numRead;
+                    output.write(buffer, 0, numRead);
+                }
+                listener.onData(contentLengthLong, count, numRead == -1);
+            } while (numRead != -1);
         }
 
-        return baos.toByteArray();
+        return output.toByteArray();
+    }
+
+    public interface ProgressListener {
+        void onData(long totalBytes, long currentBytes, boolean done);
+    }
+
+    public static final class NopProgressListener implements ProgressListener {
+        public void onData(long totalBytes, long currentBytes, boolean done) {
+            // No-operation progress listener
+        }
     }
 
     private Http() {

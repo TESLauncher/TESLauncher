@@ -108,7 +108,14 @@ public class MinecraftDownloader {
         File jarFile = this.clientsDir.resolve(versionId).resolve(versionId + ".jar").toFile();
 
         if (!jarFile.exists()) {
-            byte[] clientBytes = Http.get(clientUrl);
+            System.out.println("Downloading " + versionId + ".jar...");
+            byte[] clientBytes = Http.get(clientUrl, ((totalBytes, currentBytes, done) -> {
+                if (done) {
+                    System.out.println("Downloaded " + (versionId + ".jar") + ", writing to disk...");
+                } else {
+                    System.out.println("Progress (" + (versionId + ".jar") + "): " + (currentBytes / 1024 / 1024) + " / " + (totalBytes / 1024 / 1024));
+                }
+            }));
             try (FileOutputStream fos = new FileOutputStream(jarFile)) {
                 fos.write(clientBytes);
             }
@@ -131,7 +138,14 @@ public class MinecraftDownloader {
                 PathUtils.createDirectories(resolvedPath.getParent());
                 File file = resolvedPath.toFile();
                 if (!file.exists()) {
-                    byte[] libraryBytes = Http.get(libraryUrl);
+                    System.out.println("Downloading " + resolvedPath.getFileName().toString());
+                    byte[] libraryBytes = Http.get(libraryUrl, ((totalBytes, currentBytes, done) -> {
+                        if (done) {
+                            System.out.println("Downloaded " + resolvedPath.getFileName().toString());
+                        } else {
+                            System.out.println("Progress (" + resolvedPath.getFileName().toString() + "): " + (currentBytes / 1024 / 1024) + " / " + (totalBytes / 1024 / 1024));
+                        }
+                    }));
                     try (FileOutputStream fos = new FileOutputStream(file)) {
                         fos.write(libraryBytes);
                     }
@@ -148,7 +162,14 @@ public class MinecraftDownloader {
                     PathUtils.createDirectories(resolvedPath.getParent());
                     File file = resolvedPath.toFile();
                     if (!file.exists()) {
-                        byte[] libraryBytes = Http.get(libraryUrl);
+                        System.out.println("Downloading " + resolvedPath.getFileName().toString());
+                        byte[] libraryBytes = Http.get(libraryUrl, ((totalBytes, currentBytes, done) -> {
+                            if (done) {
+                                System.out.println("Downloaded " + resolvedPath.getFileName().toString());
+                            } else {
+                                System.out.println("Progress (" + resolvedPath.getFileName().toString() + "): " + (currentBytes / 1024 / 1024) + " / " + (totalBytes / 1024 / 1024));
+                            }
+                        }));
                         try (FileOutputStream fos = new FileOutputStream(file)) {
                             fos.write(libraryBytes);
                         }
