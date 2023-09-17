@@ -23,6 +23,7 @@ import me.theentropyshard.teslauncher.gui.components.InstanceItem;
 import me.theentropyshard.teslauncher.gui.dialogs.AddInstanceDialog;
 import me.theentropyshard.teslauncher.instance.Instance;
 import me.theentropyshard.teslauncher.instance.InstanceManager;
+import me.theentropyshard.teslauncher.instance.InstanceRunner;
 import me.theentropyshard.teslauncher.utils.SwingUtils;
 
 import javax.swing.*;
@@ -130,6 +131,7 @@ public class PlayView extends View {
             InstanceItem clickedItem = (InstanceItem) e.getSource();
             InstanceManager manager = TESLauncher.instance.getInstanceManager();
 
+            new InstanceRunner(manager.getInstanceByName(clickedItem.getTextLabel().getText())).start();
             // TODO manager.runInstance(clickedItem.getTextLabel().getText());
         }, true);
     }

@@ -16,10 +16,7 @@
 
 package me.theentropyshard.teslauncher.utils;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -56,13 +53,14 @@ public final class Http {
     }
 
     private static byte[] inputStreamToByteArray(InputStream inputStream) throws IOException {
-        byte[] buffer = new byte[512];
+        byte[] buffer = new byte[8192];
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        int numRead;
-        while ((numRead = inputStream.read(buffer)) != -1) {
-            baos.write(buffer, 0, numRead);
+        try (BufferedInputStream bis = new BufferedInputStream(inputStream)) {
+            int numRead;
+            while ((numRead = bis.read(buffer, 0, 8192)) != -1) {
+                baos.write(buffer, 0, numRead);
+            }
         }
-        baos.flush();
 
         return baos.toByteArray();
     }
