@@ -44,7 +44,7 @@ public class TESLauncher {
     private final Path workDir;
     private final Path minecraftDir;
     private final Path instancesDir;
-    private final Path clientsDir;
+    private final Path versionsDir;
     private final Path assetsDir;
     private final Path librariesDir;
     private final Path log4j2ConfigsDir;
@@ -63,7 +63,7 @@ public class TESLauncher {
         this.workDir = Paths.get(System.getProperty("user.dir")).resolve("dev");
         this.minecraftDir = this.workDir.resolve("minecraft");
         this.instancesDir = this.minecraftDir.resolve("instances");
-        this.clientsDir = this.minecraftDir.resolve("clients");
+        this.versionsDir = this.minecraftDir.resolve("versions");
         this.assetsDir = this.minecraftDir.resolve("assets");
         this.librariesDir = this.minecraftDir.resolve("libraries");
         this.log4j2ConfigsDir = this.minecraftDir.resolve("log4j2");
@@ -122,7 +122,7 @@ public class TESLauncher {
     public void prepareDirs() throws IOException {
         PathUtils.createDirectories(this.workDir);
         PathUtils.createDirectories(this.minecraftDir);
-        PathUtils.createDirectories(this.clientsDir);
+        PathUtils.createDirectories(this.versionsDir);
         PathUtils.createDirectories(this.assetsDir);
         PathUtils.createDirectories(this.instancesDir);
         PathUtils.createDirectories(this.librariesDir);
@@ -153,8 +153,8 @@ public class TESLauncher {
         return this.instancesDir;
     }
 
-    public Path getClientsDir() {
-        return this.clientsDir;
+    public Path getVersionsDir() {
+        return this.versionsDir;
     }
 
     public Path getAssetsDir() {

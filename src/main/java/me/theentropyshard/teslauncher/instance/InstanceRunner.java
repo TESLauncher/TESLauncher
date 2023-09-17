@@ -58,7 +58,7 @@ public class InstanceRunner extends Thread {
                             .resolve(this.instance.getMinecraftVersion())
             );
 
-            Path clientsDir = launcher.getClientsDir();
+            Path clientsDir = launcher.getVersionsDir();
             Path librariesDir = launcher.getLibrariesDir();
             if (!this.instance.wasEverPlayed()) {
                 MinecraftDownloader downloader = new MinecraftDownloader(
