@@ -21,6 +21,16 @@ public class Instance {
     private String groupName;
     private String minecraftVersion;
     private boolean wasEverPlayed;
+    private String javaPath;
+    private int minecraftWindowWidth;
+    private int minecraftWindowHeight;
+    private String customWindowString;
+    private int minimumMemoryInMegabytes;
+    private int maximumMemoryInMegabytes;
+
+    public Instance() {
+
+    }
 
     public Instance(String name, String groupName, String minecraftVersion) {
         this.name = name;
@@ -58,5 +68,57 @@ public class Instance {
 
     public void setWasEverPlayed(boolean wasEverPlayed) {
         this.wasEverPlayed = wasEverPlayed;
+    }
+
+    public boolean isWasEverPlayed() {
+        return this.wasEverPlayed;
+    }
+
+    public String getJavaPath() {
+        return this.javaPath;
+    }
+
+    public void setJavaPath(String javaPath) {
+        this.javaPath = javaPath;
+    }
+
+    public int getMinecraftWindowWidth() {
+        return this.minecraftWindowWidth;
+    }
+
+    public void setMinecraftWindowWidth(int minecraftWindowWidth) {
+        this.minecraftWindowWidth = minecraftWindowWidth;
+    }
+
+    public int getMinecraftWindowHeight() {
+        return this.minecraftWindowHeight;
+    }
+
+    public void setMinecraftWindowHeight(int minecraftWindowHeight) {
+        this.minecraftWindowHeight = minecraftWindowHeight;
+    }
+
+    public String getCustomWindowString() {
+        return this.customWindowString;
+    }
+
+    public void setCustomWindowString(String customWindowString) {
+        this.customWindowString = customWindowString;
+    }
+
+    public int getMinimumMemoryInMegabytes() {
+        return this.minimumMemoryInMegabytes;
+    }
+
+    public void setMinimumMemoryInMegabytes(int minimumMemoryInMegabytes) {
+        this.minimumMemoryInMegabytes = minimumMemoryInMegabytes;
+    }
+
+    public int getMaximumMemoryInMegabytes() {
+        return this.maximumMemoryInMegabytes;
+    }
+
+    public void setMaximumMemoryInMegabytes(int maximumMemoryInMegabytes) {
+        this.maximumMemoryInMegabytes = maximumMemoryInMegabytes;
     }
 }
