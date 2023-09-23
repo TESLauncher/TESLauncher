@@ -89,7 +89,7 @@ public class PlayView extends View {
         new SwingWorker<List<Instance>, Void>() {
             @Override
             protected List<Instance> doInBackground() throws Exception {
-                return TESLauncher.instance.getInstanceManager().getInstances();
+                return TESLauncher.getInstance().getInstanceManager().getInstances();
             }
 
             @Override
@@ -129,7 +129,7 @@ public class PlayView extends View {
 
         item.addListener(e -> {
             InstanceItem clickedItem = (InstanceItem) e.getSource();
-            InstanceManager manager = TESLauncher.instance.getInstanceManager();
+            InstanceManager manager = TESLauncher.getInstance().getInstanceManager();
 
             new InstanceRunner(manager.getInstanceByName(clickedItem.getTextLabel().getText())).start();
             // TODO manager.runInstance(clickedItem.getTextLabel().getText());

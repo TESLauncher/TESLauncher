@@ -146,14 +146,14 @@ public class AddInstanceDialog {
             int selectedRow = versionsTable.getSelectedRow();
             selectedRow = versionsTable.convertRowIndexToModel(selectedRow);
             String mcVersion = String.valueOf(model.getValueAt(selectedRow, 0));
-            TESLauncher.instance.doTask(() -> {
-                InstanceManager instanceManager = TESLauncher.instance.getInstanceManager();
+           /* TESLauncher.getInstance().doTask(() -> {
+                InstanceManager instanceManager = TESLauncher.getInstance().getInstanceManager();
                 try {
                     instanceManager.createInstance(instanceName, chosenGroupName, mcVersion);
                 } catch (IOException ex) {
                     throw new RuntimeException("Unable to create new instance", ex);
                 }
-            });
+            });*/
         });
         buttonsPanel.add(this.addButton);
         JButton cancelButton = new JButton("Cancel");
@@ -167,7 +167,7 @@ public class AddInstanceDialog {
         root.add(centerPanel, BorderLayout.CENTER);
         root.setPreferredSize(new Dimension(800, 600));
 
-        this.dialog = new JDialog(TESLauncher.window.getFrame(), "Add New Instance", true);
+        this.dialog = new JDialog(/*TESLauncher.getInstance().getFrame()*/(Frame) null, "Add New Instance", true);
         this.dialog.setResizable(false);
         this.dialog.add(root, BorderLayout.CENTER);
         this.dialog.pack();

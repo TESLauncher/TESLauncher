@@ -16,8 +16,17 @@
 
 package me.theentropyshard.teslauncher;
 
-public class Main {
-    public static void main(String[] args) {
-        TESLauncher.start(args);
+import com.beust.jcommander.Parameter;
+
+public class Args {
+    @Parameter(names = {"--workDir"})
+    private String workDirPath;
+
+    public Args() {
+
+    }
+
+    public String getWorkDirPath() {
+        return this.workDirPath;
     }
 }

@@ -110,9 +110,9 @@ public class InstanceManagerImpl implements InstanceManager {
             return;
         }
 
-        PathUtils.createDirectories(instanceDir);
+        PathUtils.createDirectoryIfNotExists(instanceDir);
         Path minecraftDir = instanceDir.resolve(this.mcDirName);
-        PathUtils.createDirectories(minecraftDir);
+        PathUtils.createDirectoryIfNotExists(minecraftDir);
         Path instanceFile = instanceDir.resolve("instance.json");
         Files.write(instanceFile, this.gson.toJson(instance).getBytes(StandardCharsets.UTF_8));
     }

@@ -50,7 +50,7 @@ public class AccountsView extends View {
         addButton.addActionListener(e -> {
             String nickname = usernameField.getText();
             PlayViewHeader.instance.getAccounts().addItem(nickname);
-            TESLauncher.instance.getAccountsManager().saveAccount(nickname);
+            //TESLauncher.getInstance().getAccountsManager().saveAccount(nickname);
             usernameField.setText("");
         });
         centerPanel.add(addButton);

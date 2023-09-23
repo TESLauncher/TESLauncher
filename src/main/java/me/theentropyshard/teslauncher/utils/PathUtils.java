@@ -26,7 +26,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public final class PathUtils {
-    public static Path createDirectories(Path path) throws IOException {
+    public static Path createDirectoryIfNotExists(Path path) throws IOException {
         if (Files.exists(path)) {
             return path;
         }
@@ -47,7 +47,7 @@ public final class PathUtils {
             return file;
         }
 
-        PathUtils.createDirectories(file.getParent());
+        PathUtils.createDirectoryIfNotExists(file.getParent());
         return Files.createFile(file);
     }
 

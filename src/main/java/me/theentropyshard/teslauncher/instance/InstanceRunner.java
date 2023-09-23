@@ -50,10 +50,10 @@ public class InstanceRunner extends Thread {
     @Override
     public void run() {
         try {
-            TESLauncher launcher = TESLauncher.instance;
+            TESLauncher launcher = TESLauncher.getInstance();
             InstanceManager instanceManager = launcher.getInstanceManager();
-            Path mcDirOfInstance = PathUtils.createDirectories(instanceManager.getMinecraftDir(this.instance));
-            Path tmpNativesDir = PathUtils.createDirectories(
+            Path mcDirOfInstance = PathUtils.createDirectoryIfNotExists(instanceManager.getMinecraftDir(this.instance));
+            Path tmpNativesDir = PathUtils.createDirectoryIfNotExists(
                     launcher.getInstancesDir().resolve(this.instance.getName()).resolve("natives-tmp")
                             .resolve(this.instance.getMinecraftVersion())
             );
@@ -96,7 +96,7 @@ public class InstanceRunner extends Thread {
                     versionInfo.logArgument != null;
 
             if (hasLogInfo) {
-                Path log4j2ConfigsDir = TESLauncher.instance.getLog4j2ConfigsDir();
+                Path log4j2ConfigsDir = TESLauncher.getInstance().getLog4jConfigsDir();
 
                 Path log4j2ConfigFile = log4j2ConfigsDir.resolve(versionInfo.logConfigId);
                 if (!Files.exists(log4j2ConfigFile)) {

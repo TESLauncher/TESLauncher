@@ -46,8 +46,7 @@ public class PlayViewHeader extends View {
         rightSide.add(accountsLabel);
 
         this.accounts = new JComboBox<>(
-                TESLauncher.instance.getAccountsManager().getAccounts()
-                        .toArray(new String[0])
+                new String[]{"Player"}
         );
         rightSide.add(this.accounts);
 

@@ -48,7 +48,7 @@ public class MinecraftDownloader {
     }
 
     public void downloadMinecraft(String versionId) throws IOException {
-        PathUtils.createDirectories(this.clientsDir.resolve(versionId));
+        PathUtils.createDirectoryIfNotExists(this.clientsDir.resolve(versionId));
 
         //LOG.info("Downloading Minecraft " + versionId);
 
@@ -135,7 +135,7 @@ public class MinecraftDownloader {
                 String libraryUrl = (String) artifact.get("url");
 
                 Path resolvedPath = this.librariesDir.resolve(path);
-                PathUtils.createDirectories(resolvedPath.getParent());
+                PathUtils.createDirectoryIfNotExists(resolvedPath.getParent());
                 File file = resolvedPath.toFile();
                 if (!file.exists()) {
                     System.out.println("Downloading " + resolvedPath.getFileName().toString());
@@ -159,7 +159,7 @@ public class MinecraftDownloader {
                     String path = (String) classifier.get("path");
                     String libraryUrl = (String) classifier.get("url");
                     Path resolvedPath = this.nativesDir.resolve(versionId).resolve(path);
-                    PathUtils.createDirectories(resolvedPath.getParent());
+                    PathUtils.createDirectoryIfNotExists(resolvedPath.getParent());
                     File file = resolvedPath.toFile();
                     if (!file.exists()) {
                         System.out.println("Downloading " + resolvedPath.getFileName().toString());
