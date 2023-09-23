@@ -19,11 +19,13 @@ package me.theentropyshard.teslauncher.utils;
 import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Locale;
 
 public final class PathUtils {
     public static Path createDirectoryIfNotExists(Path path) throws IOException {
@@ -35,14 +37,24 @@ public final class PathUtils {
     }
 
     public static Path deleteDirectoryRecursively(Path path) throws IOException {
-        return Files.walkFileTree(path, new DeleteFileVisitor());
+        return Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                Files.delete(file);
+
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                Files.delete(dir);
+
+                return FileVisitResult.CONTINUE;
+            }
+        });
     }
 
-    private PathUtils() {
-        throw new UnsupportedOperationException();
-    }
-
-    public static Path createFile(Path file) throws IOException {
+    public static Path createFileIfNotExists(Path file) throws IOException {
         if (Files.exists(file)) {
             return file;
         }
@@ -51,7 +63,14 @@ public final class PathUtils {
         return Files.createFile(file);
     }
 
-    // Slightly changed from https://stackoverflow.com/a/54712447/19857533
+    public static Path writeString(Path path, String s) throws IOException {
+        return Files.write(path, s.getBytes(StandardCharsets.UTF_8));
+    }
+
+    public static Path appendString(Path path, String s) throws IOException {
+        return Files.write(path, s.getBytes(StandardCharsets.UTF_8), StandardOpenOption.APPEND);
+    }
+
     public static String sha1(Path path) throws IOException {
         if (!Files.isRegularFile(path)) {
             throw new IllegalArgumentException("Can compute SHA-1 only for files!");
@@ -68,7 +87,11 @@ public final class PathUtils {
              DigestInputStream digestStream = new DigestInputStream(input, digest)) {
             while (digestStream.read() != -1);
             digest = digestStream.getMessageDigest();
-            return new HexBinaryAdapter().marshal(digest.digest());
+            return new HexBinaryAdapter().marshal(digest.digest()).toLowerCase(Locale.ENGLISH);
         }
+    }
+
+    private PathUtils() {
+        throw new UnsupportedOperationException();
     }
 }

@@ -96,7 +96,7 @@ public class InstanceManagerImpl implements InstanceManager {
         }
 
         Path instanceFile = instanceDir.resolve("instance.json");
-        Files.write(instanceFile, this.gson.toJson(instance).getBytes(StandardCharsets.UTF_8));
+        PathUtils.writeString(instanceFile, this.gson.toJson(instance));
     }
 
     @Override
@@ -114,7 +114,7 @@ public class InstanceManagerImpl implements InstanceManager {
         Path minecraftDir = instanceDir.resolve(this.mcDirName);
         PathUtils.createDirectoryIfNotExists(minecraftDir);
         Path instanceFile = instanceDir.resolve("instance.json");
-        Files.write(instanceFile, this.gson.toJson(instance).getBytes(StandardCharsets.UTF_8));
+        PathUtils.writeString(instanceFile, this.gson.toJson(instance));
     }
 
     @Override
