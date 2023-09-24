@@ -32,6 +32,7 @@ public class TESLauncher {
     private final Logger logger;
     private final Path workDir;
 
+    private final Path runtimesDir;
     private final Path minecraftDir;
     private final Path assetsDir;
     private final Path librariesDir;
@@ -48,6 +49,7 @@ public class TESLauncher {
 
         TESLauncher.setInstance(this);
 
+        this.runtimesDir = this.workDir.resolve("runtimes");
         this.minecraftDir = this.workDir.resolve("minecraft");
         this.assetsDir = this.minecraftDir.resolve("assets");
         this.librariesDir = this.minecraftDir.resolve("libraries");
@@ -77,6 +79,7 @@ public class TESLauncher {
     private void createDirectories() {
         try {
             PathUtils.createDirectoryIfNotExists(this.workDir);
+            PathUtils.createDirectoryIfNotExists(this.runtimesDir);
             PathUtils.createDirectoryIfNotExists(this.minecraftDir);
             PathUtils.createDirectoryIfNotExists(this.assetsDir);
             PathUtils.createDirectoryIfNotExists(this.librariesDir);
