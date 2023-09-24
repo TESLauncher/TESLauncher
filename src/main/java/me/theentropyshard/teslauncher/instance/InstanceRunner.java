@@ -84,8 +84,10 @@ public class InstanceRunner extends Thread {
                     StandardCharsets.UTF_8
             ), VersionInfo.class);
 
+            System.out.println("Libraries:");
             List<String> classpath = new ArrayList<>();
             for (String libPath : versionInfo.librariesPaths) {
+                System.out.println("\t" + libPath);
                 classpath.add(librariesDir.resolve(libPath).toAbsolutePath().toString());
             }
             classpath.add(clientsDir.resolve(versionInfo.id).resolve(versionInfo.id + ".jar").toAbsolutePath().toString());
@@ -95,7 +97,7 @@ public class InstanceRunner extends Thread {
             boolean hasLogInfo = versionInfo.logConfigId != null && versionInfo.logConfigUrl != null &&
                     versionInfo.logArgument != null;
 
-            if (hasLogInfo) {
+            /*if (hasLogInfo) {
                 Path log4j2ConfigsDir = TESLauncher.getInstance().getLog4jConfigsDir();
 
                 Path log4j2ConfigFile = log4j2ConfigsDir.resolve(versionInfo.logConfigId);
@@ -105,7 +107,7 @@ public class InstanceRunner extends Thread {
                 }
 
                 argVars.put("path", log4j2ConfigFile.toAbsolutePath().toString());
-            }
+            }*/
 
             // JVM
             argVars.put("natives_directory", tmpNativesDir.toAbsolutePath().toString());
@@ -148,9 +150,9 @@ public class InstanceRunner extends Thread {
 
             List<String> jvmArgs = new ArrayList<>();
 
-            if (hasLogInfo) {
+            /*if (hasLogInfo) {
                 jvmArgs.add(substitutor.replace(versionInfo.logArgument));
-            }
+            }*/
 
             for (String arg : versionInfo.jvmArgs) {
                 jvmArgs.add(substitutor.replace(arg));
