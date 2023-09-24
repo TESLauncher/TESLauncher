@@ -65,7 +65,8 @@ public class InstanceRunner extends Thread {
                         clientsDir,
                         launcher.getAssetsDir(),
                         librariesDir,
-                        tmpNativesDir
+                        tmpNativesDir,
+                        instanceManager.getMinecraftDir(this.instance).resolve("resources")
                 );
 
                 downloader.downloadMinecraft(this.instance.getMinecraftVersion());

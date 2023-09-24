@@ -33,17 +33,21 @@ import java.util.stream.Stream;
 
 public class MinecraftDownloader {
     private static final String VER_MAN_V2 = "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json";
+    private static final String RESOURCES = "https://resources.download.minecraft.net/";
     private final Gson gson;
     private final Path clientsDir;
     private final Path assetsDir;
     private final Path librariesDir;
     private final Path nativesDir;
+    private final Path instanceResourcesDir;
 
-    public MinecraftDownloader(Path clientsDir, Path assetsDir, Path librariesDir, Path nativesDir) {
+    public MinecraftDownloader(Path clientsDir, Path assetsDir, Path librariesDir, Path nativesDir,
+                               Path instanceResourcesDir) {
         this.clientsDir = clientsDir;
         this.assetsDir = assetsDir;
         this.librariesDir = librariesDir;
         this.nativesDir = nativesDir;
+        this.instanceResourcesDir = instanceResourcesDir;
         this.gson = new Gson();
     }
 
@@ -79,13 +83,19 @@ public class MinecraftDownloader {
             }
 
             //LOG.info("Downloading client...");
+            System.out.println("Downloading client...");
             this.downloadClient(versionId, version.url);
 
             //LOG.info("Downloading libraries...");
+            System.out.println("Downloading libraries...");
             this.downloadLibraries(versionId, version.url);
 
             //LOG.info("Extracting natives...");
+            System.out.println("Extracting natives...");
             this.extractNatives(versionId);
+
+            System.out.println("Downloading assets...");
+            this.downloadAssets(versionId);
 
             //LOG.info("Done");
         }
@@ -135,9 +145,8 @@ public class MinecraftDownloader {
                 String libraryUrl = (String) artifact.get("url");
 
                 Path resolvedPath = this.librariesDir.resolve(path);
-                PathUtils.createFileIfNotExists(resolvedPath.getParent());
-                File file = resolvedPath.toFile();
-                if (!file.exists()) {
+
+                if (!Files.exists(resolvedPath)) {
                     System.out.println("Downloading " + resolvedPath.getFileName().toString());
                     byte[] libraryBytes = Http.get(libraryUrl, ((totalBytes, currentBytes, done) -> {
                         if (done) {
@@ -146,9 +155,8 @@ public class MinecraftDownloader {
                             System.out.println("Progress (" + resolvedPath.getFileName().toString() + "): " + (currentBytes / 1024 / 1024) + " / " + (totalBytes / 1024 / 1024));
                         }
                     }));
-                    try (FileOutputStream fos = new FileOutputStream(file)) {
-                        fos.write(libraryBytes);
-                    }
+                    PathUtils.createDirectoryIfNotExists(resolvedPath.getParent());
+                    Files.write(resolvedPath, libraryBytes);
                 }
             }
 
@@ -179,8 +187,86 @@ public class MinecraftDownloader {
         }
     }
 
-    private void downloadAssets() throws IOException {
+    private void downloadAssets(String versionId) throws IOException {
+        File jsonFile = this.clientsDir.resolve(versionId).resolve(versionId + ".json").toFile();
+        Map<String, Object> map = this.gson.fromJson(new FileReader(jsonFile), Map.class);
+        Map<String, Object> assetIndex = (Map<String, Object>) map.get("assetIndex");
+        if (assetIndex == null) {
+            return;
+        }
 
+        Path assetsIndexFile = this.assetsDir.resolve("indexes").resolve(assetIndex.get("id") + ".json");
+        if (!Files.exists(assetsIndexFile)) {
+            PathUtils.createDirectoryIfNotExists(assetsIndexFile.getParent());
+            String assetIndexUrl = (String) assetIndex.get("url");
+            byte[] assetIndexJsonBytes = Http.get(assetIndexUrl);
+            Files.write(assetsIndexFile, assetIndexJsonBytes);
+        }
+
+        Map<String, Object> assetIndexInfo = this.gson.fromJson(Files.newBufferedReader(assetsIndexFile), Map.class);
+        Object virtualObj = assetIndexInfo.get("virtual");
+        boolean assetsVirtual;
+        if (virtualObj != null) {
+            assetsVirtual = Boolean.parseBoolean(String.valueOf(virtualObj));
+        } else {
+            assetsVirtual = false;
+        }
+
+        Object mapToResourcesObj = assetIndexInfo.get("map_to_resources");
+        boolean mapToResources;
+        if (mapToResourcesObj != null) {
+            mapToResources = Boolean.parseBoolean(String.valueOf(mapToResourcesObj));
+        } else {
+            mapToResources = false;
+        }
+
+        Map<String, Object> objects = (Map<String, Object>) assetIndexInfo.get("objects");
+        objects.forEach((fileName, obj) -> {
+            if (mapToResources) {
+                Path filePath = this.instanceResourcesDir.resolve(fileName);
+                if (!Files.exists(filePath)) {
+                    Map<String, Object> assetItem = (Map<String, Object>) obj;
+                    String assetItemHash = (String) assetItem.get("hash");
+                    String prefix = assetItemHash.substring(0, 2);
+                    try {
+                        PathUtils.createDirectoryIfNotExists(filePath.getParent());
+                        byte[] bytes = Http.get(MinecraftDownloader.RESOURCES + prefix + "/" + assetItemHash);
+                        Files.write(filePath, bytes);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            } else if (assetsVirtual) {
+                Path filePath = this.assetsDir.resolve("virtual").resolve("legacy").resolve(fileName);
+                if (!Files.exists(filePath)) {
+                    Map<String, Object> assetItem = (Map<String, Object>) obj;
+                    String assetItemHash = (String) assetItem.get("hash");
+                    String prefix = assetItemHash.substring(0, 2);
+                    try {
+                        PathUtils.createDirectoryIfNotExists(filePath.getParent());
+                        byte[] bytes = Http.get(MinecraftDownloader.RESOURCES + prefix + "/" + assetItemHash);
+                        Files.write(filePath, bytes);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            } else {
+                Map<String, Object> assetItem = (Map<String, Object>) obj;
+                String assetItemHash = (String) assetItem.get("hash");
+                String prefix = assetItemHash.substring(0, 2);
+
+                Path filePath = this.assetsDir.resolve("objects").resolve(prefix).resolve(assetItemHash);
+                if (!Files.exists(filePath)) {
+                    try {
+                        PathUtils.createDirectoryIfNotExists(filePath.getParent());
+                        byte[] bytes = Http.get(MinecraftDownloader.RESOURCES + prefix + "/" + assetItemHash);
+                        Files.write(filePath, bytes);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
     }
 
     private void downloadResources() throws IOException {
