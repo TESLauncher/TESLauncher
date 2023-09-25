@@ -17,6 +17,7 @@
 package me.theentropyshard.teslauncher.gson;
 
 import com.google.gson.*;
+import me.theentropyshard.teslauncher.minecraft.models.VersionAssetIndex;
 import me.theentropyshard.teslauncher.minecraft.models.VersionInfo;
 
 import java.lang.reflect.Type;
@@ -100,6 +101,11 @@ public class DetailedVersionInfoDeserializerOld implements JsonDeserializer<Vers
             JsonObject fileObject = clientObject.getAsJsonObject("file");
             versionInfo.logConfigId = fileObject.get("id").getAsString();
             versionInfo.logConfigUrl = fileObject.get("url").getAsString();
+        }
+
+        if (root.has("assetIndex")) {
+            JsonObject assetIndex = root.getAsJsonObject("assetIndex");
+            versionInfo.assetIndex = new Gson().fromJson(assetIndex, VersionAssetIndex.class);
         }
 
         return versionInfo;

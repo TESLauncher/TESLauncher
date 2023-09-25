@@ -16,20 +16,13 @@
 
 package me.theentropyshard.teslauncher.minecraft.models;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.google.gson.annotations.SerializedName;
 
-public final class VersionInfo {
-    public boolean newFormat;
-    public String id;
-    public String mainClass;
-    public String type;
-    public String assets;
-    public final List<String> jvmArgs = new ArrayList<>();
-    public final List<String> gameArgs = new ArrayList<>();
-    public final List<String> librariesPaths = new ArrayList<>();
-    public String logArgument;
-    public String logConfigUrl;
-    public String logConfigId;
-    public VersionAssetIndex assetIndex;
+import java.util.Map;
+
+public class AssetIndex {
+    @SerializedName("map_to_resources")
+    public boolean mapToResources;
+    public boolean virtual;
+    public Map<String, AssetObject> objects;
 }

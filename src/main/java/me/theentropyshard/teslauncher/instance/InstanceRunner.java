@@ -22,9 +22,10 @@ import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.accounts.AccountsManager;
 import me.theentropyshard.teslauncher.gson.DetailedVersionInfoDeserializerOld;
 import me.theentropyshard.teslauncher.minecraft.MinecraftDownloader;
+import me.theentropyshard.teslauncher.minecraft.models.AssetIndex;
+import me.theentropyshard.teslauncher.minecraft.models.VersionAssetIndex;
 import me.theentropyshard.teslauncher.minecraft.models.VersionInfo;
 import me.theentropyshard.teslauncher.utils.EnumOS;
-import me.theentropyshard.teslauncher.utils.Http;
 import me.theentropyshard.teslauncher.utils.PathUtils;
 import org.apache.commons.text.StringSubstitutor;
 
@@ -60,10 +61,11 @@ public class InstanceRunner extends Thread {
 
             Path clientsDir = launcher.getVersionsDir();
             Path librariesDir = launcher.getLibrariesDir();
+            Path assetsDir = launcher.getAssetsDir();
             if (!this.instance.wasEverPlayed()) {
                 MinecraftDownloader downloader = new MinecraftDownloader(
                         clientsDir,
-                        launcher.getAssetsDir(),
+                        assetsDir,
                         librariesDir,
                         tmpNativesDir,
                         instanceManager.getMinecraftDir(this.instance).resolve("resources")
@@ -116,6 +118,11 @@ public class InstanceRunner extends Thread {
             argVars.put("launcher_version", "1.0.0");
             argVars.put("classpath", String.join(File.pathSeparator, classpath));
 
+            VersionAssetIndex vAssetIndex = versionInfo.assetIndex;
+            AssetIndex assetIndex = gson.fromJson(Files.newBufferedReader(
+                    assetsDir.resolve("indexes").resolve(vAssetIndex.id + ".json")
+            ), AssetIndex.class);
+
             // Game
             if (versionInfo.newFormat) {
                 argVars.put("clientid", "-");
@@ -142,9 +149,12 @@ public class InstanceRunner extends Thread {
                 argVars.put("auth_player_name", AccountsManager.getCurrentUsername());
                 argVars.put("uuid", "-");
                 argVars.put("accessToken", "-");
-                Path assetsAbsolute = launcher.getAssetsDir().toAbsolutePath();
-                argVars.put("assets_root", assetsAbsolute.toString());
-                argVars.put("game_assets", assetsAbsolute.resolve("virtual").resolve("legacy").toString());
+                if (assetIndex.mapToResources || vAssetIndex.id.equals("legacy")) {
+                    argVars.put("assets_root", instanceManager.getMinecraftDir(this.instance).resolve("resources"));
+                    argVars.put("game_assets", instanceManager.getMinecraftDir(this.instance).resolve("resources"));
+                }
+                //argVars.put("assets_root", assetsAbsolute.toString());
+                //argVars.put("game_assets", assetsAbsolute.resolve("virtual").resolve("legacy").toString());
             }
 
             StringSubstitutor substitutor = new StringSubstitutor(argVars);

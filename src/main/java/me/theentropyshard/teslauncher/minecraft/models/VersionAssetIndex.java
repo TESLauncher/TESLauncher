@@ -16,20 +16,10 @@
 
 package me.theentropyshard.teslauncher.minecraft.models;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public final class VersionInfo {
-    public boolean newFormat;
+public class VersionAssetIndex {
     public String id;
-    public String mainClass;
-    public String type;
-    public String assets;
-    public final List<String> jvmArgs = new ArrayList<>();
-    public final List<String> gameArgs = new ArrayList<>();
-    public final List<String> librariesPaths = new ArrayList<>();
-    public String logArgument;
-    public String logConfigUrl;
-    public String logConfigId;
-    public VersionAssetIndex assetIndex;
+    public String sha1;
+    public long size;
+    public long totalSize;
+    public String url;
 }
