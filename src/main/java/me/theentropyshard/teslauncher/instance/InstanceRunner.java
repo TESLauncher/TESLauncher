@@ -189,6 +189,8 @@ public class InstanceRunner extends Thread {
             ProcessBuilder processBuilder = new ProcessBuilder(command);
             processBuilder.directory(instanceManager.getMinecraftDir(this.instance).getParent().toAbsolutePath().toFile());
             processBuilder.redirectErrorStream(true);
+
+            long start = System.currentTimeMillis();
             Process process = processBuilder.start();
             InputStream inputStream = process.getInputStream();
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
@@ -198,6 +200,9 @@ public class InstanceRunner extends Thread {
             }
             int exitCode = process.waitFor();
             System.out.println("Minecraft process finished with exit code " + exitCode);
+            long end = System.currentTimeMillis();
+
+            System.out.println("You played for " + ((end - start) / 1000) + " seconds!");
         } catch (Exception e) {
             e.printStackTrace();
         }
