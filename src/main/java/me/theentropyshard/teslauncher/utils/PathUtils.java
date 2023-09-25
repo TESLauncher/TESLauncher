@@ -16,7 +16,6 @@
 
 package me.theentropyshard.teslauncher.utils;
 
-import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -25,7 +24,6 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Locale;
 
 public final class PathUtils {
     public static Path createDirectoryIfNotExists(Path path) throws IOException {
@@ -85,9 +83,10 @@ public final class PathUtils {
 
         try (InputStream input = Files.newInputStream(path);
              DigestInputStream digestStream = new DigestInputStream(input, digest)) {
-            while (digestStream.read() != -1);
+            while (digestStream.read() != -1) ;
             digest = digestStream.getMessageDigest();
-            return new HexBinaryAdapter().marshal(digest.digest()).toLowerCase(Locale.ENGLISH);
+            //return new HexBinaryAdapter().marshal(digest.digest()).toLowerCase(Locale.ENGLISH);
+            return "Not Implemented";
         }
     }
 
