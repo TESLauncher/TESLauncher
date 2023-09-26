@@ -85,17 +85,21 @@ public class MinecraftDownloader {
             //LOG.info("Downloading client...");
             System.out.println("Downloading client...");
             this.downloadClient(versionId, version.url);
+            System.out.println("Downloaded client");
 
             //LOG.info("Downloading libraries...");
             System.out.println("Downloading libraries...");
             this.downloadLibraries(versionId, version.url);
+            System.out.println("Downloaded libraries");
 
             //LOG.info("Extracting natives...");
             System.out.println("Extracting natives...");
             this.extractNatives(versionId);
+            System.out.println("Extracted natives");
 
             System.out.println("Downloading assets...");
             this.downloadAssets(versionId);
+            System.out.println("Downloaded assets");
 
             //LOG.info("Done");
         }
@@ -119,7 +123,7 @@ public class MinecraftDownloader {
 
         if (!jarFile.exists()) {
             System.out.println("Downloading " + versionId + ".jar...");
-            byte[] clientBytes = Http.get(clientUrl, ((totalBytes, currentBytes, done) -> {
+            /*byte[] clientBytes = Http.get(clientUrl, ((totalBytes, currentBytes, done) -> {
                 if (done) {
                     System.out.println("Downloaded " + (versionId + ".jar") + ", writing to disk...");
                 } else {
@@ -128,7 +132,14 @@ public class MinecraftDownloader {
             }));
             try (FileOutputStream fos = new FileOutputStream(jarFile)) {
                 fos.write(clientBytes);
-            }
+            }*/
+            Http.downloadFile(clientUrl, jarFile.toPath(), ((totalBytes, currentBytes, done) -> {
+                if (done) {
+                    System.out.println("Downloaded " + (versionId + ".jar") + ", writing to disk...");
+                } else {
+                    System.out.println("Progress (" + (versionId + ".jar") + "): " + (currentBytes / 1024 / 1024) + " / " + (totalBytes / 1024 / 1024));
+                }
+            }));
         }
     }
 

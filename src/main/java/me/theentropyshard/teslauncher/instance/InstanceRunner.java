@@ -152,9 +152,10 @@ public class InstanceRunner extends Thread {
                 if (assetIndex.mapToResources || vAssetIndex.id.equals("legacy")) {
                     argVars.put("assets_root", instanceManager.getMinecraftDir(this.instance).resolve("resources"));
                     argVars.put("game_assets", instanceManager.getMinecraftDir(this.instance).resolve("resources"));
+                } else {
+                    argVars.put("assets_root", assetsDir.toString());
+                    argVars.put("game_assets", assetsDir.toString());
                 }
-                //argVars.put("assets_root", assetsAbsolute.toString());
-                //argVars.put("game_assets", assetsAbsolute.resolve("virtual").resolve("legacy").toString());
             }
 
             StringSubstitutor substitutor = new StringSubstitutor(argVars);
