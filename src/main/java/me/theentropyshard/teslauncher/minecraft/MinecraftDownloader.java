@@ -123,7 +123,7 @@ public class MinecraftDownloader {
 
         if (!jarFile.exists()) {
             System.out.println("Downloading " + versionId + ".jar...");
-            /*byte[] clientBytes = Http.get(clientUrl, ((totalBytes, currentBytes, done) -> {
+            byte[] clientBytes = Http.get(clientUrl, ((totalBytes, currentBytes, done) -> {
                 if (done) {
                     System.out.println("Downloaded " + (versionId + ".jar") + ", writing to disk...");
                 } else {
@@ -132,14 +132,14 @@ public class MinecraftDownloader {
             }));
             try (FileOutputStream fos = new FileOutputStream(jarFile)) {
                 fos.write(clientBytes);
-            }*/
-            Http.downloadFile(clientUrl, jarFile.toPath(), ((totalBytes, currentBytes, done) -> {
+            }
+            /*Http.downloadFile(clientUrl, jarFile.toPath(), ((totalBytes, currentBytes, done) -> {
                 if (done) {
                     System.out.println("Downloaded " + (versionId + ".jar") + ", writing to disk...");
                 } else {
                     System.out.println("Progress (" + (versionId + ".jar") + "): " + (currentBytes / 1024 / 1024) + " / " + (totalBytes / 1024 / 1024));
                 }
-            }));
+            }));*/
         }
     }
 
