@@ -17,8 +17,42 @@
 package me.theentropyshard.teslauncher.http;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.file.Path;
 
-public interface FileDownloader {
-    void download(String url, Path savePath) throws IOException;
+public abstract class FileDownloader {
+    private static final ProgressListener NO_OP_LISTENER = ((bytesRead, contentLength, done, fileName) -> {
+    });
+
+    private String userAgent;
+
+    public FileDownloader(String userAgent) {
+        this.userAgent = userAgent;
+    }
+
+    public Response makeRequest(String url) throws IOException {
+        HttpURLConnection c = (HttpURLConnection) new URL(url).openConnection();
+        c.setRequestMethod("GET");
+        c.setRequestProperty("User-Agent", this.userAgent);
+
+        InputStream inputStream = c.getErrorStream() == null ? c.getInputStream() : c.getErrorStream();
+
+        return new Response(inputStream, c.getContentLengthLong());
+    }
+
+    public void download(String url, Path savePath) throws IOException {
+        this.download(url, savePath, FileDownloader.NO_OP_LISTENER);
+    }
+
+    public abstract void download(String url, Path savePath, ProgressListener listener) throws IOException;
+
+    public String getUserAgent() {
+        return this.userAgent;
+    }
+
+    public void setUserAgent(String userAgent) {
+        this.userAgent = userAgent;
+    }
 }

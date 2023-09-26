@@ -64,6 +64,7 @@ public class TESLauncher {
     private boolean darkTheme;
 
     public static AppWindow window;
+    private PlayView playView;
 
     private TESLauncher(Args args, Logger logger, Path workDir) {
         this.args = args;
@@ -155,7 +156,9 @@ public class TESLauncher {
             AppWindow appWindow = new AppWindow(TESLauncher.TITLE, TESLauncher.WIDTH, TESLauncher.HEIGHT, viewSelector);
             TESLauncher.window = appWindow;
 
-            viewSelector.addTab("Play", new PlayView().getRoot());
+            this.playView = new PlayView();
+
+            viewSelector.addTab("Play", this.playView.getRoot());
             viewSelector.addTab("Accounts", new AccountsView().getRoot());
             viewSelector.addTab("Settings", new SettingsView().getRoot());
             viewSelector.addTab("About", new AboutView().getRoot());
@@ -180,6 +183,10 @@ public class TESLauncher {
 
     private static void setInstance(TESLauncher instance) {
         TESLauncher.instance = instance;
+    }
+
+    public PlayView getPlayView() {
+        return this.playView;
     }
 
     public Args getArgs() {

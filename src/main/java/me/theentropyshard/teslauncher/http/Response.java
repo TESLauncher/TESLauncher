@@ -16,7 +16,22 @@
 
 package me.theentropyshard.teslauncher.http;
 
-@FunctionalInterface
-public interface ProgressListener {
-    void onProgress(long bytesRead, long contentLength, boolean done, String fileName);
+import java.io.InputStream;
+
+public class Response {
+    private final InputStream inputStream;
+    private final long contentLength;
+
+    public Response(InputStream inputStream, long contentLength) {
+        this.inputStream = inputStream;
+        this.contentLength = contentLength;
+    }
+
+    public InputStream getInputStream() {
+        return this.inputStream;
+    }
+
+    public long getContentLength() {
+        return this.contentLength;
+    }
 }

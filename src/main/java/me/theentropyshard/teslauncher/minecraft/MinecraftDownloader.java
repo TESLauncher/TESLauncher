@@ -17,6 +17,9 @@
 package me.theentropyshard.teslauncher.minecraft;
 
 import com.google.gson.Gson;
+import me.theentropyshard.teslauncher.http.FileDownloader;
+import me.theentropyshard.teslauncher.http.FileDownloaderIO;
+import me.theentropyshard.teslauncher.http.ProgressListener;
 import me.theentropyshard.teslauncher.minecraft.models.VersionManifest;
 import me.theentropyshard.teslauncher.utils.EnumOS;
 import me.theentropyshard.teslauncher.utils.Http;
@@ -40,15 +43,21 @@ public class MinecraftDownloader {
     private final Path librariesDir;
     private final Path nativesDir;
     private final Path instanceResourcesDir;
+    private final ProgressListener progressListener;
+
+    private final FileDownloader fileDownloader;
 
     public MinecraftDownloader(Path clientsDir, Path assetsDir, Path librariesDir, Path nativesDir,
-                               Path instanceResourcesDir) {
+                               Path instanceResourcesDir, ProgressListener progressListener) {
         this.clientsDir = clientsDir;
         this.assetsDir = assetsDir;
         this.librariesDir = librariesDir;
         this.nativesDir = nativesDir;
         this.instanceResourcesDir = instanceResourcesDir;
+        this.progressListener = progressListener;
         this.gson = new Gson();
+
+        this.fileDownloader = new FileDownloaderIO("TESLauncher/1.0.0");
     }
 
     public void downloadMinecraft(String versionId) throws IOException {
@@ -94,7 +103,7 @@ public class MinecraftDownloader {
 
             //LOG.info("Extracting natives...");
             System.out.println("Extracting natives...");
-            this.extractNatives(versionId);
+            this.extractNatives();
             System.out.println("Extracted natives");
 
             System.out.println("Downloading assets...");
@@ -123,23 +132,7 @@ public class MinecraftDownloader {
 
         if (!jarFile.exists()) {
             System.out.println("Downloading " + versionId + ".jar...");
-            byte[] clientBytes = Http.get(clientUrl, ((totalBytes, currentBytes, done) -> {
-                if (done) {
-                    System.out.println("Downloaded " + (versionId + ".jar") + ", writing to disk...");
-                } else {
-                    System.out.println("Progress (" + (versionId + ".jar") + "): " + (currentBytes / 1024 / 1024) + " / " + (totalBytes / 1024 / 1024));
-                }
-            }));
-            try (FileOutputStream fos = new FileOutputStream(jarFile)) {
-                fos.write(clientBytes);
-            }
-            /*Http.downloadFile(clientUrl, jarFile.toPath(), ((totalBytes, currentBytes, done) -> {
-                if (done) {
-                    System.out.println("Downloaded " + (versionId + ".jar") + ", writing to disk...");
-                } else {
-                    System.out.println("Progress (" + (versionId + ".jar") + "): " + (currentBytes / 1024 / 1024) + " / " + (totalBytes / 1024 / 1024));
-                }
-            }));*/
+            this.fileDownloader.download(clientUrl, jarFile.toPath(), this.progressListener);
         }
     }
 
@@ -159,15 +152,8 @@ public class MinecraftDownloader {
 
                 if (!Files.exists(resolvedPath)) {
                     System.out.println("Downloading " + resolvedPath.getFileName().toString());
-                    byte[] libraryBytes = Http.get(libraryUrl, ((totalBytes, currentBytes, done) -> {
-                        if (done) {
-                            System.out.println("Downloaded " + resolvedPath.getFileName().toString());
-                        } else {
-                            System.out.println("Progress (" + resolvedPath.getFileName().toString() + "): " + (currentBytes / 1024 / 1024) + " / " + (totalBytes / 1024 / 1024));
-                        }
-                    }));
                     PathUtils.createDirectoryIfNotExists(resolvedPath.getParent());
-                    Files.write(resolvedPath, libraryBytes);
+                    this.fileDownloader.download(libraryUrl, resolvedPath, this.progressListener);
                 }
             }
 
@@ -182,16 +168,8 @@ public class MinecraftDownloader {
                     File file = resolvedPath.toFile();
                     if (!file.exists()) {
                         System.out.println("Downloading " + resolvedPath.getFileName().toString());
-                        byte[] libraryBytes = Http.get(libraryUrl, ((totalBytes, currentBytes, done) -> {
-                            if (done) {
-                                System.out.println("Downloaded " + resolvedPath.getFileName().toString());
-                            } else {
-                                System.out.println("Progress (" + resolvedPath.getFileName().toString() + "): " + (currentBytes / 1024 / 1024) + " / " + (totalBytes / 1024 / 1024));
-                            }
-                        }));
-                        try (FileOutputStream fos = new FileOutputStream(file)) {
-                            fos.write(libraryBytes);
-                        }
+                        PathUtils.createDirectoryIfNotExists(resolvedPath.getParent());
+                        this.fileDownloader.download(libraryUrl, resolvedPath, this.progressListener);
                     }
                 }
             }
@@ -241,8 +219,8 @@ public class MinecraftDownloader {
                     String prefix = assetItemHash.substring(0, 2);
                     try {
                         PathUtils.createDirectoryIfNotExists(filePath.getParent());
-                        byte[] bytes = Http.get(MinecraftDownloader.RESOURCES + prefix + "/" + assetItemHash);
-                        Files.write(filePath, bytes);
+                        String url = MinecraftDownloader.RESOURCES + prefix + "/" + assetItemHash;
+                        this.fileDownloader.download(url, filePath, this.progressListener);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -255,8 +233,8 @@ public class MinecraftDownloader {
                     String prefix = assetItemHash.substring(0, 2);
                     try {
                         PathUtils.createDirectoryIfNotExists(filePath.getParent());
-                        byte[] bytes = Http.get(MinecraftDownloader.RESOURCES + prefix + "/" + assetItemHash);
-                        Files.write(filePath, bytes);
+                        String url = MinecraftDownloader.RESOURCES + prefix + "/" + assetItemHash;
+                        this.fileDownloader.download(url, filePath, this.progressListener);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -270,8 +248,8 @@ public class MinecraftDownloader {
                 if (!Files.exists(filePath)) {
                     try {
                         PathUtils.createDirectoryIfNotExists(filePath.getParent());
-                        byte[] bytes = Http.get(MinecraftDownloader.RESOURCES + prefix + "/" + assetItemHash);
-                        Files.write(filePath, bytes);
+                        String url = MinecraftDownloader.RESOURCES + prefix + "/" + assetItemHash;
+                        this.fileDownloader.download(url, filePath, this.progressListener);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -284,11 +262,11 @@ public class MinecraftDownloader {
 
     }
 
-    private static Reader getReader(byte[] bytes) throws IOException {
+    private static Reader getReader(byte[] bytes) {
         return new InputStreamReader(new ByteArrayInputStream(bytes), StandardCharsets.UTF_8);
     }
 
-    private void extractNatives(String versionId) throws IOException {
+    private void extractNatives() throws IOException {
         Path nativesDir = this.nativesDir;
         try (Stream<Path> files = Files.walk(nativesDir)) {
             files.forEach(file -> {

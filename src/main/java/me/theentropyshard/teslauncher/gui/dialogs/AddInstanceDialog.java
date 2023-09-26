@@ -73,6 +73,14 @@ public class AddInstanceDialog {
         McVersionsTableModel tableModel = new McVersionsTableModel(this, versionsTable);
         versionsTable.setModel(tableModel);
 
+        ListSelectionModel selectionModel = versionsTable.getSelectionModel();
+        selectionModel.addListSelectionListener(e -> {
+            int selectedRow = versionsTable.getSelectedRow();
+            selectedRow = versionsTable.convertRowIndexToModel(selectedRow);
+            String mcVersion = String.valueOf(versionsTable.getModel().getValueAt(selectedRow, 0));
+            this.nameField.setText(mcVersion);
+        });
+
         JScrollPane scrollPane = new JScrollPane(versionsTable);
 
         JPanel filterPanel = new JPanel();

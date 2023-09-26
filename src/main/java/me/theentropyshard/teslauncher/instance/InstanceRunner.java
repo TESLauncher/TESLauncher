@@ -21,6 +21,8 @@ import com.google.gson.GsonBuilder;
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.accounts.AccountsManager;
 import me.theentropyshard.teslauncher.gson.DetailedVersionInfoDeserializerOld;
+import me.theentropyshard.teslauncher.gui.playview.PlayView;
+import me.theentropyshard.teslauncher.http.ProgressListener;
 import me.theentropyshard.teslauncher.minecraft.MinecraftDownloader;
 import me.theentropyshard.teslauncher.minecraft.models.AssetIndex;
 import me.theentropyshard.teslauncher.minecraft.models.VersionAssetIndex;
@@ -29,6 +31,7 @@ import me.theentropyshard.teslauncher.utils.EnumOS;
 import me.theentropyshard.teslauncher.utils.PathUtils;
 import org.apache.commons.text.StringSubstitutor;
 
+import javax.swing.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStream;
@@ -59,6 +62,22 @@ public class InstanceRunner extends Thread {
                             .resolve(this.instance.getMinecraftVersion())
             );
 
+            ProgressListener progressListener = (contentLength, bytesRead, done, fileName) -> {
+                SwingUtilities.invokeLater(() -> {
+                    PlayView playView = TESLauncher.getInstance().getPlayView();
+                    JProgressBar progressBar = playView.getProgressBar();
+                    progressBar.setMaximum((int) contentLength);
+                    progressBar.setMinimum(0);
+                    progressBar.setValue((int) bytesRead);
+
+                    if (done) {
+                        progressBar.setString("Downloaded " + fileName);
+                    } else {
+                        progressBar.setString("Downloading " + fileName + ": " + (bytesRead / 1024) + " KB / " + (contentLength / 1024) + " KB");
+                    }
+                });
+            };
+
             Path clientsDir = launcher.getVersionsDir();
             Path librariesDir = launcher.getLibrariesDir();
             Path assetsDir = launcher.getAssetsDir();
@@ -68,10 +87,15 @@ public class InstanceRunner extends Thread {
                         assetsDir,
                         librariesDir,
                         tmpNativesDir,
-                        instanceManager.getMinecraftDir(this.instance).resolve("resources")
+                        instanceManager.getMinecraftDir(this.instance).resolve("resources"),
+                        progressListener
                 );
 
+                TESLauncher.getInstance().getPlayView().getProgressBar().setVisible(true);
+                TESLauncher.getInstance().getPlayView().getProgressBar().setEnabled(true);
                 downloader.downloadMinecraft(this.instance.getMinecraftVersion());
+                TESLauncher.getInstance().getPlayView().getProgressBar().setVisible(false);
+                TESLauncher.getInstance().getPlayView().getProgressBar().setEnabled(false);
 
                 this.instance.setWasEverPlayed(true);
                 instanceManager.save(this.instance);
