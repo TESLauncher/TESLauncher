@@ -96,4 +96,32 @@ public class TESLauncher {
     public Path getWorkDir() {
         return this.workDir;
     }
+
+    public Path getRuntimesDir() {
+        return this.runtimesDir;
+    }
+
+    public Path getMinecraftDir() {
+        return this.minecraftDir;
+    }
+
+    public Path getAssetsDir() {
+        return this.assetsDir;
+    }
+
+    public Path getLibrariesDir() {
+        return this.librariesDir;
+    }
+
+    public Path getInstancesDir() {
+        return this.instancesDir;
+    }
+
+    public Path getVersionsDir() {
+        return this.versionsDir;
+    }
+
+    public Path getLog4jConfigsDir() {
+        return this.log4jConfigsDir;
+    }
 }
