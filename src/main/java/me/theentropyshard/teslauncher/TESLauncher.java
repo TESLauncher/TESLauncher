@@ -18,6 +18,7 @@ package me.theentropyshard.teslauncher;
 
 import com.beust.jcommander.JCommander;
 import com.google.gson.Gson;
+import me.theentropyshard.teslauncher.gui.Gui;
 import me.theentropyshard.teslauncher.settings.JsonSettings;
 import me.theentropyshard.teslauncher.settings.Settings;
 import me.theentropyshard.teslauncher.utils.PathUtils;
@@ -47,6 +48,8 @@ public class TESLauncher {
     private final Gson gson;
     private final Settings settings;
 
+    private final Gui gui;
+
     private TESLauncher(Args args, Logger logger, Path workDir) {
         this.args = args;
         this.logger = logger;
@@ -65,6 +68,15 @@ public class TESLauncher {
         this.settings = new JsonSettings(this.gson);
         this.loadSettings();
 
+        this.gui = new Gui(
+                "TESLauncher",
+                Integer.parseInt(this.settings.getValue("windowWidth")),
+                Integer.parseInt(this.settings.getValue("windowHeight")),
+                Boolean.parseBoolean(this.settings.getValue("darkTheme"))
+        );
+        this.gui.addWindowClosingListener(this::saveSettings);
+
+        this.gui.show();
     }
 
     public static void start(String[] rawArgs) {
@@ -139,6 +151,7 @@ public class TESLauncher {
     private void writeDefaultSettings() {
         this.settings.setValue("windowWidth", "1280");
         this.settings.setValue("windowHeight", "720");
+        this.settings.setValue("darkTheme", "false");
         this.saveSettings();
     }
 
