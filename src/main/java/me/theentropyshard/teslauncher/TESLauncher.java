@@ -17,11 +17,17 @@
 package me.theentropyshard.teslauncher;
 
 import com.beust.jcommander.JCommander;
+import com.google.gson.Gson;
+import me.theentropyshard.teslauncher.settings.JsonSettings;
+import me.theentropyshard.teslauncher.settings.Settings;
 import me.theentropyshard.teslauncher.utils.PathUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -38,6 +44,9 @@ public class TESLauncher {
     private final Path versionsDir;
     private final Path log4jConfigsDir;
 
+    private final Gson gson;
+    private final Settings settings;
+
     private TESLauncher(Args args, Logger logger, Path workDir) {
         this.args = args;
         this.logger = logger;
@@ -52,6 +61,9 @@ public class TESLauncher {
         this.log4jConfigsDir = this.minecraftDir.resolve("log4j");
         this.createDirectories();
 
+        this.gson = new Gson();
+        this.settings = new JsonSettings(this.gson);
+        this.loadSettings();
 
     }
 
@@ -83,6 +95,51 @@ public class TESLauncher {
         } catch (IOException e) {
             this.logger.error("Unable to create launcher directories", e);
         }
+    }
+
+    private void loadSettings() {
+        this.loadSettingsFromFile();
+
+        if (this.settings.isEmpty()) {
+            this.writeDefaultSettings();
+            this.loadSettingsFromFile();
+        }
+
+        if (this.settings.isEmpty()) {
+            this.logger.warn("Unable to save and load default settings");
+        }
+    }
+
+    private void loadSettingsFromFile() {
+        Path settingsFile = this.workDir.resolve("settings.json");
+        try {
+            PathUtils.createFileIfNotExists(settingsFile);
+
+            try (InputStream inputStream = Files.newInputStream(settingsFile)) {
+                this.settings.load(inputStream);
+            }
+        } catch (IOException e) {
+            this.logger.error("Unable to load settings", e);
+        }
+    }
+
+    private void saveSettings() {
+        Path settingsFile = this.workDir.resolve("settings.json");
+        try {
+            PathUtils.createFileIfNotExists(settingsFile);
+
+            try (OutputStream outputStream = Files.newOutputStream(settingsFile)) {
+                this.settings.save(outputStream);
+            }
+        } catch (IOException e) {
+            this.logger.error("Unable to save settings", e);
+        }
+    }
+
+    private void writeDefaultSettings() {
+        this.settings.setValue("windowWidth", "1280");
+        this.settings.setValue("windowHeight", "720");
+        this.saveSettings();
     }
 
     public Args getArgs() {
@@ -123,5 +180,13 @@ public class TESLauncher {
 
     public Path getLog4jConfigsDir() {
         return this.log4jConfigsDir;
+    }
+
+    public Gson getGson() {
+        return this.gson;
+    }
+
+    public Settings getSettings() {
+        return this.settings;
     }
 }
