@@ -25,7 +25,29 @@ public interface Settings {
 
     void save(OutputStream outputStream) throws IOException;
 
-    String getValue(String key);
+    String getString(String key);
+
+    String getString(String key, String def);
+
+    int getInt(String key);
+
+    int getInt(String key, int def);
+
+    long getLong(String key);
+
+    long getLong(String key, long def);
+
+    boolean getBoolean(String key);
+
+    boolean getBoolean(String key, boolean def);
+
+    float getFloat(String key);
+
+    float getFloat(String key, float def);
+
+    double getDouble(String key);
+
+    double getDouble(String key, double def);
 
     void setValue(String key, String value);
 

@@ -70,9 +70,9 @@ public class TESLauncher {
 
         this.gui = new Gui(
                 "TESLauncher",
-                Integer.parseInt(this.settings.getValue("windowWidth")),
-                Integer.parseInt(this.settings.getValue("windowHeight")),
-                Boolean.parseBoolean(this.settings.getValue("darkTheme"))
+                this.settings.getInt("windowWidth"),
+                this.settings.getInt("windowHeight"),
+                this.settings.getBoolean("darkTheme")
         );
         this.gui.addWindowClosingListener(this::saveSettings);
 

@@ -43,8 +43,92 @@ public abstract class MapBasedSettings implements Settings {
     }
 
     @Override
-    public String getValue(String key) {
+    public String getString(String key) {
         return this.data.get(key);
+    }
+
+    @Override
+    public String getString(String key, String def) {
+        String string = this.getString(key);
+        if (string == null) {
+            return def;
+        } else {
+            return string;
+        }
+    }
+
+    @Override
+    public int getInt(String key) {
+        return Integer.parseInt(this.getString(key));
+    }
+
+    @Override
+    public int getInt(String key, int def) {
+        try {
+            return Integer.parseInt(this.getString(key));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return def;
+        }
+    }
+
+    @Override
+    public long getLong(String key) {
+        return Long.parseLong(this.getString(key));
+    }
+
+    @Override
+    public long getLong(String key, long def) {
+        try {
+            return Long.parseLong(this.getString(key));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return def;
+        }
+    }
+
+    @Override
+    public boolean getBoolean(String key) {
+        return Boolean.parseBoolean(this.getString(key));
+    }
+
+    @Override
+    public boolean getBoolean(String key, boolean def) {
+        String string = this.getString(key);
+        if (string == null) {
+            return def;
+        }
+        return Boolean.parseBoolean(string);
+    }
+
+    @Override
+    public float getFloat(String key) {
+        return Float.parseFloat(this.getString(key));
+    }
+
+    @Override
+    public float getFloat(String key, float def) {
+        try {
+            return Float.parseFloat(this.getString(key));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return def;
+        }
+    }
+
+    @Override
+    public double getDouble(String key) {
+        return Double.parseDouble(this.getString(key));
+    }
+
+    @Override
+    public double getDouble(String key, double def) {
+        try {
+            return Double.parseDouble(this.getString(key));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return def;
+        }
     }
 
     @Override
