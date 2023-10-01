@@ -14,20 +14,27 @@
  * limitations under the License.
  */
 
-package me.theentropyshard.teslauncher.settings;
+package me.theentropyshard.teslauncher.network;
+
+import okhttp3.Interceptor;
+import okhttp3.Response;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 
-public interface Settings {
-    void load(InputStream inputStream) throws IOException;
+public class UserAgentInterceptor implements Interceptor {
+    private final String userAgent;
 
-    void save(OutputStream outputStream) throws IOException;
+    public UserAgentInterceptor(String userAgent) {
+        this.userAgent = userAgent;
+    }
 
-    String getValue(String key);
-
-    void setValue(String key, String value);
-
-    boolean isEmpty();
+    @NotNull
+    @Override
+    public Response intercept(@NotNull Chain chain) throws IOException {
+        return chain.proceed(chain.request().newBuilder()
+                .header("User-Agent", this.userAgent)
+                .build()
+        );
+    }
 }
