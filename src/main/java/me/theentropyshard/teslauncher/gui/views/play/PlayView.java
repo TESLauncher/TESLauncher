@@ -19,17 +19,39 @@ package me.theentropyshard.teslauncher.gui.views.play;
 import me.theentropyshard.teslauncher.gui.View;
 
 import javax.swing.*;
+import java.awt.*;
 
 public class PlayView extends View {
     private final JComboBox<String> groups;
     private final JComboBox<String> accounts;
-
+    private final JPanel instancePanelsView;
+    private final CardLayout cardLayout;
+    private final JProgressBar progressBar;
 
     public PlayView() {
         this.groups = new JComboBox<>();
         this.accounts = new JComboBox<>();
+        this.instancePanelsView = new JPanel();
+        this.cardLayout = new CardLayout();
+        this.instancePanelsView.setLayout(this.cardLayout);
+        this.progressBar = new JProgressBar();
+        this.progressBar.setStringPainted(true);
+        this.progressBar.setVisible(false);
+
+        JPanel leftSide = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        leftSide.add(this.groups);
+
+        JPanel rightSide = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        rightSide.add(this.accounts);
+
+        JPanel header = new JPanel(new BorderLayout());
+        header.add(leftSide, BorderLayout.WEST);
+        header.add(rightSide, BorderLayout.EAST);
 
         JPanel root = this.getRoot();
+        root.add(header, BorderLayout.NORTH);
+        root.add(this.instancePanelsView, BorderLayout.CENTER);
+        root.add(this.progressBar, BorderLayout.SOUTH);
     }
 
     public JComboBox<String> getGroups() {
@@ -38,5 +60,17 @@ public class PlayView extends View {
 
     public JComboBox<String> getAccounts() {
         return this.accounts;
+    }
+
+    public JPanel getInstancePanelsView() {
+        return this.instancePanelsView;
+    }
+
+    public CardLayout getCardLayout() {
+        return this.cardLayout;
+    }
+
+    public JProgressBar getProgressBar() {
+        return this.progressBar;
     }
 }

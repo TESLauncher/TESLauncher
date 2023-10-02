@@ -21,7 +21,9 @@ import com.formdev.flatlaf.FlatIntelliJLaf;
 import me.theentropyshard.teslauncher.gui.views.about.AboutView;
 import me.theentropyshard.teslauncher.gui.views.accounts.AccountsView;
 import me.theentropyshard.teslauncher.gui.views.play.PlayView;
+import me.theentropyshard.teslauncher.gui.views.play.PlayViewController;
 import me.theentropyshard.teslauncher.gui.views.settings.SettingsView;
+import me.theentropyshard.teslauncher.utils.SwingUtils;
 
 import javax.swing.*;
 import javax.swing.plaf.ColorUIResource;
@@ -35,7 +37,10 @@ public class Gui {
     private final int windowHeight;
 
     private final JTabbedPane viewSelector;
+
     private final PlayView playView;
+    private final PlayViewController playViewController;
+
     private final AccountsView accountsView;
     private final SettingsView settingsView;
     private final AboutView aboutView;
@@ -56,6 +61,14 @@ public class Gui {
 
         this.playView = new PlayView();
         this.viewSelector.addTab("Play", this.playView.getRoot());
+
+        this.playViewController = new PlayViewController(this.playView);
+        this.playViewController.addInstance("Mazafaka", "Minecraft", SwingUtils.getIcon("/grass_icon.png"), () -> {});
+        this.playViewController.addInstance("Mazafaka", "PlayGame", SwingUtils.getIcon("/grass_icon.png"), () -> {});
+        this.playViewController.addInstance("Mazafaka", "Oldii", SwingUtils.getIcon("/grass_icon.png"), () -> {});
+        this.playViewController.addInstance("Kekis", "Yeas", SwingUtils.getIcon("/grass_icon.png"), () -> {});
+        this.playViewController.addInstance("Kekis", "Truly", SwingUtils.getIcon("/grass_icon.png"), () -> {});
+        this.playViewController.addInstance("Mega", "bebrii", SwingUtils.getIcon("/grass_icon.png"), () -> {});
 
         this.accountsView = new AccountsView();
         this.viewSelector.addTab("Accounts", this.accountsView.getRoot());
@@ -169,5 +182,9 @@ public class Gui {
 
     public JFrame getFrame() {
         return this.frame;
+    }
+
+    public PlayViewController getPlayViewController() {
+        return this.playViewController;
     }
 }
