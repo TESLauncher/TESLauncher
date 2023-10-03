@@ -14,19 +14,9 @@
  * limitations under the License.
  */
 
-package me.theentropyshard.teslauncher.gui;
+package me.theentropyshard.teslauncher.minecraft.models;
 
-import javax.swing.*;
-import java.awt.*;
-
-public abstract class View {
-    private final JPanel root;
-
-    public View() {
-        this.root = new JPanel(new BorderLayout(), true);
-    }
-
-    public JPanel getRoot() {
-        return this.root;
-    }
+public class AssetObject {
+    public long size;
+    public String hash;
 }

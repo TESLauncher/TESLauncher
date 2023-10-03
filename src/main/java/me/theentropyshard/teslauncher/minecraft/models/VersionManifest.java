@@ -14,19 +14,24 @@
  * limitations under the License.
  */
 
-package me.theentropyshard.teslauncher.gui;
+package me.theentropyshard.teslauncher.minecraft.models;
 
-import javax.swing.*;
-import java.awt.*;
+public final class VersionManifest {
+    public Latest latest;
+    public Version[] versions;
 
-public abstract class View {
-    private final JPanel root;
-
-    public View() {
-        this.root = new JPanel(new BorderLayout(), true);
+    public static final class Latest {
+        public String release;
+        public String snapshot;
     }
 
-    public JPanel getRoot() {
-        return this.root;
+    public static final class Version {
+        public String id;
+        public String type;
+        public String url;
+        public String time;
+        public String releaseTime;
+        public String sha1;
+        public int complianceLevel;
     }
 }

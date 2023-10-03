@@ -16,17 +16,6 @@
 
 package me.theentropyshard.teslauncher.gui;
 
-import javax.swing.*;
-import java.awt.*;
+public class AboutView extends View {
 
-public abstract class View {
-    private final JPanel root;
-
-    public View() {
-        this.root = new JPanel(new BorderLayout(), true);
-    }
-
-    public JPanel getRoot() {
-        return this.root;
-    }
 }

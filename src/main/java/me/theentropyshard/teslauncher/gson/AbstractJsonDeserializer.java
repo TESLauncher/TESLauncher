@@ -14,19 +14,17 @@
  * limitations under the License.
  */
 
-package me.theentropyshard.teslauncher.gui;
+package me.theentropyshard.teslauncher.gson;
 
-import javax.swing.*;
-import java.awt.*;
+import com.google.gson.*;
 
-public abstract class View {
-    private final JPanel root;
+import java.lang.reflect.Type;
 
-    public View() {
-        this.root = new JPanel(new BorderLayout(), true);
-    }
+public abstract class AbstractJsonDeserializer<T> implements JsonDeserializer<T> {
+    public abstract T deserialize(JsonObject root);
 
-    public JPanel getRoot() {
-        return this.root;
+    @Override
+    public T deserialize(JsonElement element, Type type, JsonDeserializationContext ctx) throws JsonParseException {
+        return this.deserialize(element.getAsJsonObject());
     }
 }

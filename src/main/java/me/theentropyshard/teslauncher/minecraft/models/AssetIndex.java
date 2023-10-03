@@ -14,19 +14,15 @@
  * limitations under the License.
  */
 
-package me.theentropyshard.teslauncher.gui;
+package me.theentropyshard.teslauncher.minecraft.models;
 
-import javax.swing.*;
-import java.awt.*;
+import com.google.gson.annotations.SerializedName;
 
-public abstract class View {
-    private final JPanel root;
+import java.util.Map;
 
-    public View() {
-        this.root = new JPanel(new BorderLayout(), true);
-    }
-
-    public JPanel getRoot() {
-        return this.root;
-    }
+public class AssetIndex {
+    @SerializedName("map_to_resources")
+    public boolean mapToResources;
+    public boolean virtual;
+    public Map<String, AssetObject> objects;
 }

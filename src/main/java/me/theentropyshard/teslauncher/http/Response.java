@@ -14,19 +14,24 @@
  * limitations under the License.
  */
 
-package me.theentropyshard.teslauncher.gui;
+package me.theentropyshard.teslauncher.http;
 
-import javax.swing.*;
-import java.awt.*;
+import java.io.InputStream;
 
-public abstract class View {
-    private final JPanel root;
+public class Response {
+    private final InputStream inputStream;
+    private final long contentLength;
 
-    public View() {
-        this.root = new JPanel(new BorderLayout(), true);
+    public Response(InputStream inputStream, long contentLength) {
+        this.inputStream = inputStream;
+        this.contentLength = contentLength;
     }
 
-    public JPanel getRoot() {
-        return this.root;
+    public InputStream getInputStream() {
+        return this.inputStream;
+    }
+
+    public long getContentLength() {
+        return this.contentLength;
     }
 }

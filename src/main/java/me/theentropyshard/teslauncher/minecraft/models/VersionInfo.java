@@ -14,19 +14,22 @@
  * limitations under the License.
  */
 
-package me.theentropyshard.teslauncher.gui;
+package me.theentropyshard.teslauncher.minecraft.models;
 
-import javax.swing.*;
-import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
-public abstract class View {
-    private final JPanel root;
-
-    public View() {
-        this.root = new JPanel(new BorderLayout(), true);
-    }
-
-    public JPanel getRoot() {
-        return this.root;
-    }
+public final class VersionInfo {
+    public boolean newFormat;
+    public String id;
+    public String mainClass;
+    public String type;
+    public String assets;
+    public final List<String> jvmArgs = new ArrayList<>();
+    public final List<String> gameArgs = new ArrayList<>();
+    public final List<String> librariesPaths = new ArrayList<>();
+    public String logArgument;
+    public String logConfigUrl;
+    public String logConfigId;
+    public VersionAssetIndex assetIndex;
 }

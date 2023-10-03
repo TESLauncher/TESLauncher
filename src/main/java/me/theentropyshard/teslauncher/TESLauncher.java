@@ -17,22 +17,33 @@
 package me.theentropyshard.teslauncher;
 
 import com.beust.jcommander.JCommander;
-import com.google.gson.Gson;
-import me.theentropyshard.teslauncher.gui.Gui;
-import me.theentropyshard.teslauncher.settings.JsonSettings;
-import me.theentropyshard.teslauncher.settings.Settings;
+import com.formdev.flatlaf.FlatDarculaLaf;
+import com.formdev.flatlaf.FlatIntelliJLaf;
+import me.theentropyshard.teslauncher.accounts.AccountsManager;
+import me.theentropyshard.teslauncher.gui.AboutView;
+import me.theentropyshard.teslauncher.gui.AccountsView;
+import me.theentropyshard.teslauncher.gui.AppWindow;
+import me.theentropyshard.teslauncher.gui.SettingsView;
+import me.theentropyshard.teslauncher.gui.playview.PlayView;
+import me.theentropyshard.teslauncher.instance.InstanceManager;
+import me.theentropyshard.teslauncher.instance.InstanceManagerImpl;
 import me.theentropyshard.teslauncher.utils.PathUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.swing.*;
+import javax.swing.plaf.ColorUIResource;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class TESLauncher {
+    public static final String TITLE = "TESLauncher";
+    public static final int WIDTH = 960;
+    public static final int HEIGHT = 540;
+
     private final Args args;
     private final Logger logger;
     private final Path workDir;
@@ -45,15 +56,22 @@ public class TESLauncher {
     private final Path versionsDir;
     private final Path log4jConfigsDir;
 
-    private final Gson gson;
-    private final Settings settings;
+    private final AccountsManager accountsManager;
+    private final InstanceManager instanceManager;
 
-    private final Gui gui;
+    private final ExecutorService taskPool;
+
+    private boolean darkTheme;
+
+    public static AppWindow window;
+    private PlayView playView;
 
     private TESLauncher(Args args, Logger logger, Path workDir) {
         this.args = args;
         this.logger = logger;
         this.workDir = workDir;
+
+        TESLauncher.setInstance(this);
 
         this.runtimesDir = this.workDir.resolve("runtimes");
         this.minecraftDir = this.workDir.resolve("minecraft");
@@ -64,19 +82,25 @@ public class TESLauncher {
         this.log4jConfigsDir = this.minecraftDir.resolve("log4j");
         this.createDirectories();
 
-        this.gson = new Gson();
-        this.settings = new JsonSettings(this.gson);
-        this.loadSettings();
+        this.accountsManager = new AccountsManager(this.workDir);
+        try {
+            this.accountsManager.loadAccounts();
+        } catch (IOException e) {
+            this.logger.error("Unable to load accounts", e);
+        }
 
-        this.gui = new Gui(
-                "TESLauncher",
-                this.settings.getInt("windowWidth"),
-                this.settings.getInt("windowHeight"),
-                this.settings.getBoolean("darkTheme")
-        );
-        this.gui.addWindowClosingListener(this::saveSettings);
+        this.instanceManager = new InstanceManagerImpl(this.instancesDir);
+        try {
+            this.instanceManager.load();
+        } catch (IOException e) {
+            this.logger.error("Unable to load instances", e);
+        }
 
-        this.gui.show();
+        this.taskPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+
+        this.darkTheme = false;
+
+        this.showGui();
     }
 
     public static void start(String[] rawArgs) {
@@ -109,50 +133,60 @@ public class TESLauncher {
         }
     }
 
-    private void loadSettings() {
-        this.loadSettingsFromFile();
+    private void showGui() {
+        SwingUtilities.invokeLater(() -> {
+            if (this.darkTheme) {
+                UIManager.put("InstanceItem.defaultColor", new ColorUIResource(64, 75, 93));
+                UIManager.put("InstanceItem.hoveredColor", new ColorUIResource(70, 80, 100));
+                UIManager.put("InstanceItem.pressedColor", new ColorUIResource(60, 70, 86));
 
-        if (this.settings.isEmpty()) {
-            this.writeDefaultSettings();
-            this.loadSettingsFromFile();
-        }
+                FlatDarculaLaf.setup();
+            } else {
+                UIManager.put("InstanceItem.defaultColor", new ColorUIResource(222, 230, 237));
+                UIManager.put("InstanceItem.hoveredColor", new ColorUIResource(224, 234, 244));
+                UIManager.put("InstanceItem.pressedColor", new ColorUIResource(216, 224, 240));
 
-        if (this.settings.isEmpty()) {
-            this.logger.warn("Unable to save and load default settings");
-        }
-    }
-
-    private void loadSettingsFromFile() {
-        Path settingsFile = this.workDir.resolve("settings.json");
-        try {
-            PathUtils.createFileIfNotExists(settingsFile);
-
-            try (InputStream inputStream = Files.newInputStream(settingsFile)) {
-                this.settings.load(inputStream);
+                FlatIntelliJLaf.setup();
             }
-        } catch (IOException e) {
-            this.logger.error("Unable to load settings", e);
-        }
+
+            JDialog.setDefaultLookAndFeelDecorated(true);
+            JFrame.setDefaultLookAndFeelDecorated(true);
+
+            JTabbedPane viewSelector = new JTabbedPane(JTabbedPane.LEFT);
+            AppWindow appWindow = new AppWindow(TESLauncher.TITLE, TESLauncher.WIDTH, TESLauncher.HEIGHT, viewSelector);
+            TESLauncher.window = appWindow;
+
+            this.playView = new PlayView();
+
+            viewSelector.addTab("Play", this.playView.getRoot());
+            viewSelector.addTab("Accounts", new AccountsView().getRoot());
+            viewSelector.addTab("Settings", new SettingsView().getRoot());
+            viewSelector.addTab("About", new AboutView().getRoot());
+
+            appWindow.setVisible(true);
+        });
     }
 
-    private void saveSettings() {
-        Path settingsFile = this.workDir.resolve("settings.json");
-        try {
-            PathUtils.createFileIfNotExists(settingsFile);
-
-            try (OutputStream outputStream = Files.newOutputStream(settingsFile)) {
-                this.settings.save(outputStream);
-            }
-        } catch (IOException e) {
-            this.logger.error("Unable to save settings", e);
-        }
+    public void doTask(Runnable r) {
+        this.taskPool.submit(r);
     }
 
-    private void writeDefaultSettings() {
-        this.settings.setValue("windowWidth", "1280");
-        this.settings.setValue("windowHeight", "720");
-        this.settings.setValue("darkTheme", "false");
-        this.saveSettings();
+    public void shutdown() {
+        this.taskPool.shutdown();
+    }
+
+    private static TESLauncher instance;
+
+    public static TESLauncher getInstance() {
+        return TESLauncher.instance;
+    }
+
+    private static void setInstance(TESLauncher instance) {
+        TESLauncher.instance = instance;
+    }
+
+    public PlayView getPlayView() {
+        return this.playView;
     }
 
     public Args getArgs() {
@@ -165,10 +199,6 @@ public class TESLauncher {
 
     public Path getWorkDir() {
         return this.workDir;
-    }
-
-    public Path getRuntimesDir() {
-        return this.runtimesDir;
     }
 
     public Path getMinecraftDir() {
@@ -195,11 +225,11 @@ public class TESLauncher {
         return this.log4jConfigsDir;
     }
 
-    public Gson getGson() {
-        return this.gson;
+    public AccountsManager getAccountsManager() {
+        return this.accountsManager;
     }
 
-    public Settings getSettings() {
-        return this.settings;
+    public InstanceManager getInstanceManager() {
+        return this.instanceManager;
     }
 }

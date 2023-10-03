@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -69,25 +70,23 @@ public final class PathUtils {
     }
 
     public static String sha1(Path path) throws IOException {
-        try (InputStream inputStream = Files.newInputStream(path)) {
-            MessageDigest md = MessageDigest.getInstance("SHA-1");
+        if (!Files.isRegularFile(path)) {
+            throw new IllegalArgumentException("Can compute SHA-1 only for files!");
+        }
 
-            byte[] dataBytes = new byte[1024];
+        MessageDigest digest;
+        try {
+            digest = MessageDigest.getInstance("SHA-1");
+        } catch (NoSuchAlgorithmException e) {
+            throw new IOException("Impossible to get SHA-1 digester", e);
+        }
 
-            int numRead;
-            while ((numRead = inputStream.read(dataBytes)) != -1) {
-                md.update(dataBytes, 0, numRead);
-            }
-
-            byte[] mdBytes = md.digest();
-
-            StringBuilder sb = new StringBuilder();
-            for (byte b : mdBytes) {
-                sb.append(Integer.toString((b & 0xff) + 0x100, 16).substring(1));
-            }
-            return sb.toString();
-        } catch (NoSuchAlgorithmException ex) {
-            throw new IOException(ex);
+        try (InputStream input = Files.newInputStream(path);
+             DigestInputStream digestStream = new DigestInputStream(input, digest)) {
+            while (digestStream.read() != -1) ;
+            digest = digestStream.getMessageDigest();
+            //return new HexBinaryAdapter().marshal(digest.digest()).toLowerCase(Locale.ENGLISH);
+            return "Not Implemented";
         }
     }
 

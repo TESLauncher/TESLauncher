@@ -14,19 +14,9 @@
  * limitations under the License.
  */
 
-package me.theentropyshard.teslauncher.gui;
+package me.theentropyshard.teslauncher.http;
 
-import javax.swing.*;
-import java.awt.*;
-
-public abstract class View {
-    private final JPanel root;
-
-    public View() {
-        this.root = new JPanel(new BorderLayout(), true);
-    }
-
-    public JPanel getRoot() {
-        return this.root;
-    }
+@FunctionalInterface
+public interface ProgressListener {
+    void onProgress(long bytesRead, long contentLength, boolean done, String fileName);
 }

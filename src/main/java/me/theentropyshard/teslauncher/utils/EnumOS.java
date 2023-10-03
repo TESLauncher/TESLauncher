@@ -14,19 +14,21 @@
  * limitations under the License.
  */
 
-package me.theentropyshard.teslauncher.gui;
+package me.theentropyshard.teslauncher.utils;
 
-import javax.swing.*;
-import java.awt.*;
+public enum EnumOS {
+    WINDOWS,
+    LINUX,
+    MACOS,
+    SOLARIS,
+    UNKNOWN;
 
-public abstract class View {
-    private final JPanel root;
-
-    public View() {
-        this.root = new JPanel(new BorderLayout(), true);
-    }
-
-    public JPanel getRoot() {
-        return this.root;
+    public static EnumOS getOS() {
+        String osName = System.getProperty("os.name").toLowerCase();
+        if(osName.contains("win")) return EnumOS.WINDOWS;
+        if(osName.contains("mac")) return EnumOS.MACOS;
+        if(osName.contains("solaris") || osName.contains("sunos")) return EnumOS.SOLARIS;
+        if(osName.contains("linux") || osName.contains("unix")) return EnumOS.LINUX;
+        return EnumOS.UNKNOWN;
     }
 }

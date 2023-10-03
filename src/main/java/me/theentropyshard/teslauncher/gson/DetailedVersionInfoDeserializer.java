@@ -14,19 +14,18 @@
  * limitations under the License.
  */
 
-package me.theentropyshard.teslauncher.gui;
+package me.theentropyshard.teslauncher.gson;
 
-import javax.swing.*;
-import java.awt.*;
+import com.google.gson.JsonObject;
+import me.theentropyshard.teslauncher.version.model.DetailedVersionInfo;
 
-public abstract class View {
-    private final JPanel root;
+public class DetailedVersionInfoDeserializer extends AbstractJsonDeserializer<DetailedVersionInfo> {
+    public DetailedVersionInfoDeserializer() {
 
-    public View() {
-        this.root = new JPanel(new BorderLayout(), true);
     }
 
-    public JPanel getRoot() {
-        return this.root;
+    @Override
+    public DetailedVersionInfo deserialize(JsonObject root) {
+        return null;
     }
 }
