@@ -16,6 +16,7 @@
 
 package me.theentropyshard.teslauncher.gui.playview;
 
+import com.formdev.flatlaf.FlatClientProperties;
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.gui.View;
 import me.theentropyshard.teslauncher.gui.components.AddInstanceItem;
@@ -82,6 +83,8 @@ public class PlayView extends View {
         });
 
         this.progressBar = new JProgressBar(JProgressBar.HORIZONTAL);
+        this.progressBar.putClientProperty(FlatClientProperties.PROGRESS_BAR_SQUARE, true);
+        this.progressBar.setFont(this.progressBar.getFont().deriveFont(12.0f));
         this.progressBar.setStringPainted(true);
         this.progressBar.setVisible(false);
         root.add(this.progressBar, BorderLayout.SOUTH);

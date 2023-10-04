@@ -17,6 +17,7 @@
 package me.theentropyshard.teslauncher;
 
 import com.beust.jcommander.JCommander;
+import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.FlatDarculaLaf;
 import com.formdev.flatlaf.FlatIntelliJLaf;
 import me.theentropyshard.teslauncher.accounts.AccountsManager;
@@ -33,6 +34,7 @@ import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import javax.swing.plaf.ColorUIResource;
+import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -98,7 +100,7 @@ public class TESLauncher {
 
         this.taskPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
-        this.darkTheme = false;
+        this.darkTheme = true;
 
         this.showGui();
     }
@@ -140,11 +142,17 @@ public class TESLauncher {
                 UIManager.put("InstanceItem.hoveredColor", new ColorUIResource(70, 80, 100));
                 UIManager.put("InstanceItem.pressedColor", new ColorUIResource(60, 70, 86));
 
+                UIManager.put("ProgressBar.selectionBackground", Color.WHITE);
+                UIManager.put("ProgressBar.selectionForeground", Color.WHITE);
+
                 FlatDarculaLaf.setup();
             } else {
                 UIManager.put("InstanceItem.defaultColor", new ColorUIResource(222, 230, 237));
                 UIManager.put("InstanceItem.hoveredColor", new ColorUIResource(224, 234, 244));
                 UIManager.put("InstanceItem.pressedColor", new ColorUIResource(216, 224, 240));
+
+                UIManager.put("ProgressBar.selectionBackground", Color.BLACK);
+                UIManager.put("ProgressBar.selectionForeground", Color.BLACK);
 
                 FlatIntelliJLaf.setup();
             }
@@ -157,6 +165,11 @@ public class TESLauncher {
             TESLauncher.window = appWindow;
 
             this.playView = new PlayView();
+            if (this.darkTheme) {
+                this.playView.getProgressBar().setForeground(new Color(64, 75, 93));
+            } else {
+                this.playView.getProgressBar().setForeground(new Color(222, 230, 237));
+            }
 
             viewSelector.addTab("Play", this.playView.getRoot());
             viewSelector.addTab("Accounts", new AccountsView().getRoot());
