@@ -32,10 +32,7 @@ import me.theentropyshard.teslauncher.utils.PathUtils;
 import org.apache.commons.text.StringSubstitutor;
 
 import javax.swing.*;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -47,16 +44,21 @@ import java.util.Map;
 public class InstanceRunner extends Thread {
     private final Instance instance;
 
+    private Gson gson;
+
     public InstanceRunner(Instance instance) {
         this.instance = instance;
     }
 
     @Override
     public void run() {
+        this.gson = new GsonBuilder()
+                .registerTypeAdapter(VersionInfo.class, new DetailedVersionInfoDeserializerOld())
+                .create();
+
         try {
             TESLauncher launcher = TESLauncher.getInstance();
             InstanceManager instanceManager = launcher.getInstanceManager();
-            Path mcDirOfInstance = PathUtils.createDirectoryIfNotExists(instanceManager.getMinecraftDir(this.instance));
             Path tmpNativesDir = PathUtils.createDirectoryIfNotExists(
                     launcher.getInstancesDir().resolve(this.instance.getName()).resolve("natives-tmp")
                             .resolve(this.instance.getMinecraftVersion())
@@ -103,128 +105,19 @@ public class InstanceRunner extends Thread {
 
             Path clientJson = clientsDir.resolve(this.instance.getMinecraftVersion())
                     .resolve(this.instance.getMinecraftVersion() + ".json");
-            Gson gson = new GsonBuilder()
-                    .registerTypeAdapter(VersionInfo.class, new DetailedVersionInfoDeserializerOld())
-                    .create();
-            VersionInfo versionInfo = gson.fromJson(new InputStreamReader(
+            VersionInfo versionInfo = this.gson.fromJson(new InputStreamReader(
                     Files.newInputStream(clientJson),
                     StandardCharsets.UTF_8
             ), VersionInfo.class);
 
-            System.out.println("Libraries:");
-            List<String> classpath = new ArrayList<>();
-            for (String libPath : versionInfo.librariesPaths) {
-                System.out.println("\t" + libPath);
-                classpath.add(librariesDir.resolve(libPath).toAbsolutePath().toString());
-            }
-            classpath.add(clientsDir.resolve(versionInfo.id).resolve(versionInfo.id + ".jar").toAbsolutePath().toString());
-
-            Map<String, Object> argVars = new HashMap<>();
-
-            boolean hasLogInfo = versionInfo.logConfigId != null && versionInfo.logConfigUrl != null &&
-                    versionInfo.logArgument != null;
-
-            /*if (hasLogInfo) {
-                Path log4j2ConfigsDir = TESLauncher.getInstance().getLog4jConfigsDir();
-
-                Path log4j2ConfigFile = log4j2ConfigsDir.resolve(versionInfo.logConfigId);
-                if (!Files.exists(log4j2ConfigFile)) {
-                    byte[] bytes = Http.get(versionInfo.logConfigUrl);
-                    Files.write(log4j2ConfigFile, bytes);
-                }
-
-                argVars.put("path", log4j2ConfigFile.toAbsolutePath().toString());
-            }*/
-
-            // JVM
-            argVars.put("natives_directory", tmpNativesDir.toAbsolutePath().toString());
-            argVars.put("launcher_name", "TESLauncher");
-            argVars.put("launcher_version", "1.0.0");
-            argVars.put("classpath", String.join(File.pathSeparator, classpath));
-
-            VersionAssetIndex vAssetIndex = versionInfo.assetIndex;
-            AssetIndex assetIndex = gson.fromJson(Files.newBufferedReader(
-                    assetsDir.resolve("indexes").resolve(vAssetIndex.id + ".json")
-            ), AssetIndex.class);
-
-            // Game
-            if (versionInfo.newFormat) {
-                argVars.put("clientid", "-");
-                argVars.put("auth_xuid", "-");
-                argVars.put("auth_player_name", AccountsManager.getCurrentUsername());
-                argVars.put("version_name", versionInfo.id);
-                argVars.put("game_directory", mcDirOfInstance.toAbsolutePath().toString());
-                argVars.put("assets_root", launcher.getAssetsDir().toAbsolutePath().toString());
-                argVars.put("assets_index_name", versionInfo.assets);
-                argVars.put("auth_uuid", "-");
-                argVars.put("auth_access_token", "-");
-                argVars.put("user_type", "msa");
-                argVars.put("version_type", versionInfo.type);
-            } else {
-                argVars.put("auth_uuid", "-");
-                argVars.put("auth_access_token", "-");
-                argVars.put("auth_session", "-");
-                argVars.put("user_properties", "-");
-                argVars.put("game_directory", mcDirOfInstance.toAbsolutePath().toString());
-                argVars.put("version_type", versionInfo.type);
-                argVars.put("user_type", "msa");
-                argVars.put("assets_index_name", versionInfo.assets);
-                argVars.put("version_name", versionInfo.id);
-                argVars.put("auth_player_name", AccountsManager.getCurrentUsername());
-                argVars.put("uuid", "-");
-                argVars.put("accessToken", "-");
-                if (assetIndex.mapToResources || vAssetIndex.id.equals("legacy")) {
-                    argVars.put("assets_root", instanceManager.getMinecraftDir(this.instance).resolve("resources"));
-                    argVars.put("game_assets", instanceManager.getMinecraftDir(this.instance).resolve("resources"));
-                } else {
-                    argVars.put("assets_root", assetsDir.toString());
-                    argVars.put("game_assets", assetsDir.toString());
-                }
-            }
-
-            StringSubstitutor substitutor = new StringSubstitutor(argVars);
-
-            List<String> jvmArgs = new ArrayList<>();
-
-            /*if (hasLogInfo) {
-                jvmArgs.add(substitutor.replace(versionInfo.logArgument));
-            }*/
-
-            for (String arg : versionInfo.jvmArgs) {
-                jvmArgs.add(substitutor.replace(arg));
-            }
-
-            List<String> gameArgs = new ArrayList<>();
-            for (String arg : versionInfo.gameArgs) {
-                gameArgs.add(substitutor.replace(arg));
-            }
-
-            String mainClass = versionInfo.mainClass;
-
-            String javaPath = this.getJavaExecutable();
-
-            List<String> command = new ArrayList<>();
-            command.add(javaPath);
-            command.addAll(jvmArgs);
-            command.add(mainClass);
-            command.addAll(gameArgs);
-
+            List<String> command = this.buildRunCommand(this.getArguments(versionInfo, tmpNativesDir, librariesDir, clientsDir));
             System.out.println("Starting Minecraft with the command:\n" + command);
 
-            ProcessBuilder processBuilder = new ProcessBuilder(command);
-            processBuilder.directory(instanceManager.getMinecraftDir(this.instance).getParent().toAbsolutePath().toFile());
-            processBuilder.redirectErrorStream(true);
-
             long start = System.currentTimeMillis();
-            Process process = processBuilder.start();
-            InputStream inputStream = process.getInputStream();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                System.out.println(line);
-            }
-            int exitCode = process.waitFor();
+
+            int exitCode = this.runGameProcess(command);
             System.out.println("Minecraft process finished with exit code " + exitCode);
+
             long end = System.currentTimeMillis();
 
             System.out.println("You played for " + ((end - start) / 1000) + " seconds!");
@@ -233,7 +126,119 @@ public class InstanceRunner extends Thread {
         }
     }
 
-    public String getJavaExecutable() {
+    private List<String> resolveClasspath(VersionInfo versionInfo, Path librariesDir, Path clientsDir) {
+        List<String> classpath = new ArrayList<>();
+
+        for (String libPath : versionInfo.librariesPaths) {
+            classpath.add(librariesDir.resolve(libPath).toAbsolutePath().toString());
+        }
+
+        classpath.add(clientsDir.resolve(versionInfo.id).resolve(versionInfo.id + ".jar").toAbsolutePath().toString());
+
+        return classpath;
+    }
+
+    private List<String> getArguments(VersionInfo versionInfo, Path tmpNativesDir, Path librariesDir, Path clientsDir) throws IOException {
+        TESLauncher launcher = TESLauncher.getInstance();
+        InstanceManager instanceManager = launcher.getInstanceManager();
+        Path mcDirOfInstance = PathUtils.createDirectoryIfNotExists(instanceManager.getMinecraftDir(this.instance));
+        Path assetsDir = launcher.getAssetsDir();
+
+        List<String> arguments = new ArrayList<>();
+
+        List<String> classpath = this.resolveClasspath(versionInfo, librariesDir, clientsDir);
+
+        Map<String, Object> argVars = new HashMap<>();
+
+        // JVM
+        argVars.put("natives_directory", tmpNativesDir.toAbsolutePath().toString());
+        argVars.put("launcher_name", "TESLauncher");
+        argVars.put("launcher_version", "1.0.0");
+        argVars.put("classpath", String.join(File.pathSeparator, classpath));
+
+        VersionAssetIndex vAssetIndex = versionInfo.assetIndex;
+        AssetIndex assetIndex = this.gson.fromJson(Files.newBufferedReader(
+                assetsDir.resolve("indexes").resolve(vAssetIndex.id + ".json")
+        ), AssetIndex.class);
+
+        // Game
+        if (versionInfo.newFormat) {
+            argVars.put("clientid", "-");
+            argVars.put("auth_xuid", "-");
+            argVars.put("auth_player_name", AccountsManager.getCurrentUsername());
+            argVars.put("version_name", versionInfo.id);
+            argVars.put("game_directory", mcDirOfInstance.toAbsolutePath().toString());
+            argVars.put("assets_root", assetsDir.toAbsolutePath().toString());
+            argVars.put("assets_index_name", versionInfo.assets);
+            argVars.put("auth_uuid", "-");
+            argVars.put("auth_access_token", "-");
+            argVars.put("user_type", "msa");
+            argVars.put("version_type", versionInfo.type);
+        } else {
+            argVars.put("auth_uuid", "-");
+            argVars.put("auth_access_token", "-");
+            argVars.put("auth_session", "-");
+            argVars.put("user_properties", "-");
+            argVars.put("game_directory", mcDirOfInstance.toAbsolutePath().toString());
+            argVars.put("version_type", versionInfo.type);
+            argVars.put("user_type", "msa");
+            argVars.put("assets_index_name", versionInfo.assets);
+            argVars.put("version_name", versionInfo.id);
+            argVars.put("auth_player_name", AccountsManager.getCurrentUsername());
+            argVars.put("uuid", "-");
+            argVars.put("accessToken", "-");
+            if (assetIndex.mapToResources || vAssetIndex.id.equals("legacy")) {
+                argVars.put("assets_root", instanceManager.getMinecraftDir(this.instance).resolve("resources"));
+                argVars.put("game_assets", instanceManager.getMinecraftDir(this.instance).resolve("resources"));
+            } else {
+                argVars.put("assets_root", assetsDir.toString());
+                argVars.put("game_assets", assetsDir.toString());
+            }
+        }
+
+        StringSubstitutor substitutor = new StringSubstitutor(argVars);
+
+        for (String arg : versionInfo.jvmArgs) {
+            arguments.add(substitutor.replace(arg));
+        }
+
+        arguments.add(versionInfo.mainClass);
+
+        for (String arg : versionInfo.gameArgs) {
+            arguments.add(substitutor.replace(arg));
+        }
+
+        return arguments;
+    }
+
+    private List<String> buildRunCommand(List<String> arguments) {
+        List<String> command = new ArrayList<>();
+
+        command.add(this.getJavaExecutable());
+        command.addAll(arguments);
+
+        return command;
+    }
+
+    private int runGameProcess(List<String> command) throws IOException, InterruptedException {
+        InstanceManager manager = TESLauncher.getInstance().getInstanceManager();
+
+        ProcessBuilder processBuilder = new ProcessBuilder(command);
+        processBuilder.directory(manager.getMinecraftDir(this.instance).getParent().toAbsolutePath().toFile());
+        processBuilder.redirectErrorStream(true);
+
+        Process process = processBuilder.start();
+        InputStream inputStream = process.getInputStream();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
+        String line;
+        while ((line = reader.readLine()) != null) {
+            System.out.println(line);
+        }
+
+        return process.waitFor();
+    }
+
+    private String getJavaExecutable() {
         String binDir = System.getProperty("java.home") + File.separator + "bin";
         //String binDir = "E:\\Users\\Aleksey\\.jdks\\liberica-17.0.3\\bin";
         if (EnumOS.getOS() == EnumOS.WINDOWS) {
