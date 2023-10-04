@@ -23,6 +23,7 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Path;
 
+// TODO: this one does not really count progress, we need to make a wrapper around a byte channel
 public class FileDownloaderNIO extends FileDownloader {
     public FileDownloaderNIO(String userAgent) {
         super(userAgent);
