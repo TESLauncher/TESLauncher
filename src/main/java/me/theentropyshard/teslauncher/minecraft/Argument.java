@@ -34,4 +34,12 @@ public class Argument {
         argument.rules = new ArrayList<>();
         return argument;
     }
+
+    @Override
+    public String toString() {
+        return "Argument{" +
+                "rules=" + this.rules +
+                ", value=" + this.value +
+                '}';
+    }
 }

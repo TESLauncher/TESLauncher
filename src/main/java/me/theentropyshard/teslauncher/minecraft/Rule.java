@@ -34,9 +34,22 @@ public class Rule {
 
             return Action.DISALLOW;
         }
+
+        public String getJsonName() {
+            return this == Action.ALLOW ? "allow" : "disallow";
+        }
     }
 
     public boolean useOnThisPlatform() {
         return false;
+    }
+
+    @Override
+    public String toString() {
+        return "Rule{" +
+                "action=" + this.action +
+                ", features=" + this.features +
+                ", os=" + this.os +
+                '}';
     }
 }

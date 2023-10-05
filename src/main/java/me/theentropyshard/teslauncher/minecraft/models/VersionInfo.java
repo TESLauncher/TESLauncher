@@ -17,6 +17,7 @@
 package me.theentropyshard.teslauncher.minecraft.models;
 
 import me.theentropyshard.teslauncher.minecraft.Argument;
+import me.theentropyshard.teslauncher.minecraft.Library;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +32,7 @@ public final class VersionInfo {
     public final List<Argument> jvmArgs = new ArrayList<>();
     public final List<Argument> gameArgs = new ArrayList<>();
     public final List<String> librariesPaths = new ArrayList<>();
+    public final List<Library> libraries = new ArrayList<>();
     public String logArgument;
     public String logConfigUrl;
     public String logConfigId;

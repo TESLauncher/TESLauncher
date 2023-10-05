@@ -23,10 +23,7 @@ import me.theentropyshard.teslauncher.accounts.AccountsManager;
 import me.theentropyshard.teslauncher.gson.DetailedVersionInfoDeserializerOld;
 import me.theentropyshard.teslauncher.gui.playview.PlayView;
 import me.theentropyshard.teslauncher.http.ProgressListener;
-import me.theentropyshard.teslauncher.minecraft.Argument;
-import me.theentropyshard.teslauncher.minecraft.MinecraftDownloader;
-import me.theentropyshard.teslauncher.minecraft.Os;
-import me.theentropyshard.teslauncher.minecraft.Rule;
+import me.theentropyshard.teslauncher.minecraft.*;
 import me.theentropyshard.teslauncher.minecraft.models.AssetIndex;
 import me.theentropyshard.teslauncher.minecraft.models.VersionAssetIndex;
 import me.theentropyshard.teslauncher.minecraft.models.VersionInfo;
@@ -39,10 +36,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 
 public class InstanceRunner extends Thread {
@@ -133,8 +127,38 @@ public class InstanceRunner extends Thread {
     private List<String> resolveClasspath(VersionInfo versionInfo, Path librariesDir, Path clientsDir) {
         List<String> classpath = new ArrayList<>();
 
-        for (String libPath : versionInfo.librariesPaths) {
+        /*for (String libPath : versionInfo.librariesPaths) {
             classpath.add(librariesDir.resolve(libPath).toAbsolutePath().toString());
+        }*/
+
+        for (Library library : versionInfo.libraries) {
+            DownloadArtifact artifact = library.downloads.artifact;
+            if (artifact == null) {
+                continue;
+            }
+
+            Rule.Action lastAction = Rule.Action.DISALLOW;
+            if (library.rules == null || library.rules.isEmpty()) {
+                lastAction = Rule.Action.ALLOW;
+            } else {
+                for (Rule rule : library.rules) {
+                    Os os = rule.os;
+                    if (os == null) {
+                        lastAction = rule.action;
+                    } else {
+                        boolean versionMatches = os.version != null &&
+                                Pattern.compile(os.version).matcher(EnumOS.getVersion()).matches();
+                        if (EnumOS.getOsName().equals(os.name) ||
+                                versionMatches || EnumOS.getArch().equals("x" + os.arch)) {
+                            lastAction = rule.action;
+                        }
+                    }
+                }
+            }
+
+            if (lastAction == Rule.Action.ALLOW) {
+                classpath.add(librariesDir.resolve(artifact.path).toAbsolutePath().toString());
+            }
         }
 
         classpath.add(clientsDir.resolve(versionInfo.id).resolve(versionInfo.id + ".jar").toAbsolutePath().toString());
@@ -214,12 +238,14 @@ public class InstanceRunner extends Thread {
                 for (Rule rule : argument.rules) {
                     Os os = rule.os;
                     if (os == null) {
-                        continue;
-                    }
-                    Pattern pattern = Pattern.compile(os.version);
-                    if (EnumOS.getOsName().equals(os.name) ||
-                            pattern.matcher(EnumOS.getVersion()).matches() || EnumOS.getArch().equals("x" + os.arch)) {
                         lastAction = rule.action;
+                    } else {
+                        boolean versionMatches = os.version != null &&
+                                Pattern.compile(os.version).matcher(EnumOS.getVersion()).matches();
+                        if (EnumOS.getOsName().equals(os.name) ||
+                                versionMatches || EnumOS.getArch().equals("x" + os.arch)) {
+                            lastAction = rule.action;
+                        }
                     }
                 }
             }
@@ -245,12 +271,14 @@ public class InstanceRunner extends Thread {
                 for (Rule rule : argument.rules) {
                     Os os = rule.os;
                     if (os == null) {
-                        continue;
-                    }
-                    Pattern pattern = Pattern.compile(os.version);
-                    if (EnumOS.getOsName().equals(os.name) ||
-                            pattern.matcher(EnumOS.getVersion()).matches() || EnumOS.getArch().equals("x" + os.arch)) {
                         lastAction = rule.action;
+                    } else {
+                        boolean versionMatches = os.version != null &&
+                                Pattern.compile(os.version).matcher(EnumOS.getVersion()).matches();
+                        if (EnumOS.getOsName().equals(os.name) ||
+                                versionMatches || EnumOS.getArch().equals("x" + os.arch)) {
+                            lastAction = rule.action;
+                        }
                     }
                 }
             }
@@ -261,6 +289,8 @@ public class InstanceRunner extends Thread {
                 }
             }
         }
+
+        arguments.remove("--demo"); // :)
 
         return arguments;
     }

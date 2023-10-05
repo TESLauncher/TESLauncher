@@ -14,19 +14,27 @@
  * limitations under the License.
  */
 
-package me.theentropyshard.teslauncher.minecraft;
+package me.theentropyshard.teslauncher.gson;
 
-public class Os {
-    public String name;
-    public String version;
-    public String arch;
+import com.google.gson.TypeAdapter;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
+import me.theentropyshard.teslauncher.minecraft.Rule;
+
+import java.io.IOException;
+
+public class ActionTypeAdapter extends TypeAdapter<Rule.Action> {
+    public ActionTypeAdapter() {
+
+    }
 
     @Override
-    public String toString() {
-        return "Os{" +
-                "name='" + this.name + '\'' +
-                ", version='" + this.version + '\'' +
-                ", arch='" + this.arch + '\'' +
-                '}';
+    public void write(JsonWriter writer, Rule.Action action) throws IOException {
+        writer.value(action.getJsonName());
+    }
+
+    @Override
+    public Rule.Action read(JsonReader reader) throws IOException {
+        return Rule.Action.getByName(reader.nextString());
     }
 }

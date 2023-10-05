@@ -18,6 +18,7 @@ package me.theentropyshard.teslauncher.gson;
 
 import com.google.gson.*;
 import me.theentropyshard.teslauncher.minecraft.Argument;
+import me.theentropyshard.teslauncher.minecraft.Library;
 import me.theentropyshard.teslauncher.minecraft.Os;
 import me.theentropyshard.teslauncher.minecraft.Rule;
 import me.theentropyshard.teslauncher.minecraft.models.VersionAssetIndex;
@@ -26,6 +27,7 @@ import me.theentropyshard.teslauncher.utils.EnumOS;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -51,7 +53,9 @@ public class DetailedVersionInfoDeserializerOld implements JsonDeserializer<Vers
             List<Argument> gameArguments = new ArrayList<>();
             List<Argument> jvmArguments = new ArrayList<>();
 
-            Gson gson = new Gson();
+            Gson gson = new GsonBuilder()
+                    .registerTypeAdapter(Rule.Action.class, new ActionTypeAdapter())
+                    .create();
 
             for (JsonElement elem : gameArgsArr) {
                 if (elem.isJsonPrimitive()) {
@@ -81,12 +85,14 @@ public class DetailedVersionInfoDeserializerOld implements JsonDeserializer<Vers
                     for (Rule rule : argument.rules) {
                         Os os = rule.os;
                         if (os == null) {
-                            continue;
-                        }
-                        Pattern pattern = Pattern.compile(os.version);
-                        if (EnumOS.getOsName().equals(os.name) ||
-                                pattern.matcher(EnumOS.getVersion()).matches() || EnumOS.getArch().equals("x" + os.arch)) {
                             lastAction = rule.action;
+                        } else {
+                            boolean versionMatches = os.version != null &&
+                                    Pattern.compile(os.version).matcher(EnumOS.getVersion()).matches();
+                            if (EnumOS.getOsName().equals(os.name) ||
+                                    versionMatches || EnumOS.getArch().equals("x" + os.arch)) {
+                                lastAction = rule.action;
+                            }
                         }
                     }
                 }
@@ -104,12 +110,14 @@ public class DetailedVersionInfoDeserializerOld implements JsonDeserializer<Vers
                     for (Rule rule : argument.rules) {
                         Os os = rule.os;
                         if (os == null) {
-                            continue;
-                        }
-                        Pattern pattern = Pattern.compile(os.version);
-                        if (EnumOS.getOsName().equals(os.name) ||
-                                pattern.matcher(EnumOS.getVersion()).matches() || EnumOS.getArch().equals("x" + os.arch)) {
                             lastAction = rule.action;
+                        } else {
+                            boolean versionMatches = os.version != null &&
+                                    Pattern.compile(os.version).matcher(EnumOS.getVersion()).matches();
+                            if (EnumOS.getOsName().equals(os.name) ||
+                                    versionMatches || EnumOS.getArch().equals("x" + os.arch)) {
+                                lastAction = rule.action;
+                            }
                         }
                     }
                 }
@@ -138,8 +146,9 @@ public class DetailedVersionInfoDeserializerOld implements JsonDeserializer<Vers
         versionInfo.type = root.get("type").getAsString();
         versionInfo.assets = root.get("assets").getAsString();
 
-        List<String> libs = new ArrayList<>();
         JsonArray libsArray = root.getAsJsonArray("libraries");
+
+        List<String> libs = new ArrayList<>();
         for (JsonElement elem : libsArray) {
             JsonObject libObject = elem.getAsJsonObject();
             JsonObject downloadsObject = libObject.getAsJsonObject("downloads");
@@ -149,6 +158,11 @@ public class DetailedVersionInfoDeserializerOld implements JsonDeserializer<Vers
             }
         }
         versionInfo.librariesPaths.addAll(libs);
+
+        Library[] libraries = new GsonBuilder()
+                .registerTypeAdapter(Rule.Action.class, new ActionTypeAdapter())
+                .create().fromJson(libsArray, Library[].class);
+        versionInfo.libraries.addAll(Arrays.asList(libraries));
 
         if (root.has("logging")) {
             JsonObject loggingObject = root.getAsJsonObject("logging");
