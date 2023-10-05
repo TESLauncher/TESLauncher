@@ -16,6 +16,25 @@
 
 package me.theentropyshard.teslauncher.gui;
 
-public class AboutView extends View {
+import javax.swing.*;
+import java.awt.*;
 
+public class AboutView extends View {
+    public AboutView() {
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.fill = GridBagConstraints.VERTICAL;
+
+        JPanel root = this.getRoot();
+        root.setLayout(new GridBagLayout());
+
+        this.addLine(root, gbc, "TESLauncher - simple Minecraft launcher");
+        this.addLine(root, gbc, "by TheEntropyShard");
+        this.addLine(root, gbc, "More at https://github.com/TESLauncher");
+    }
+
+    private void addLine(JPanel panel, GridBagConstraints gbc, String text) {
+        gbc.gridy++;
+        panel.add(new JLabel(text), gbc);
+    }
 }
