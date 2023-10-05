@@ -158,7 +158,7 @@ public class MinecraftDownloader {
             }
 
             if (classifiers != null) {
-                String key = "natives-" + MinecraftDownloader.getOsName();
+                String key = "natives-" + EnumOS.getOsName();
                 Map<String, Object> classifier = (Map<String, Object>) classifiers.get(key);
                 if (classifier != null) {
                     String path = (String) classifier.get("path");
@@ -280,21 +280,5 @@ public class MinecraftDownloader {
 
             });
         }
-    }
-
-    private static String getOsName() {
-        EnumOS os = EnumOS.getOS();
-        switch (os) {
-            case WINDOWS:
-                return "windows";
-            case LINUX:
-            case SOLARIS:
-                return "linux";
-            case MACOS:
-                return "osx";
-            case UNKNOWN:
-                throw new RuntimeException("Unsupported OS");
-        }
-        return null;
     }
 }

@@ -14,25 +14,14 @@
  * limitations under the License.
  */
 
-package me.theentropyshard.teslauncher.minecraft.models;
+package me.theentropyshard.teslauncher.minecraft;
 
-import me.theentropyshard.teslauncher.minecraft.Argument;
-
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-public final class VersionInfo {
-
-    public boolean newFormat;
-    public String id;
-    public String mainClass;
-    public String type;
-    public String assets;
-    public final List<Argument> jvmArgs = new ArrayList<>();
-    public final List<Argument> gameArgs = new ArrayList<>();
-    public final List<String> librariesPaths = new ArrayList<>();
-    public String logArgument;
-    public String logConfigUrl;
-    public String logConfigId;
-    public VersionAssetIndex assetIndex;
+public class Library {
+    public String name;
+    public List<Rule> rules;
+    public Map<String, String> natives;
+    public LibraryDownloads downloads;
 }

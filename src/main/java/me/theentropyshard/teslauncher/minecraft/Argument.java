@@ -14,25 +14,24 @@
  * limitations under the License.
  */
 
-package me.theentropyshard.teslauncher.minecraft.models;
+package me.theentropyshard.teslauncher.minecraft;
 
-import me.theentropyshard.teslauncher.minecraft.Argument;
+import com.google.gson.annotations.JsonAdapter;
+import me.theentropyshard.teslauncher.gson.AlwaysListTypeAdapterFactory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-public final class VersionInfo {
+public class Argument {
+    public List<Rule> rules;
+    @JsonAdapter(AlwaysListTypeAdapterFactory.class)
+    public List<String> value;
 
-    public boolean newFormat;
-    public String id;
-    public String mainClass;
-    public String type;
-    public String assets;
-    public final List<Argument> jvmArgs = new ArrayList<>();
-    public final List<Argument> gameArgs = new ArrayList<>();
-    public final List<String> librariesPaths = new ArrayList<>();
-    public String logArgument;
-    public String logConfigUrl;
-    public String logConfigId;
-    public VersionAssetIndex assetIndex;
+    public static Argument withValues(String... values) {
+        Argument argument = new Argument();
+        argument.value = Arrays.asList(values);
+        argument.rules = new ArrayList<>();
+        return argument;
+    }
 }

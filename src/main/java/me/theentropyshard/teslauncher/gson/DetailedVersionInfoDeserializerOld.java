@@ -17,13 +17,17 @@
 package me.theentropyshard.teslauncher.gson;
 
 import com.google.gson.*;
+import me.theentropyshard.teslauncher.minecraft.Argument;
+import me.theentropyshard.teslauncher.minecraft.Os;
+import me.theentropyshard.teslauncher.minecraft.Rule;
 import me.theentropyshard.teslauncher.minecraft.models.VersionAssetIndex;
 import me.theentropyshard.teslauncher.minecraft.models.VersionInfo;
+import me.theentropyshard.teslauncher.utils.EnumOS;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class DetailedVersionInfoDeserializerOld implements JsonDeserializer<VersionInfo> {
     public DetailedVersionInfoDeserializerOld() {
@@ -42,36 +46,88 @@ public class DetailedVersionInfoDeserializerOld implements JsonDeserializer<Vers
             JsonObject argsObject = root.getAsJsonObject("arguments");
 
             JsonArray gameArgsArr = argsObject.getAsJsonArray("game");
+            JsonArray jvmArgsArr = argsObject.getAsJsonArray("jvm");
+
+            List<Argument> gameArguments = new ArrayList<>();
+            List<Argument> jvmArguments = new ArrayList<>();
+
+            Gson gson = new Gson();
+
             for (JsonElement elem : gameArgsArr) {
                 if (elem.isJsonPrimitive()) {
                     String stringArg = elem.getAsString();
-                    versionInfo.gameArgs.add(stringArg);
+                    gameArguments.add(Argument.withValues(stringArg));
                 } else if (elem.isJsonObject()) {
-                    // TODO
-                    elem.getAsJsonObject();
+                    Argument argument = gson.fromJson(elem.getAsJsonObject(), Argument.class);
+                    gameArguments.add(argument);
                 }
             }
 
-            JsonArray jvmArgsArr = argsObject.getAsJsonArray("jvm");
             for (JsonElement elem : jvmArgsArr) {
                 if (elem.isJsonPrimitive()) {
                     String stringArg = elem.getAsString();
-                    versionInfo.jvmArgs.add(stringArg);
+                    jvmArguments.add(Argument.withValues(stringArg));
                 } else if (elem.isJsonObject()) {
-                    // TODO
-                    elem.getAsJsonObject();
+                    Argument argument = gson.fromJson(elem.getAsJsonObject(), Argument.class);
+                    jvmArguments.add(argument);
+                }
+            }
+
+            for (Argument argument : gameArguments) {
+                Rule.Action lastAction = Rule.Action.DISALLOW;
+                if (argument.rules == null || argument.rules.isEmpty()) {
+                    lastAction = Rule.Action.ALLOW;
+                } else {
+                    for (Rule rule : argument.rules) {
+                        Os os = rule.os;
+                        if (os == null) {
+                            continue;
+                        }
+                        Pattern pattern = Pattern.compile(os.version);
+                        if (EnumOS.getOsName().equals(os.name) ||
+                                pattern.matcher(EnumOS.getVersion()).matches() || EnumOS.getArch().equals("x" + os.arch)) {
+                            lastAction = rule.action;
+                        }
+                    }
+                }
+
+                if (lastAction == Rule.Action.ALLOW) {
+                    versionInfo.gameArgs.add(argument);
+                }
+            }
+
+            for (Argument argument : jvmArguments) {
+                Rule.Action lastAction = Rule.Action.DISALLOW;
+                if (argument.rules == null || argument.rules.isEmpty()) {
+                    lastAction = Rule.Action.ALLOW;
+                } else {
+                    for (Rule rule : argument.rules) {
+                        Os os = rule.os;
+                        if (os == null) {
+                            continue;
+                        }
+                        Pattern pattern = Pattern.compile(os.version);
+                        if (EnumOS.getOsName().equals(os.name) ||
+                                pattern.matcher(EnumOS.getVersion()).matches() || EnumOS.getArch().equals("x" + os.arch)) {
+                            lastAction = rule.action;
+                        }
+                    }
+                }
+
+                if (lastAction == Rule.Action.ALLOW) {
+                    versionInfo.jvmArgs.add(argument);
                 }
             }
         } else if (root.has("minecraftArguments")) {
             versionInfo.newFormat = false;
             String minecraftArguments = root.get("minecraftArguments").getAsString();
-            versionInfo.gameArgs.addAll(Arrays.asList(minecraftArguments.split("\\s")));
+            versionInfo.gameArgs.add(Argument.withValues(minecraftArguments.split("\\s")));
 
             // Old format does not have any JVM args preset, so we set it manually here
-            versionInfo.jvmArgs.add("-Djava.library.path=${natives_directory}");
+            versionInfo.jvmArgs.add(Argument.withValues("-Djava.library.path=${natives_directory}"));
 
-            versionInfo.jvmArgs.add("-cp");
-            versionInfo.jvmArgs.add("${classpath}");
+            versionInfo.jvmArgs.add(Argument.withValues("-cp"));
+            versionInfo.jvmArgs.add(Argument.withValues("${classpath}"));
 
         } else {
             throw new JsonParseException("Minecraft arguments were not found");

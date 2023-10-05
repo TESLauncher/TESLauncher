@@ -23,7 +23,10 @@ import me.theentropyshard.teslauncher.accounts.AccountsManager;
 import me.theentropyshard.teslauncher.gson.DetailedVersionInfoDeserializerOld;
 import me.theentropyshard.teslauncher.gui.playview.PlayView;
 import me.theentropyshard.teslauncher.http.ProgressListener;
+import me.theentropyshard.teslauncher.minecraft.Argument;
 import me.theentropyshard.teslauncher.minecraft.MinecraftDownloader;
+import me.theentropyshard.teslauncher.minecraft.Os;
+import me.theentropyshard.teslauncher.minecraft.Rule;
 import me.theentropyshard.teslauncher.minecraft.models.AssetIndex;
 import me.theentropyshard.teslauncher.minecraft.models.VersionAssetIndex;
 import me.theentropyshard.teslauncher.minecraft.models.VersionInfo;
@@ -40,6 +43,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 public class InstanceRunner extends Thread {
     private final Instance instance;
@@ -198,14 +202,64 @@ public class InstanceRunner extends Thread {
 
         StringSubstitutor substitutor = new StringSubstitutor(argVars);
 
-        for (String arg : versionInfo.jvmArgs) {
+        /*for (String arg : versionInfo.jvmArgs) {
             arguments.add(substitutor.replace(arg));
+        }*/
+
+        for (Argument argument : versionInfo.jvmArgs) {
+            Rule.Action lastAction = Rule.Action.DISALLOW;
+            if (argument.rules == null || argument.rules.isEmpty()) {
+                lastAction = Rule.Action.ALLOW;
+            } else {
+                for (Rule rule : argument.rules) {
+                    Os os = rule.os;
+                    if (os == null) {
+                        continue;
+                    }
+                    Pattern pattern = Pattern.compile(os.version);
+                    if (EnumOS.getOsName().equals(os.name) ||
+                            pattern.matcher(EnumOS.getVersion()).matches() || EnumOS.getArch().equals("x" + os.arch)) {
+                        lastAction = rule.action;
+                    }
+                }
+            }
+
+            if (lastAction == Rule.Action.ALLOW) {
+                for (String value : argument.value) {
+                    arguments.add(substitutor.replace(value));
+                }
+            }
         }
 
         arguments.add(versionInfo.mainClass);
 
-        for (String arg : versionInfo.gameArgs) {
+        /*for (String arg : versionInfo.gameArgs) {
             arguments.add(substitutor.replace(arg));
+        }*/
+
+        for (Argument argument : versionInfo.gameArgs) {
+            Rule.Action lastAction = Rule.Action.DISALLOW;
+            if (argument.rules == null || argument.rules.isEmpty()) {
+                lastAction = Rule.Action.ALLOW;
+            } else {
+                for (Rule rule : argument.rules) {
+                    Os os = rule.os;
+                    if (os == null) {
+                        continue;
+                    }
+                    Pattern pattern = Pattern.compile(os.version);
+                    if (EnumOS.getOsName().equals(os.name) ||
+                            pattern.matcher(EnumOS.getVersion()).matches() || EnumOS.getArch().equals("x" + os.arch)) {
+                        lastAction = rule.action;
+                    }
+                }
+            }
+
+            if (lastAction == Rule.Action.ALLOW) {
+                for (String value : argument.value) {
+                    arguments.add(substitutor.replace(value));
+                }
+            }
         }
 
         return arguments;

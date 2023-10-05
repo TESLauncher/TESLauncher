@@ -16,6 +16,8 @@
 
 package me.theentropyshard.teslauncher.utils;
 
+import com.sun.jna.Platform;
+
 public enum EnumOS {
     WINDOWS,
     LINUX,
@@ -30,5 +32,33 @@ public enum EnumOS {
         if(osName.contains("solaris") || osName.contains("sunos")) return EnumOS.SOLARIS;
         if(osName.contains("linux") || osName.contains("unix")) return EnumOS.LINUX;
         return EnumOS.UNKNOWN;
+    }
+
+    public static String getOsName() {
+        EnumOS os = EnumOS.getOS();
+        switch (os) {
+            case WINDOWS:
+                return "windows";
+            case LINUX:
+            case SOLARIS:
+                return "linux";
+            case MACOS:
+                return "osx";
+            case UNKNOWN:
+            default:
+                return "unknown";
+        }
+    }
+
+    public static String getArch() {
+        if (Platform.is64Bit()) {
+            return "64";
+        }
+
+        return "32";
+    }
+
+    public static String getVersion() {
+        return System.getProperty("os.version");
     }
 }

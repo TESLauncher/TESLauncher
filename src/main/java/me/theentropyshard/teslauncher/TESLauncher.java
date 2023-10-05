@@ -100,7 +100,7 @@ public class TESLauncher {
 
         this.taskPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
-        this.darkTheme = true;
+        this.darkTheme = false;
 
         this.showGui();
     }
