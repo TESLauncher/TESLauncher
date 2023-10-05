@@ -224,6 +224,9 @@ public class InstanceRunner extends Thread {
             }
         }
 
+        argVars.put("resolution_width", "960");
+        argVars.put("resolution_height", "540");
+
         StringSubstitutor substitutor = new StringSubstitutor(argVars);
 
         /*for (String arg : versionInfo.jvmArgs) {
@@ -255,6 +258,22 @@ public class InstanceRunner extends Thread {
                     arguments.add(substitutor.replace(value));
                 }
             }
+        }
+
+        try {
+            String[] split = versionInfo.id.split("\\.");
+            int minorVersion = Integer.parseInt(split[1]);
+            int patch = Integer.parseInt(split[2]);
+
+            // TODO this is a workaround
+            if (minorVersion == 16 && patch == 5) {
+                arguments.add("-Dminecraft.api.auth.host=https://nope.invalid");
+                arguments.add("-Dminecraft.api.account.host=https://nope.invalid");
+                arguments.add("-Dminecraft.api.session.host=https://nope.invalid");
+                arguments.add("-Dminecraft.api.services.host=https://nope.invalid");
+            }
+        } catch (Exception ignored) {
+
         }
 
         arguments.add(versionInfo.mainClass);
