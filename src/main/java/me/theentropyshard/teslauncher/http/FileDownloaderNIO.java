@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 // TODO: this one does not really count progress, we need to make a wrapper around a byte channel
@@ -30,8 +31,8 @@ public class FileDownloaderNIO extends FileDownloader {
     }
 
     @Override
-    public void download(String url, Path savePath, ProgressListener listener) throws IOException {
-        Response response = this.makeRequest(url);
+    public void download(String url, Path savePath, long bytesAlreadyHave, ProgressListener listener) throws IOException {
+        Response response = this.makeRequest(url, bytesAlreadyHave);
 
         try (ReadableByteChannel rbc = Channels.newChannel(response.getInputStream());
              FileOutputStream fos = new FileOutputStream(savePath.toFile());

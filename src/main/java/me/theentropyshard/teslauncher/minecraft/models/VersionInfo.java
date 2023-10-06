@@ -17,10 +17,14 @@
 package me.theentropyshard.teslauncher.minecraft.models;
 
 import me.theentropyshard.teslauncher.minecraft.Argument;
+import me.theentropyshard.teslauncher.minecraft.ClientDownload;
+import me.theentropyshard.teslauncher.minecraft.ClientDownloads;
 import me.theentropyshard.teslauncher.minecraft.Library;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public final class VersionInfo {
 
@@ -29,9 +33,9 @@ public final class VersionInfo {
     public String mainClass;
     public String type;
     public String assets;
+    public ClientDownloads downloads;
     public final List<Argument> jvmArgs = new ArrayList<>();
     public final List<Argument> gameArgs = new ArrayList<>();
-    public final List<String> librariesPaths = new ArrayList<>();
     public final List<Library> libraries = new ArrayList<>();
     public String logArgument;
     public String logConfigUrl;

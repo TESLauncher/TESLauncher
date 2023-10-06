@@ -16,35 +16,50 @@
 
 package me.theentropyshard.teslauncher.http;
 
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 
 public class FileDownloaderIO extends FileDownloader {
     public FileDownloaderIO(String userAgent) {
         super(userAgent);
     }
 
+    private StandardOpenOption[] getOpenOptions(boolean newDownload) {
+        if (newDownload) {
+            return new StandardOpenOption[] {StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE};
+        } else {
+            return new StandardOpenOption[] {StandardOpenOption.APPEND};
+        }
+    }
+
     @Override
-    public void download(String url, Path savePath, ProgressListener listener) throws IOException {
-        Response response = this.makeRequest(url);
+    public void download(String url, Path savePath, long bytesAlreadyHave, ProgressListener listener) throws IOException {
+        Response response = this.makeRequest(url, bytesAlreadyHave);
 
         try (InputStream inputStream = response.getInputStream();
-             OutputStream outputStream = new BufferedOutputStream(Files.newOutputStream(savePath.toFile().toPath()))) {
+             OutputStream out = Files.newOutputStream(savePath.toFile().toPath(), this.getOpenOptions(bytesAlreadyHave == 0));
+             OutputStream outputStream = new BufferedOutputStream(out)) {
             byte[] buffer = new byte[2048];
-            ByteArrayOutputStream output = new ByteArrayOutputStream();
             long count = 0L;
             int numRead;
             do {
                 numRead = inputStream.read(buffer);
                 if (numRead != -1) {
                     count += numRead;
-                    output.write(buffer, 0, numRead);
+                    outputStream.write(buffer, 0, numRead);
                 }
-                listener.onProgress(response.getContentLength(), count, numRead == -1, savePath.getFileName().toString());
+                if (bytesAlreadyHave > 0) {
+                    listener.onProgress(response.getContentLength() + bytesAlreadyHave, bytesAlreadyHave + count, numRead == -1, savePath.getFileName().toString());
+                } else {
+                    listener.onProgress(response.getContentLength(), count, numRead == -1, savePath.getFileName().toString());
+                }
             } while (numRead != -1);
 
-            outputStream.write(output.toByteArray());
             outputStream.flush();
         }
     }

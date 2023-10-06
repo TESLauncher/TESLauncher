@@ -17,10 +17,7 @@
 package me.theentropyshard.teslauncher.gson;
 
 import com.google.gson.*;
-import me.theentropyshard.teslauncher.minecraft.Argument;
-import me.theentropyshard.teslauncher.minecraft.Library;
-import me.theentropyshard.teslauncher.minecraft.Os;
-import me.theentropyshard.teslauncher.minecraft.Rule;
+import me.theentropyshard.teslauncher.minecraft.*;
 import me.theentropyshard.teslauncher.minecraft.models.VersionAssetIndex;
 import me.theentropyshard.teslauncher.minecraft.models.VersionInfo;
 import me.theentropyshard.teslauncher.utils.EnumOS;
@@ -29,6 +26,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 public class DetailedVersionInfoDeserializerOld implements JsonDeserializer<VersionInfo> {
@@ -42,6 +40,10 @@ public class DetailedVersionInfoDeserializerOld implements JsonDeserializer<Vers
 
         JsonObject root = element.getAsJsonObject();
 
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(Rule.Action.class, new ActionTypeAdapter())
+                .create();
+
         if (root.has("arguments")) {
             versionInfo.newFormat = true;
 
@@ -52,10 +54,6 @@ public class DetailedVersionInfoDeserializerOld implements JsonDeserializer<Vers
 
             List<Argument> gameArguments = new ArrayList<>();
             List<Argument> jvmArguments = new ArrayList<>();
-
-            Gson gson = new GsonBuilder()
-                    .registerTypeAdapter(Rule.Action.class, new ActionTypeAdapter())
-                    .create();
 
             for (JsonElement elem : gameArgsArr) {
                 if (elem.isJsonPrimitive()) {
@@ -146,18 +144,9 @@ public class DetailedVersionInfoDeserializerOld implements JsonDeserializer<Vers
         versionInfo.type = root.get("type").getAsString();
         versionInfo.assets = root.get("assets").getAsString();
 
-        JsonArray libsArray = root.getAsJsonArray("libraries");
+        versionInfo.downloads = gson.fromJson(root.get("downloads"), ClientDownloads.class);
 
-        List<String> libs = new ArrayList<>();
-        for (JsonElement elem : libsArray) {
-            JsonObject libObject = elem.getAsJsonObject();
-            JsonObject downloadsObject = libObject.getAsJsonObject("downloads");
-            if (downloadsObject.has("artifact")) {
-                JsonObject artifactObject = downloadsObject.getAsJsonObject("artifact");
-                libs.add(artifactObject.get("path").getAsString());
-            }
-        }
-        versionInfo.librariesPaths.addAll(libs);
+        JsonArray libsArray = root.getAsJsonArray("libraries");
 
         Library[] libraries = new GsonBuilder()
                 .registerTypeAdapter(Rule.Action.class, new ActionTypeAdapter())

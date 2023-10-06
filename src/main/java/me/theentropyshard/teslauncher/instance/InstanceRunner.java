@@ -20,6 +20,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.accounts.AccountsManager;
+import me.theentropyshard.teslauncher.gson.ActionTypeAdapter;
 import me.theentropyshard.teslauncher.gson.DetailedVersionInfoDeserializerOld;
 import me.theentropyshard.teslauncher.gui.playview.PlayView;
 import me.theentropyshard.teslauncher.http.ProgressListener;
@@ -52,6 +53,7 @@ public class InstanceRunner extends Thread {
     public void run() {
         this.gson = new GsonBuilder()
                 .registerTypeAdapter(VersionInfo.class, new DetailedVersionInfoDeserializerOld())
+                .registerTypeAdapter(AutoCloseable.class, new ActionTypeAdapter())
                 .create();
 
         try {
@@ -81,7 +83,7 @@ public class InstanceRunner extends Thread {
             Path clientsDir = launcher.getVersionsDir();
             Path librariesDir = launcher.getLibrariesDir();
             Path assetsDir = launcher.getAssetsDir();
-            if (!this.instance.wasEverPlayed()) {
+            //if (!this.instance.wasEverPlayed()) {
                 MinecraftDownloader downloader = new MinecraftDownloader(
                         clientsDir,
                         assetsDir,
@@ -97,9 +99,9 @@ public class InstanceRunner extends Thread {
                 TESLauncher.getInstance().getPlayView().getProgressBar().setVisible(false);
                 TESLauncher.getInstance().getPlayView().getProgressBar().setEnabled(false);
 
-                this.instance.setWasEverPlayed(true);
-                instanceManager.save(this.instance);
-            }
+                //this.instance.setWasEverPlayed(true);
+                //instanceManager.save(this.instance);
+            //}
 
             Path clientJson = clientsDir.resolve(this.instance.getMinecraftVersion())
                     .resolve(this.instance.getMinecraftVersion() + ".json");

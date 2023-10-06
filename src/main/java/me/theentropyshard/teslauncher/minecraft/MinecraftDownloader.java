@@ -17,10 +17,14 @@
 package me.theentropyshard.teslauncher.minecraft;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import me.theentropyshard.teslauncher.gson.ActionTypeAdapter;
+import me.theentropyshard.teslauncher.gson.DetailedVersionInfoDeserializerOld;
 import me.theentropyshard.teslauncher.http.FileDownloader;
 import me.theentropyshard.teslauncher.http.FileDownloaderIO;
 import me.theentropyshard.teslauncher.http.ProgressListener;
 import me.theentropyshard.teslauncher.minecraft.models.VersionManifest;
+import me.theentropyshard.teslauncher.minecraft.models.*;
 import me.theentropyshard.teslauncher.utils.EnumOS;
 import me.theentropyshard.teslauncher.utils.Http;
 import me.theentropyshard.teslauncher.utils.PathUtils;
@@ -32,6 +36,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class MinecraftDownloader {
@@ -55,9 +60,25 @@ public class MinecraftDownloader {
         this.nativesDir = nativesDir;
         this.instanceResourcesDir = instanceResourcesDir;
         this.progressListener = progressListener;
-        this.gson = new Gson();
+        this.gson = new GsonBuilder()
+                .registerTypeAdapter(VersionInfo.class, new DetailedVersionInfoDeserializerOld())
+                .registerTypeAdapter(Rule.Action.class, new ActionTypeAdapter())
+                .create();
 
         this.fileDownloader = new FileDownloaderIO("TESLauncher/1.0.0");
+    }
+
+    public void download(String url, Path savePath, long expectedSize, ProgressListener progressListener) throws IOException {
+        PathUtils.createDirectoryIfNotExists(savePath.getParent());
+
+        if (!Files.exists(savePath)) {
+            this.fileDownloader.download(url, savePath, 0, progressListener);
+        } else {
+            long size = Files.size(savePath);
+            if (size < expectedSize) {
+                this.fileDownloader.download(url, savePath, size, progressListener);
+            }
+        }
     }
 
     public void downloadMinecraft(String versionId) throws IOException {
@@ -91,194 +112,138 @@ public class MinecraftDownloader {
                 throw new IOException("Version url is null");
             }
 
+            this.saveClientJson(version);
+
             //LOG.info("Downloading client...");
             System.out.println("Downloading client...");
-            this.downloadClient(versionId, version.url);
+            VersionInfo versionInfo = this.downloadClient(version);
             System.out.println("Downloaded client");
 
             //LOG.info("Downloading libraries...");
             System.out.println("Downloading libraries...");
-            this.downloadLibraries(versionId, version.url);
+            this.downloadLibraries(versionInfo);
             System.out.println("Downloaded libraries");
 
             //LOG.info("Extracting natives...");
             System.out.println("Extracting natives...");
-            this.extractNatives();
+            this.extractNatives(versionInfo);
             System.out.println("Extracted natives");
 
             System.out.println("Downloading assets...");
-            this.downloadAssets(versionId);
+            this.downloadAssets(versionInfo);
             System.out.println("Downloaded assets");
 
             //LOG.info("Done");
+            break;
         }
     }
 
-    private void downloadClient(String versionId, String url) throws IOException {
-        File jsonFile = this.clientsDir.resolve(versionId).resolve(versionId + ".json").toFile();
-        if (!jsonFile.exists()) {
-            byte[] bytes = Http.get(url);
-            try (FileOutputStream fos = new FileOutputStream(jsonFile)) {
-                fos.write(bytes);
-            }
-        }
-
-        FileInputStream fileInputStream = new FileInputStream(jsonFile);
-        Map<String, Object> map = this.gson.fromJson(new InputStreamReader(fileInputStream, StandardCharsets.UTF_8), Map.class);
-        Map<String, Object> downloads = (Map<String, Object>) map.get("downloads");
-        Map<String, Object> client = (Map<String, Object>) downloads.get("client");
-        String clientUrl = (String) client.get("url");
-        File jarFile = this.clientsDir.resolve(versionId).resolve(versionId + ".jar").toFile();
-
-        if (!jarFile.exists()) {
-            System.out.println("Downloading " + versionId + ".jar...");
-            this.fileDownloader.download(clientUrl, jarFile.toPath(), this.progressListener);
+    private void saveClientJson(VersionManifest.Version version) throws IOException {
+        Path jsonFile = this.clientsDir.resolve(version.id).resolve(version.id + ".json");
+        if (!Files.exists(jsonFile)) {
+            Files.write(jsonFile, Http.get(version.url));
         }
     }
 
-    private void downloadLibraries(String versionId, String url) throws IOException {
-        byte[] bytes = Http.get(url);
-        Map<String, Object> map = this.gson.fromJson(MinecraftDownloader.getReader(bytes), Map.class);
-        List<Map<String, Object>> libraries = (List<Map<String, Object>>) map.get("libraries");
-        for (Map<String, Object> library : libraries) {
-            Map<String, Object> downloads = (Map<String, Object>) library.get("downloads");
-            Map<String, Object> artifact = (Map<String, Object>) downloads.get("artifact");
-            Map<String, Object> classifiers = (Map<String, Object>) downloads.get("classifiers");
+    private VersionInfo downloadClient(VersionManifest.Version version) throws IOException {
+        Reader reader = MinecraftDownloader.getReader(Http.get(version.url));
+
+        VersionInfo versionInfo = this.gson.fromJson(reader, VersionInfo.class);
+        ClientDownload client = versionInfo.downloads.client;
+
+        System.out.println("Downloading " + version.id + ".jar...");
+        Path jarFile = this.clientsDir.resolve(version.id).resolve(version.id + ".jar");
+        this.download(client.url, jarFile, client.size, this.progressListener);
+
+        return versionInfo;
+    }
+
+    private void downloadLibraries(VersionInfo versionInfo) throws IOException {
+        for (Library library : versionInfo.libraries) {
+            LibraryDownloads downloads = library.downloads;
+            DownloadArtifact artifact = downloads.artifact;
+            Map<String, DownloadArtifact> classifiers = downloads.classifiers;
+
             if (artifact != null) {
-                String path = (String) artifact.get("path");
-                String libraryUrl = (String) artifact.get("url");
-
-                Path resolvedPath = this.librariesDir.resolve(path);
-
-                if (!Files.exists(resolvedPath)) {
-                    System.out.println("Downloading " + resolvedPath.getFileName().toString());
-                    PathUtils.createDirectoryIfNotExists(resolvedPath.getParent());
-                    this.fileDownloader.download(libraryUrl, resolvedPath, this.progressListener);
-                }
+                Path jarFile = this.librariesDir.resolve(artifact.path);
+                this.download(artifact.url, jarFile, artifact.size, this.progressListener);
             }
 
             if (classifiers != null) {
                 String key = "natives-" + EnumOS.getOsName();
-                Map<String, Object> classifier = (Map<String, Object>) classifiers.get(key);
+                DownloadArtifact classifier = classifiers.get(key);
                 if (classifier != null) {
-                    String path = (String) classifier.get("path");
-                    String libraryUrl = (String) classifier.get("url");
-                    Path resolvedPath = this.nativesDir.resolve(versionId).resolve(path);
-                    PathUtils.createDirectoryIfNotExists(resolvedPath.getParent());
-                    File file = resolvedPath.toFile();
-                    if (!file.exists()) {
-                        System.out.println("Downloading " + resolvedPath.getFileName().toString());
-                        PathUtils.createDirectoryIfNotExists(resolvedPath.getParent());
-                        this.fileDownloader.download(libraryUrl, resolvedPath, this.progressListener);
-                    }
+                    Path filePath = this.nativesDir.resolve(classifier.path);
+                    this.download(classifier.url, filePath, classifier.size, this.progressListener);
                 }
             }
         }
     }
 
-    private void downloadAssets(String versionId) throws IOException {
-        File jsonFile = this.clientsDir.resolve(versionId).resolve(versionId + ".json").toFile();
-        Map<String, Object> map = this.gson.fromJson(new FileReader(jsonFile), Map.class);
-        Map<String, Object> assetIndex = (Map<String, Object>) map.get("assetIndex");
-        if (assetIndex == null) {
+    private void downloadAsset(Path filePath, AssetObject assetObject) throws IOException {
+        String prefix = assetObject.hash.substring(0, 2);
+        String url = MinecraftDownloader.RESOURCES + prefix + "/" + assetObject.hash;
+        this.download(url, filePath, assetObject.size, this.progressListener);
+    }
+
+    private void downloadAssets(VersionInfo versionInfo) throws IOException {
+        VersionAssetIndex vAssetIndex = versionInfo.assetIndex;
+
+        if (vAssetIndex == null) {
             return;
         }
 
-        Path assetsIndexFile = this.assetsDir.resolve("indexes").resolve(assetIndex.get("id") + ".json");
+        Path assetsIndexFile = this.assetsDir.resolve("indexes").resolve(vAssetIndex.id + ".json");
         if (!Files.exists(assetsIndexFile)) {
             PathUtils.createDirectoryIfNotExists(assetsIndexFile.getParent());
-            String assetIndexUrl = (String) assetIndex.get("url");
-            byte[] assetIndexJsonBytes = Http.get(assetIndexUrl);
-            Files.write(assetsIndexFile, assetIndexJsonBytes);
+            Files.write(assetsIndexFile, Http.get(vAssetIndex.url));
         }
 
-        Map<String, Object> assetIndexInfo = this.gson.fromJson(Files.newBufferedReader(assetsIndexFile), Map.class);
-        Object virtualObj = assetIndexInfo.get("virtual");
-        boolean assetsVirtual;
-        if (virtualObj != null) {
-            assetsVirtual = Boolean.parseBoolean(String.valueOf(virtualObj));
-        } else {
-            assetsVirtual = false;
-        }
+        AssetIndex assetIndex = this.gson.fromJson(Files.newBufferedReader(assetsIndexFile), AssetIndex.class);
 
-        Object mapToResourcesObj = assetIndexInfo.get("map_to_resources");
-        boolean mapToResources;
-        if (mapToResourcesObj != null) {
-            mapToResources = Boolean.parseBoolean(String.valueOf(mapToResourcesObj));
-        } else {
-            mapToResources = false;
-        }
-
-        Map<String, Object> objects = (Map<String, Object>) assetIndexInfo.get("objects");
-        objects.forEach((fileName, obj) -> {
-            if (mapToResources) {
-                Path filePath = this.instanceResourcesDir.resolve(fileName);
-                if (!Files.exists(filePath)) {
-                    Map<String, Object> assetItem = (Map<String, Object>) obj;
-                    String assetItemHash = (String) assetItem.get("hash");
-                    String prefix = assetItemHash.substring(0, 2);
-                    try {
-                        PathUtils.createDirectoryIfNotExists(filePath.getParent());
-                        String url = MinecraftDownloader.RESOURCES + prefix + "/" + assetItemHash;
-                        this.fileDownloader.download(url, filePath, this.progressListener);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+        assetIndex.objects.forEach((fileName, assetObject) -> {
+            try {
+                if (assetIndex.mapToResources) {
+                    Path filePath = this.instanceResourcesDir.resolve(fileName);
+                    this.downloadAsset(filePath, assetObject);
+                } else if (assetIndex.virtual) {
+                    Path filePath = this.assetsDir.resolve("virtual").resolve("legacy").resolve(fileName);
+                    this.downloadAsset(filePath, assetObject);
+                } else {
+                    String prefix = assetObject.hash.substring(0, 2);
+                    Path filePath = this.assetsDir.resolve("objects").resolve(prefix).resolve(assetObject.hash);
+                    this.downloadAsset(filePath, assetObject);
                 }
-            } else if (assetsVirtual) {
-                Path filePath = this.assetsDir.resolve("virtual").resolve("legacy").resolve(fileName);
-                if (!Files.exists(filePath)) {
-                    Map<String, Object> assetItem = (Map<String, Object>) obj;
-                    String assetItemHash = (String) assetItem.get("hash");
-                    String prefix = assetItemHash.substring(0, 2);
-                    try {
-                        PathUtils.createDirectoryIfNotExists(filePath.getParent());
-                        String url = MinecraftDownloader.RESOURCES + prefix + "/" + assetItemHash;
-                        this.fileDownloader.download(url, filePath, this.progressListener);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            } else {
-                Map<String, Object> assetItem = (Map<String, Object>) obj;
-                String assetItemHash = (String) assetItem.get("hash");
-                String prefix = assetItemHash.substring(0, 2);
-
-                Path filePath = this.assetsDir.resolve("objects").resolve(prefix).resolve(assetItemHash);
-                if (!Files.exists(filePath)) {
-                    try {
-                        PathUtils.createDirectoryIfNotExists(filePath.getParent());
-                        String url = MinecraftDownloader.RESOURCES + prefix + "/" + assetItemHash;
-                        this.fileDownloader.download(url, filePath, this.progressListener);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         });
     }
 
-    private void downloadResources() throws IOException {
-
-    }
-
     private static Reader getReader(byte[] bytes) {
-        return new InputStreamReader(new ByteArrayInputStream(bytes), StandardCharsets.UTF_8);
+        return new BufferedReader(new InputStreamReader(new ByteArrayInputStream(bytes), StandardCharsets.UTF_8));
     }
 
-    private void extractNatives() throws IOException {
+    private void extractNatives(VersionInfo versionInfo) throws IOException {
         Path nativesDir = this.nativesDir;
-        try (Stream<Path> files = Files.walk(nativesDir)) {
-            files.forEach(file -> {
-                if (Files.isRegularFile(file)) {
-                    try (ZipFile zipFile = new ZipFile(file.toFile())) {
-                        zipFile.extractAll(nativesDir.normalize().toAbsolutePath().toString());
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
 
-            });
+        List<Path> paths;
+        try (Stream<Path> files = Files.walk(nativesDir)) {
+            paths = files.collect(Collectors.toList());
+        }
+
+        for (Path file : paths) {
+            if (!file.endsWith(".jar") || !file.endsWith(".zip")) {
+                continue;
+            }
+
+            if (Files.isRegularFile(file)) {
+                try (ZipFile zipFile = new ZipFile(file.toFile())) {
+                    zipFile.extractAll(nativesDir.normalize().toAbsolutePath().toString());
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
     }
 }

@@ -32,21 +32,24 @@ public abstract class FileDownloader {
         this.userAgent = userAgent;
     }
 
-    public Response makeRequest(String url) throws IOException {
+    public Response makeRequest(String url, long downloadedBytes) throws IOException {
         HttpURLConnection c = (HttpURLConnection) new URL(url).openConnection();
         c.setRequestMethod("GET");
         c.setRequestProperty("User-Agent", this.userAgent);
+        if (downloadedBytes > 0) {
+            c.setRequestProperty("Range", "bytes=" + downloadedBytes + "-");
+        }
 
         InputStream inputStream = c.getErrorStream() == null ? c.getInputStream() : c.getErrorStream();
 
         return new Response(inputStream, c.getContentLengthLong());
     }
 
-    public void download(String url, Path savePath) throws IOException {
-        this.download(url, savePath, FileDownloader.NO_OP_LISTENER);
+    public void download(String url, Path savePath, long bytesAlreadyHave) throws IOException {
+        this.download(url, savePath, bytesAlreadyHave, FileDownloader.NO_OP_LISTENER);
     }
 
-    public abstract void download(String url, Path savePath, ProgressListener listener) throws IOException;
+    public abstract void download(String url, Path savePath, long bytesAlreadyHave, ProgressListener listener) throws IOException;
 
     public String getUserAgent() {
         return this.userAgent;
