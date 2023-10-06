@@ -29,14 +29,14 @@ public class FileDownloaderIO extends FileDownloader {
     public void download(String url, Path savePath, ProgressListener listener) throws IOException {
         Response response = this.makeRequest(url);
 
-        try (InputStream inputStream = new BufferedInputStream(response.getInputStream(), 4096);
+        try (InputStream inputStream = response.getInputStream();
              OutputStream outputStream = new BufferedOutputStream(Files.newOutputStream(savePath.toFile().toPath()))) {
-            byte[] buffer = new byte[4096];
+            byte[] buffer = new byte[2048];
             ByteArrayOutputStream output = new ByteArrayOutputStream();
             long count = 0L;
             int numRead;
             do {
-                numRead = inputStream.read(buffer, 0, 4096);
+                numRead = inputStream.read(buffer);
                 if (numRead != -1) {
                     count += numRead;
                     output.write(buffer, 0, numRead);
