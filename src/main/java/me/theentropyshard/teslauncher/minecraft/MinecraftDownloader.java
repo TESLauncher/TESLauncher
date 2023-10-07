@@ -233,22 +233,19 @@ public class MinecraftDownloader {
     private void extractNatives() throws IOException {
         Path nativesDir = this.nativesDir;
 
-        List<Path> paths;
+        List<String> paths;
         try (Stream<Path> files = Files.walk(nativesDir)) {
-            paths = files.collect(Collectors.toList());
+            paths = files
+                    .map(path -> path.normalize().toAbsolutePath().toString())
+                    .filter(strPath -> strPath.endsWith(".jar") || strPath.endsWith(".zip"))
+                    .collect(Collectors.toList());
         }
 
-        for (Path file : paths) {
-            if (!file.endsWith(".jar") || !file.endsWith(".zip")) {
-                continue;
-            }
-
-            if (Files.isRegularFile(file)) {
-                try (ZipFile zipFile = new ZipFile(file.toFile())) {
-                    zipFile.extractAll(nativesDir.normalize().toAbsolutePath().toString());
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+        for (String filePath : paths) {
+            try (ZipFile zipFile = new ZipFile(filePath)) {
+                zipFile.extractAll(nativesDir.normalize().toAbsolutePath().toString());
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }
