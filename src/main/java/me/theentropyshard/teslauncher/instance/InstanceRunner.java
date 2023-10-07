@@ -37,25 +37,27 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 public class InstanceRunner extends Thread {
     private final Instance instance;
 
-    private Gson gson;
+    private final Gson gson;
 
     public InstanceRunner(Instance instance) {
         this.instance = instance;
+        this.gson = new GsonBuilder()
+                .registerTypeAdapter(VersionInfo.class, new DetailedVersionInfoDeserializerOld())
+                .registerTypeAdapter(Rule.Action.class, new ActionTypeAdapter())
+                .create();
     }
 
     @Override
     public void run() {
-        this.gson = new GsonBuilder()
-                .registerTypeAdapter(VersionInfo.class, new DetailedVersionInfoDeserializerOld())
-                .registerTypeAdapter(AutoCloseable.class, new ActionTypeAdapter())
-                .create();
-
         try {
             TESLauncher launcher = TESLauncher.getInstance();
             InstanceManager instanceManager = launcher.getInstanceManager();
@@ -83,25 +85,22 @@ public class InstanceRunner extends Thread {
             Path clientsDir = launcher.getVersionsDir();
             Path librariesDir = launcher.getLibrariesDir();
             Path assetsDir = launcher.getAssetsDir();
-            //if (!this.instance.wasEverPlayed()) {
-                MinecraftDownloader downloader = new MinecraftDownloader(
-                        clientsDir,
-                        assetsDir,
-                        librariesDir,
-                        tmpNativesDir,
-                        instanceManager.getMinecraftDir(this.instance).resolve("resources"),
-                        progressListener
-                );
 
-                TESLauncher.getInstance().getPlayView().getProgressBar().setVisible(true);
-                TESLauncher.getInstance().getPlayView().getProgressBar().setEnabled(true);
-                downloader.downloadMinecraft(this.instance.getMinecraftVersion());
-                TESLauncher.getInstance().getPlayView().getProgressBar().setVisible(false);
-                TESLauncher.getInstance().getPlayView().getProgressBar().setEnabled(false);
+            // TODO: check version different way, not like this
+            MinecraftDownloader downloader = new MinecraftDownloader(
+                    clientsDir,
+                    assetsDir,
+                    librariesDir,
+                    tmpNativesDir,
+                    instanceManager.getMinecraftDir(this.instance).resolve("resources"),
+                    progressListener
+            );
 
-                //this.instance.setWasEverPlayed(true);
-                //instanceManager.save(this.instance);
-            //}
+            TESLauncher.getInstance().getPlayView().getProgressBar().setVisible(true);
+            TESLauncher.getInstance().getPlayView().getProgressBar().setEnabled(true);
+            downloader.downloadMinecraft(this.instance.getMinecraftVersion());
+            TESLauncher.getInstance().getPlayView().getProgressBar().setVisible(false);
+            TESLauncher.getInstance().getPlayView().getProgressBar().setEnabled(false);
 
             Path clientJson = clientsDir.resolve(this.instance.getMinecraftVersion())
                     .resolve(this.instance.getMinecraftVersion() + ".json");
@@ -129,10 +128,6 @@ public class InstanceRunner extends Thread {
     private List<String> resolveClasspath(VersionInfo versionInfo, Path librariesDir, Path clientsDir) {
         List<String> classpath = new ArrayList<>();
 
-        /*for (String libPath : versionInfo.librariesPaths) {
-            classpath.add(librariesDir.resolve(libPath).toAbsolutePath().toString());
-        }*/
-
         for (Library library : versionInfo.libraries) {
             DownloadArtifact artifact = library.downloads.artifact;
             if (artifact == null) {
@@ -151,7 +146,7 @@ public class InstanceRunner extends Thread {
                         boolean versionMatches = os.version != null &&
                                 Pattern.compile(os.version).matcher(EnumOS.getVersion()).matches();
                         if (EnumOS.getOsName().equals(os.name) ||
-                                versionMatches || EnumOS.getArch().equals("x" + os.arch)) {
+                                versionMatches || EnumOS.getBits().equals("x" + os.arch)) {
                             lastAction = rule.action;
                         }
                     }
@@ -231,10 +226,6 @@ public class InstanceRunner extends Thread {
 
         StringSubstitutor substitutor = new StringSubstitutor(argVars);
 
-        /*for (String arg : versionInfo.jvmArgs) {
-            arguments.add(substitutor.replace(arg));
-        }*/
-
         for (Argument argument : versionInfo.jvmArgs) {
             Rule.Action lastAction = Rule.Action.DISALLOW;
             if (argument.rules == null || argument.rules.isEmpty()) {
@@ -248,7 +239,7 @@ public class InstanceRunner extends Thread {
                         boolean versionMatches = os.version != null &&
                                 Pattern.compile(os.version).matcher(EnumOS.getVersion()).matches();
                         if (EnumOS.getOsName().equals(os.name) ||
-                                versionMatches || EnumOS.getArch().equals("x" + os.arch)) {
+                                versionMatches || EnumOS.getBits().equals("x" + os.arch)) {
                             lastAction = rule.action;
                         }
                     }
@@ -267,7 +258,7 @@ public class InstanceRunner extends Thread {
             int minorVersion = Integer.parseInt(split[1]);
             int patch = Integer.parseInt(split[2]);
 
-            // TODO this is a workaround
+            // TODO this is a workaround for 1.16.5
             if (minorVersion == 16 && patch == 5) {
                 arguments.add("-Dminecraft.api.auth.host=https://nope.invalid");
                 arguments.add("-Dminecraft.api.account.host=https://nope.invalid");
@@ -279,10 +270,6 @@ public class InstanceRunner extends Thread {
         }
 
         arguments.add(versionInfo.mainClass);
-
-        /*for (String arg : versionInfo.gameArgs) {
-            arguments.add(substitutor.replace(arg));
-        }*/
 
         for (Argument argument : versionInfo.gameArgs) {
             Rule.Action lastAction = Rule.Action.DISALLOW;
@@ -297,7 +284,7 @@ public class InstanceRunner extends Thread {
                         boolean versionMatches = os.version != null &&
                                 Pattern.compile(os.version).matcher(EnumOS.getVersion()).matches();
                         if (EnumOS.getOsName().equals(os.name) ||
-                                versionMatches || EnumOS.getArch().equals("x" + os.arch)) {
+                                versionMatches || EnumOS.getBits().equals("x" + os.arch)) {
                             lastAction = rule.action;
                         }
                     }

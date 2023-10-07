@@ -52,6 +52,14 @@ public enum EnumOS {
 
     public static String getArch() {
         if (Platform.is64Bit()) {
+            return "x64";
+        }
+
+        return "x86";
+    }
+
+    public static String getBits() {
+        if (Platform.is64Bit()) {
             return "64";
         }
 

@@ -26,7 +26,6 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 public class DetailedVersionInfoDeserializerOld implements JsonDeserializer<VersionInfo> {
@@ -88,7 +87,7 @@ public class DetailedVersionInfoDeserializerOld implements JsonDeserializer<Vers
                             boolean versionMatches = os.version != null &&
                                     Pattern.compile(os.version).matcher(EnumOS.getVersion()).matches();
                             if (EnumOS.getOsName().equals(os.name) ||
-                                    versionMatches || EnumOS.getArch().equals("x" + os.arch)) {
+                                    versionMatches || EnumOS.getBits().equals("x" + os.arch)) {
                                 lastAction = rule.action;
                             }
                         }
@@ -113,7 +112,7 @@ public class DetailedVersionInfoDeserializerOld implements JsonDeserializer<Vers
                             boolean versionMatches = os.version != null &&
                                     Pattern.compile(os.version).matcher(EnumOS.getVersion()).matches();
                             if (EnumOS.getOsName().equals(os.name) ||
-                                    versionMatches || EnumOS.getArch().equals("x" + os.arch)) {
+                                    versionMatches || EnumOS.getBits().equals("x" + os.arch)) {
                                 lastAction = rule.action;
                             }
                         }

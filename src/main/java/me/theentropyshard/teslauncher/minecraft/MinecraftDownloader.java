@@ -126,7 +126,7 @@ public class MinecraftDownloader {
 
             //LOG.info("Extracting natives...");
             System.out.println("Extracting natives...");
-            this.extractNatives(versionInfo);
+            this.extractNatives();
             System.out.println("Extracted natives");
 
             System.out.println("Downloading assets...");
@@ -172,6 +172,12 @@ public class MinecraftDownloader {
             if (classifiers != null) {
                 String key = "natives-" + EnumOS.getOsName();
                 DownloadArtifact classifier = classifiers.get(key);
+
+                if (classifier == null) {
+                    key = key + "-" + EnumOS.getBits();
+                    classifier = classifiers.get(key);
+                }
+
                 if (classifier != null) {
                     Path filePath = this.nativesDir.resolve(classifier.path);
                     this.download(classifier.url, filePath, classifier.size, this.progressListener);
@@ -224,7 +230,7 @@ public class MinecraftDownloader {
         return new BufferedReader(new InputStreamReader(new ByteArrayInputStream(bytes), StandardCharsets.UTF_8));
     }
 
-    private void extractNatives(VersionInfo versionInfo) throws IOException {
+    private void extractNatives() throws IOException {
         Path nativesDir = this.nativesDir;
 
         List<Path> paths;
