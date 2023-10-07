@@ -16,20 +16,26 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher;
+package me.theentropyshard.teslauncher.minecraft.auth.microsoft;
 
-import me.theentropyshard.teslauncher.minecraft.auth.microsoft.MicrosoftAuthenticator;
+import com.google.gson.annotations.SerializedName;
 
-import java.io.IOException;
+public class OAuthCodeResponse {
+    @SerializedName("token_type")
+    public String tokenType;
 
-public class Main {
-    public static void main(String[] args) {
-        //TESLauncher.start(args);
-        MicrosoftAuthenticator microsoftAuthenticator = new MicrosoftAuthenticator();
-        try {
-            microsoftAuthenticator.authenticate();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+    @SerializedName("scope")
+    public String scope;
+
+    @SerializedName("expires_in")
+    public int expiresIn;
+
+    @SerializedName("access_token")
+    public String accessToken;
+
+    @SerializedName("refresh_token")
+    public String refreshToken;
+
+    @SerializedName("id_token")
+    public String idToken;
 }

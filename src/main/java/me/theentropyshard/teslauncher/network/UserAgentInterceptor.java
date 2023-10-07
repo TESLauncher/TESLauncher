@@ -16,20 +16,26 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher;
+package me.theentropyshard.teslauncher.network;
 
-import me.theentropyshard.teslauncher.minecraft.auth.microsoft.MicrosoftAuthenticator;
+import okhttp3.Interceptor;
+import okhttp3.Response;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
-public class Main {
-    public static void main(String[] args) {
-        //TESLauncher.start(args);
-        MicrosoftAuthenticator microsoftAuthenticator = new MicrosoftAuthenticator();
-        try {
-            microsoftAuthenticator.authenticate();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+public class UserAgentInterceptor implements Interceptor {
+    private final String userAgent;
+
+    public UserAgentInterceptor(String userAgent) {
+        this.userAgent = userAgent;
+    }
+
+    @NotNull
+    @Override
+    public Response intercept(Chain chain) throws IOException {
+        return chain.proceed(chain.request().newBuilder()
+                .header("User-Agent", this.userAgent)
+                .build());
     }
 }

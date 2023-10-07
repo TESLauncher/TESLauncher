@@ -16,20 +16,30 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher;
+package me.theentropyshard.teslauncher.minecraft.auth.microsoft;
 
-import me.theentropyshard.teslauncher.minecraft.auth.microsoft.MicrosoftAuthenticator;
+import com.google.gson.annotations.SerializedName;
 
-import java.io.IOException;
+import java.util.List;
 
-public class Main {
-    public static void main(String[] args) {
-        //TESLauncher.start(args);
-        MicrosoftAuthenticator microsoftAuthenticator = new MicrosoftAuthenticator();
-        try {
-            microsoftAuthenticator.authenticate();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+public class XSTSAuthResponse {
+    @SerializedName("IssueInstant")
+    public String issueInstant;
+
+    @SerializedName("NotAfter")
+    public String notAfter;
+
+    @SerializedName("Token")
+    public String token;
+
+    @SerializedName("DisplayClaims")
+    public XboxLiveAuthResponse.DisplayClaims displayClaims;
+
+    public static final class UserHash {
+        public String uhs;
+    }
+
+    public static final class DisplayClaims {
+        public List<XboxLiveAuthResponse.UserHash> xui;
     }
 }
