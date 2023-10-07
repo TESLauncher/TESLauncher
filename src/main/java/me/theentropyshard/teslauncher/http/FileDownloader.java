@@ -42,7 +42,7 @@ public abstract class FileDownloader {
 
         InputStream inputStream = c.getErrorStream() == null ? c.getInputStream() : c.getErrorStream();
 
-        return new Response(inputStream, c.getContentLengthLong());
+        return new Response(inputStream, c.getContentLengthLong(), c.getResponseCode());
     }
 
     public void download(String url, Path savePath, long bytesAlreadyHave) throws IOException {

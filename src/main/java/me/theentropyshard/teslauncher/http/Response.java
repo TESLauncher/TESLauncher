@@ -21,10 +21,12 @@ import java.io.InputStream;
 public class Response {
     private final InputStream inputStream;
     private final long contentLength;
+    private final int responseCode;
 
-    public Response(InputStream inputStream, long contentLength) {
+    public Response(InputStream inputStream, long contentLength, int responseCode) {
         this.inputStream = inputStream;
         this.contentLength = contentLength;
+        this.responseCode = responseCode;
     }
 
     public InputStream getInputStream() {
@@ -33,5 +35,9 @@ public class Response {
 
     public long getContentLength() {
         return this.contentLength;
+    }
+
+    public int getResponseCode() {
+        return this.responseCode;
     }
 }
