@@ -146,7 +146,7 @@ public class InstanceRunner extends Thread {
                         boolean versionMatches = os.version != null &&
                                 Pattern.compile(os.version).matcher(EnumOS.getVersion()).matches();
                         if (EnumOS.getOsName().equals(os.name) ||
-                                versionMatches || EnumOS.getBits().equals("x" + os.arch)) {
+                                versionMatches || EnumOS.getArch().equals(os.arch)) {
                             lastAction = rule.action;
                         }
                     }
@@ -239,7 +239,7 @@ public class InstanceRunner extends Thread {
                         boolean versionMatches = os.version != null &&
                                 Pattern.compile(os.version).matcher(EnumOS.getVersion()).matches();
                         if (EnumOS.getOsName().equals(os.name) ||
-                                versionMatches || EnumOS.getBits().equals("x" + os.arch)) {
+                                versionMatches || EnumOS.getArch().equals(os.arch)) {
                             lastAction = rule.action;
                         }
                     }
@@ -284,7 +284,7 @@ public class InstanceRunner extends Thread {
                         boolean versionMatches = os.version != null &&
                                 Pattern.compile(os.version).matcher(EnumOS.getVersion()).matches();
                         if (EnumOS.getOsName().equals(os.name) ||
-                                versionMatches || EnumOS.getBits().equals("x" + os.arch)) {
+                                versionMatches || EnumOS.getArch().equals(os.arch)) {
                             lastAction = rule.action;
                         }
                     }
