@@ -17,12 +17,7 @@
 package me.theentropyshard.teslauncher.minecraft;
 
 import java.util.List;
-import java.util.Map;
 
-public class Library {
-    public String name;
-    public ExtractRules extract;
-    public List<Rule> rules;
-    public Map<String, String> natives;
-    public LibraryDownloads downloads;
+public class ExtractRules {
+    public List<String> exclude;
 }

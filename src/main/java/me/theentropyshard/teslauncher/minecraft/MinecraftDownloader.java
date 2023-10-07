@@ -29,15 +29,14 @@ import me.theentropyshard.teslauncher.utils.EnumOS;
 import me.theentropyshard.teslauncher.utils.Http;
 import me.theentropyshard.teslauncher.utils.PathUtils;
 import net.lingala.zip4j.ZipFile;
+import net.lingala.zip4j.model.FileHeader;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class MinecraftDownloader {
     private static final String VER_MAN_V2 = "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json";
@@ -121,12 +120,12 @@ public class MinecraftDownloader {
 
             //LOG.info("Downloading libraries...");
             System.out.println("Downloading libraries...");
-            this.downloadLibraries(versionInfo);
+            List<Library> nativeLibraries = this.downloadLibraries(versionInfo);
             System.out.println("Downloaded libraries");
 
             //LOG.info("Extracting natives...");
             System.out.println("Extracting natives...");
-            this.extractNatives();
+            this.extractNatives(nativeLibraries);
             System.out.println("Extracted natives");
 
             System.out.println("Downloading assets...");
@@ -158,32 +157,43 @@ public class MinecraftDownloader {
         return versionInfo;
     }
 
-    private void downloadLibraries(VersionInfo versionInfo) throws IOException {
+    private DownloadArtifact getClassifier(Library library) {
+        if (library.downloads.classifiers != null) {
+            String key = "natives-" + EnumOS.getOsName();
+            DownloadArtifact classifier = library.downloads.classifiers.get(key);
+
+            if (classifier == null) {
+                key = key + "-" + EnumOS.getBits();
+                classifier = library.downloads.classifiers.get(key);
+            }
+
+            return classifier;
+        }
+
+        return null;
+    }
+
+    private List<Library> downloadLibraries(VersionInfo versionInfo) throws IOException {
+        List<Library> nativeLibraries = new ArrayList<>();
+
         for (Library library : versionInfo.libraries) {
             LibraryDownloads downloads = library.downloads;
             DownloadArtifact artifact = downloads.artifact;
-            Map<String, DownloadArtifact> classifiers = downloads.classifiers;
 
             if (artifact != null) {
                 Path jarFile = this.librariesDir.resolve(artifact.path);
                 this.download(artifact.url, jarFile, artifact.size, this.progressListener);
             }
 
-            if (classifiers != null) {
-                String key = "natives-" + EnumOS.getOsName();
-                DownloadArtifact classifier = classifiers.get(key);
-
-                if (classifier == null) {
-                    key = key + "-" + EnumOS.getBits();
-                    classifier = classifiers.get(key);
-                }
-
-                if (classifier != null) {
-                    Path filePath = this.nativesDir.resolve(classifier.path);
-                    this.download(classifier.url, filePath, classifier.size, this.progressListener);
-                }
+            DownloadArtifact classifier = this.getClassifier(library);
+            if (classifier != null) {
+                nativeLibraries.add(library);
+                Path filePath = this.nativesDir.resolve(classifier.path);
+                this.download(classifier.url, filePath, classifier.size, this.progressListener);
             }
         }
+
+        return nativeLibraries;
     }
 
     private void downloadAsset(Path filePath, AssetObject assetObject) throws IOException {
@@ -230,22 +240,35 @@ public class MinecraftDownloader {
         return new BufferedReader(new InputStreamReader(new ByteArrayInputStream(bytes), StandardCharsets.UTF_8));
     }
 
-    private void extractNatives() throws IOException {
-        Path nativesDir = this.nativesDir;
-
-        List<String> paths;
-        try (Stream<Path> files = Files.walk(nativesDir)) {
-            paths = files
-                    .map(path -> path.normalize().toAbsolutePath().toString())
-                    .filter(strPath -> strPath.endsWith(".jar") || strPath.endsWith(".zip"))
-                    .collect(Collectors.toList());
+    private boolean excludeFromExtract(Library library, String fileName) {
+        for (String excludeName : library.extract.exclude) {
+            if (fileName.startsWith(excludeName)) {
+                return true;
+            }
         }
 
-        for (String filePath : paths) {
-            try (ZipFile zipFile = new ZipFile(filePath)) {
-                zipFile.extractAll(nativesDir.normalize().toAbsolutePath().toString());
-            } catch (IOException e) {
-                e.printStackTrace();
+        return false;
+    }
+
+    private void extractNatives(List<Library> nativeLibraries) throws IOException {
+        for (Library library : nativeLibraries) {
+            DownloadArtifact classifier = this.getClassifier(library);
+            if (classifier == null) {
+                continue;
+            }
+
+            String extractPath = this.nativesDir.normalize().toAbsolutePath().toString();
+            Path path = this.nativesDir.resolve(classifier.path).toAbsolutePath();
+
+            try (ZipFile zipFile = new ZipFile(path.toFile())) {
+                List<FileHeader> fileHeaders = zipFile.getFileHeaders();
+                for (FileHeader fileHeader : fileHeaders) {
+                    if (this.excludeFromExtract(library, fileHeader.getFileName())) {
+                        continue;
+                    }
+
+                    zipFile.extractFile(fileHeader, extractPath);
+                }
             }
         }
     }
