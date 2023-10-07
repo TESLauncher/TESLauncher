@@ -134,26 +134,7 @@ public class InstanceRunner extends Thread {
                 continue;
             }
 
-            Rule.Action lastAction = Rule.Action.DISALLOW;
-            if (library.rules == null || library.rules.isEmpty()) {
-                lastAction = Rule.Action.ALLOW;
-            } else {
-                for (Rule rule : library.rules) {
-                    Os os = rule.os;
-                    if (os == null) {
-                        lastAction = rule.action;
-                    } else {
-                        boolean versionMatches = os.version != null &&
-                                Pattern.compile(os.version).matcher(EnumOS.getVersion()).matches();
-                        if (EnumOS.getOsName().equals(os.name) ||
-                                versionMatches || EnumOS.getArch().equals(os.arch)) {
-                            lastAction = rule.action;
-                        }
-                    }
-                }
-            }
-
-            if (lastAction == Rule.Action.ALLOW) {
+            if (RuleMatcher.applyOnThisPlatform(library)) {
                 classpath.add(librariesDir.resolve(artifact.path).toAbsolutePath().toString());
             }
         }
@@ -227,26 +208,7 @@ public class InstanceRunner extends Thread {
         StringSubstitutor substitutor = new StringSubstitutor(argVars);
 
         for (Argument argument : versionInfo.jvmArgs) {
-            Rule.Action lastAction = Rule.Action.DISALLOW;
-            if (argument.rules == null || argument.rules.isEmpty()) {
-                lastAction = Rule.Action.ALLOW;
-            } else {
-                for (Rule rule : argument.rules) {
-                    Os os = rule.os;
-                    if (os == null) {
-                        lastAction = rule.action;
-                    } else {
-                        boolean versionMatches = os.version != null &&
-                                Pattern.compile(os.version).matcher(EnumOS.getVersion()).matches();
-                        if (EnumOS.getOsName().equals(os.name) ||
-                                versionMatches || EnumOS.getArch().equals(os.arch)) {
-                            lastAction = rule.action;
-                        }
-                    }
-                }
-            }
-
-            if (lastAction == Rule.Action.ALLOW) {
+            if (RuleMatcher.applyOnThisPlatform(argument)) {
                 for (String value : argument.value) {
                     arguments.add(substitutor.replace(value));
                 }
@@ -272,26 +234,7 @@ public class InstanceRunner extends Thread {
         arguments.add(versionInfo.mainClass);
 
         for (Argument argument : versionInfo.gameArgs) {
-            Rule.Action lastAction = Rule.Action.DISALLOW;
-            if (argument.rules == null || argument.rules.isEmpty()) {
-                lastAction = Rule.Action.ALLOW;
-            } else {
-                for (Rule rule : argument.rules) {
-                    Os os = rule.os;
-                    if (os == null) {
-                        lastAction = rule.action;
-                    } else {
-                        boolean versionMatches = os.version != null &&
-                                Pattern.compile(os.version).matcher(EnumOS.getVersion()).matches();
-                        if (EnumOS.getOsName().equals(os.name) ||
-                                versionMatches || EnumOS.getArch().equals(os.arch)) {
-                            lastAction = rule.action;
-                        }
-                    }
-                }
-            }
-
-            if (lastAction == Rule.Action.ALLOW) {
+            if (RuleMatcher.applyOnThisPlatform(argument)) {
                 for (String value : argument.value) {
                     arguments.add(substitutor.replace(value));
                 }

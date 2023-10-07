@@ -72,51 +72,13 @@ public class DetailedVersionInfoDeserializer extends AbstractJsonDeserializer<Ve
             }
 
             for (Argument argument : gameArguments) {
-                Rule.Action lastAction = Rule.Action.DISALLOW;
-                if (argument.rules == null || argument.rules.isEmpty()) {
-                    lastAction = Rule.Action.ALLOW;
-                } else {
-                    for (Rule rule : argument.rules) {
-                        Os os = rule.os;
-                        if (os == null) {
-                            lastAction = rule.action;
-                        } else {
-                            boolean versionMatches = os.version != null &&
-                                    Pattern.compile(os.version).matcher(EnumOS.getVersion()).matches();
-                            if (EnumOS.getOsName().equals(os.name) ||
-                                    versionMatches || EnumOS.getArch().equals(os.arch)) {
-                                lastAction = rule.action;
-                            }
-                        }
-                    }
-                }
-
-                if (lastAction == Rule.Action.ALLOW) {
+                if (RuleMatcher.applyOnThisPlatform(argument)) {
                     versionInfo.gameArgs.add(argument);
                 }
             }
 
             for (Argument argument : jvmArguments) {
-                Rule.Action lastAction = Rule.Action.DISALLOW;
-                if (argument.rules == null || argument.rules.isEmpty()) {
-                    lastAction = Rule.Action.ALLOW;
-                } else {
-                    for (Rule rule : argument.rules) {
-                        Os os = rule.os;
-                        if (os == null) {
-                            lastAction = rule.action;
-                        } else {
-                            boolean versionMatches = os.version != null &&
-                                    Pattern.compile(os.version).matcher(EnumOS.getVersion()).matches();
-                            if (EnumOS.getOsName().equals(os.name) ||
-                                    versionMatches || EnumOS.getArch().equals(os.arch)) {
-                                lastAction = rule.action;
-                            }
-                        }
-                    }
-                }
-
-                if (lastAction == Rule.Action.ALLOW) {
+                if (RuleMatcher.applyOnThisPlatform(argument)) {
                     versionInfo.jvmArgs.add(argument);
                 }
             }

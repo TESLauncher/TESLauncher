@@ -17,17 +17,7 @@
 package me.theentropyshard.teslauncher.minecraft;
 
 import java.util.List;
-import java.util.Map;
 
-public class Library implements Ruleable {
-    public String name;
-    public ExtractRules extract;
-    public List<Rule> rules;
-    public Map<String, String> natives;
-    public LibraryDownloads downloads;
-
-    @Override
-    public List<Rule> getRules() {
-        return this.rules;
-    }
+public interface Ruleable {
+    List<Rule> getRules();
 }

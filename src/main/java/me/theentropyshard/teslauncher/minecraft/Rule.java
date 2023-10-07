@@ -40,10 +40,6 @@ public class Rule {
         }
     }
 
-    public boolean useOnThisPlatform() {
-        return false;
-    }
-
     @Override
     public String toString() {
         return "Rule{" +

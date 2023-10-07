@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class Argument {
+public class Argument implements Ruleable {
     public List<Rule> rules;
     @JsonAdapter(AlwaysListTypeAdapterFactory.class)
     public List<String> value;
@@ -33,6 +33,11 @@ public class Argument {
         argument.value = Arrays.asList(values);
         argument.rules = new ArrayList<>();
         return argument;
+    }
+
+    @Override
+    public List<Rule> getRules() {
+        return this.rules;
     }
 
     @Override
