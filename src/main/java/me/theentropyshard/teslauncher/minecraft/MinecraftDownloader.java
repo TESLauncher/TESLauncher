@@ -19,7 +19,7 @@ package me.theentropyshard.teslauncher.minecraft;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import me.theentropyshard.teslauncher.gson.ActionTypeAdapter;
-import me.theentropyshard.teslauncher.gson.DetailedVersionInfoDeserializerOld;
+import me.theentropyshard.teslauncher.gson.DetailedVersionInfoDeserializer;
 import me.theentropyshard.teslauncher.http.FileDownloader;
 import me.theentropyshard.teslauncher.http.FileDownloaderIO;
 import me.theentropyshard.teslauncher.http.ProgressListener;
@@ -60,7 +60,7 @@ public class MinecraftDownloader {
         this.instanceResourcesDir = instanceResourcesDir;
         this.progressListener = progressListener;
         this.gson = new GsonBuilder()
-                .registerTypeAdapter(VersionInfo.class, new DetailedVersionInfoDeserializerOld())
+                .registerTypeAdapter(VersionInfo.class, new DetailedVersionInfoDeserializer())
                 .registerTypeAdapter(Rule.Action.class, new ActionTypeAdapter())
                 .create();
 

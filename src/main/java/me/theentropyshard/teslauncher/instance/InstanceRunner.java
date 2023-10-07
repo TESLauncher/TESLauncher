@@ -21,7 +21,7 @@ import com.google.gson.GsonBuilder;
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.accounts.AccountsManager;
 import me.theentropyshard.teslauncher.gson.ActionTypeAdapter;
-import me.theentropyshard.teslauncher.gson.DetailedVersionInfoDeserializerOld;
+import me.theentropyshard.teslauncher.gson.DetailedVersionInfoDeserializer;
 import me.theentropyshard.teslauncher.gui.playview.PlayView;
 import me.theentropyshard.teslauncher.http.ProgressListener;
 import me.theentropyshard.teslauncher.minecraft.*;
@@ -51,7 +51,7 @@ public class InstanceRunner extends Thread {
     public InstanceRunner(Instance instance) {
         this.instance = instance;
         this.gson = new GsonBuilder()
-                .registerTypeAdapter(VersionInfo.class, new DetailedVersionInfoDeserializerOld())
+                .registerTypeAdapter(VersionInfo.class, new DetailedVersionInfoDeserializer())
                 .registerTypeAdapter(Rule.Action.class, new ActionTypeAdapter())
                 .create();
     }
