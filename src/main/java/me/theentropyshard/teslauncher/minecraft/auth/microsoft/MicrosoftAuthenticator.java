@@ -181,8 +181,9 @@ public class MicrosoftAuthenticator {
 
             if (response.code() == 401) {
                 JsonObject jsonObject = this.gson.fromJson(reader, JsonObject.class);
-                System.out.println("Error obtaining XSTS token: " + jsonObject.get("XErr"));
-                // TODO: check error
+                String xErr = jsonObject.get("XErr").getAsString();
+                String errorMsg = MicrosoftAuthenticator.getXSTSErrorMessage(xErr);
+                System.out.println("Error obtaining XSTS token: " + errorMsg + " (" + xErr + ")");
                 return null;
             } else {
                 return this.gson.fromJson(reader, XSTSAuthResponse.class);
@@ -217,5 +218,21 @@ public class MicrosoftAuthenticator {
 
     private static Reader getReader(InputStream inputStream) {
         return new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
+    }
+
+    private static String getXSTSErrorMessage(String errorCode) {
+        switch (errorCode) {
+            case "2148916233":
+                return "The account doesn't have an Xbox account";
+            case "2148916235":
+                return "The account is from a country where Xbox Live is not available/banned";
+            case "2148916236":
+            case "2148916237":
+                return "The account needs adult verification on Xbox page";
+            case "2148916238":
+                return "The account is a child (under 18) and cannot proceed unless the account is added to a Family by an adult";
+            default:
+                return "unknown error";
+        }
     }
 }
