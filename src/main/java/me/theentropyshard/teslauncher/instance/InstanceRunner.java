@@ -123,7 +123,7 @@ public class InstanceRunner extends Thread {
             long timePlayed = (end - start) / 1000;
             System.out.println("You played for " + timePlayed + " seconds!");
 
-            this.instance.setTotalPlayedForSeconds(this.instance.getLastPlayedForSeconds() + timePlayed);
+            this.instance.setTotalPlayedForSeconds(this.instance.getTotalPlayedForSeconds() + timePlayed);
             this.instance.setLastPlayedForSeconds(timePlayed);
 
             instanceManager.save(this.instance);
