@@ -34,6 +34,8 @@ public class InstanceItem extends JPanel {
 
     private final Set<ActionListener> listeners;
     private final Set<ActionListener> mouseClickListeners;
+    private final Set<ActionListener> mouseEnteredListeners;
+    private final Set<ActionListener> mouseExitedListeners;
 
     private final JLabel iconLabel;
     private final JLabel textLabel;
@@ -50,6 +52,8 @@ public class InstanceItem extends JPanel {
 
         this.listeners = new HashSet<>();
         this.mouseClickListeners = new HashSet<>();
+        this.mouseEnteredListeners = new HashSet<>();
+        this.mouseExitedListeners = new HashSet<>();
 
         this.iconLabel = new JLabel(icon);
         this.iconLabel.setHorizontalAlignment(JLabel.CENTER);
@@ -72,12 +76,18 @@ public class InstanceItem extends JPanel {
             public void mouseEntered(MouseEvent e) {
                 InstanceItem.this.mouseOver = true;
                 InstanceItem.this.repaint();
+
+                ActionEvent event = new ActionEvent(InstanceItem.this, 1, String.valueOf(e.getButton()));
+                InstanceItem.this.mouseEnteredListeners.forEach(listener -> listener.actionPerformed(event));
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
                 InstanceItem.this.mouseOver = false;
                 InstanceItem.this.repaint();
+
+                ActionEvent event = new ActionEvent(InstanceItem.this, 1, String.valueOf(e.getButton()));
+                InstanceItem.this.mouseExitedListeners.forEach(listener -> listener.actionPerformed(event));
             }
 
             @Override
@@ -140,6 +150,22 @@ public class InstanceItem extends JPanel {
         } else {
             this.listeners.remove(listener);
         }
+    }
+
+    public void addMouseExitedListener(ActionListener listener) {
+        this.mouseExitedListeners.add(listener);
+    }
+
+    public void removeMouseExitedListener(ActionListener listener) {
+        this.mouseExitedListeners.remove(listener);
+    }
+
+    public void addMouseEnteredListener(ActionListener listener) {
+        this.mouseEnteredListeners.add(listener);
+    }
+
+    public void removeMouseEnteredListener(ActionListener listener) {
+        this.mouseEnteredListeners.remove(listener);
     }
 
     public JLabel getIconLabel() {

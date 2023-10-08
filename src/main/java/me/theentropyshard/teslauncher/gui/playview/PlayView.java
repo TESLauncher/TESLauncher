@@ -47,6 +47,7 @@ public class PlayView extends View {
     private final CardLayout cardLayout;
     private final DefaultComboBoxModel<String> model;
     private final JProgressBar progressBar;
+    private final JLabel instanceInfoLabel;
 
     public PlayView() {
         JPanel root = this.getRoot();
@@ -89,7 +90,15 @@ public class PlayView extends View {
         this.progressBar.setFont(this.progressBar.getFont().deriveFont(12.0f));
         this.progressBar.setStringPainted(true);
         this.progressBar.setVisible(false);
-        root.add(this.progressBar, BorderLayout.SOUTH);
+
+        this.instanceInfoLabel = new JLabel();
+        this.instanceInfoLabel.setVisible(false);
+
+        JPanel bottomPanel = new JPanel(new GridLayout(2, 1, 0, 0));
+        bottomPanel.add(this.progressBar);
+        bottomPanel.add(this.instanceInfoLabel);
+
+        root.add(bottomPanel, BorderLayout.SOUTH);
 
         new SwingWorker<List<Instance>, Void>() {
             @Override
@@ -141,6 +150,22 @@ public class PlayView extends View {
             new InstanceRunner(manager.getInstanceByName(clickedItem.getTextLabel().getText())).start();
             // TODO manager.runInstance(clickedItem.getTextLabel().getText());
         }, true);
+
+        item.addMouseEnteredListener(e -> {
+            this.instanceInfoLabel.setVisible(true);
+
+            InstanceItem clickedItem = (InstanceItem) e.getSource();
+            InstanceManager manager = TESLauncher.getInstance().getInstanceManager();
+            Instance instance = manager.getInstanceByName(clickedItem.getTextLabel().getText());
+
+            this.instanceInfoLabel.setText(instance.getName() + " - Last played for: " +
+                    instance.getLastPlayedForSeconds() + " s, Total played for: " + instance.getTotalPlayedForSeconds() + " s");
+        });
+
+        item.addMouseExitedListener(e -> {
+            this.instanceInfoLabel.setVisible(false);
+            this.instanceInfoLabel.setText("");
+        });
     }
 
     public PlayViewHeader getHeader() {

@@ -121,7 +121,13 @@ public class InstanceRunner extends Thread {
 
             long end = System.currentTimeMillis();
 
-            System.out.println("You played for " + ((end - start) / 1000) + " seconds!");
+            long timePlayed = (end - start) / 1000;
+            System.out.println("You played for " + timePlayed + " seconds!");
+
+            this.instance.setTotalPlayedForSeconds(this.instance.getLastPlayedForSeconds() + timePlayed);
+            this.instance.setLastPlayedForSeconds(timePlayed);
+
+            instanceManager.save(this.instance);
         } catch (Exception e) {
             e.printStackTrace();
         }

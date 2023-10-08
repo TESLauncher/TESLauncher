@@ -29,6 +29,8 @@ public class Instance {
     private String customWindowString;
     private int minimumMemoryInMegabytes;
     private int maximumMemoryInMegabytes;
+    private long lastPlayedForSeconds;
+    private long totalPlayedForSeconds;
 
     public Instance() {
 
@@ -122,5 +124,21 @@ public class Instance {
 
     public void setMaximumMemoryInMegabytes(int maximumMemoryInMegabytes) {
         this.maximumMemoryInMegabytes = maximumMemoryInMegabytes;
+    }
+
+    public long getLastPlayedForSeconds() {
+        return this.lastPlayedForSeconds;
+    }
+
+    public void setLastPlayedForSeconds(long lastPlayedForSeconds) {
+        this.lastPlayedForSeconds = lastPlayedForSeconds;
+    }
+
+    public long getTotalPlayedForSeconds() {
+        return this.totalPlayedForSeconds;
+    }
+
+    public void setTotalPlayedForSeconds(long totalPlayedForSeconds) {
+        this.totalPlayedForSeconds = totalPlayedForSeconds;
     }
 }
