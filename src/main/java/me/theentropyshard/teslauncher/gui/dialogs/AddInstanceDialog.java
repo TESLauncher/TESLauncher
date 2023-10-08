@@ -31,7 +31,6 @@ import java.awt.*;
 import java.io.IOException;
 
 public class AddInstanceDialog extends AppDialog {
-    //private final JDialog dialog;
     private final JTextField nameField;
     private final JTextField groupField;
     private final JButton addButton;
@@ -183,13 +182,6 @@ public class AddInstanceDialog extends AppDialog {
         this.setContent(root);
         this.center(0);
         this.setVisible(true);
-        /*this.dialog = new JDialog(TESLauncher.window.getFrame(), "Add New Instance", true);
-        this.dialog.setResizable(false);
-        this.dialog.add(root, BorderLayout.CENTER);
-        this.dialog.pack();
-        this.dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        this.center(this.dialog, 0);
-        this.dialog.setVisible(true);*/
     }
 
     public JButton getAddButton() {
