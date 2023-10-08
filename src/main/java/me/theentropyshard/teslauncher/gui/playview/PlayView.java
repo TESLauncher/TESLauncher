@@ -149,7 +149,6 @@ public class PlayView extends View {
             InstanceManager manager = TESLauncher.getInstance().getInstanceManager();
 
             new InstanceRunner(manager.getInstanceByName(clickedItem.getTextLabel().getText())).start();
-            // TODO manager.runInstance(clickedItem.getTextLabel().getText());
         }, true);
 
         item.addMouseEnteredListener(e -> {
