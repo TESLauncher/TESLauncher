@@ -18,6 +18,8 @@
 
 package me.theentropyshard.teslauncher.gui;
 
+import me.theentropyshard.teslauncher.utils.SwingUtils;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
@@ -47,18 +49,7 @@ public class AppWindow {
     }
 
     public void center(int screen) {
-        GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
-        GraphicsDevice[] allDevices = env.getScreenDevices();
-
-        if (screen < 0 || screen >= allDevices.length) {
-            screen = 0;
-        }
-
-        Rectangle bounds = allDevices[screen].getDefaultConfiguration().getBounds();
-        this.frame.setLocation(
-                ((bounds.width - this.frame.getWidth()) / 2) + bounds.x,
-                ((bounds.height - this.frame.getHeight()) / 2) + bounds.y
-        );
+        SwingUtils.centerWindow(this.frame, screen);
     }
 
     public void setVisible(boolean visible) {

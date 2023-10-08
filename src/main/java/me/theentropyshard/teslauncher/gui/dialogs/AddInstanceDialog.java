@@ -30,8 +30,8 @@ import javax.swing.table.TableModel;
 import java.awt.*;
 import java.io.IOException;
 
-public class AddInstanceDialog {
-    private final JDialog dialog;
+public class AddInstanceDialog extends AppDialog {
+    //private final JDialog dialog;
     private final JTextField nameField;
     private final JTextField groupField;
     private final JButton addButton;
@@ -41,6 +41,8 @@ public class AddInstanceDialog {
     private final JCheckBox alphasBox;
 
     public AddInstanceDialog(PlayView playView, String groupName) {
+        super(TESLauncher.window.getFrame(), "Add New Instance");
+
         JPanel root = new JPanel(new BorderLayout());
 
         JPanel headerPanel = new JPanel(new BorderLayout());
@@ -177,36 +179,21 @@ public class AddInstanceDialog {
         root.add(centerPanel, BorderLayout.CENTER);
         root.setPreferredSize(new Dimension(800, 600));
 
-        this.dialog = new JDialog(TESLauncher.window.getFrame(), "Add New Instance", true);
+        this.setResizable(false);
+        this.setContent(root);
+        this.center(0);
+        this.setVisible(true);
+        /*this.dialog = new JDialog(TESLauncher.window.getFrame(), "Add New Instance", true);
         this.dialog.setResizable(false);
         this.dialog.add(root, BorderLayout.CENTER);
         this.dialog.pack();
         this.dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         this.center(this.dialog, 0);
-        this.dialog.setVisible(true);
-    }
-
-    public void center(Window window, int screen) {
-        GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
-        GraphicsDevice[] allDevices = env.getScreenDevices();
-
-        if (screen < 0 || screen >= allDevices.length) {
-            screen = 0;
-        }
-
-        Rectangle bounds = allDevices[screen].getDefaultConfiguration().getBounds();
-        window.setLocation(
-                ((bounds.width - window.getWidth()) / 2) + bounds.x,
-                ((bounds.height - window.getHeight()) / 2) + bounds.y
-        );
+        this.dialog.setVisible(true);*/
     }
 
     public JButton getAddButton() {
         return this.addButton;
-    }
-
-    public JDialog getDialog() {
-        return this.dialog;
     }
 
     public JCheckBox getReleasesBox() {

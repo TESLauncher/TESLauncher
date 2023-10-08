@@ -19,6 +19,7 @@
 package me.theentropyshard.teslauncher.utils;
 
 import javax.swing.*;
+import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -35,5 +36,20 @@ public final class SwingUtils {
         SwingUtils.ICON_CACHE.put(path, icon);
 
         return icon;
+    }
+
+    public static void centerWindow(Window window, int screen) {
+        GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        GraphicsDevice[] allDevices = env.getScreenDevices();
+
+        if (screen < 0 || screen >= allDevices.length) {
+            screen = 0;
+        }
+
+        Rectangle bounds = allDevices[screen].getDefaultConfiguration().getBounds();
+        window.setLocation(
+                ((bounds.width - window.getWidth()) / 2) + bounds.x,
+                ((bounds.height - window.getHeight()) / 2) + bounds.y
+        );
     }
 }
