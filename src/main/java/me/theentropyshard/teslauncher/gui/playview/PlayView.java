@@ -28,6 +28,7 @@ import me.theentropyshard.teslauncher.instance.Instance;
 import me.theentropyshard.teslauncher.instance.InstanceManager;
 import me.theentropyshard.teslauncher.instance.InstanceRunner;
 import me.theentropyshard.teslauncher.utils.SwingUtils;
+import me.theentropyshard.teslauncher.utils.TimeUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -158,8 +159,26 @@ public class PlayView extends View {
             InstanceManager manager = TESLauncher.getInstance().getInstanceManager();
             Instance instance = manager.getInstanceByName(clickedItem.getTextLabel().getText());
 
-            this.instanceInfoLabel.setText(instance.getName() + " - Last played for: " +
-                    instance.getLastPlayedForSeconds() + " s, Total played for: " + instance.getTotalPlayedForSeconds() + " s");
+            String lastPlayedTime = TimeUtils.getHoursMinutesSeconds(instance.getLastPlayedForSeconds());
+            String totalPlayedTime = TimeUtils.getHoursMinutesSeconds(instance.getTotalPlayedForSeconds());
+
+            String timeString = "";
+
+            if (!lastPlayedTime.isEmpty()) {
+                timeString = " - Last played for " + lastPlayedTime;
+            }
+
+            if (!totalPlayedTime.isEmpty()) {
+                if (lastPlayedTime.isEmpty()) {
+                    timeString = " - Total played for " + totalPlayedTime;
+                } else {
+                    timeString = timeString + ", Total played for " + totalPlayedTime;
+                }
+            }
+
+            if (!timeString.isEmpty()) {
+                this.instanceInfoLabel.setText(instance.getName() + timeString);
+            }
         });
 
         item.addMouseExitedListener(e -> {

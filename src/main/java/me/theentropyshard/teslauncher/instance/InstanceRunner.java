@@ -32,6 +32,7 @@ import me.theentropyshard.teslauncher.minecraft.models.VersionAssetIndex;
 import me.theentropyshard.teslauncher.minecraft.models.VersionInfo;
 import me.theentropyshard.teslauncher.utils.EnumOS;
 import me.theentropyshard.teslauncher.utils.PathUtils;
+import me.theentropyshard.teslauncher.utils.TimeUtils;
 import org.apache.commons.text.StringSubstitutor;
 
 import javax.swing.*;
@@ -120,11 +121,12 @@ public class InstanceRunner extends Thread {
 
             long end = System.currentTimeMillis();
 
-            long timePlayed = (end - start) / 1000;
+            long timePlayedSeconds = (end - start) / 1000;
+            String timePlayed = TimeUtils.getHoursMinutesSeconds(timePlayedSeconds);
             System.out.println("You played for " + timePlayed + " seconds!");
 
-            this.instance.setTotalPlayedForSeconds(this.instance.getTotalPlayedForSeconds() + timePlayed);
-            this.instance.setLastPlayedForSeconds(timePlayed);
+            this.instance.setTotalPlayedForSeconds(this.instance.getTotalPlayedForSeconds() + timePlayedSeconds);
+            this.instance.setLastPlayedForSeconds(timePlayedSeconds);
 
             instanceManager.save(this.instance);
         } catch (Exception e) {
