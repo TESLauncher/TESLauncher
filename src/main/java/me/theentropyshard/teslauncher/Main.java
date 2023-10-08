@@ -18,18 +18,8 @@
 
 package me.theentropyshard.teslauncher;
 
-import me.theentropyshard.teslauncher.minecraft.auth.microsoft.MicrosoftAuthenticator;
-
-import java.io.IOException;
-
 public class Main {
     public static void main(String[] args) {
-        //TESLauncher.start(args);
-        MicrosoftAuthenticator microsoftAuthenticator = new MicrosoftAuthenticator();
-        try {
-            microsoftAuthenticator.authenticate();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        TESLauncher.start(args);
     }
 }
