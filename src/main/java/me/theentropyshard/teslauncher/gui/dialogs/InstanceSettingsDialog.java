@@ -80,8 +80,38 @@ public class InstanceSettingsDialog extends AppDialog {
             @Override
             public void windowClosing(WindowEvent e) {
                 instance.setJavaPath(javaPathTextField.getText());
-                instance.setMinimumMemoryInMegabytes(Integer.parseInt(minMemoryField.getText()));
-                instance.setMaximumMemoryInMegabytes(Integer.parseInt(maxMemoryField.getText()));
+                String minMemory = minMemoryField.getText();
+                if (minMemory.isEmpty()) {
+                    minMemory = "512";
+                }
+
+                String maxMemory = maxMemoryField.getText();
+                if (maxMemory.isEmpty()) {
+                    maxMemory = "2048";
+                }
+
+                int minimumMemoryInMegabytes = Integer.parseInt(minMemory);
+                int maximumMemoryInMegabytes = Integer.parseInt(maxMemory);
+
+                if (minimumMemoryInMegabytes >= maximumMemoryInMegabytes) {
+                    JOptionPane.showMessageDialog(InstanceSettingsDialog.this.getDialog(),
+                            "Minimum amount of RAM cannot be larger than maximum",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                if (minimumMemoryInMegabytes < 512) {
+                    JOptionPane.showMessageDialog(
+                            InstanceSettingsDialog.this.getDialog(),
+                            "Minimum amount of RAM cannot be less than 512 MiB",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE
+                    );
+                }
+
+                instance.setMinimumMemoryInMegabytes(minimumMemoryInMegabytes);
+                instance.setMaximumMemoryInMegabytes(maximumMemoryInMegabytes);
             }
         });
 
