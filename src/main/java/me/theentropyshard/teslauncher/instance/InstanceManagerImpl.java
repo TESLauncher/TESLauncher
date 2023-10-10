@@ -20,6 +20,7 @@ package me.theentropyshard.teslauncher.instance;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import me.theentropyshard.teslauncher.gson.InstantTypeAdapter;
 import me.theentropyshard.teslauncher.utils.EnumOS;
 import me.theentropyshard.teslauncher.utils.PathUtils;
 
@@ -29,6 +30,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -46,7 +48,11 @@ public class InstanceManagerImpl implements InstanceManager {
 
     public InstanceManagerImpl(Path workDir) {
         this.workDir = workDir;
-        this.gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+        this.gson = new GsonBuilder()
+                .registerTypeAdapter(Instant.class, new InstantTypeAdapter())
+                .setPrettyPrinting()
+                .disableHtmlEscaping()
+                .create();
         this.instances = new ArrayList<>();
         this.instancesByName = new HashMap<>();
 

@@ -35,6 +35,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.MouseEvent;
+import java.time.Instant;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -115,6 +117,12 @@ public class PlayView extends View {
             protected void done() {
                 try {
                     List<Instance> instances = this.get();
+                    instances.sort((instance1, instance2) -> {
+                        Instant lastTimePlayed1 = instance1.getLastTimePlayed();
+                        Instant lastTimePlayed2 = instance2.getLastTimePlayed();
+                        return lastTimePlayed2.compareTo(lastTimePlayed1);
+                    });
+
                     for (Instance instance : instances) {
                         Icon icon = SwingUtils.getIcon("/grass_icon.png");
                         InstanceItem item = new InstanceItem(icon, instance.getName());

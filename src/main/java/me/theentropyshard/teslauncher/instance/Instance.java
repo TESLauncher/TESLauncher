@@ -18,6 +18,8 @@
 
 package me.theentropyshard.teslauncher.instance;
 
+import java.time.Instant;
+
 public class Instance {
     private String name;
     private String groupName;
@@ -29,6 +31,7 @@ public class Instance {
     private String customWindowString;
     private int minimumMemoryInMegabytes;
     private int maximumMemoryInMegabytes;
+    private Instant lastTimePlayed = Instant.EPOCH;
     private long lastPlayedForSeconds;
     private long totalPlayedForSeconds;
 
@@ -124,6 +127,14 @@ public class Instance {
 
     public void setMaximumMemoryInMegabytes(int maximumMemoryInMegabytes) {
         this.maximumMemoryInMegabytes = maximumMemoryInMegabytes;
+    }
+
+    public Instant getLastTimePlayed() {
+        return this.lastTimePlayed;
+    }
+
+    public void setLastTimePlayed(Instant lastTimePlayed) {
+        this.lastTimePlayed = lastTimePlayed;
     }
 
     public long getLastPlayedForSeconds() {

@@ -24,6 +24,7 @@ import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.accounts.AccountsManager;
 import me.theentropyshard.teslauncher.gson.ActionTypeAdapter;
 import me.theentropyshard.teslauncher.gson.DetailedVersionInfoDeserializer;
+import me.theentropyshard.teslauncher.gson.InstantTypeAdapter;
 import me.theentropyshard.teslauncher.gui.playview.PlayView;
 import me.theentropyshard.teslauncher.http.ProgressListener;
 import me.theentropyshard.teslauncher.minecraft.*;
@@ -40,6 +41,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -53,6 +55,7 @@ public class InstanceRunner extends Thread {
     public InstanceRunner(Instance instance) {
         this.instance = instance;
         this.gson = new GsonBuilder()
+                .registerTypeAdapter(Instant.class, new InstantTypeAdapter())
                 .registerTypeAdapter(VersionInfo.class, new DetailedVersionInfoDeserializer())
                 .registerTypeAdapter(Rule.Action.class, new ActionTypeAdapter())
                 .create();
@@ -113,6 +116,8 @@ public class InstanceRunner extends Thread {
 
             List<String> command = this.buildRunCommand(this.getArguments(versionInfo, tmpNativesDir, librariesDir, clientsDir));
             System.out.println("Starting Minecraft with the command:\n" + command);
+
+            this.instance.setLastTimePlayed(Instant.now());
 
             long start = System.currentTimeMillis();
 
