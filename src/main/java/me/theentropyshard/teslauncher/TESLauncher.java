@@ -67,6 +67,7 @@ public class TESLauncher {
     private final ExecutorService taskPool;
 
     private boolean darkTheme;
+    private volatile boolean shutdown;
 
     public static AppWindow window;
     private PlayView playView;
@@ -104,6 +105,8 @@ public class TESLauncher {
         this.taskPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
         this.darkTheme = false;
+
+        Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown));
 
         this.showGui();
     }
@@ -182,13 +185,7 @@ public class TESLauncher {
             appWindow.addWindowListener(new WindowAdapter() {
                 @Override
                 public void windowClosing(WindowEvent e) {
-                    TESLauncher.this.instanceManager.getInstances().forEach(i -> {
-                        try {
-                            TESLauncher.this.instanceManager.save(i);
-                        } catch (IOException ex) {
-                            throw new RuntimeException(ex);
-                        }
-                    });
+                    TESLauncher.this.shutdown();
                 }
             });
 
@@ -201,7 +198,24 @@ public class TESLauncher {
     }
 
     public void shutdown() {
-        this.taskPool.shutdown();
+        if (this.shutdown) {
+            return;
+        }
+
+        this.shutdown = true;
+
+        try {
+            this.taskPool.shutdown();
+            TESLauncher.this.instanceManager.getInstances().forEach(i -> {
+                try {
+                    TESLauncher.this.instanceManager.save(i);
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private static TESLauncher instance;
