@@ -36,6 +36,8 @@ import org.apache.logging.log4j.Logger;
 import javax.swing.*;
 import javax.swing.plaf.ColorUIResource;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -176,6 +178,19 @@ public class TESLauncher {
             viewSelector.addTab("Accounts", new AccountsView().getRoot());
             viewSelector.addTab("Settings", new SettingsView().getRoot());
             viewSelector.addTab("About", new AboutView().getRoot());
+
+            appWindow.addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosing(WindowEvent e) {
+                    TESLauncher.this.instanceManager.getInstances().forEach(i -> {
+                        try {
+                            TESLauncher.this.instanceManager.save(i);
+                        } catch (IOException ex) {
+                            throw new RuntimeException(ex);
+                        }
+                    });
+                }
+            });
 
             appWindow.setVisible(true);
         });

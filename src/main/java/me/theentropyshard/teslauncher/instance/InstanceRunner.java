@@ -231,6 +231,9 @@ public class InstanceRunner extends Thread {
             maximumMemoryInMegabytes = minimumMemoryInMegabytes;
         }
 
+        this.instance.setMinimumMemoryInMegabytes(minimumMemoryInMegabytes);
+        this.instance.setMaximumMemoryInMegabytes(maximumMemoryInMegabytes);
+
         arguments.add("-Xms" + minimumMemoryInMegabytes + "m");
         arguments.add("-Xmx" + maximumMemoryInMegabytes + "m");
 
@@ -276,7 +279,14 @@ public class InstanceRunner extends Thread {
     private List<String> buildRunCommand(List<String> arguments) {
         List<String> command = new ArrayList<>();
 
-        command.add(this.getJavaExecutable());
+        String javaExecutable = this.getJavaExecutable();
+        String javaPath = this.instance.getJavaPath();
+        if (javaPath == null || javaPath.isEmpty()) {
+            this.instance.setJavaPath(javaExecutable);
+            javaPath = javaExecutable;
+        }
+
+        command.add(javaPath);
         command.addAll(arguments);
 
         return command;

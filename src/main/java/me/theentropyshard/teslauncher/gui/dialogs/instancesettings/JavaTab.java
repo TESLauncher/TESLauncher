@@ -16,10 +16,9 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.gui.dialogs;
+package me.theentropyshard.teslauncher.gui.dialogs.instancesettings;
 
 import com.formdev.flatlaf.FlatClientProperties;
-import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.instance.Instance;
 
 import javax.swing.*;
@@ -28,19 +27,12 @@ import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-public class InstanceSettingsDialog extends AppDialog {
-    public InstanceSettingsDialog(Instance instance) {
-        super(TESLauncher.window.getFrame(), "Instance Settings - " + instance.getName());
+public class JavaTab extends Tab {
+    public JavaTab(Instance instance, JDialog dialog) {
+        super(instance, dialog);
 
-        JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.LEFT);
-
-        JPanel mainTab = new JPanel(new GridBagLayout());
-        // TODO: use OOP to make such settings tabs
-        JPanel commonPanel = new JPanel();
-        commonPanel.setBorder(new TitledBorder("Common"));
-        // add text field with name here
-
-        JPanel javaTab = new JPanel(new GridBagLayout());
+        JPanel root = this.getRoot();
+        root.setLayout(new GridBagLayout());
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.weightx = 2;
@@ -49,6 +41,7 @@ public class InstanceSettingsDialog extends AppDialog {
 
         JPanel javaInstallation = new JPanel(new GridLayout(0, 1));
         JTextField javaPathTextField = new JTextField();
+        javaPathTextField.setText(instance.getJavaPath());
         javaPathTextField.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Path to java.exe");
         javaInstallation.add(javaPathTextField);
         javaInstallation.setBorder(new TitledBorder("Java Installation"));
@@ -57,8 +50,10 @@ public class InstanceSettingsDialog extends AppDialog {
         JLabel minMemoryLabel = new JLabel("Minimum memory (Megabytes):");
         JLabel maxMemoryLabel = new JLabel("Maximum memory (Megabytes):");
         JTextField minMemoryField = new JTextField();
+        minMemoryField.setText(String.valueOf(instance.getMinimumMemoryInMegabytes()));
         minMemoryField.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "512");
         JTextField maxMemoryField = new JTextField();
+        maxMemoryField.setText(String.valueOf(instance.getMaximumMemoryInMegabytes()));
         maxMemoryField.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "2048");
         memorySettings.add(minMemoryLabel);
         memorySettings.add(minMemoryField);
@@ -67,14 +62,11 @@ public class InstanceSettingsDialog extends AppDialog {
         memorySettings.setBorder(new TitledBorder("Memory Settings"));
 
         gbc.gridy++;
-        javaTab.add(javaInstallation, gbc);
+        root.add(javaInstallation, gbc);
 
         gbc.gridy++;
         gbc.weighty = 1;
-        javaTab.add(memorySettings, gbc);
-
-        tabbedPane.addTab("Main", mainTab);
-        tabbedPane.addTab("Java", javaTab);
+        root.add(memorySettings, gbc);
 
         this.getDialog().addWindowListener(new WindowAdapter() {
             @Override
@@ -94,7 +86,7 @@ public class InstanceSettingsDialog extends AppDialog {
                 int maximumMemoryInMegabytes = Integer.parseInt(maxMemory);
 
                 if (minimumMemoryInMegabytes >= maximumMemoryInMegabytes) {
-                    JOptionPane.showMessageDialog(InstanceSettingsDialog.this.getDialog(),
+                    JOptionPane.showMessageDialog(JavaTab.this.getDialog(),
                             "Minimum amount of RAM cannot be larger than maximum",
                             "Error",
                             JOptionPane.ERROR_MESSAGE);
@@ -103,20 +95,17 @@ public class InstanceSettingsDialog extends AppDialog {
 
                 if (minimumMemoryInMegabytes < 512) {
                     JOptionPane.showMessageDialog(
-                            InstanceSettingsDialog.this.getDialog(),
+                            JavaTab.this.getDialog(),
                             "Minimum amount of RAM cannot be less than 512 MiB",
                             "Error",
                             JOptionPane.ERROR_MESSAGE
                     );
                 }
 
+                instance.setJavaPath(javaPathTextField.getText());
                 instance.setMinimumMemoryInMegabytes(minimumMemoryInMegabytes);
                 instance.setMaximumMemoryInMegabytes(maximumMemoryInMegabytes);
             }
         });
-
-        this.setContent(tabbedPane);
-        this.center(0);
-        this.setVisible(true);
     }
 }
