@@ -177,9 +177,7 @@ public class PlayView extends View {
                 }
             }
 
-            if (!timeString.isEmpty()) {
-                this.instanceInfoLabel.setText(instance.getName() + timeString);
-            }
+            this.instanceInfoLabel.setText(instance.getName() + timeString);
         });
 
         item.addMouseExitedListener(e -> {
