@@ -18,6 +18,10 @@
 
 package me.theentropyshard.teslauncher.gui.components;
 
+import me.theentropyshard.teslauncher.TESLauncher;
+import me.theentropyshard.teslauncher.instance.Instance;
+import me.theentropyshard.teslauncher.instance.InstanceManager;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
@@ -111,6 +115,11 @@ public class InstanceItem extends JPanel {
                 InstanceItem.this.mouseClickListeners.forEach(listener -> listener.actionPerformed(event));
             }
         });
+    }
+
+    public Instance getAssociatedInstance() {
+        InstanceManager instanceManager = TESLauncher.getInstance().getInstanceManager();
+        return instanceManager.getInstanceByName(this.getTextLabel().getText());
     }
 
     @Override

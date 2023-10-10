@@ -24,6 +24,7 @@ import me.theentropyshard.teslauncher.gui.View;
 import me.theentropyshard.teslauncher.gui.components.AddInstanceItem;
 import me.theentropyshard.teslauncher.gui.components.InstanceItem;
 import me.theentropyshard.teslauncher.gui.dialogs.AddInstanceDialog;
+import me.theentropyshard.teslauncher.gui.dialogs.InstanceSettingsDialog;
 import me.theentropyshard.teslauncher.instance.Instance;
 import me.theentropyshard.teslauncher.instance.InstanceManager;
 import me.theentropyshard.teslauncher.instance.InstanceRunner;
@@ -33,6 +34,7 @@ import me.theentropyshard.teslauncher.utils.TimeUtils;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ItemEvent;
+import java.awt.event.MouseEvent;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -119,7 +121,7 @@ public class PlayView extends View {
                         PlayView.this.addInstanceItem(item, instance.getGroupName());
                     }
                 } catch (InterruptedException | ExecutionException e) {
-                    throw new RuntimeException(e);
+                    e.printStackTrace();
                 }
             }
         }.execute();
@@ -145,18 +147,18 @@ public class PlayView extends View {
         panel.addInstanceItem(item);
 
         item.addListener(e -> {
-            InstanceItem clickedItem = (InstanceItem) e.getSource();
-            InstanceManager manager = TESLauncher.getInstance().getInstanceManager();
-
-            new InstanceRunner(manager.getInstanceByName(clickedItem.getTextLabel().getText())).start();
+            int mouseButton = Integer.parseInt(e.getActionCommand());
+            if (mouseButton == MouseEvent.BUTTON1) { // left mouse button
+                new InstanceRunner(item.getAssociatedInstance()).start();
+            } else if (mouseButton == MouseEvent.BUTTON3) { // right mouse button
+                new InstanceSettingsDialog(item.getAssociatedInstance());
+            }
         }, true);
 
         item.addMouseEnteredListener(e -> {
             this.instanceInfoLabel.setVisible(true);
 
-            InstanceItem clickedItem = (InstanceItem) e.getSource();
-            InstanceManager manager = TESLauncher.getInstance().getInstanceManager();
-            Instance instance = manager.getInstanceByName(clickedItem.getTextLabel().getText());
+            Instance instance = item.getAssociatedInstance();
 
             String lastPlayedTime = TimeUtils.getHoursMinutesSeconds(instance.getLastPlayedForSeconds());
             String totalPlayedTime = TimeUtils.getHoursMinutesSeconds(instance.getTotalPlayedForSeconds());
