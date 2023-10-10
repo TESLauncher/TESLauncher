@@ -216,6 +216,24 @@ public class InstanceRunner extends Thread {
 
         StringSubstitutor substitutor = new StringSubstitutor(argVars);
 
+        int minimumMemoryInMegabytes = this.instance.getMinimumMemoryInMegabytes();
+        int maximumMemoryInMegabytes = this.instance.getMaximumMemoryInMegabytes();
+
+        if (minimumMemoryInMegabytes < 512) {
+            maximumMemoryInMegabytes = 512;
+        }
+
+        if (maximumMemoryInMegabytes <= 0) {
+            maximumMemoryInMegabytes = 2048;
+        }
+
+        if (minimumMemoryInMegabytes > maximumMemoryInMegabytes) {
+            maximumMemoryInMegabytes = minimumMemoryInMegabytes;
+        }
+
+        arguments.add("-Xms" + minimumMemoryInMegabytes + "m");
+        arguments.add("-Xmx" + maximumMemoryInMegabytes + "m");
+
         for (Argument argument : versionInfo.jvmArgs) {
             if (RuleMatcher.applyOnThisPlatform(argument)) {
                 for (String value : argument.value) {
