@@ -222,7 +222,7 @@ public class InstanceRunner extends Thread {
         int maximumMemoryInMegabytes = this.instance.getMaximumMemoryInMegabytes();
 
         if (minimumMemoryInMegabytes < 512) {
-            maximumMemoryInMegabytes = 512;
+            minimumMemoryInMegabytes = 512;
         }
 
         if (maximumMemoryInMegabytes <= 0) {

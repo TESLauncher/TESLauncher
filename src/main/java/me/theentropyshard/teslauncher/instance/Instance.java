@@ -29,8 +29,8 @@ public class Instance {
     private int minecraftWindowWidth;
     private int minecraftWindowHeight;
     private String customWindowString;
-    private int minimumMemoryInMegabytes;
-    private int maximumMemoryInMegabytes;
+    private int minimumMemoryInMegabytes = 512;
+    private int maximumMemoryInMegabytes = 2048;
     private Instant lastTimePlayed = Instant.EPOCH;
     private long lastPlayedForSeconds;
     private long totalPlayedForSeconds;
