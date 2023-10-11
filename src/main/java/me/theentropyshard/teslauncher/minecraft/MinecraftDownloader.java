@@ -44,7 +44,7 @@ public class MinecraftDownloader {
     private static final String VER_MAN_V2 = "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json";
     private static final String RESOURCES = "https://resources.download.minecraft.net/";
     private final Gson gson;
-    private final Path clientsDir;
+    private final Path versionsDir;
     private final Path assetsDir;
     private final Path librariesDir;
     private final Path nativesDir;
@@ -53,9 +53,9 @@ public class MinecraftDownloader {
 
     private final FileDownloader fileDownloader;
 
-    public MinecraftDownloader(Path clientsDir, Path assetsDir, Path librariesDir, Path nativesDir,
+    public MinecraftDownloader(Path versionsDir, Path assetsDir, Path librariesDir, Path nativesDir,
                                Path instanceResourcesDir, ProgressListener progressListener) {
-        this.clientsDir = clientsDir;
+        this.versionsDir = versionsDir;
         this.assetsDir = assetsDir;
         this.librariesDir = librariesDir;
         this.nativesDir = nativesDir;
@@ -83,7 +83,7 @@ public class MinecraftDownloader {
     }
 
     public void downloadMinecraft(String versionId) throws IOException {
-        PathUtils.createDirectoryIfNotExists(this.clientsDir.resolve(versionId));
+        PathUtils.createDirectoryIfNotExists(this.versionsDir.resolve(versionId));
 
         //LOG.info("Downloading Minecraft " + versionId);
 
@@ -140,7 +140,7 @@ public class MinecraftDownloader {
     }
 
     private void saveClientJson(VersionManifest.Version version) throws IOException {
-        Path jsonFile = this.clientsDir.resolve(version.id).resolve(version.id + ".json");
+        Path jsonFile = this.versionsDir.resolve(version.id).resolve(version.id + ".json");
         if (!Files.exists(jsonFile)) {
             Files.write(jsonFile, Http.get(version.url));
         }
@@ -153,7 +153,7 @@ public class MinecraftDownloader {
         ClientDownload client = versionInfo.downloads.client;
 
         System.out.println("Downloading " + version.id + ".jar...");
-        Path jarFile = this.clientsDir.resolve(version.id).resolve(version.id + ".jar");
+        Path jarFile = this.versionsDir.resolve(version.id).resolve(version.id + ".jar");
         this.download(client.url, jarFile, client.size, this.progressListener);
 
         return versionInfo;
@@ -190,7 +190,7 @@ public class MinecraftDownloader {
             DownloadArtifact classifier = this.getClassifier(library);
             if (classifier != null) {
                 nativeLibraries.add(library);
-                Path filePath = this.nativesDir.resolve(classifier.path);
+                Path filePath = this.librariesDir.resolve(classifier.path);
                 this.download(classifier.url, filePath, classifier.size, this.progressListener);
             }
         }
@@ -260,12 +260,16 @@ public class MinecraftDownloader {
             }
 
             String extractPath = this.nativesDir.normalize().toAbsolutePath().toString();
-            Path path = this.nativesDir.resolve(classifier.path).toAbsolutePath();
+            Path path = this.librariesDir.resolve(classifier.path).toAbsolutePath();
 
             try (ZipFile zipFile = new ZipFile(path.toFile())) {
                 List<FileHeader> fileHeaders = zipFile.getFileHeaders();
                 for (FileHeader fileHeader : fileHeaders) {
                     if (this.excludeFromExtract(library, fileHeader.getFileName())) {
+                        continue;
+                    }
+
+                    if (Files.exists(this.nativesDir.resolve(fileHeader.getFileName()))) {
                         continue;
                     }
 

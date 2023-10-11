@@ -66,10 +66,6 @@ public class InstanceRunner extends Thread {
         try {
             TESLauncher launcher = TESLauncher.getInstance();
             InstanceManager instanceManager = launcher.getInstanceManager();
-            Path tmpNativesDir = PathUtils.createDirectoryIfNotExists(
-                    launcher.getInstancesDir().resolve(this.instance.getName()).resolve("natives-tmp")
-                            .resolve(this.instance.getMinecraftVersion())
-            );
 
             ProgressListener progressListener = (contentLength, bytesRead, done, fileName) -> {
                 SwingUtilities.invokeLater(() -> {
@@ -87,16 +83,17 @@ public class InstanceRunner extends Thread {
                 });
             };
 
-            Path clientsDir = launcher.getVersionsDir();
+            Path versionsDir = launcher.getVersionsDir();
             Path librariesDir = launcher.getLibrariesDir();
             Path assetsDir = launcher.getAssetsDir();
+            Path nativesDir = versionsDir.resolve(this.instance.getMinecraftVersion()).resolve("natives");
 
             // TODO: check version different way, not like this
             MinecraftDownloader downloader = new MinecraftDownloader(
-                    clientsDir,
+                    versionsDir,
                     assetsDir,
                     librariesDir,
-                    tmpNativesDir,
+                    nativesDir,
                     instanceManager.getMinecraftDir(this.instance).resolve("resources"),
                     progressListener
             );
@@ -107,14 +104,14 @@ public class InstanceRunner extends Thread {
             TESLauncher.getInstance().getPlayView().getProgressBar().setVisible(false);
             TESLauncher.getInstance().getPlayView().getProgressBar().setEnabled(false);
 
-            Path clientJson = clientsDir.resolve(this.instance.getMinecraftVersion())
+            Path clientJson = versionsDir.resolve(this.instance.getMinecraftVersion())
                     .resolve(this.instance.getMinecraftVersion() + ".json");
             VersionInfo versionInfo = this.gson.fromJson(new InputStreamReader(
                     Files.newInputStream(clientJson),
                     StandardCharsets.UTF_8
             ), VersionInfo.class);
 
-            List<String> command = this.buildRunCommand(this.getArguments(versionInfo, tmpNativesDir, librariesDir, clientsDir));
+            List<String> command = this.buildRunCommand(this.getArguments(versionInfo, nativesDir, librariesDir, versionsDir));
             System.out.println("Starting Minecraft with the command:\n" + command);
 
             this.instance.setLastTimePlayed(Instant.now());
