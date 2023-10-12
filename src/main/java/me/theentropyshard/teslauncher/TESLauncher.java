@@ -19,13 +19,9 @@
 package me.theentropyshard.teslauncher;
 
 import com.beust.jcommander.JCommander;
-import com.formdev.flatlaf.FlatDarculaLaf;
-import com.formdev.flatlaf.FlatIntelliJLaf;
 import me.theentropyshard.teslauncher.accounts.AccountsManager;
-import me.theentropyshard.teslauncher.gui.AboutView;
-import me.theentropyshard.teslauncher.gui.AccountsView;
 import me.theentropyshard.teslauncher.gui.AppWindow;
-import me.theentropyshard.teslauncher.gui.SettingsView;
+import me.theentropyshard.teslauncher.gui.Gui;
 import me.theentropyshard.teslauncher.gui.playview.PlayView;
 import me.theentropyshard.teslauncher.instance.InstanceManager;
 import me.theentropyshard.teslauncher.instance.InstanceManagerImpl;
@@ -33,11 +29,6 @@ import me.theentropyshard.teslauncher.utils.PathUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.swing.*;
-import javax.swing.plaf.ColorUIResource;
-import java.awt.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -66,11 +57,11 @@ public class TESLauncher {
 
     private final ExecutorService taskPool;
 
-    private boolean darkTheme;
+    private final Gui gui;
+
     private volatile boolean shutdown;
 
     public static AppWindow window;
-    private PlayView playView;
 
     private TESLauncher(Args args, Logger logger, Path workDir) {
         this.args = args;
@@ -104,11 +95,12 @@ public class TESLauncher {
 
         this.taskPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
-        this.darkTheme = false;
+        this.gui = new Gui(false);
+        this.gui.getAppWindow().addWindowClosingListener(this::shutdown);
 
         Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown));
 
-        this.showGui();
+        this.gui.showGui();
     }
 
     public static void start(String[] rawArgs) {
@@ -139,58 +131,6 @@ public class TESLauncher {
         } catch (IOException e) {
             this.logger.error("Unable to create launcher directories", e);
         }
-    }
-
-    private void showGui() {
-        SwingUtilities.invokeLater(() -> {
-            if (this.darkTheme) {
-                UIManager.put("InstanceItem.defaultColor", new ColorUIResource(64, 75, 93));
-                UIManager.put("InstanceItem.hoveredColor", new ColorUIResource(70, 80, 100));
-                UIManager.put("InstanceItem.pressedColor", new ColorUIResource(60, 70, 86));
-
-                UIManager.put("ProgressBar.selectionBackground", Color.WHITE);
-                UIManager.put("ProgressBar.selectionForeground", Color.WHITE);
-
-                FlatDarculaLaf.setup();
-            } else {
-                UIManager.put("InstanceItem.defaultColor", new ColorUIResource(222, 230, 237));
-                UIManager.put("InstanceItem.hoveredColor", new ColorUIResource(224, 234, 244));
-                UIManager.put("InstanceItem.pressedColor", new ColorUIResource(216, 224, 240));
-
-                UIManager.put("ProgressBar.selectionBackground", Color.BLACK);
-                UIManager.put("ProgressBar.selectionForeground", Color.BLACK);
-
-                FlatIntelliJLaf.setup();
-            }
-
-            JDialog.setDefaultLookAndFeelDecorated(true);
-            JFrame.setDefaultLookAndFeelDecorated(true);
-
-            JTabbedPane viewSelector = new JTabbedPane(JTabbedPane.LEFT);
-            AppWindow appWindow = new AppWindow(TESLauncher.TITLE, TESLauncher.WIDTH, TESLauncher.HEIGHT, viewSelector);
-            TESLauncher.window = appWindow;
-
-            this.playView = new PlayView();
-            if (this.darkTheme) {
-                this.playView.getProgressBar().setForeground(new Color(64, 75, 93));
-            } else {
-                this.playView.getProgressBar().setForeground(new Color(222, 230, 237));
-            }
-
-            viewSelector.addTab("Play", this.playView.getRoot());
-            viewSelector.addTab("Accounts", new AccountsView().getRoot());
-            viewSelector.addTab("Settings", new SettingsView().getRoot());
-            viewSelector.addTab("About", new AboutView().getRoot());
-
-            appWindow.addWindowListener(new WindowAdapter() {
-                @Override
-                public void windowClosing(WindowEvent e) {
-                    TESLauncher.this.shutdown();
-                }
-            });
-
-            appWindow.setVisible(true);
-        });
     }
 
     public void doTask(Runnable r) {
@@ -226,10 +166,6 @@ public class TESLauncher {
 
     private static void setInstance(TESLauncher instance) {
         TESLauncher.instance = instance;
-    }
-
-    public PlayView getPlayView() {
-        return this.playView;
     }
 
     public Args getArgs() {
@@ -274,5 +210,9 @@ public class TESLauncher {
 
     public InstanceManager getInstanceManager() {
         return this.instanceManager;
+    }
+
+    public Gui getGui() {
+        return this.gui;
     }
 }

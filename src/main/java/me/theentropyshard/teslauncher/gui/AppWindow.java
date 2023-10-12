@@ -60,12 +60,13 @@ public class AppWindow {
         this.frame.dispose();
     }
 
-    public void addWindowListener(WindowListener listener) {
-        this.frame.addWindowListener(listener);
-    }
-
-    public void removeWindowListener(WindowListener listener) {
-        this.frame.removeWindowListener(listener);
+    public void addWindowClosingListener(Runnable r) {
+        this.frame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                r.run();
+            }
+        });
     }
 
     public JFrame getFrame() {

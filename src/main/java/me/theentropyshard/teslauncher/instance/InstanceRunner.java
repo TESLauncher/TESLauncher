@@ -69,7 +69,7 @@ public class InstanceRunner extends Thread {
 
             ProgressListener progressListener = (contentLength, bytesRead, done, fileName) -> {
                 SwingUtilities.invokeLater(() -> {
-                    PlayView playView = TESLauncher.getInstance().getPlayView();
+                    PlayView playView = TESLauncher.getInstance().getGui().getPlayView();
                     JProgressBar progressBar = playView.getProgressBar();
                     progressBar.setMaximum((int) contentLength);
                     progressBar.setMinimum(0);
@@ -98,11 +98,12 @@ public class InstanceRunner extends Thread {
                     progressListener
             );
 
-            TESLauncher.getInstance().getPlayView().getProgressBar().setVisible(true);
-            TESLauncher.getInstance().getPlayView().getProgressBar().setEnabled(true);
+            JProgressBar progressBar = TESLauncher.getInstance().getGui().getPlayView().getProgressBar();
+            progressBar.setVisible(true);
+            progressBar.setEnabled(true);
             downloader.downloadMinecraft(this.instance.getMinecraftVersion());
-            TESLauncher.getInstance().getPlayView().getProgressBar().setVisible(false);
-            TESLauncher.getInstance().getPlayView().getProgressBar().setEnabled(false);
+            progressBar.setVisible(false);
+            progressBar.setEnabled(false);
 
             Path clientJson = versionsDir.resolve(this.instance.getMinecraftVersion())
                     .resolve(this.instance.getMinecraftVersion() + ".json");
