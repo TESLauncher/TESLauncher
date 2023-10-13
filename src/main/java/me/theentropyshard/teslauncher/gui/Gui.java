@@ -63,7 +63,7 @@ public class Gui {
         JFrame.setDefaultLookAndFeelDecorated(true);
 
         this.viewSelector = new JTabbedPane(JTabbedPane.LEFT);
-        this.appWindow = new AppWindow(TESLauncher.TITLE, TESLauncher.WIDTH, TESLauncher.HEIGHT, this.viewSelector);
+        TESLauncher.window = this.appWindow = new AppWindow(TESLauncher.TITLE, TESLauncher.WIDTH, TESLauncher.HEIGHT, this.viewSelector);
     }
 
     public void showGui() {
