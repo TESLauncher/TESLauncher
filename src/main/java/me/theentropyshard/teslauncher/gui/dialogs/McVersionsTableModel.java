@@ -28,9 +28,12 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 import java.nio.charset.StandardCharsets;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 
@@ -38,11 +41,19 @@ public class McVersionsTableModel extends DefaultTableModel {
 
     public static final String VM_V2 = "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json";
 
+    private final DateTimeFormatter formatter;
+
     public McVersionsTableModel(AddInstanceDialog dialog, JTable table) {
         super(
                 new Object[][]{},
                 new Object[]{"Version", "Date released", "Type"}
         );
+
+        if (Locale.getDefault().getLanguage().equalsIgnoreCase("en")) {
+            this.formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+        } else /*if (Locale.getDefault().getLanguage().equalsIgnoreCase("ru"))*/ {
+            this.formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+        }
 
         new SwingWorker<List<List<String>>, Void>() {
             @Override
@@ -72,7 +83,7 @@ public class McVersionsTableModel extends DefaultTableModel {
                     for (List<String> rowData : objects) {
                         McVersionsTableModel.this.addRow(new Object[]{
                                 rowData.get(0),
-                                rowData.get(1),
+                                McVersionsTableModel.this.formatter.format(OffsetDateTime.parse(rowData.get(1))),
                                 rowData.get(2)
                         });
                     }
