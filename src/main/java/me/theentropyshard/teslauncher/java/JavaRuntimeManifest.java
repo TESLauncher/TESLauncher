@@ -16,28 +16,10 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.minecraft.models;
+package me.theentropyshard.teslauncher.java;
 
-import me.theentropyshard.teslauncher.minecraft.*;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-public final class VersionInfo {
-    public JavaVersion javaVersion;
-    public boolean newFormat;
-    public String id;
-    public String mainClass;
-    public String type;
-    public String assets;
-    public ClientDownloads downloads;
-    public final List<Argument> jvmArgs = new ArrayList<>();
-    public final List<Argument> gameArgs = new ArrayList<>();
-    public final List<Library> libraries = new ArrayList<>();
-    public String logArgument;
-    public String logConfigUrl;
-    public String logConfigId;
-    public VersionAssetIndex assetIndex;
+public class JavaRuntimeManifest {
+    public Map<String, JreFile> files;
 }

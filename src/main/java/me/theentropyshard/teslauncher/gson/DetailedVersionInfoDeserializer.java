@@ -19,6 +19,7 @@
 package me.theentropyshard.teslauncher.gson;
 
 import com.google.gson.*;
+import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.minecraft.*;
 import me.theentropyshard.teslauncher.minecraft.models.VersionAssetIndex;
 import me.theentropyshard.teslauncher.minecraft.models.VersionInfo;
@@ -30,8 +31,10 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 public class DetailedVersionInfoDeserializer extends AbstractJsonDeserializer<VersionInfo> {
-    public DetailedVersionInfoDeserializer() {
+    private final TESLauncher launcher;
 
+    public DetailedVersionInfoDeserializer(TESLauncher launcher) {
+        this.launcher = launcher;
     }
 
     @Override
@@ -41,6 +44,12 @@ public class DetailedVersionInfoDeserializer extends AbstractJsonDeserializer<Ve
         Gson gson = new GsonBuilder()
                 .registerTypeAdapter(Rule.Action.class, new ActionTypeAdapter())
                 .create();
+
+        if (root.has("javaVersion")) {
+            versionInfo.javaVersion = gson.fromJson(root.get("javaVersion"), JavaVersion.class);
+        } else {
+            this.launcher.getLogger().warn("Unable to find javaVersion key");
+        }
 
         if (root.has("arguments")) {
             versionInfo.newFormat = true;

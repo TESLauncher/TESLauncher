@@ -27,6 +27,7 @@ import me.theentropyshard.teslauncher.gson.DetailedVersionInfoDeserializer;
 import me.theentropyshard.teslauncher.gson.InstantTypeAdapter;
 import me.theentropyshard.teslauncher.gui.playview.PlayView;
 import me.theentropyshard.teslauncher.http.ProgressListener;
+import me.theentropyshard.teslauncher.java.JavaManager;
 import me.theentropyshard.teslauncher.minecraft.*;
 import me.theentropyshard.teslauncher.minecraft.models.AssetIndex;
 import me.theentropyshard.teslauncher.minecraft.models.VersionAssetIndex;
@@ -51,12 +52,13 @@ public class InstanceRunner extends Thread {
     private final Instance instance;
 
     private final Gson gson;
+    private ProgressListener progressListener;
 
     public InstanceRunner(Instance instance) {
         this.instance = instance;
         this.gson = new GsonBuilder()
                 .registerTypeAdapter(Instant.class, new InstantTypeAdapter())
-                .registerTypeAdapter(VersionInfo.class, new DetailedVersionInfoDeserializer())
+                .registerTypeAdapter(VersionInfo.class, new DetailedVersionInfoDeserializer(TESLauncher.getInstance()))
                 .registerTypeAdapter(Rule.Action.class, new ActionTypeAdapter())
                 .create();
     }
@@ -67,7 +69,7 @@ public class InstanceRunner extends Thread {
             TESLauncher launcher = TESLauncher.getInstance();
             InstanceManager instanceManager = launcher.getInstanceManager();
 
-            ProgressListener progressListener = (contentLength, bytesRead, done, fileName) -> {
+            this.progressListener = (contentLength, bytesRead, done, fileName) -> {
                 SwingUtilities.invokeLater(() -> {
                     PlayView playView = TESLauncher.getInstance().getGui().getPlayView();
                     JProgressBar progressBar = playView.getProgressBar();
@@ -95,7 +97,7 @@ public class InstanceRunner extends Thread {
                     librariesDir,
                     nativesDir,
                     instanceManager.getMinecraftDir(this.instance).resolve("resources"),
-                    progressListener
+                    this.progressListener
             );
 
             JProgressBar progressBar = TESLauncher.getInstance().getGui().getPlayView().getProgressBar();
@@ -112,7 +114,7 @@ public class InstanceRunner extends Thread {
                     StandardCharsets.UTF_8
             ), VersionInfo.class);
 
-            List<String> command = this.buildRunCommand(this.getArguments(versionInfo, nativesDir, librariesDir, versionsDir));
+            List<String> command = this.buildRunCommand(versionInfo, this.getArguments(versionInfo, nativesDir, librariesDir, versionsDir));
             System.out.println("Starting Minecraft with the command:\n" + command);
 
             this.instance.setLastTimePlayed(Instant.now());
@@ -279,10 +281,10 @@ public class InstanceRunner extends Thread {
         return arguments;
     }
 
-    private List<String> buildRunCommand(List<String> arguments) {
+    private List<String> buildRunCommand(VersionInfo versionInfo, List<String> arguments) {
         List<String> command = new ArrayList<>();
 
-        String javaExecutable = this.getJavaExecutable();
+        String javaExecutable = this.getJavaExecutable(versionInfo.javaVersion.component);
         String javaPath = this.instance.getJavaPath();
         if (javaPath == null || javaPath.isEmpty()) {
             this.instance.setJavaPath(javaExecutable);
@@ -313,13 +315,21 @@ public class InstanceRunner extends Thread {
         return process.waitFor();
     }
 
-    private String getJavaExecutable() {
-        String binDir = System.getProperty("java.home") + File.separator + "bin";
-        //String binDir = "E:\\Users\\Aleksey\\.jdks\\liberica-17.0.3\\bin";
-        if (EnumOS.getOS() == EnumOS.WINDOWS) {
-            return binDir + File.separator + "javaw.exe";
-        } else {
-            return binDir + File.separator + "java";
+    private String getJavaExecutable(String componentName) {
+        JavaManager javaManager = TESLauncher.getInstance().getJavaManager();
+        // TODO: see in JavaManager
+        if (!javaManager.runtimeExists(componentName)) {
+            try {
+                JProgressBar progressBar = TESLauncher.getInstance().getGui().getPlayView().getProgressBar();
+                progressBar.setVisible(true);
+                progressBar.setEnabled(true);
+                javaManager.downloadRuntime(componentName, this.progressListener);
+                progressBar.setVisible(false);
+                progressBar.setEnabled(false);
+            } catch (IOException e) {
+                TESLauncher.getInstance().getLogger().error(e);
+            }
         }
+        return javaManager.getJavaExecutable(componentName);
     }
 }

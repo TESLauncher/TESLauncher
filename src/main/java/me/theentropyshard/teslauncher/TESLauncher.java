@@ -19,12 +19,15 @@
 package me.theentropyshard.teslauncher;
 
 import com.beust.jcommander.JCommander;
+import com.google.gson.Gson;
 import me.theentropyshard.teslauncher.accounts.AccountsManager;
 import me.theentropyshard.teslauncher.gui.AppWindow;
 import me.theentropyshard.teslauncher.gui.Gui;
 import me.theentropyshard.teslauncher.gui.playview.PlayView;
+import me.theentropyshard.teslauncher.http.FileDownloaderIO;
 import me.theentropyshard.teslauncher.instance.InstanceManager;
 import me.theentropyshard.teslauncher.instance.InstanceManagerImpl;
+import me.theentropyshard.teslauncher.java.JavaManager;
 import me.theentropyshard.teslauncher.utils.PathUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -54,6 +57,7 @@ public class TESLauncher {
 
     private final AccountsManager accountsManager;
     private final InstanceManager instanceManager;
+    private final JavaManager javaManager;
 
     private final ExecutorService taskPool;
 
@@ -92,6 +96,8 @@ public class TESLauncher {
         } catch (IOException e) {
             this.logger.error("Unable to load instances", e);
         }
+
+        this.javaManager = new JavaManager(this.runtimesDir, new FileDownloaderIO("TESLauncher/1.0.0"));
 
         this.taskPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
@@ -210,6 +216,10 @@ public class TESLauncher {
 
     public InstanceManager getInstanceManager() {
         return this.instanceManager;
+    }
+
+    public JavaManager getJavaManager() {
+        return this.javaManager;
     }
 
     public Gui getGui() {
