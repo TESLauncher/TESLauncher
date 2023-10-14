@@ -34,9 +34,13 @@ import java.lang.reflect.Array;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.FileAttributeView;
+import java.nio.file.attribute.PosixFilePermission;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class JavaManager {
     private static final String ALL_RUNTIMES = "https://launchermeta.mojang.com/v1/products/java-runtime/2ec0cc96c44e5a76b9c8b7c39df7210883d12871/all.json";
@@ -86,6 +90,13 @@ public class JavaManager {
                         JreFile.Download raw = jreFile.downloads.get("raw");
                         this.download(raw.url, savePath, raw.size, progressListener);
                     }
+                }
+
+                if (EnumOS.getOS() == EnumOS.LINUX) {
+                    Path javaExecutable = Paths.get(this.getJavaExecutable(componentName));
+                    Set<PosixFilePermission> posixFilePermissions = Files.getPosixFilePermissions(javaExecutable);
+                    posixFilePermissions.add(PosixFilePermission.OWNER_EXECUTE);
+                    Files.setPosixFilePermissions(javaExecutable, posixFilePermissions);
                 }
             } else {
                 throw new IOException("Unable to find JRE for component '" + componentName + "'");
