@@ -14,6 +14,6 @@ If your Maven home and OS information is displayed, it means you have installed 
 ```shell
 git clone https://github.com/TESLauncher/TESLauncher
 cd TESLauncher
-mvn clean compile assembly:single
-java -jar target/TESLauncher-1.0-jar-with-dependencies.jar
+mvn clean package
+java -jar target/TESLauncher-0.1.0.jar
 ```
