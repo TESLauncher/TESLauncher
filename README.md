@@ -15,5 +15,5 @@ If your Maven home and OS information is displayed, it means you have installed 
 git clone https://github.com/TESLauncher/TESLauncher
 cd TESLauncher
 mvn clean package
-java -jar target/TESLauncher-0.1.0.jar
+java -jar target/TESLauncher-0.1.1.jar
 ```
