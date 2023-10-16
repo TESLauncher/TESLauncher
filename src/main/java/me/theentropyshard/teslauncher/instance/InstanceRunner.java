@@ -268,10 +268,7 @@ public class InstanceRunner extends Thread {
         for (Argument argument : versionInfo.gameArgs) {
             if (RuleMatcher.applyOnThisPlatform(argument)) {
                 for (String value : argument.value) {
-                    System.out.println("Value: " + value);
-                    String replaced = substitutor.replace(value);
-                    System.out.println("Replaced: " + replaced);
-                    arguments.add(replaced);
+                    arguments.add(substitutor.replace(value));
                 }
             }
         }
