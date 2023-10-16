@@ -23,7 +23,7 @@ Launcher will create its folders in the current working directory. That means th
 ```shell
 java -jar target/TESLauncher-0.1.1.jar
 ```
-launcher will run in `target` directory. After a new build, it will be <strong>erased</strong>. If you want to run the launcher in any other place, <br>
+launcher will run in `target` directory. After a new build, it will be <strong>erased</strong>. If you want to run the launcher in any other place,
 just put its jar file in that place, or specify a path to the working directory using `--workDir` parameter. <br>
 Example:
 ```shell
