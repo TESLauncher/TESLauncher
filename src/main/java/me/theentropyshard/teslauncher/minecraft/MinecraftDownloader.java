@@ -180,6 +180,10 @@ public class MinecraftDownloader {
         List<Library> nativeLibraries = new ArrayList<>();
 
         for (Library library : versionInfo.libraries) {
+            if (!RuleMatcher.applyOnThisPlatform(library)) {
+                continue;
+            }
+
             LibraryDownloads downloads = library.downloads;
             DownloadArtifact artifact = downloads.artifact;
 
