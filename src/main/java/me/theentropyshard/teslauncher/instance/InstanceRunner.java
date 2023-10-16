@@ -43,10 +43,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class InstanceRunner extends Thread {
     private final Instance instance;
@@ -190,7 +187,7 @@ public class InstanceRunner extends Thread {
             argVars.put("game_directory", mcDirOfInstance.toAbsolutePath().toString());
             argVars.put("assets_root", assetsDir.toAbsolutePath().toString());
             argVars.put("assets_index_name", versionInfo.assets);
-            argVars.put("auth_uuid", "-");
+            argVars.put("auth_uuid", UUID.randomUUID().toString());
             argVars.put("auth_access_token", "-");
             argVars.put("user_type", "msa");
             argVars.put("version_type", versionInfo.type);
