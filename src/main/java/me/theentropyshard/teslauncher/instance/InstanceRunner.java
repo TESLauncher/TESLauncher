@@ -268,12 +268,27 @@ public class InstanceRunner extends Thread {
         for (Argument argument : versionInfo.gameArgs) {
             if (RuleMatcher.applyOnThisPlatform(argument)) {
                 for (String value : argument.value) {
-                    arguments.add(substitutor.replace(value));
+                    System.out.println("Value: " + value);
+                    String replaced = substitutor.replace(value);
+                    System.out.println("Replaced: " + replaced);
+                    arguments.add(replaced);
                 }
             }
         }
 
         arguments.remove("--demo"); // :)
+
+        arguments.remove("--quickPlayPath");
+        arguments.remove("${quickPlayPath}");
+
+        arguments.remove("--quickPlaySingleplayer");
+        arguments.remove("${quickPlaySingleplayer}");
+
+        arguments.remove("--quickPlayMultiplayer");
+        arguments.remove("${quickPlayMultiplayer}");
+
+        arguments.remove("--quickPlayRealms");
+        arguments.remove("${quickPlayRealms}");
 
         return arguments;
     }
