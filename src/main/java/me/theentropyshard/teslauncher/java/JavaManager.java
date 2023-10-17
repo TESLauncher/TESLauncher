@@ -158,6 +158,10 @@ public class JavaManager {
     }
 
     public String getJavaExecutable(String componentName) {
-        return this.workDir.resolve(componentName).resolve("bin").resolve(this.executableName).toString();
+        Path componentDir = this.workDir.resolve(componentName);
+        if (EnumOS.getOS() == EnumOS.MACOS) {
+            componentDir = componentDir.resolve("jre.bundle").resolve("Contents").resolve("Home");
+        }
+        return componentDir.resolve("bin").resolve(this.executableName).toString();
     }
 }
