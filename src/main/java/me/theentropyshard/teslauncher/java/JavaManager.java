@@ -26,21 +26,14 @@ import me.theentropyshard.teslauncher.utils.EnumOS;
 import me.theentropyshard.teslauncher.utils.Http;
 import me.theentropyshard.teslauncher.utils.PathUtils;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.lang.reflect.Array;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.attribute.FileAttributeView;
-import java.nio.file.attribute.PosixFilePermission;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class JavaManager {
     private static final String ALL_RUNTIMES = "https://launchermeta.mojang.com/v1/products/java-runtime/2ec0cc96c44e5a76b9c8b7c39df7210883d12871/all.json";
@@ -63,7 +56,7 @@ public class JavaManager {
 
     // TODO: implement a proper check for this
     public boolean runtimeExists(String componentName) {
-        return Files.exists(this.workDir.resolve(componentName));
+        return Files.exists(Paths.get(this.getJavaExecutable(componentName)));
     }
 
     public void downloadRuntime(String componentName, ProgressListener progressListener) throws IOException {
@@ -92,11 +85,9 @@ public class JavaManager {
                     }
                 }
 
-                if (EnumOS.getOS() == EnumOS.LINUX || EnumOS.getOS() == EnumOS.MACOS) {
-                    Path javaExecutable = Paths.get(this.getJavaExecutable(componentName));
-                    Set<PosixFilePermission> posixFilePermissions = Files.getPosixFilePermissions(javaExecutable);
-                    posixFilePermissions.add(PosixFilePermission.OWNER_EXECUTE);
-                    Files.setPosixFilePermissions(javaExecutable, posixFilePermissions);
+                String javaExecutable = this.getJavaExecutable(componentName);
+                if (!new File(javaExecutable).setExecutable(true, true)) {
+                    System.err.println("Unable to make '" + javaExecutable + "' executable. Operating system: " + EnumOS.getOS());
                 }
             } else {
                 throw new IOException("Unable to find JRE for component '" + componentName + "'");
