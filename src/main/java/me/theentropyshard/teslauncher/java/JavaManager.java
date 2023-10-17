@@ -92,7 +92,7 @@ public class JavaManager {
                     }
                 }
 
-                if (EnumOS.getOS() == EnumOS.LINUX) {
+                if (EnumOS.getOS() == EnumOS.LINUX || EnumOS.getOS() == EnumOS.MACOS) {
                     Path javaExecutable = Paths.get(this.getJavaExecutable(componentName));
                     Set<PosixFilePermission> posixFilePermissions = Files.getPosixFilePermissions(javaExecutable);
                     posixFilePermissions.add(PosixFilePermission.OWNER_EXECUTE);
