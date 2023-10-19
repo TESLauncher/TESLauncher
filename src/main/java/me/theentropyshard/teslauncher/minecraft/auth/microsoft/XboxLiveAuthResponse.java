@@ -35,11 +35,35 @@ public class XboxLiveAuthResponse {
     @SerializedName("DisplayClaims")
     public DisplayClaims displayClaims;
 
+    @Override
+    public String toString() {
+        return "XboxLiveAuthResponse{" +
+                "issueInstant='" + this.issueInstant + '\'' +
+                ", notAfter='" + this.notAfter + '\'' +
+                ", token='" + this.token + '\'' +
+                ", displayClaims=" + this.displayClaims +
+                '}';
+    }
+
     public static final class UserHash {
         public String uhs;
+
+        @Override
+        public String toString() {
+            return "UserHash{" +
+                    "uhs='" + this.uhs + '\'' +
+                    '}';
+        }
     }
 
     public static final class DisplayClaims {
         public List<UserHash> xui;
+
+        @Override
+        public String toString() {
+            return "DisplayClaims{" +
+                    "xui=" + this.xui +
+                    '}';
+        }
     }
 }

@@ -29,4 +29,13 @@ public class XboxLiveAuthRequest {
 
     @SerializedName("TokenType")
     public String tokenType;
+
+    @Override
+    public String toString() {
+        return "XboxLiveAuthRequest{" +
+                "properties=" + this.properties +
+                ", relyingParty='" + this.relyingParty + '\'' +
+                ", tokenType='" + this.tokenType + '\'' +
+                '}';
+    }
 }

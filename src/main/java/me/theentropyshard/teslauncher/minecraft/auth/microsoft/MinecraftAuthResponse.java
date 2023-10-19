@@ -37,4 +37,15 @@ public class MinecraftAuthResponse {
 
     @SerializedName("expires_in")
     public int expiresIn;
+
+    @Override
+    public String toString() {
+        return "MinecraftAuthResponse{" +
+                "username='" + this.username + '\'' +
+                ", roles=" + this.roles +
+                ", accessToken='" + this.accessToken + '\'' +
+                ", tokenType='" + this.tokenType + '\'' +
+                ", expiresIn=" + this.expiresIn +
+                '}';
+    }
 }

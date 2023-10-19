@@ -38,4 +38,16 @@ public class OAuthCodeResponse {
 
     @SerializedName("id_token")
     public String idToken;
+
+    @Override
+    public String toString() {
+        return "OAuthCodeResponse{" +
+                "tokenType='" + this.tokenType + '\'' +
+                ", scope='" + this.scope + '\'' +
+                ", expiresIn=" + this.expiresIn +
+                ", accessToken='" + this.accessToken + '\'' +
+                ", refreshToken='" + this.refreshToken + '\'' +
+                ", idToken='" + this.idToken + '\'' +
+                '}';
+    }
 }

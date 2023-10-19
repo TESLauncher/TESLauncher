@@ -29,4 +29,13 @@ public class XSTSTokenRequest {
 
     @SerializedName("TokenType")
     public String tokenType;
+
+    @Override
+    public String toString() {
+        return "XSTSTokenRequest{" +
+                "properties=" + this.properties +
+                ", relyingParty='" + this.relyingParty + '\'' +
+                ", tokenType='" + this.tokenType + '\'' +
+                '}';
+    }
 }

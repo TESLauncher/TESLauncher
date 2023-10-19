@@ -18,22 +18,10 @@
 
 package me.theentropyshard.teslauncher.minecraft.auth.microsoft;
 
-import com.google.gson.annotations.SerializedName;
+public class MinecraftAuthRequest {
+    public String identityToken;
 
-import java.util.List;
-
-public class XSTSProperties {
-    @SerializedName("SandboxId")
-    public String sandboxId;
-
-    @SerializedName("UserTokens")
-    public List<String> userTokens;
-
-    @Override
-    public String toString() {
-        return "XSTSProperties{" +
-                "sandboxId='" + this.sandboxId + '\'' +
-                ", userTokens=" + this.userTokens +
-                '}';
+    public MinecraftAuthRequest(String identityToken) {
+        this.identityToken = identityToken;
     }
 }

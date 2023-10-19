@@ -38,4 +38,16 @@ public class DeviceCodeResponse {
 
     @SerializedName("message")
     public String message;
+
+    @Override
+    public String toString() {
+        return "DeviceCodeResponse{" +
+                "deviceCode='" + this.deviceCode + '\'' +
+                ", userCode='" + this.userCode + '\'' +
+                ", verificationUri='" + this.verificationUri + '\'' +
+                ", expiresIn=" + this.expiresIn +
+                ", interval=" + this.interval +
+                ", message='" + this.message + '\'' +
+                '}';
+    }
 }

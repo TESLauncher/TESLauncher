@@ -33,13 +33,37 @@ public class XSTSAuthResponse {
     public String token;
 
     @SerializedName("DisplayClaims")
-    public XboxLiveAuthResponse.DisplayClaims displayClaims;
+    public DisplayClaims displayClaims;
 
     public static final class UserHash {
         public String uhs;
+
+        @Override
+        public String toString() {
+            return "UserHash{" +
+                    "uhs='" + this.uhs + '\'' +
+                    '}';
+        }
     }
 
     public static final class DisplayClaims {
-        public List<XboxLiveAuthResponse.UserHash> xui;
+        public List<UserHash> xui;
+
+        @Override
+        public String toString() {
+            return "DisplayClaims{" +
+                    "xui=" + this.xui +
+                    '}';
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "XSTSAuthResponse{" +
+                "issueInstant='" + this.issueInstant + '\'' +
+                ", notAfter='" + this.notAfter + '\'' +
+                ", token='" + this.token + '\'' +
+                ", displayClaims=" + this.displayClaims +
+                '}';
     }
 }

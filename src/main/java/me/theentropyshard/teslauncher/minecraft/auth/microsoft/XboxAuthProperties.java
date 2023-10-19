@@ -29,4 +29,13 @@ public class XboxAuthProperties {
 
     @SerializedName("RpsTicket")
     public String rpsTicket;
+
+    @Override
+    public String toString() {
+        return "XboxAuthProperties{" +
+                "authMethod='" + this.authMethod + '\'' +
+                ", siteName='" + this.siteName + '\'' +
+                ", rpsTicket='" + this.rpsTicket + '\'' +
+                '}';
+    }
 }

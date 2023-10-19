@@ -45,16 +45,25 @@ public class MicrosoftAuthenticator {
     // DO NOT USE MY APPLICATION (CLIENT) ID!!! YOU MUST CREATE YOUR OWN APPLICATION!!!
 
     public void authenticate() throws IOException {
-        DeviceCodeResponse deviceCodeResponse = this.getDeviceCode("consumers", "ad3043e2-36c0-4b85-9d69-febf872d0205", "XboxLive.signin");
-        System.out.println(deviceCodeResponse.verificationUri);
-        System.out.println(deviceCodeResponse.userCode);
+        DeviceCodeResponse deviceCodeResponse = this.getDeviceCode("consumers", "ad3043e2-36c0-4b85-9d69-febf872d0205", "XboxLive.signin offline_access");
+        System.out.println(deviceCodeResponse);
 
+        System.out.println();
         OAuthCodeResponse microsoftOAuthCode = this.getMicrosoftOAuthCode(deviceCodeResponse);
+        System.out.println(microsoftOAuthCode);
+
+        System.out.println();
         XboxLiveAuthResponse xboxLiveAuthResponse = this.authenticateWithXboxLive(microsoftOAuthCode);
+        System.out.println(xboxLiveAuthResponse);
+        System.out.println();
+
         XSTSAuthResponse xstsAuthResponse = this.obtainXSTSToken(xboxLiveAuthResponse);
+        System.out.println(xstsAuthResponse);
+        System.out.println();
 
         MinecraftAuthResponse minecraftAuthResponse = this.authenticateWithMinecraft(xstsAuthResponse);
-        System.out.println("Minecraft token: " + minecraftAuthResponse.accessToken);
+        System.out.println("Response:");
+        System.out.println(minecraftAuthResponse);
     }
 
     private DeviceCodeResponse getDeviceCode(String tenant, String clientId, String scope) throws IOException {
@@ -194,7 +203,10 @@ public class MicrosoftAuthenticator {
     private MinecraftAuthResponse authenticateWithMinecraft(XSTSAuthResponse authResponse) throws IOException {
         String mcAuthUrl = "https://api.minecraftservices.com/authentication/login_with_xbox";
 
-        String json = String.format("{\"identityToken\": \"XBL3.0 x=%s;%s\"}", authResponse.displayClaims.xui.get(0).uhs, authResponse.token);
+        //String json = String.format("{\"identityToken\": \"XBL3.0 x=%s;%s\"}", authResponse.displayClaims.xui.get(0).uhs, authResponse.token);
+
+        MinecraftAuthRequest authRequest = new MinecraftAuthRequest(String.format("XBL3.0 x=%s;%s", authResponse.displayClaims.xui.get(0).uhs, authResponse.token));
+        String json = this.gson.toJson(authRequest);
 
         RequestBody requestBody = RequestBody.create(json, MediaType.parse("application/json"));
 
@@ -204,7 +216,9 @@ public class MicrosoftAuthenticator {
                 .build();
 
         try (Response response = this.httpClient.newCall(request).execute()) {
-            return this.gson.fromJson(MicrosoftAuthenticator.getReader(response.body().byteStream()), MinecraftAuthResponse.class);
+            System.out.println(response.body().string());
+            return null;
+            //return this.gson.fromJson(MicrosoftAuthenticator.getReader(response.body().byteStream()), MinecraftAuthResponse.class);
         }
     }
 
