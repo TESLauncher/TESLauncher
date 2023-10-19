@@ -31,32 +31,6 @@ public final class Http {
     public static final String USER_AGENT = "TESLauncher/1.0.0";
 
     private static final String GET_METHOD = "GET";
-    private static final String POST_METHOD = "POST";
-
-    public static void downloadFile(String url, Path savePath) throws IOException {
-        Http.downloadFile(url, savePath, new NopProgressListener());
-    }
-
-    public static void downloadFile(String url, Path savePath, ProgressListener listener) throws IOException {
-        if (!Files.exists(savePath)) {
-            PathUtils.createDirectoryIfNotExists(savePath.getParent());
-        }
-
-        HttpURLConnection c = Http.buildConnection(url, Http.GET_METHOD);
-        c.connect();
-        long contentLengthLong = c.getContentLengthLong();
-
-        try (ReadableByteChannel rbc = Channels.newChannel(c.getInputStream());
-             FileOutputStream fos = new FileOutputStream(savePath.toFile());
-             FileChannel channel = fos.getChannel()) {
-            long bytesWritten = 0;
-            for (; bytesWritten < contentLengthLong; ) {
-                bytesWritten += channel.transferFrom(rbc, bytesWritten, contentLengthLong - bytesWritten);
-                listener.onData(contentLengthLong, bytesWritten, false);
-            }
-            listener.onData(contentLengthLong, bytesWritten, true);
-        }
-    }
 
     private static HttpURLConnection buildConnection(String url, String method) throws IOException {
         HttpURLConnection c = (HttpURLConnection) new URL(url).openConnection();
@@ -74,19 +48,6 @@ public final class Http {
         HttpURLConnection c = Http.buildConnection(url, Http.GET_METHOD);
 
         return Http.inputStreamToByteArray(Http.getNeededInputStream(c), listener, c);
-    }
-
-    public static byte[] post(String url, String contentType, byte[] payload) throws IOException {
-        HttpURLConnection c = Http.buildConnection(url, Http.POST_METHOD);
-        c.setRequestProperty("Content-Type", contentType);
-        c.setRequestProperty("Content-Length", String.valueOf(payload.length));
-        c.setDoOutput(true);
-
-        OutputStream outputStream = c.getOutputStream();
-        outputStream.write(payload);
-        outputStream.flush();
-
-        return Http.inputStreamToByteArray(Http.getNeededInputStream(c), new NopProgressListener(), c);
     }
 
     private static InputStream getNeededInputStream(HttpURLConnection c) throws IOException {

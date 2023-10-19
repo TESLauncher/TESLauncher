@@ -32,7 +32,6 @@ import me.theentropyshard.teslauncher.minecraft.*;
 import me.theentropyshard.teslauncher.minecraft.models.AssetIndex;
 import me.theentropyshard.teslauncher.minecraft.models.VersionAssetIndex;
 import me.theentropyshard.teslauncher.minecraft.models.VersionInfo;
-import me.theentropyshard.teslauncher.utils.EnumOS;
 import me.theentropyshard.teslauncher.utils.PathUtils;
 import me.theentropyshard.teslauncher.utils.TimeUtils;
 import org.apache.commons.text.StringSubstitutor;

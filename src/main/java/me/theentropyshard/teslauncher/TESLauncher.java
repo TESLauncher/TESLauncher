@@ -19,11 +19,9 @@
 package me.theentropyshard.teslauncher;
 
 import com.beust.jcommander.JCommander;
-import com.google.gson.Gson;
 import me.theentropyshard.teslauncher.accounts.AccountsManager;
 import me.theentropyshard.teslauncher.gui.AppWindow;
 import me.theentropyshard.teslauncher.gui.Gui;
-import me.theentropyshard.teslauncher.gui.playview.PlayView;
 import me.theentropyshard.teslauncher.http.FileDownloaderIO;
 import me.theentropyshard.teslauncher.instance.InstanceManager;
 import me.theentropyshard.teslauncher.instance.InstanceManagerImpl;
