@@ -21,14 +21,12 @@ package me.theentropyshard.teslauncher.gson;
 import com.google.gson.*;
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.minecraft.*;
-import me.theentropyshard.teslauncher.minecraft.models.VersionAssetIndex;
-import me.theentropyshard.teslauncher.minecraft.models.VersionInfo;
-import me.theentropyshard.teslauncher.utils.EnumOS;
+import me.theentropyshard.teslauncher.minecraft.VersionAssetIndex;
+import me.theentropyshard.teslauncher.minecraft.VersionInfo;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Pattern;
 
 public class DetailedVersionInfoDeserializer extends AbstractJsonDeserializer<VersionInfo> {
     private final TESLauncher launcher;

@@ -16,9 +16,15 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.minecraft.models;
+package me.theentropyshard.teslauncher.minecraft;
 
-public class AssetObject {
-    public long size;
-    public String hash;
+import com.google.gson.annotations.SerializedName;
+
+import java.util.Map;
+
+public class AssetIndex {
+    @SerializedName("map_to_resources")
+    public boolean mapToResources;
+    public boolean virtual;
+    public Map<String, AssetObject> objects;
 }

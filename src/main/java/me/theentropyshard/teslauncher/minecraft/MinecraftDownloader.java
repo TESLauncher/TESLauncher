@@ -26,8 +26,6 @@ import me.theentropyshard.teslauncher.gson.DetailedVersionInfoDeserializer;
 import me.theentropyshard.teslauncher.http.FileDownloader;
 import me.theentropyshard.teslauncher.http.FileDownloaderIO;
 import me.theentropyshard.teslauncher.http.ProgressListener;
-import me.theentropyshard.teslauncher.minecraft.models.VersionManifest;
-import me.theentropyshard.teslauncher.minecraft.models.*;
 import me.theentropyshard.teslauncher.utils.EnumOS;
 import me.theentropyshard.teslauncher.utils.Http;
 import me.theentropyshard.teslauncher.utils.PathUtils;

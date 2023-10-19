@@ -16,12 +16,9 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.minecraft.models;
+package me.theentropyshard.teslauncher.minecraft;
 
-public class VersionAssetIndex {
-    public String id;
-    public String sha1;
+public class AssetObject {
     public long size;
-    public long totalSize;
-    public String url;
+    public String hash;
 }

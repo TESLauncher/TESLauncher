@@ -18,6 +18,22 @@
 
 package me.theentropyshard.teslauncher.minecraft;
 
-public class VersionManifest {
+public final class VersionManifest {
+    public Latest latest;
+    public Version[] versions;
 
+    public static final class Latest {
+        public String release;
+        public String snapshot;
+    }
+
+    public static final class Version {
+        public String id;
+        public String type;
+        public String url;
+        public String time;
+        public String releaseTime;
+        public String sha1;
+        public int complianceLevel;
+    }
 }

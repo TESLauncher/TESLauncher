@@ -16,14 +16,24 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.minecraft.models;
+package me.theentropyshard.teslauncher.minecraft;
 
-public class VersionMeta {
+import java.util.ArrayList;
+import java.util.List;
+
+public final class VersionInfo {
+    public JavaVersion javaVersion;
+    public boolean newFormat;
     public String id;
+    public String mainClass;
     public String type;
-    public String url;
-    public String time;
-    public String releaseTime;
-    public String sha1;
-    public int complianceLevel;
+    public String assets;
+    public ClientDownloads downloads;
+    public final List<Argument> jvmArgs = new ArrayList<>();
+    public final List<Argument> gameArgs = new ArrayList<>();
+    public final List<Library> libraries = new ArrayList<>();
+    public String logArgument;
+    public String logConfigUrl;
+    public String logConfigId;
+    public VersionAssetIndex assetIndex;
 }
