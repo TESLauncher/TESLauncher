@@ -45,7 +45,7 @@ public class MicrosoftAuthenticator {
     // DO NOT USE MY APPLICATION (CLIENT) ID!!! YOU MUST CREATE YOUR OWN APPLICATION!!!
 
     public void authenticate() throws IOException {
-        DeviceCodeResponse deviceCodeResponse = this.getDeviceCode("consumers", "ad3043e2-36c0-4b85-9d69-febf872d0205", "XboxLive.signin offline_access");
+        DeviceCodeResponse deviceCodeResponse = this.getDeviceCode("consumers", "394fd08d-cb75-4f21-9807-ae14babcb4c0", "XboxLive.signin offline_access");
         System.out.println(deviceCodeResponse);
 
         System.out.println();
@@ -101,7 +101,7 @@ public class MicrosoftAuthenticator {
                 ),
                 Arrays.asList(
                         "urn:ietf:params:oauth:grant-type:device_code",
-                        "ad3043e2-36c0-4b85-9d69-febf872d0205",
+                        "394fd08d-cb75-4f21-9807-ae14babcb4c0",
                         deviceCodeResponse.deviceCode
                 )
         );
@@ -216,6 +216,7 @@ public class MicrosoftAuthenticator {
                 .build();
 
         try (Response response = this.httpClient.newCall(request).execute()) {
+            System.out.println("Minecraft response code: " + response.code());
             System.out.println(response.body().string());
             return null;
             //return this.gson.fromJson(MicrosoftAuthenticator.getReader(response.body().byteStream()), MinecraftAuthResponse.class);
