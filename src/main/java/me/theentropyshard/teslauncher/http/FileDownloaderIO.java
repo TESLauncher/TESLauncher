@@ -46,7 +46,7 @@ public class FileDownloaderIO extends FileDownloader {
         try (InputStream inputStream = response.getInputStream();
              OutputStream out = Files.newOutputStream(savePath.toFile().toPath(), this.getOpenOptions(bytesAlreadyHave == 0));
              OutputStream outputStream = new BufferedOutputStream(out)) {
-            byte[] buffer = new byte[2048];
+            byte[] buffer = new byte[1024 * 8];
             long count = 0L;
             int numRead;
             do {
