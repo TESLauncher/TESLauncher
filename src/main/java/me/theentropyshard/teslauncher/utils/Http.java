@@ -18,6 +18,8 @@
 
 package me.theentropyshard.teslauncher.utils;
 
+import me.theentropyshard.teslauncher.TESLauncher;
+
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -28,14 +30,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public final class Http {
-    public static final String USER_AGENT = "TESLauncher/1.0.0";
-
     private static final String GET_METHOD = "GET";
 
     private static HttpURLConnection buildConnection(String url, String method) throws IOException {
         HttpURLConnection c = (HttpURLConnection) new URL(url).openConnection();
         c.setRequestMethod(method);
-        c.setRequestProperty("User-Agent", Http.USER_AGENT);
+        c.setRequestProperty("User-Agent", TESLauncher.USER_AGENT);
 
         return c;
     }

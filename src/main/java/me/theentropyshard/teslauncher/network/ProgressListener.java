@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.http;
+package me.theentropyshard.teslauncher.network;
 
 @FunctionalInterface
 public interface ProgressListener {

@@ -26,7 +26,7 @@ import me.theentropyshard.teslauncher.gson.ActionTypeAdapter;
 import me.theentropyshard.teslauncher.gson.DetailedVersionInfoDeserializer;
 import me.theentropyshard.teslauncher.gson.InstantTypeAdapter;
 import me.theentropyshard.teslauncher.gui.playview.PlayView;
-import me.theentropyshard.teslauncher.http.ProgressListener;
+import me.theentropyshard.teslauncher.network.ProgressListener;
 import me.theentropyshard.teslauncher.java.JavaManager;
 import me.theentropyshard.teslauncher.minecraft.*;
 import me.theentropyshard.teslauncher.minecraft.AssetIndex;

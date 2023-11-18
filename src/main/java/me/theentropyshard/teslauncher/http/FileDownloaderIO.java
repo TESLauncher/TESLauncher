@@ -18,6 +18,8 @@
 
 package me.theentropyshard.teslauncher.http;
 
+import me.theentropyshard.teslauncher.network.ProgressListener;
+
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,7 +43,7 @@ public class FileDownloaderIO extends FileDownloader {
 
     @Override
     public void download(String url, Path savePath, long bytesAlreadyHave, ProgressListener listener) throws IOException {
-        Response response = this.makeRequest(url, bytesAlreadyHave);
+        MyResponse response = this.makeRequest(url, bytesAlreadyHave);
 
         try (InputStream inputStream = response.getInputStream();
              OutputStream out = Files.newOutputStream(savePath.toFile().toPath(), this.getOpenOptions(bytesAlreadyHave == 0));

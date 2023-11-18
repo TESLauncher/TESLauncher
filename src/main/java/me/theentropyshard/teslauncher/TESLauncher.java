@@ -26,17 +26,23 @@ import me.theentropyshard.teslauncher.http.FileDownloaderIO;
 import me.theentropyshard.teslauncher.instance.InstanceManager;
 import me.theentropyshard.teslauncher.instance.InstanceManagerImpl;
 import me.theentropyshard.teslauncher.java.JavaManager;
+import me.theentropyshard.teslauncher.network.UserAgentInterceptor;
 import me.theentropyshard.teslauncher.utils.PathUtils;
+import okhttp3.OkHttpClient;
+import okhttp3.Protocol;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class TESLauncher {
+    public static final String USER_AGENT = "TESLauncher/1.0.0";
     public static final String TITLE = "TESLauncher";
     public static final int WIDTH = 960;
     public static final int HEIGHT = 540;
@@ -52,6 +58,8 @@ public class TESLauncher {
     private final Path instancesDir;
     private final Path versionsDir;
     private final Path log4jConfigsDir;
+
+    private final OkHttpClient httpClient;
 
     private final AccountsManager accountsManager;
     private final InstanceManager instanceManager;
@@ -81,6 +89,13 @@ public class TESLauncher {
         this.log4jConfigsDir = this.minecraftDir.resolve("log4j");
         this.createDirectories();
 
+        this.httpClient = new OkHttpClient.Builder()
+                .addNetworkInterceptor(new UserAgentInterceptor(TESLauncher.USER_AGENT))
+                .connectTimeout(30, TimeUnit.SECONDS)
+                .readTimeout(5, TimeUnit.MINUTES)
+                .protocols(Collections.singletonList(Protocol.HTTP_1_1))
+                .build();
+
         this.accountsManager = new AccountsManager(this.workDir);
         try {
             this.accountsManager.loadAccounts();
@@ -95,7 +110,7 @@ public class TESLauncher {
             this.logger.error("Unable to load instances", e);
         }
 
-        this.javaManager = new JavaManager(this.runtimesDir, new FileDownloaderIO("TESLauncher/1.0.0"));
+        this.javaManager = new JavaManager(this.runtimesDir, new FileDownloaderIO(TESLauncher.USER_AGENT));
 
         this.taskPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
@@ -170,6 +185,10 @@ public class TESLauncher {
 
     private static void setInstance(TESLauncher instance) {
         TESLauncher.instance = instance;
+    }
+
+    public OkHttpClient getHttpClient() {
+        return this.httpClient;
     }
 
     public Args getArgs() {

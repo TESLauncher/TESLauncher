@@ -25,7 +25,7 @@ import me.theentropyshard.teslauncher.gson.ActionTypeAdapter;
 import me.theentropyshard.teslauncher.gson.DetailedVersionInfoDeserializer;
 import me.theentropyshard.teslauncher.http.FileDownloader;
 import me.theentropyshard.teslauncher.http.FileDownloaderIO;
-import me.theentropyshard.teslauncher.http.ProgressListener;
+import me.theentropyshard.teslauncher.network.ProgressListener;
 import me.theentropyshard.teslauncher.utils.EnumOS;
 import me.theentropyshard.teslauncher.utils.Http;
 import me.theentropyshard.teslauncher.utils.PathUtils;
@@ -65,7 +65,7 @@ public class MinecraftDownloader {
                 .registerTypeAdapter(Rule.Action.class, new ActionTypeAdapter())
                 .create();
 
-        this.fileDownloader = new FileDownloaderIO("TESLauncher/1.0.0");
+        this.fileDownloader = new FileDownloaderIO(TESLauncher.USER_AGENT);
     }
 
     public void download(String url, Path savePath, long expectedSize, ProgressListener progressListener) throws IOException {

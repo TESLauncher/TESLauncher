@@ -21,6 +21,7 @@ package me.theentropyshard.teslauncher.minecraft.auth.microsoft;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.network.UserAgentInterceptor;
 import me.theentropyshard.teslauncher.utils.Http;
 import okhttp3.*;
@@ -38,7 +39,7 @@ public class MicrosoftAuthenticator {
         this.gson = new GsonBuilder()
                 .create();
         this.httpClient = new OkHttpClient.Builder()
-                .addNetworkInterceptor(new UserAgentInterceptor(Http.USER_AGENT))
+                .addNetworkInterceptor(new UserAgentInterceptor(TESLauncher.USER_AGENT))
                 .build();
     }
 
