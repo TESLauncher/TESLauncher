@@ -20,6 +20,7 @@ package me.theentropyshard.teslauncher.gui.playview;
 
 import com.formdev.flatlaf.FlatClientProperties;
 import me.theentropyshard.teslauncher.TESLauncher;
+import me.theentropyshard.teslauncher.accounts.AccountsManager;
 import me.theentropyshard.teslauncher.gui.View;
 import me.theentropyshard.teslauncher.gui.components.AddInstanceItem;
 import me.theentropyshard.teslauncher.gui.components.InstanceItem;
@@ -157,7 +158,7 @@ public class PlayView extends View {
         item.addListener(e -> {
             int mouseButton = Integer.parseInt(e.getActionCommand());
             if (mouseButton == MouseEvent.BUTTON1) { // left mouse button
-                new InstanceRunner(item.getAssociatedInstance()).start();
+                new InstanceRunner(AccountsManager.getCurrentAccount(), item.getAssociatedInstance()).start();
             } else if (mouseButton == MouseEvent.BUTTON3) { // right mouse button
                 new InstanceSettingsDialog(item.getAssociatedInstance());
             }

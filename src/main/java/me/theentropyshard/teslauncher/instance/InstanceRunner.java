@@ -21,11 +21,13 @@ package me.theentropyshard.teslauncher.instance;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import me.theentropyshard.teslauncher.TESLauncher;
+import me.theentropyshard.teslauncher.accounts.Account;
 import me.theentropyshard.teslauncher.accounts.AccountsManager;
 import me.theentropyshard.teslauncher.gson.ActionTypeAdapter;
 import me.theentropyshard.teslauncher.gson.DetailedVersionInfoDeserializer;
 import me.theentropyshard.teslauncher.gson.InstantTypeAdapter;
 import me.theentropyshard.teslauncher.gui.playview.PlayView;
+import me.theentropyshard.teslauncher.minecraft.auth.microsoft.AuthException;
 import me.theentropyshard.teslauncher.network.ProgressListener;
 import me.theentropyshard.teslauncher.java.JavaManager;
 import me.theentropyshard.teslauncher.minecraft.*;
@@ -45,12 +47,14 @@ import java.time.Instant;
 import java.util.*;
 
 public class InstanceRunner extends Thread {
+    private final Account account;
     private final Instance instance;
 
     private final Gson gson;
     private ProgressListener progressListener;
 
-    public InstanceRunner(Instance instance) {
+    public InstanceRunner(Account account, Instance instance) {
+        this.account = account;
         this.instance = instance;
         this.gson = new GsonBuilder()
                 .registerTypeAdapter(Instant.class, new InstantTypeAdapter())
@@ -62,24 +66,31 @@ public class InstanceRunner extends Thread {
     @Override
     public void run() {
         try {
+            try {
+                this.account.authenticate();
+            } catch (AuthException e) {
+                JOptionPane.showMessageDialog(TESLauncher.getInstance().getGui().getAppWindow().getFrame(),
+                        e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                this.join();
+                return;
+            }
+
             TESLauncher launcher = TESLauncher.getInstance();
             InstanceManager instanceManager = launcher.getInstanceManager();
 
-            this.progressListener = (contentLength, bytesRead, done, fileName) -> {
-                SwingUtilities.invokeLater(() -> {
-                    PlayView playView = TESLauncher.getInstance().getGui().getPlayView();
-                    JProgressBar progressBar = playView.getProgressBar();
-                    progressBar.setMaximum((int) contentLength);
-                    progressBar.setMinimum(0);
-                    progressBar.setValue((int) bytesRead);
+            this.progressListener = (contentLength, bytesRead, done, fileName) -> SwingUtilities.invokeLater(() -> {
+                PlayView playView = TESLauncher.getInstance().getGui().getPlayView();
+                JProgressBar progressBar = playView.getProgressBar();
+                progressBar.setMaximum((int) contentLength);
+                progressBar.setMinimum(0);
+                progressBar.setValue((int) bytesRead);
 
-                    if (done) {
-                        progressBar.setString("Downloaded " + fileName);
-                    } else {
-                        progressBar.setString("Downloading " + fileName + ": " + (bytesRead / 1024) + " KB / " + (contentLength / 1024) + " KB");
-                    }
-                });
-            };
+                if (done) {
+                    progressBar.setString("Downloaded " + fileName);
+                } else {
+                    progressBar.setString("Downloading " + fileName + ": " + (bytesRead / 1024) + " KB / " + (contentLength / 1024) + " KB");
+                }
+            });
 
             Path versionsDir = launcher.getVersionsDir();
             Path librariesDir = launcher.getLibrariesDir();
@@ -110,7 +121,8 @@ public class InstanceRunner extends Thread {
                     StandardCharsets.UTF_8
             ), VersionInfo.class);
 
-            List<String> command = this.buildRunCommand(versionInfo, this.getArguments(versionInfo, nativesDir, librariesDir, versionsDir));
+            List<String> arguments = this.getArguments(versionInfo, nativesDir, librariesDir, versionsDir);
+            List<String> command = this.buildRunCommand(versionInfo, arguments);
             System.out.println("Starting Minecraft with the command:\n" + command);
 
             this.instance.setLastTimePlayed(Instant.now());
@@ -124,7 +136,9 @@ public class InstanceRunner extends Thread {
 
             long timePlayedSeconds = (end - start) / 1000;
             String timePlayed = TimeUtils.getHoursMinutesSeconds(timePlayedSeconds);
-            System.out.println("You played for " + timePlayed + " seconds!");
+            if (!timePlayed.trim().isEmpty()) {
+                System.out.println("You played for " + timePlayed + " seconds!");
+            }
 
             this.instance.setTotalPlayedForSeconds(this.instance.getTotalPlayedForSeconds() + timePlayedSeconds);
             this.instance.setLastPlayedForSeconds(timePlayedSeconds);
@@ -181,18 +195,18 @@ public class InstanceRunner extends Thread {
         if (versionInfo.newFormat) {
             argVars.put("clientid", "-");
             argVars.put("auth_xuid", "-");
-            argVars.put("auth_player_name", AccountsManager.getCurrentUsername());
+            argVars.put("auth_player_name", this.account.getUsername());
             argVars.put("version_name", versionInfo.id);
             argVars.put("game_directory", mcDirOfInstance.toAbsolutePath().toString());
             argVars.put("assets_root", assetsDir.toAbsolutePath().toString());
             argVars.put("assets_index_name", versionInfo.assets);
-            argVars.put("auth_uuid", UUID.randomUUID().toString());
-            argVars.put("auth_access_token", "-");
+            argVars.put("auth_uuid", this.account.getUuid().toString());
+            argVars.put("auth_access_token", this.account.getAccessToken());
             argVars.put("user_type", "msa");
             argVars.put("version_type", versionInfo.type);
         } else {
-            argVars.put("auth_uuid", "-");
-            argVars.put("auth_access_token", "-");
+            argVars.put("auth_uuid", this.account.getUuid().toString());
+            argVars.put("auth_access_token", this.account.getAccessToken());
             argVars.put("auth_session", "-");
             argVars.put("user_properties", "-");
             argVars.put("game_directory", mcDirOfInstance.toAbsolutePath().toString());
@@ -200,9 +214,9 @@ public class InstanceRunner extends Thread {
             argVars.put("user_type", "msa");
             argVars.put("assets_index_name", versionInfo.assets);
             argVars.put("version_name", versionInfo.id);
-            argVars.put("auth_player_name", AccountsManager.getCurrentUsername());
-            argVars.put("uuid", "-");
-            argVars.put("accessToken", "-");
+            argVars.put("auth_player_name", this.account.getUsername());
+            argVars.put("uuid", this.account.getUuid().toString());
+            argVars.put("accessToken", this.account.getAccessToken());
             if (assetIndex.mapToResources || vAssetIndex.id.equals("legacy")) {
                 argVars.put("assets_root", instanceManager.getMinecraftDir(this.instance).resolve("resources"));
                 argVars.put("game_assets", instanceManager.getMinecraftDir(this.instance).resolve("resources"));

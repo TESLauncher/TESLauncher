@@ -20,10 +20,22 @@ package me.theentropyshard.teslauncher.gui;
 
 import com.formdev.flatlaf.FlatClientProperties;
 import me.theentropyshard.teslauncher.TESLauncher;
+import me.theentropyshard.teslauncher.accounts.AccountsManager;
+import me.theentropyshard.teslauncher.accounts.MicrosoftAccount;
+import me.theentropyshard.teslauncher.accounts.OfflineAccount;
 import me.theentropyshard.teslauncher.gui.playview.PlayViewHeader;
+import me.theentropyshard.teslauncher.minecraft.auth.microsoft.AuthListener;
+import me.theentropyshard.teslauncher.minecraft.auth.microsoft.MicrosoftAuthenticator;
+import me.theentropyshard.teslauncher.minecraft.auth.microsoft.MinecraftProfile;
+import me.theentropyshard.teslauncher.utils.SwingUtils;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.datatransfer.StringSelection;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.UUID;
 
 public class AccountsView extends View {
     public AccountsView() {
@@ -32,7 +44,7 @@ public class AccountsView extends View {
         JLabel noticeLabel = new JLabel(
                 // @formatter:off
                 "<html>" +
-                    "<strong>Notice</strong>: Only offline accounts supported for now" +
+                    "<s><strong>Notice</strong>: Only offline accounts supported for now</s>" +
                 "</html>"
                 // @formatter:on
         );
@@ -51,11 +63,62 @@ public class AccountsView extends View {
         JButton addButton = new JButton("Add");
         addButton.addActionListener(e -> {
             String nickname = usernameField.getText();
-            PlayViewHeader.instance.getAccounts().addItem(nickname);
-            TESLauncher.getInstance().getAccountsManager().saveAccount(nickname);
+            PlayViewHeader.instance.getAccounts().addItem(new OfflineAccount(nickname));
+            TESLauncher.getInstance().getAccountsManager().saveAccount(new OfflineAccount(nickname));
             usernameField.setText("");
         });
         centerPanel.add(addButton);
+
+        JButton addMicrosoft = new JButton("Add Microsoft");
+        addMicrosoft.addActionListener(e -> {
+            new SwingWorker<Void, Void>() {
+                @Override
+                protected Void doInBackground() throws Exception {
+                    AuthListener authListener = new AuthListener() {
+                        @Override
+                        public void onUserCodeReceived(String userCode, String verificationUri) {
+                            JOptionPane.showMessageDialog(TESLauncher.getInstance().getGui().getAppWindow().getFrame(),
+                                    "A web page will be opened now. You will need to paste the\n" +
+                                    " code that I already put in your clipboard.", "Info", JOptionPane.INFORMATION_MESSAGE);
+                            if (!Desktop.isDesktopSupported()) {
+                                JOptionPane.showMessageDialog(TESLauncher.getInstance().getGui().getAppWindow().getFrame(),
+                                        "java.awt.Desktop is not supported", "Error", JOptionPane.ERROR_MESSAGE);
+                                return;
+                            }
+
+                            StringSelection selection = new StringSelection(userCode);
+                            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(selection, selection);
+
+                            Desktop desktop = Desktop.getDesktop();
+                            try {
+                                desktop.browse(new URI(verificationUri));
+                            } catch (IOException | URISyntaxException ex) {
+                                throw new RuntimeException(ex);
+                            }
+                        }
+                    };
+
+                    MicrosoftAuthenticator authenticator = new MicrosoftAuthenticator(
+                            TESLauncher.getInstance().getHttpClient(),
+                            authListener
+                    );
+
+                    MinecraftProfile profile = authenticator.authenticate();
+                    MicrosoftAccount microsoftAccount = new MicrosoftAccount();
+                    microsoftAccount.setAccessToken(profile.accessToken);
+                    microsoftAccount.setUuid(UUID.fromString(profile.id.replaceFirst(
+                            "(\\p{XDigit}{8})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}+)", "$1-$2-$3-$4-$5"
+                    )));
+                    microsoftAccount.setUsername(profile.name);
+                    TESLauncher.getInstance().getAccountsManager().saveAccount(microsoftAccount);
+
+                    PlayViewHeader.instance.getAccounts().addItem(microsoftAccount);
+
+                    return null;
+                }
+            }.execute();
+        });
+        centerPanel.add(addMicrosoft);
 
         root.add(centerPanel, BorderLayout.CENTER);
     }

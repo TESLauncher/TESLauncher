@@ -21,8 +21,9 @@ package me.theentropyshard.teslauncher.minecraft.auth.microsoft;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
-import me.theentropyshard.teslauncher.TESLauncher;
-import me.theentropyshard.teslauncher.network.UserAgentInterceptor;
+import me.theentropyshard.teslauncher.accounts.Account;
+import me.theentropyshard.teslauncher.accounts.MicrosoftAccount;
+import me.theentropyshard.teslauncher.accounts.OfflineAccount;
 import okhttp3.*;
 
 import java.io.*;
@@ -33,37 +34,47 @@ import java.util.Collections;
 public class MicrosoftAuthenticator {
     private final Gson gson;
     private final OkHttpClient httpClient;
+    private final AuthListener listener;
 
-    public MicrosoftAuthenticator() {
+    public MicrosoftAuthenticator(OkHttpClient httpClient, AuthListener listener) {
+        this.listener = listener;
         this.gson = new GsonBuilder()
                 .create();
-        this.httpClient = new OkHttpClient.Builder()
-                .addNetworkInterceptor(new UserAgentInterceptor(TESLauncher.USER_AGENT))
-                .build();
+        this.httpClient = httpClient;
     }
 
     // DO NOT USE MY APPLICATION (CLIENT) ID!!! YOU MUST CREATE YOUR OWN APPLICATION!!!
 
-    public void authenticate() throws IOException {
+    public MinecraftProfile authenticate() throws IOException {
         DeviceCodeResponse deviceCodeResponse = this.getDeviceCode("consumers", "394fd08d-cb75-4f21-9807-ae14babcb4c0", "XboxLive.signin offline_access");
-        System.out.println(deviceCodeResponse);
+        //System.out.println(deviceCodeResponse);
+        this.listener.onUserCodeReceived(deviceCodeResponse.userCode, deviceCodeResponse.verificationUri);
+        System.out.println("Code: " + deviceCodeResponse.userCode);
+        System.out.println("Url: " + deviceCodeResponse.verificationUri);
 
-        System.out.println();
+        //System.out.println();
         OAuthCodeResponse microsoftOAuthCode = this.getMicrosoftOAuthCode(deviceCodeResponse);
-        System.out.println(microsoftOAuthCode);
+        //System.out.println(microsoftOAuthCode);
 
-        System.out.println();
+        //System.out.println();
         XboxLiveAuthResponse xboxLiveAuthResponse = this.authenticateWithXboxLive(microsoftOAuthCode);
-        System.out.println(xboxLiveAuthResponse);
-        System.out.println();
+        //System.out.println(xboxLiveAuthResponse);
+        //System.out.println();
 
         XSTSAuthResponse xstsAuthResponse = this.obtainXSTSToken(xboxLiveAuthResponse);
-        System.out.println(xstsAuthResponse);
-        System.out.println();
+        //System.out.println(xstsAuthResponse);
+        //System.out.println();
 
         MinecraftAuthResponse minecraftAuthResponse = this.authenticateWithMinecraft(xstsAuthResponse);
-        System.out.println("Response:");
-        System.out.println(minecraftAuthResponse);
+        //System.out.println("Response:");
+        //System.out.println(minecraftAuthResponse);
+
+        if (!this.checkGameOwnership(minecraftAuthResponse)) {
+            System.err.println("Account does not own Minecraft");
+            return null;
+        }
+
+        return this.getProfile(minecraftAuthResponse);
     }
 
     private DeviceCodeResponse getDeviceCode(String tenant, String clientId, String scope) throws IOException {
@@ -216,19 +227,39 @@ public class MicrosoftAuthenticator {
                 .build();
 
         try (Response response = this.httpClient.newCall(request).execute()) {
-            System.out.println("Minecraft response code: " + response.code());
-            System.out.println(response.body().string());
-            return null;
-            //return this.gson.fromJson(MicrosoftAuthenticator.getReader(response.body().byteStream()), MinecraftAuthResponse.class);
+            return this.gson.fromJson(MicrosoftAuthenticator.getReader(response.body().byteStream()), MinecraftAuthResponse.class);
         }
     }
 
-    private void checkGameOwnership() {
+    private boolean checkGameOwnership(MinecraftAuthResponse mcResponse) throws IOException {
+        String url = "https://api.minecraftservices.com/entitlements/mcstore";
 
+        Request request = new Request.Builder()
+                .url(url)
+                .header("Authorization", "Bearer " + mcResponse.accessToken)
+                .get()
+                .build();
+
+        try (Response response = this.httpClient.newCall(request).execute()) {
+            GameOwnershipResponse gameOwnershipResponse = this.gson.fromJson(MicrosoftAuthenticator.getReader(response.body().byteStream()), GameOwnershipResponse.class);
+            return gameOwnershipResponse.items != null && !gameOwnershipResponse.items.isEmpty();
+        }
     }
 
-    private void getProfile() {
+    private MinecraftProfile getProfile(MinecraftAuthResponse mcResponse) throws IOException {
+        String url = "https://api.minecraftservices.com/minecraft/profile";
 
+        Request request = new Request.Builder()
+                .url(url)
+                .header("Authorization", "Bearer " + mcResponse.accessToken)
+                .get()
+                .build();
+
+        try (Response response = this.httpClient.newCall(request).execute()) {
+            MinecraftProfile profile = this.gson.fromJson(MicrosoftAuthenticator.getReader(response.body().byteStream()), MinecraftProfile.class);
+            profile.accessToken = mcResponse.accessToken;
+            return profile;
+        }
     }
 
     private static Reader getReader(InputStream inputStream) {

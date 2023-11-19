@@ -19,8 +19,9 @@
 package me.theentropyshard.teslauncher.accounts;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.gui.playview.PlayViewHeader;
 import me.theentropyshard.teslauncher.utils.PathUtils;
 
@@ -31,11 +32,13 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class AccountsManager {
     private final Path accountsFile;
-    private final List<String> accounts;
+    private final Map<String, Account> accounts;
     private final Gson gson;
 
     public AccountsManager(Path workDir) {
@@ -47,29 +50,34 @@ public class AccountsManager {
             throw new RuntimeException(e);
         }
 
-        this.accounts = new ArrayList<>();
-        this.gson = new Gson();
+        this.accounts = new HashMap<>();
+        this.gson = new GsonBuilder()
+                .registerTypeAdapter(Account.class, new AccountDeserializer())
+                .disableHtmlEscaping()
+                .create();
+    }
+
+    public static Account getCurrentAccount() {
+        Map<String, Account> accountsMap = TESLauncher.getInstance().getAccountsManager().getAccountsMap();
+        return accountsMap.get(String.valueOf(PlayViewHeader.instance.getAccounts().getSelectedItem()));
     }
 
     public void loadAccounts() throws IOException {
         InputStream inputStream = Files.newInputStream(this.accountsFile);
         InputStreamReader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
-        JsonArray accountsArray = this.gson.fromJson(reader, JsonArray.class);
-        if (accountsArray == null) {
-            return;
-        }
-        for (JsonElement element : accountsArray) {
-            String nickname = element.getAsString();
-            this.accounts.add(nickname);
+
+        Map<String, Account> accounts = this.gson.fromJson(reader, new TypeToken<Map<String, Account>>() {}.getType());
+        if (accounts != null) {
+            this.accounts.putAll(accounts);
         }
     }
 
-    public boolean saveAccount(String nickname) {
-        if (this.accounts.contains(nickname)) {
+    public boolean saveAccount(Account account) {
+        if (this.accounts.containsKey(account.getUsername())) {
             return false;
         }
 
-        this.accounts.add(nickname);
+        this.accounts.put(account.getUsername(), account);
 
         try {
             this.save();
@@ -81,8 +89,9 @@ public class AccountsManager {
     }
 
     public boolean deleteAccount(String nickname) {
-        if (this.accounts.contains(nickname)) {
+        if (this.accounts.containsKey(nickname)) {
             this.accounts.remove(nickname);
+
             try {
                 this.save();
             } catch (IOException e) {
@@ -100,11 +109,11 @@ public class AccountsManager {
         Files.write(this.accountsFile, json.getBytes(StandardCharsets.UTF_8));
     }
 
-    public static String getCurrentUsername() {
-        return String.valueOf(PlayViewHeader.instance.getAccounts().getSelectedItem());
+    public List<Account> getAccounts() {
+        return new ArrayList<>(this.accounts.values());
     }
 
-    public List<String> getAccounts() {
-        return new ArrayList<>(this.accounts);
+    public Map<String, Account> getAccountsMap() {
+        return this.accounts;
     }
 }
