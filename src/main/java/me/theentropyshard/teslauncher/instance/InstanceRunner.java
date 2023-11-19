@@ -123,7 +123,7 @@ public class InstanceRunner extends Thread {
 
             List<String> arguments = this.getArguments(versionInfo, nativesDir, librariesDir, versionsDir);
             List<String> command = this.buildRunCommand(versionInfo, arguments);
-            System.out.println("Starting Minecraft with the command:\n" + command);
+            //System.out.println("Starting Minecraft with the command:\n" + command);
 
             this.instance.setLastTimePlayed(Instant.now());
 
