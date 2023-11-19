@@ -29,15 +29,19 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 
 public class FileDownloaderIO extends FileDownloader {
+
+    public static final StandardOpenOption[] NEW_FILE_OPTIONS = {StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE};
+    public static final StandardOpenOption[] APPEND_OPTIONS = {StandardOpenOption.APPEND};
+
     public FileDownloaderIO(String userAgent) {
         super(userAgent);
     }
 
     private StandardOpenOption[] getOpenOptions(boolean newDownload) {
         if (newDownload) {
-            return new StandardOpenOption[] {StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE};
+            return FileDownloaderIO.NEW_FILE_OPTIONS;
         } else {
-            return new StandardOpenOption[] {StandardOpenOption.APPEND};
+            return FileDownloaderIO.APPEND_OPTIONS;
         }
     }
 
