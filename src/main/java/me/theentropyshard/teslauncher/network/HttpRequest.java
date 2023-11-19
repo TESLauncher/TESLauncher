@@ -54,6 +54,12 @@ public class HttpRequest implements AutoCloseable {
         this.response = this.httpClient.newCall(request).execute();
     }
 
+    public byte[] asBytes(String url) throws IOException {
+        this.send(url);
+
+        return Objects.requireNonNull(this.response.body()).bytes();
+    }
+
     public String asString(String url) throws IOException {
         this.send(url);
 
