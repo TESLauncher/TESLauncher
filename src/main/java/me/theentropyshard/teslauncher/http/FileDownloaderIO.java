@@ -19,6 +19,7 @@
 package me.theentropyshard.teslauncher.http;
 
 import me.theentropyshard.teslauncher.network.ProgressListener;
+import okhttp3.ResponseBody;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -47,11 +48,11 @@ public class FileDownloaderIO extends FileDownloader {
 
     @Override
     public void download(String url, Path savePath, long bytesAlreadyHave, ProgressListener listener) throws IOException {
-        MyResponse response = this.makeRequest(url, bytesAlreadyHave);
-
-        try (InputStream inputStream = response.getInputStream();
+        try (ResponseBody responseBody = this.makeRequest(url, bytesAlreadyHave);
              OutputStream out = Files.newOutputStream(savePath.toFile().toPath(), this.getOpenOptions(bytesAlreadyHave == 0));
              OutputStream outputStream = new BufferedOutputStream(out)) {
+            InputStream inputStream = responseBody.byteStream();
+            long contentLength = responseBody.contentLength();
             byte[] buffer = new byte[1024 * 8];
             long count = 0L;
             int numRead;
@@ -62,9 +63,9 @@ public class FileDownloaderIO extends FileDownloader {
                     outputStream.write(buffer, 0, numRead);
                 }
                 if (bytesAlreadyHave > 0) {
-                    listener.onProgress(response.getContentLength() + bytesAlreadyHave, bytesAlreadyHave + count, numRead == -1, savePath.getFileName().toString());
+                    listener.onProgress(contentLength + bytesAlreadyHave, bytesAlreadyHave + count, numRead == -1, savePath.getFileName().toString());
                 } else {
-                    listener.onProgress(response.getContentLength(), count, numRead == -1, savePath.getFileName().toString());
+                    listener.onProgress(contentLength, count, numRead == -1, savePath.getFileName().toString());
                 }
             } while (numRead != -1);
 

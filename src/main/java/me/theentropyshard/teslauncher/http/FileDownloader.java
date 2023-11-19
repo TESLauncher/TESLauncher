@@ -18,13 +18,15 @@
 
 package me.theentropyshard.teslauncher.http;
 
+import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.network.ProgressListener;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.nio.file.Path;
+import java.util.Objects;
 
 public abstract class FileDownloader {
     private static final ProgressListener NO_OP_LISTENER = ((bytesRead, contentLength, done, fileName) -> {
@@ -36,17 +38,17 @@ public abstract class FileDownloader {
         this.userAgent = userAgent;
     }
 
-    public MyResponse makeRequest(String url, long downloadedBytes) throws IOException {
-        HttpURLConnection c = (HttpURLConnection) new URL(url).openConnection();
-        c.setRequestMethod("GET");
-        c.setRequestProperty("User-Agent", this.userAgent);
+    public ResponseBody makeRequest(String url, long downloadedBytes) throws IOException {
+        Request.Builder builder = new Request.Builder()
+                .url(url)
+                .get();
+
         if (downloadedBytes > 0) {
-            c.setRequestProperty("Range", "bytes=" + downloadedBytes + "-");
+            builder.header("Range", "bytes=" + downloadedBytes + "-");
         }
 
-        InputStream inputStream = c.getErrorStream() == null ? c.getInputStream() : c.getErrorStream();
-
-        return new MyResponse(inputStream, c.getContentLengthLong(), c.getResponseCode());
+        Response response = TESLauncher.getInstance().getHttpClient().newCall(builder.build()).execute();
+        return Objects.requireNonNull(response.body());
     }
 
     public void download(String url, Path savePath, long bytesAlreadyHave) throws IOException {
