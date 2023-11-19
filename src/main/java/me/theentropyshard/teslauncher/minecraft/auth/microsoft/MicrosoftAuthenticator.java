@@ -23,7 +23,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.network.UserAgentInterceptor;
-import me.theentropyshard.teslauncher.utils.Http;
 import okhttp3.*;
 
 import java.io.*;

@@ -22,12 +22,12 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import me.theentropyshard.teslauncher.utils.Http;
+import me.theentropyshard.teslauncher.TESLauncher;
+import me.theentropyshard.teslauncher.network.HttpRequest;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
-import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -35,7 +35,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ExecutionException;
-import java.util.function.Function;
 
 public class McVersionsTableModel extends DefaultTableModel {
 
@@ -60,9 +59,11 @@ public class McVersionsTableModel extends DefaultTableModel {
             protected List<List<String>> doInBackground() throws Exception {
                 List<List<String>> data = new ArrayList<>();
 
-                byte[] bytes = Http.get(McVersionsTableModel.VM_V2);
-                Gson gson = new Gson();
-                JsonObject json = gson.fromJson(new String(bytes, StandardCharsets.UTF_8), JsonObject.class);
+                JsonObject json;
+                try (HttpRequest request = new HttpRequest(TESLauncher.getInstance().getHttpClient(), new Gson())) {
+                    json = request.asObject(McVersionsTableModel.VM_V2, JsonObject.class);
+                }
+
                 JsonArray jsonArray = json.getAsJsonArray("versions");
                 for (JsonElement element : jsonArray) {
                     JsonObject versionObject = element.getAsJsonObject();

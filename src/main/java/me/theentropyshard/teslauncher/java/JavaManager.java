@@ -20,10 +20,11 @@ package me.theentropyshard.teslauncher.java;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.http.FileDownloader;
+import me.theentropyshard.teslauncher.network.HttpRequest;
 import me.theentropyshard.teslauncher.network.ProgressListener;
 import me.theentropyshard.teslauncher.utils.EnumOS;
-import me.theentropyshard.teslauncher.utils.Http;
 import me.theentropyshard.teslauncher.utils.PathUtils;
 
 import java.io.*;
@@ -65,14 +66,22 @@ public class JavaManager {
 
         String jreOsName = JavaManager.getJreOsName();
 
-        JsonObject osObject = this.gson.fromJson(JavaManager.getReader(Http.get(JavaManager.ALL_RUNTIMES)), JsonObject.class);
+        JsonObject osObject;
+        try (HttpRequest request = new HttpRequest(TESLauncher.getInstance().getHttpClient(), this.gson)) {
+            osObject = request.asObject(JavaManager.ALL_RUNTIMES, JsonObject.class);
+        }
+
         if (osObject.has(jreOsName)) {
             JsonObject runtimesObject = this.gson.fromJson(osObject.get(jreOsName), JsonObject.class);
             if (runtimesObject.has(componentName)) {
                 List<JavaRuntime> javaRuntimes = Arrays.asList(this.gson.fromJson(runtimesObject.get(componentName), JavaRuntime[].class));
                 JavaRuntime javaRuntime = javaRuntimes.get(0);
-                JavaRuntimeManifest manifest = this.gson.fromJson(
-                        JavaManager.getReader(Http.get(javaRuntime.manifest.url)), JavaRuntimeManifest.class);
+
+                JavaRuntimeManifest manifest;
+                try (HttpRequest request = new HttpRequest(TESLauncher.getInstance().getHttpClient(), this.gson)) {
+                    manifest = request.asObject(javaRuntime.manifest.url, JavaRuntimeManifest.class);
+                }
+
                 for (Map.Entry<String, JreFile> entry : manifest.files.entrySet()) {
                     JreFile jreFile = entry.getValue();
                     Path savePath = componentDir.resolve(entry.getKey());

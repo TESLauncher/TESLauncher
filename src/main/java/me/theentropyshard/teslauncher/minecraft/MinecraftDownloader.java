@@ -25,9 +25,9 @@ import me.theentropyshard.teslauncher.gson.ActionTypeAdapter;
 import me.theentropyshard.teslauncher.gson.DetailedVersionInfoDeserializer;
 import me.theentropyshard.teslauncher.http.FileDownloader;
 import me.theentropyshard.teslauncher.http.FileDownloaderIO;
+import me.theentropyshard.teslauncher.network.HttpRequest;
 import me.theentropyshard.teslauncher.network.ProgressListener;
 import me.theentropyshard.teslauncher.utils.EnumOS;
-import me.theentropyshard.teslauncher.utils.Http;
 import me.theentropyshard.teslauncher.utils.PathUtils;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.model.FileHeader;
@@ -86,8 +86,11 @@ public class MinecraftDownloader {
 
         //LOG.info("Downloading Minecraft " + versionId);
 
-        byte[] bytes = Http.get(MinecraftDownloader.VER_MAN_V2);
-        VersionManifest manifest = this.gson.fromJson(MinecraftDownloader.getReader(bytes), VersionManifest.class);
+        VersionManifest manifest;
+        try (HttpRequest request = new HttpRequest(TESLauncher.getInstance().getHttpClient(), this.gson)) {
+            manifest = request.asObject(MinecraftDownloader.VER_MAN_V2, VersionManifest.class);
+        }
+
         if (manifest == null) {
             throw new IOException("Unable to deserialize version manifest");
         }
@@ -141,14 +144,18 @@ public class MinecraftDownloader {
     private void saveClientJson(VersionManifest.Version version) throws IOException {
         Path jsonFile = this.versionsDir.resolve(version.id).resolve(version.id + ".json");
         if (!Files.exists(jsonFile)) {
-            Files.write(jsonFile, Http.get(version.url));
+            try (HttpRequest request = new HttpRequest(TESLauncher.getInstance().getHttpClient())) {
+                Files.write(jsonFile, request.asBytes(version.url));
+            }
         }
     }
 
     private VersionInfo downloadClient(VersionManifest.Version version) throws IOException {
-        Reader reader = MinecraftDownloader.getReader(Http.get(version.url));
+        VersionInfo versionInfo;
+        try (HttpRequest request = new HttpRequest(TESLauncher.getInstance().getHttpClient(), this.gson)) {
+            versionInfo = request.asObject(version.url, VersionInfo.class);
+        }
 
-        VersionInfo versionInfo = this.gson.fromJson(reader, VersionInfo.class);
         ClientDownload client = versionInfo.downloads.client;
 
         System.out.println("Downloading " + version.id + ".jar...");
@@ -217,7 +224,10 @@ public class MinecraftDownloader {
         Path assetsIndexFile = this.assetsDir.resolve("indexes").resolve(vAssetIndex.id + ".json");
         if (!Files.exists(assetsIndexFile)) {
             PathUtils.createDirectoryIfNotExists(assetsIndexFile.getParent());
-            Files.write(assetsIndexFile, Http.get(vAssetIndex.url));
+
+            try (HttpRequest request = new HttpRequest(TESLauncher.getInstance().getHttpClient())) {
+                Files.write(assetsIndexFile, request.asBytes(vAssetIndex.url));
+            }
         }
 
         AssetIndex assetIndex = this.gson.fromJson(Files.newBufferedReader(assetsIndexFile), AssetIndex.class);
