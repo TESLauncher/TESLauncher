@@ -27,15 +27,23 @@ public final class TimeUtils {
         String time = "";
 
         if (hours != 0) {
-            time = hours + " hours, ";
+            time = hours + " hours";
         }
 
         if (minutes != 0) {
-            time = time + minutes + " minutes, ";
+            if (hours == 0) {
+                time = time + minutes + " minutes";
+            } else {
+                time = time + ", " + minutes + " minutes";
+            }
         }
 
         if (seconds != 0) {
-            time = time + seconds + " seconds";
+            if (minutes == 0 && hours == 0) {
+                time = time + seconds + " seconds";
+            } else {
+                time = time + ", " + seconds + " seconds";
+            }
         }
 
         return time;
