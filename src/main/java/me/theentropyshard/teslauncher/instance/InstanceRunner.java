@@ -23,6 +23,7 @@ import com.google.gson.GsonBuilder;
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.accounts.Account;
 import me.theentropyshard.teslauncher.accounts.AccountsManager;
+import me.theentropyshard.teslauncher.accounts.MicrosoftAccount;
 import me.theentropyshard.teslauncher.gson.ActionTypeAdapter;
 import me.theentropyshard.teslauncher.gson.DetailedVersionInfoDeserializer;
 import me.theentropyshard.teslauncher.gson.InstantTypeAdapter;
@@ -266,7 +267,7 @@ public class InstanceRunner extends Thread {
             int patch = Integer.parseInt(split[2]);
 
             // TODO this is a workaround for 1.16.5
-            if (minorVersion == 16 && patch == 5) {
+            if (minorVersion == 16 && patch == 5 && !(this.account instanceof MicrosoftAccount)) {
                 arguments.add("-Dminecraft.api.auth.host=https://nope.invalid");
                 arguments.add("-Dminecraft.api.account.host=https://nope.invalid");
                 arguments.add("-Dminecraft.api.session.host=https://nope.invalid");
