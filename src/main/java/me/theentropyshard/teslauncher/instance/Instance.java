@@ -45,6 +45,10 @@ public class Instance {
         this.minecraftVersion = minecraftVersion;
     }
 
+    public static void create(String name, String groupName, String minecraftVersion) {
+
+    }
+
     public String getName() {
         return this.name;
     }

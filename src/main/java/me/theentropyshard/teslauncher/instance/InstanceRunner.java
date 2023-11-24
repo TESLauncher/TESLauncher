@@ -22,19 +22,15 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.accounts.Account;
-import me.theentropyshard.teslauncher.accounts.AccountsManager;
 import me.theentropyshard.teslauncher.accounts.MicrosoftAccount;
 import me.theentropyshard.teslauncher.gson.ActionTypeAdapter;
 import me.theentropyshard.teslauncher.gson.DetailedVersionInfoDeserializer;
 import me.theentropyshard.teslauncher.gson.InstantTypeAdapter;
 import me.theentropyshard.teslauncher.gui.playview.PlayView;
-import me.theentropyshard.teslauncher.minecraft.auth.microsoft.AuthException;
-import me.theentropyshard.teslauncher.network.ProgressListener;
 import me.theentropyshard.teslauncher.java.JavaManager;
 import me.theentropyshard.teslauncher.minecraft.*;
-import me.theentropyshard.teslauncher.minecraft.AssetIndex;
-import me.theentropyshard.teslauncher.minecraft.VersionAssetIndex;
-import me.theentropyshard.teslauncher.minecraft.VersionInfo;
+import me.theentropyshard.teslauncher.minecraft.auth.microsoft.AuthException;
+import me.theentropyshard.teslauncher.network.ProgressListener;
 import me.theentropyshard.teslauncher.utils.PathUtils;
 import me.theentropyshard.teslauncher.utils.TimeUtils;
 import org.apache.commons.text.StringSubstitutor;
@@ -45,7 +41,10 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class InstanceRunner extends Thread {
     private final Account account;
@@ -307,7 +306,23 @@ public class InstanceRunner extends Thread {
     private List<String> buildRunCommand(VersionInfo versionInfo, List<String> arguments) {
         List<String> command = new ArrayList<>();
 
-        String javaExecutable = this.getJavaExecutable(versionInfo.javaVersion.component);
+        String javaExecutable;
+        if (versionInfo.javaVersion != null) {
+            javaExecutable = this.getJavaExecutable(versionInfo.javaVersion.component);
+        } else {
+            try {
+                String[] split = versionInfo.id.split("\\.");
+                int minorVersion = Integer.parseInt(split[1]);
+
+                if (minorVersion >= 17) {
+                    javaExecutable = this.getJavaExecutable("java-runtime-gamma");
+                } else {
+                    javaExecutable = this.getJavaExecutable("jre-legacy");
+                }
+            } catch (Exception ignored) {
+                javaExecutable = this.getJavaExecutable("jre-legacy");
+            }
+        }
         String javaPath = this.instance.getJavaPath();
         if (javaPath == null || javaPath.isEmpty()) {
             this.instance.setJavaPath(javaExecutable);
@@ -354,5 +369,9 @@ public class InstanceRunner extends Thread {
             }
         }
         return javaManager.getJavaExecutable(componentName);
+    }
+
+    private void downloadJava(String componentName) {
+
     }
 }
