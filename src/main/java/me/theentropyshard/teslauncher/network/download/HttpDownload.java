@@ -18,6 +18,7 @@
 
 package me.theentropyshard.teslauncher.network.download;
 
+import me.theentropyshard.teslauncher.utils.PathUtils;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -35,12 +36,14 @@ public class HttpDownload {
     private final String url;
     private final Path saveAs;
     private final boolean forceDownload;
+    private final long expectedSize;
 
-    private HttpDownload(OkHttpClient httpClient, String url, Path saveAs, boolean forceDownload) {
+    private HttpDownload(OkHttpClient httpClient, String url, Path saveAs, boolean forceDownload, long expectedSize) {
         this.httpClient = httpClient;
         this.url = url;
         this.saveAs = saveAs;
         this.forceDownload = forceDownload;
+        this.expectedSize = expectedSize;
     }
 
     public void execute() throws IOException {
@@ -48,20 +51,38 @@ public class HttpDownload {
             throw new NullPointerException("saveAs == null");
         }
 
-        if (this.exists() && !this.forceDownload) {
-            return;
+        long size = this.size();
+        boolean partiallyDownloaded = this.expectedSize > size;
+
+        if (partiallyDownloaded || this.forceDownload) {
+            Request.Builder builder = new Request.Builder()
+                    .url(this.url)
+                    .get()
+                    .header("Accept-Encoding", "identity");
+
+            if (partiallyDownloaded && size >= 0) {
+                builder.header("Range", "bytes=" + size + "-");
+            }
+
+            PathUtils.createDirectoryIfNotExists(this.saveAs.getParent());
+
+            try (Response response = this.httpClient.newCall(builder.build()).execute();
+                 InputStream is = new BufferedInputStream(Objects.requireNonNull(response.body()).byteStream())) {
+                Files.copy(is, this.saveAs, StandardCopyOption.REPLACE_EXISTING);
+            }
+        }
+    }
+
+    public long size() {
+        if (this.exists()) {
+            try {
+                return Files.size(this.saveAs);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
-        Request request = new Request.Builder()
-                .url(this.url)
-                .get()
-                .header("Accept-Encoding", "identity")
-                .build();
-
-        try (Response response = this.httpClient.newCall(request).execute();
-             InputStream is = new BufferedInputStream(Objects.requireNonNull(response.body()).byteStream())) {
-            Files.copy(is, this.saveAs, StandardCopyOption.REPLACE_EXISTING);
-        }
+        return -1;
     }
 
     public boolean exists() {
@@ -72,7 +93,8 @@ public class HttpDownload {
         private OkHttpClient httpClient;
         private String url;
         private Path saveAs;
-        boolean forceDownload;
+        private boolean forceDownload;
+        private long expectedSize;
 
         public Builder() {
 
@@ -98,8 +120,13 @@ public class HttpDownload {
             return this;
         }
 
+        public Builder expectedSize(long expectedSize) {
+            this.expectedSize = expectedSize;
+            return this;
+        }
+
         public HttpDownload build() {
-            return new HttpDownload(this.httpClient, this.url, this.saveAs, this.forceDownload);
+            return new HttpDownload(this.httpClient, this.url, this.saveAs, this.forceDownload, this.expectedSize);
         }
     }
 }

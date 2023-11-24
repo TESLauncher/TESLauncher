@@ -27,6 +27,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class DownloadList {
+    public static final int MAX_CONNECTIONS = 8;
+
     private final DownloadListener downloadListener;
     private final List<HttpDownload> downloads;
     private final ExecutorService executorService;
@@ -37,7 +39,7 @@ public class DownloadList {
     public DownloadList(DownloadListener downloadListener) {
         this.downloadListener = downloadListener;
         this.downloads = new ArrayList<>();
-        this.executorService = Executors.newCachedThreadPool();
+        this.executorService = Executors.newFixedThreadPool(DownloadList.MAX_CONNECTIONS);
         this.completedTasks = new AtomicInteger(0);
     }
 

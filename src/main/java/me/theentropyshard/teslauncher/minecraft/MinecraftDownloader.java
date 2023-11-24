@@ -27,6 +27,8 @@ import me.theentropyshard.teslauncher.http.FileDownloader;
 import me.theentropyshard.teslauncher.http.FileDownloaderIO;
 import me.theentropyshard.teslauncher.network.HttpRequest;
 import me.theentropyshard.teslauncher.network.ProgressListener;
+import me.theentropyshard.teslauncher.network.download.DownloadList;
+import me.theentropyshard.teslauncher.network.download.HttpDownload;
 import me.theentropyshard.teslauncher.utils.EnumOS;
 import me.theentropyshard.teslauncher.utils.PathUtils;
 import net.lingala.zip4j.ZipFile;
@@ -184,6 +186,8 @@ public class MinecraftDownloader {
     private List<Library> downloadLibraries(VersionInfo versionInfo) throws IOException {
         List<Library> nativeLibraries = new ArrayList<>();
 
+        DownloadList downloadList = new DownloadList((total, completed) -> {});
+
         for (Library library : versionInfo.libraries) {
             if (!RuleMatcher.applyOnThisPlatform(library)) {
                 continue;
@@ -194,16 +198,34 @@ public class MinecraftDownloader {
 
             if (artifact != null) {
                 Path jarFile = this.librariesDir.resolve(artifact.path);
-                this.download(artifact.url, jarFile, artifact.size, this.progressListener);
+                //this.download(artifact.url, jarFile, artifact.size, this.progressListener);
+                HttpDownload download = new HttpDownload.Builder()
+                        .httpClient(TESLauncher.getInstance().getHttpClient())
+                        .url(artifact.url)
+                        .expectedSize(artifact.size)
+                        .saveAs(jarFile)
+                        .build();
+                downloadList.add(download);
             }
 
             DownloadArtifact classifier = this.getClassifier(library);
             if (classifier != null) {
                 nativeLibraries.add(library);
                 Path filePath = this.librariesDir.resolve(classifier.path);
-                this.download(classifier.url, filePath, classifier.size, this.progressListener);
+                //this.download(classifier.url, filePath, classifier.size, this.progressListener);
+                if (artifact != null) {
+                    HttpDownload download = new HttpDownload.Builder()
+                            .httpClient(TESLauncher.getInstance().getHttpClient())
+                            .url(artifact.url)
+                            .expectedSize(artifact.size)
+                            .saveAs(filePath)
+                            .build();
+                    downloadList.add(download);
+                }
             }
         }
+
+        downloadList.downloadAll();
 
         return nativeLibraries;
     }
