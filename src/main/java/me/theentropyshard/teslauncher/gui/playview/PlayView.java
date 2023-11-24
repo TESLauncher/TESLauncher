@@ -37,7 +37,6 @@ import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.MouseEvent;
 import java.time.Instant;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,7 +51,6 @@ public class PlayView extends View {
     private final Map<String, InstancesPanel> groups;
     private final CardLayout cardLayout;
     private final DefaultComboBoxModel<String> model;
-    private final JProgressBar progressBar;
     private final JLabel instanceInfoLabel;
 
     public PlayView() {
@@ -91,20 +89,10 @@ public class PlayView extends View {
             }
         });
 
-        this.progressBar = new JProgressBar(JProgressBar.HORIZONTAL);
-        this.progressBar.putClientProperty(FlatClientProperties.PROGRESS_BAR_SQUARE, true);
-        this.progressBar.setFont(this.progressBar.getFont().deriveFont(12.0f));
-        this.progressBar.setStringPainted(true);
-        this.progressBar.setVisible(false);
-
         this.instanceInfoLabel = new JLabel();
         this.instanceInfoLabel.setVisible(false);
 
-        JPanel bottomPanel = new JPanel(new GridLayout(2, 1, 0, 0));
-        bottomPanel.add(this.progressBar);
-        bottomPanel.add(this.instanceInfoLabel);
-
-        root.add(bottomPanel, BorderLayout.SOUTH);
+        root.add(this.instanceInfoLabel, BorderLayout.SOUTH);
 
         new SwingWorker<List<Instance>, Void>() {
             @Override
@@ -201,9 +189,5 @@ public class PlayView extends View {
 
     public InstancesPanel getDefaultInstancesPanel() {
         return this.defaultInstancesPanel;
-    }
-
-    public JProgressBar getProgressBar() {
-        return this.progressBar;
     }
 }

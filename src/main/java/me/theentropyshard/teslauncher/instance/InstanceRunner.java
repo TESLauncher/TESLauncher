@@ -26,6 +26,7 @@ import me.theentropyshard.teslauncher.accounts.MicrosoftAccount;
 import me.theentropyshard.teslauncher.gson.ActionTypeAdapter;
 import me.theentropyshard.teslauncher.gson.DetailedVersionInfoDeserializer;
 import me.theentropyshard.teslauncher.gson.InstantTypeAdapter;
+import me.theentropyshard.teslauncher.gui.dialogs.MinecraftDownloadDialog;
 import me.theentropyshard.teslauncher.gui.playview.PlayView;
 import me.theentropyshard.teslauncher.java.JavaManager;
 import me.theentropyshard.teslauncher.minecraft.*;
@@ -79,17 +80,7 @@ public class InstanceRunner extends Thread {
             InstanceManager instanceManager = launcher.getInstanceManager();
 
             this.progressListener = (contentLength, bytesRead, done, fileName) -> SwingUtilities.invokeLater(() -> {
-                PlayView playView = TESLauncher.getInstance().getGui().getPlayView();
-                JProgressBar progressBar = playView.getProgressBar();
-                progressBar.setMaximum((int) contentLength);
-                progressBar.setMinimum(0);
-                progressBar.setValue((int) bytesRead);
 
-                if (done) {
-                    progressBar.setString("Downloaded " + fileName);
-                } else {
-                    progressBar.setString("Downloading " + fileName + ": " + (bytesRead / 1024) + " KB / " + (contentLength / 1024) + " KB");
-                }
             });
 
             Path versionsDir = launcher.getVersionsDir();
@@ -98,21 +89,17 @@ public class InstanceRunner extends Thread {
             Path nativesDir = versionsDir.resolve(this.instance.getMinecraftVersion()).resolve("natives");
 
             // TODO: check version different way, not like this
-            MinecraftDownloader downloader = new MinecraftDownloader(
+            MinecraftDownloader downloader = new GuiMinecraftDownloader(
                     versionsDir,
                     assetsDir,
                     librariesDir,
                     nativesDir,
                     instanceManager.getMinecraftDir(this.instance).resolve("resources"),
-                    this.progressListener
+                    this.progressListener,
+                    new MinecraftDownloadDialog()
             );
 
-            JProgressBar progressBar = TESLauncher.getInstance().getGui().getPlayView().getProgressBar();
-            progressBar.setVisible(true);
-            progressBar.setEnabled(true);
             downloader.downloadMinecraft(this.instance.getMinecraftVersion());
-            progressBar.setVisible(false);
-            progressBar.setEnabled(false);
 
             Path clientJson = versionsDir.resolve(this.instance.getMinecraftVersion())
                     .resolve(this.instance.getMinecraftVersion() + ".json");
@@ -355,19 +342,16 @@ public class InstanceRunner extends Thread {
 
     private String getJavaExecutable(String componentName) {
         JavaManager javaManager = TESLauncher.getInstance().getJavaManager();
-        // TODO: see in JavaManager
+        /*// TODO: see in JavaManager
         if (!javaManager.runtimeExists(componentName)) {
             try {
-                JProgressBar progressBar = TESLauncher.getInstance().getGui().getPlayView().getProgressBar();
-                progressBar.setVisible(true);
-                progressBar.setEnabled(true);
+
                 javaManager.downloadRuntime(componentName, this.progressListener);
-                progressBar.setVisible(false);
-                progressBar.setEnabled(false);
+
             } catch (IOException e) {
                 TESLauncher.getInstance().getLogger().error(e);
             }
-        }
+        }*/
         return javaManager.getJavaExecutable(componentName);
     }
 

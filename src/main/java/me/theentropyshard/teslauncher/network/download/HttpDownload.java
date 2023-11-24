@@ -85,6 +85,10 @@ public class HttpDownload {
         return -1;
     }
 
+    public long expectedSize() {
+        return this.expectedSize;
+    }
+
     public boolean exists() {
         return this.saveAs != null && Files.exists(this.saveAs);
     }

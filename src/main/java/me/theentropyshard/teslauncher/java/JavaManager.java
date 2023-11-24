@@ -22,6 +22,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.http.FileDownloader;
+import me.theentropyshard.teslauncher.minecraft.MinecraftDownloadListener;
 import me.theentropyshard.teslauncher.network.HttpRequest;
 import me.theentropyshard.teslauncher.network.ProgressListener;
 import me.theentropyshard.teslauncher.network.download.DownloadList;
@@ -62,7 +63,7 @@ public class JavaManager {
         return Files.exists(Paths.get(this.getJavaExecutable(componentName)));
     }
 
-    public void downloadRuntime(String componentName, ProgressListener progressListener) throws IOException {
+    public void downloadRuntime(String componentName, MinecraftDownloadListener listener) throws IOException {
         Path componentDir = this.workDir.resolve(componentName);
         PathUtils.createDirectoryIfNotExists(componentDir);
 
@@ -84,7 +85,9 @@ public class JavaManager {
                     manifest = request.asObject(javaRuntime.manifest.url, JavaRuntimeManifest.class);
                 }
 
-                DownloadList downloadList = new DownloadList((total, completed) -> {});
+                DownloadList downloadList = new DownloadList((total, completed) -> {
+                    listener.onProgress(0, total, completed);
+                });
 
                 for (Map.Entry<String, JreFile> entry : manifest.files.entrySet()) {
                     JreFile jreFile = entry.getValue();

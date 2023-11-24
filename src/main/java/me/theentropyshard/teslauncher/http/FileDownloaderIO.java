@@ -63,9 +63,9 @@ public class FileDownloaderIO extends FileDownloader {
                     outputStream.write(buffer, 0, numRead);
                 }
                 if (bytesAlreadyHave > 0) {
-                    listener.onProgress(contentLength + bytesAlreadyHave, bytesAlreadyHave + count, numRead == -1, savePath.getFileName().toString());
+                    listener.onProgress(bytesAlreadyHave + count, contentLength + bytesAlreadyHave, numRead == -1, savePath.getFileName().toString());
                 } else {
-                    listener.onProgress(contentLength, count, numRead == -1, savePath.getFileName().toString());
+                    listener.onProgress(count, contentLength, numRead == -1, savePath.getFileName().toString());
                 }
             } while (numRead != -1);
 

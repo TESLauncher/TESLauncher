@@ -70,9 +70,9 @@ public class Gui {
         SwingUtilities.invokeLater(() -> {
             this.playView = new PlayView();
             if (this.darkTheme) {
-                this.playView.getProgressBar().setForeground(new Color(64, 75, 93));
+                UIManager.put("ProgressBar.foreground", new ColorUIResource(64, 75, 93));
             } else {
-                this.playView.getProgressBar().setForeground(new Color(222, 230, 237));
+                UIManager.put("ProgressBar.foreground", new ColorUIResource(222, 230, 237));
             }
 
             this.viewSelector.addTab("Play", this.playView.getRoot());
