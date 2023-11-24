@@ -20,14 +20,12 @@ package me.theentropyshard.teslauncher.gui;
 
 import com.formdev.flatlaf.FlatClientProperties;
 import me.theentropyshard.teslauncher.TESLauncher;
-import me.theentropyshard.teslauncher.accounts.AccountsManager;
 import me.theentropyshard.teslauncher.accounts.MicrosoftAccount;
 import me.theentropyshard.teslauncher.accounts.OfflineAccount;
 import me.theentropyshard.teslauncher.gui.playview.PlayViewHeader;
 import me.theentropyshard.teslauncher.minecraft.auth.microsoft.AuthListener;
 import me.theentropyshard.teslauncher.minecraft.auth.microsoft.MicrosoftAuthenticator;
 import me.theentropyshard.teslauncher.minecraft.auth.microsoft.MinecraftProfile;
-import me.theentropyshard.teslauncher.utils.SwingUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -74,27 +72,24 @@ public class AccountsView extends View {
             new SwingWorker<Void, Void>() {
                 @Override
                 protected Void doInBackground() throws Exception {
-                    AuthListener authListener = new AuthListener() {
-                        @Override
-                        public void onUserCodeReceived(String userCode, String verificationUri) {
+                    AuthListener authListener = (userCode, verificationUri) -> {
+                        JOptionPane.showMessageDialog(TESLauncher.getInstance().getGui().getAppWindow().getFrame(),
+                                "A web page will be opened now. You will need to paste the\n" +
+                                " code that I already put in your clipboard.", "Info", JOptionPane.INFORMATION_MESSAGE);
+                        if (!Desktop.isDesktopSupported()) {
                             JOptionPane.showMessageDialog(TESLauncher.getInstance().getGui().getAppWindow().getFrame(),
-                                    "A web page will be opened now. You will need to paste the\n" +
-                                    " code that I already put in your clipboard.", "Info", JOptionPane.INFORMATION_MESSAGE);
-                            if (!Desktop.isDesktopSupported()) {
-                                JOptionPane.showMessageDialog(TESLauncher.getInstance().getGui().getAppWindow().getFrame(),
-                                        "java.awt.Desktop is not supported", "Error", JOptionPane.ERROR_MESSAGE);
-                                return;
-                            }
+                                    "java.awt.Desktop is not supported", "Error", JOptionPane.ERROR_MESSAGE);
+                            return;
+                        }
 
-                            StringSelection selection = new StringSelection(userCode);
-                            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(selection, selection);
+                        StringSelection selection = new StringSelection(userCode);
+                        Toolkit.getDefaultToolkit().getSystemClipboard().setContents(selection, selection);
 
-                            Desktop desktop = Desktop.getDesktop();
-                            try {
-                                desktop.browse(new URI(verificationUri));
-                            } catch (IOException | URISyntaxException ex) {
-                                throw new RuntimeException(ex);
-                            }
+                        Desktop desktop = Desktop.getDesktop();
+                        try {
+                            desktop.browse(new URI(verificationUri));
+                        } catch (IOException | URISyntaxException ex) {
+                            throw new RuntimeException(ex);
                         }
                     };
 

@@ -27,11 +27,9 @@ import me.theentropyshard.teslauncher.gson.ActionTypeAdapter;
 import me.theentropyshard.teslauncher.gson.DetailedVersionInfoDeserializer;
 import me.theentropyshard.teslauncher.gson.InstantTypeAdapter;
 import me.theentropyshard.teslauncher.gui.dialogs.MinecraftDownloadDialog;
-import me.theentropyshard.teslauncher.gui.playview.PlayView;
 import me.theentropyshard.teslauncher.java.JavaManager;
 import me.theentropyshard.teslauncher.minecraft.*;
 import me.theentropyshard.teslauncher.minecraft.auth.microsoft.AuthException;
-import me.theentropyshard.teslauncher.network.ProgressListener;
 import me.theentropyshard.teslauncher.utils.PathUtils;
 import me.theentropyshard.teslauncher.utils.TimeUtils;
 import org.apache.commons.text.StringSubstitutor;
@@ -50,9 +48,7 @@ import java.util.Map;
 public class InstanceRunner extends Thread {
     private final Account account;
     private final Instance instance;
-
     private final Gson gson;
-    private ProgressListener progressListener;
 
     public InstanceRunner(Account account, Instance instance) {
         this.account = account;
@@ -79,10 +75,6 @@ public class InstanceRunner extends Thread {
             TESLauncher launcher = TESLauncher.getInstance();
             InstanceManager instanceManager = launcher.getInstanceManager();
 
-            this.progressListener = (contentLength, bytesRead, done, fileName) -> SwingUtilities.invokeLater(() -> {
-
-            });
-
             Path versionsDir = launcher.getVersionsDir();
             Path librariesDir = launcher.getLibrariesDir();
             Path assetsDir = launcher.getAssetsDir();
@@ -95,7 +87,6 @@ public class InstanceRunner extends Thread {
                     librariesDir,
                     nativesDir,
                     instanceManager.getMinecraftDir(this.instance).resolve("resources"),
-                    this.progressListener,
                     new MinecraftDownloadDialog()
             );
 
@@ -180,7 +171,7 @@ public class InstanceRunner extends Thread {
 
         // Game
         if (versionInfo.newFormat) {
-            argVars.put("clientid", "-");
+            argVars.put("client", "-");
             argVars.put("auth_xuid", "-");
             argVars.put("auth_player_name", this.account.getUsername());
             argVars.put("version_name", versionInfo.id);
@@ -342,20 +333,6 @@ public class InstanceRunner extends Thread {
 
     private String getJavaExecutable(String componentName) {
         JavaManager javaManager = TESLauncher.getInstance().getJavaManager();
-        /*// TODO: see in JavaManager
-        if (!javaManager.runtimeExists(componentName)) {
-            try {
-
-                javaManager.downloadRuntime(componentName, this.progressListener);
-
-            } catch (IOException e) {
-                TESLauncher.getInstance().getLogger().error(e);
-            }
-        }*/
         return javaManager.getJavaExecutable(componentName);
-    }
-
-    private void downloadJava(String componentName) {
-
     }
 }

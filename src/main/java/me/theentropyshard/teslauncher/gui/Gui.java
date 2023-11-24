@@ -46,6 +46,7 @@ public class Gui {
 
             UIManager.put("ProgressBar.selectionBackground", Color.WHITE);
             UIManager.put("ProgressBar.selectionForeground", Color.WHITE);
+            UIManager.put("ProgressBar.foreground", new ColorUIResource(64, 75, 93));
 
             FlatDarculaLaf.setup();
         } else {
@@ -55,6 +56,7 @@ public class Gui {
 
             UIManager.put("ProgressBar.selectionBackground", Color.BLACK);
             UIManager.put("ProgressBar.selectionForeground", Color.BLACK);
+            UIManager.put("ProgressBar.foreground", new ColorUIResource(222, 230, 237));
 
             FlatIntelliJLaf.setup();
         }
@@ -69,11 +71,6 @@ public class Gui {
     public void showGui() {
         SwingUtilities.invokeLater(() -> {
             this.playView = new PlayView();
-            if (this.darkTheme) {
-                UIManager.put("ProgressBar.foreground", new ColorUIResource(64, 75, 93));
-            } else {
-                UIManager.put("ProgressBar.foreground", new ColorUIResource(222, 230, 237));
-            }
 
             this.viewSelector.addTab("Play", this.playView.getRoot());
             this.viewSelector.addTab("Accounts", new AccountsView().getRoot());

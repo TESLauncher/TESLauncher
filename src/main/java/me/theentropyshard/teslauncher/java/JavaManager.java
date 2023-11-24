@@ -24,17 +24,13 @@ import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.http.FileDownloader;
 import me.theentropyshard.teslauncher.minecraft.MinecraftDownloadListener;
 import me.theentropyshard.teslauncher.network.HttpRequest;
-import me.theentropyshard.teslauncher.network.ProgressListener;
 import me.theentropyshard.teslauncher.network.download.DownloadList;
 import me.theentropyshard.teslauncher.network.download.HttpDownload;
 import me.theentropyshard.teslauncher.utils.EnumOS;
 import me.theentropyshard.teslauncher.utils.PathUtils;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -56,11 +52,6 @@ public class JavaManager {
         } else {
             this.executableName = "java";
         }
-    }
-
-    // TODO: implement a proper check for this
-    public boolean runtimeExists(String componentName) {
-        return Files.exists(Paths.get(this.getJavaExecutable(componentName)));
     }
 
     public void downloadRuntime(String componentName, MinecraftDownloadListener listener) throws IOException {
@@ -121,23 +112,6 @@ public class JavaManager {
         } else {
             throw new IOException("Runtime for os '" + jreOsName + "' not found");
         }
-    }
-
-    private void download(String url, Path savePath, long expectedSize, ProgressListener progressListener) throws IOException {
-        PathUtils.createDirectoryIfNotExists(savePath.getParent());
-
-        if (!Files.exists(savePath)) {
-            this.fileDownloader.download(url, savePath, 0, progressListener);
-        } else {
-            long size = Files.size(savePath);
-            if (size < expectedSize) {
-                this.fileDownloader.download(url, savePath, size, progressListener);
-            }
-        }
-    }
-
-    private static Reader getReader(byte[] bytes) {
-        return new InputStreamReader(new ByteArrayInputStream(bytes), StandardCharsets.UTF_8);
     }
 
     private static String getJreOsName() {

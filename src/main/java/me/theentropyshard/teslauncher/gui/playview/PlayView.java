@@ -18,7 +18,6 @@
 
 package me.theentropyshard.teslauncher.gui.playview;
 
-import com.formdev.flatlaf.FlatClientProperties;
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.accounts.AccountsManager;
 import me.theentropyshard.teslauncher.gui.View;

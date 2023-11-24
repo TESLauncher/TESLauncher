@@ -21,9 +21,6 @@ package me.theentropyshard.teslauncher.minecraft.auth.microsoft;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
-import me.theentropyshard.teslauncher.accounts.Account;
-import me.theentropyshard.teslauncher.accounts.MicrosoftAccount;
-import me.theentropyshard.teslauncher.accounts.OfflineAccount;
 import okhttp3.*;
 
 import java.io.*;

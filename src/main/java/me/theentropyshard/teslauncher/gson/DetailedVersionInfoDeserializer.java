@@ -21,8 +21,6 @@ package me.theentropyshard.teslauncher.gson;
 import com.google.gson.*;
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.minecraft.*;
-import me.theentropyshard.teslauncher.minecraft.VersionAssetIndex;
-import me.theentropyshard.teslauncher.minecraft.VersionInfo;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,9 +28,27 @@ import java.util.List;
 
 public class DetailedVersionInfoDeserializer extends AbstractJsonDeserializer<VersionInfo> {
     private final TESLauncher launcher;
+    private final Gson gson;
 
     public DetailedVersionInfoDeserializer(TESLauncher launcher) {
         this.launcher = launcher;
+        this.gson = new Gson();
+    }
+
+    private List<Argument> processArgs(JsonArray array) {
+        List<Argument> arguments = new ArrayList<>();
+
+        for (JsonElement elem : array) {
+            if (elem.isJsonPrimitive()) {
+                String stringArg = elem.getAsString();
+                arguments.add(Argument.withValues(stringArg));
+            } else if (elem.isJsonObject()) {
+                Argument argument = this.gson.fromJson(elem.getAsJsonObject(), Argument.class);
+                arguments.add(argument);
+            }
+        }
+
+        return arguments;
     }
 
     @Override
@@ -57,28 +73,8 @@ public class DetailedVersionInfoDeserializer extends AbstractJsonDeserializer<Ve
             JsonArray gameArgsArr = argsObject.getAsJsonArray("game");
             JsonArray jvmArgsArr = argsObject.getAsJsonArray("jvm");
 
-            List<Argument> gameArguments = new ArrayList<>();
-            List<Argument> jvmArguments = new ArrayList<>();
-
-            for (JsonElement elem : gameArgsArr) {
-                if (elem.isJsonPrimitive()) {
-                    String stringArg = elem.getAsString();
-                    gameArguments.add(Argument.withValues(stringArg));
-                } else if (elem.isJsonObject()) {
-                    Argument argument = gson.fromJson(elem.getAsJsonObject(), Argument.class);
-                    gameArguments.add(argument);
-                }
-            }
-
-            for (JsonElement elem : jvmArgsArr) {
-                if (elem.isJsonPrimitive()) {
-                    String stringArg = elem.getAsString();
-                    jvmArguments.add(Argument.withValues(stringArg));
-                } else if (elem.isJsonObject()) {
-                    Argument argument = gson.fromJson(elem.getAsJsonObject(), Argument.class);
-                    jvmArguments.add(argument);
-                }
-            }
+            List<Argument> gameArguments = this.processArgs(gameArgsArr);
+            List<Argument> jvmArguments = this.processArgs(jvmArgsArr);
 
             for (Argument argument : gameArguments) {
                 if (RuleMatcher.applyOnThisPlatform(argument)) {

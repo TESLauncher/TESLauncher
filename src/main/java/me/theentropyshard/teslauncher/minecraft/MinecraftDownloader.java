@@ -51,20 +51,17 @@ public class MinecraftDownloader {
     private final Path librariesDir;
     private final Path nativesDir;
     private final Path instanceResourcesDir;
-    private final ProgressListener progressListener;
     private final MinecraftDownloadListener minecraftDownloadListener;
 
     private final FileDownloader fileDownloader;
 
     public MinecraftDownloader(Path versionsDir, Path assetsDir, Path librariesDir, Path nativesDir,
-                               Path instanceResourcesDir, ProgressListener progressListener,
-                               MinecraftDownloadListener minecraftDownloadListener) {
+                               Path instanceResourcesDir, MinecraftDownloadListener minecraftDownloadListener) {
         this.versionsDir = versionsDir;
         this.assetsDir = assetsDir;
         this.librariesDir = librariesDir;
         this.nativesDir = nativesDir;
         this.instanceResourcesDir = instanceResourcesDir;
-        this.progressListener = progressListener;
         this.minecraftDownloadListener = minecraftDownloadListener;
         this.gson = new GsonBuilder()
                 .registerTypeAdapter(VersionInfo.class, new DetailedVersionInfoDeserializer(TESLauncher.getInstance()))
@@ -248,7 +245,7 @@ public class MinecraftDownloader {
 
             if (artifact != null) {
                 Path jarFile = this.librariesDir.resolve(artifact.path);
-                //this.download(artifact.url, jarFile, artifact.size, this.progressListener);
+
                 HttpDownload download = new HttpDownload.Builder()
                         .httpClient(TESLauncher.getInstance().getHttpClient())
                         .url(artifact.url)
@@ -262,7 +259,6 @@ public class MinecraftDownloader {
             if (classifier != null) {
                 nativeLibraries.add(library);
                 Path filePath = this.librariesDir.resolve(classifier.path);
-                //this.download(classifier.url, filePath, classifier.size, this.progressListener);
 
                 HttpDownload download = new HttpDownload.Builder()
                         .httpClient(TESLauncher.getInstance().getHttpClient())
@@ -279,10 +275,9 @@ public class MinecraftDownloader {
         return nativeLibraries;
     }
 
-    private void downloadAsset(DownloadList downloadList, Path filePath, AssetObject assetObject) throws IOException {
+    private void downloadAsset(DownloadList downloadList, Path filePath, AssetObject assetObject) {
         String prefix = assetObject.hash.substring(0, 2);
         String url = MinecraftDownloader.RESOURCES + prefix + "/" + assetObject.hash;
-        //this.download(url, filePath, assetObject.size, this.progressListener);
 
         HttpDownload download = new HttpDownload.Builder()
                 .httpClient(TESLauncher.getInstance().getHttpClient())
