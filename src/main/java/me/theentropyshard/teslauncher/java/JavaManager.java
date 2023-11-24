@@ -24,6 +24,8 @@ import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.http.FileDownloader;
 import me.theentropyshard.teslauncher.network.HttpRequest;
 import me.theentropyshard.teslauncher.network.ProgressListener;
+import me.theentropyshard.teslauncher.network.download.DownloadList;
+import me.theentropyshard.teslauncher.network.download.HttpDownload;
 import me.theentropyshard.teslauncher.utils.EnumOS;
 import me.theentropyshard.teslauncher.utils.PathUtils;
 
@@ -82,6 +84,8 @@ public class JavaManager {
                     manifest = request.asObject(javaRuntime.manifest.url, JavaRuntimeManifest.class);
                 }
 
+                DownloadList downloadList = new DownloadList((total, completed) -> {});
+
                 for (Map.Entry<String, JreFile> entry : manifest.files.entrySet()) {
                     JreFile jreFile = entry.getValue();
                     Path savePath = componentDir.resolve(entry.getKey());
@@ -90,9 +94,19 @@ public class JavaManager {
                         PathUtils.createDirectoryIfNotExists(savePath);
                     } else if (jreFile.type.equals("file")) {
                         JreFile.Download raw = jreFile.downloads.get("raw");
-                        this.download(raw.url, savePath, raw.size, progressListener);
+                        //this.download(raw.url, savePath, raw.size, progressListener);
+
+                        HttpDownload download = new HttpDownload.Builder()
+                                .httpClient(TESLauncher.getInstance().getHttpClient())
+                                .url(raw.url)
+                                .expectedSize(raw.size)
+                                .saveAs(savePath)
+                                .build();
+                        downloadList.add(download);
                     }
                 }
+
+                downloadList.downloadAll();
 
                 String javaExecutable = this.getJavaExecutable(componentName);
                 if (!new File(javaExecutable).setExecutable(true, true)) {
