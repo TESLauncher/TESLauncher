@@ -40,6 +40,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class MinecraftDownloader {
     private static final String VER_MAN_V2 = "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json";
@@ -230,10 +231,18 @@ public class MinecraftDownloader {
         return nativeLibraries;
     }
 
-    private void downloadAsset(Path filePath, AssetObject assetObject) throws IOException {
+    private void downloadAsset(DownloadList downloadList, Path filePath, AssetObject assetObject) throws IOException {
         String prefix = assetObject.hash.substring(0, 2);
         String url = MinecraftDownloader.RESOURCES + prefix + "/" + assetObject.hash;
-        this.download(url, filePath, assetObject.size, this.progressListener);
+        //this.download(url, filePath, assetObject.size, this.progressListener);
+
+        HttpDownload download = new HttpDownload.Builder()
+                .httpClient(TESLauncher.getInstance().getHttpClient())
+                .url(url)
+                .expectedSize(assetObject.size)
+                .saveAs(filePath)
+                .build();
+        downloadList.add(download);
     }
 
     private void downloadAssets(VersionInfo versionInfo) throws IOException {
@@ -254,23 +263,26 @@ public class MinecraftDownloader {
 
         AssetIndex assetIndex = this.gson.fromJson(Files.newBufferedReader(assetsIndexFile), AssetIndex.class);
 
-        assetIndex.objects.forEach((fileName, assetObject) -> {
-            try {
-                if (assetIndex.mapToResources) {
-                    Path filePath = this.instanceResourcesDir.resolve(fileName);
-                    this.downloadAsset(filePath, assetObject);
-                } else if (assetIndex.virtual) {
-                    Path filePath = this.assetsDir.resolve("virtual").resolve("legacy").resolve(fileName);
-                    this.downloadAsset(filePath, assetObject);
-                } else {
-                    String prefix = assetObject.hash.substring(0, 2);
-                    Path filePath = this.assetsDir.resolve("objects").resolve(prefix).resolve(assetObject.hash);
-                    this.downloadAsset(filePath, assetObject);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
+        DownloadList downloadList = new DownloadList(((total, completed) -> {}));
+
+        for (Map.Entry<String, AssetObject> entry : assetIndex.objects.entrySet()) {
+            String fileName = entry.getKey();
+            AssetObject assetObject = entry.getValue();
+
+            if (assetIndex.mapToResources) {
+                Path filePath = this.instanceResourcesDir.resolve(fileName);
+                this.downloadAsset(downloadList, filePath, assetObject);
+            } else if (assetIndex.virtual) {
+                Path filePath = this.assetsDir.resolve("virtual").resolve("legacy").resolve(fileName);
+                this.downloadAsset(downloadList, filePath, assetObject);
+            } else {
+                String prefix = assetObject.hash.substring(0, 2);
+                Path filePath = this.assetsDir.resolve("objects").resolve(prefix).resolve(assetObject.hash);
+                this.downloadAsset(downloadList, filePath, assetObject);
             }
-        });
+        }
+
+        downloadList.downloadAll();
     }
 
     private static Reader getReader(byte[] bytes) {
