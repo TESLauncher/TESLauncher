@@ -195,9 +195,13 @@ public class InstanceRunner extends Thread {
             argVars.put("auth_player_name", this.account.getUsername());
             argVars.put("uuid", this.account.getUuid().toString());
             argVars.put("accessToken", this.account.getAccessToken());
-            if (assetIndex.mapToResources || vAssetIndex.id.equals("legacy")) {
+            if (assetIndex.mapToResources) {
                 argVars.put("assets_root", instanceManager.getMinecraftDir(this.instance).resolve("resources"));
                 argVars.put("game_assets", instanceManager.getMinecraftDir(this.instance).resolve("resources"));
+            } else if ("legacy".equals(vAssetIndex.id)) {
+                Path virtualAssets = assetsDir.resolve("virtual").resolve("legacy").toAbsolutePath();
+                argVars.put("assets_root", virtualAssets.toString());
+                argVars.put("game_assets", virtualAssets.toString());
             } else {
                 argVars.put("assets_root", assetsDir.toString());
                 argVars.put("game_assets", assetsDir.toString());
