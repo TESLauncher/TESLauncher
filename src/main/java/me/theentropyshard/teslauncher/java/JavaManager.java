@@ -27,7 +27,7 @@ import me.theentropyshard.teslauncher.network.HttpRequest;
 import me.theentropyshard.teslauncher.network.download.DownloadList;
 import me.theentropyshard.teslauncher.network.download.HttpDownload;
 import me.theentropyshard.teslauncher.utils.EnumOS;
-import me.theentropyshard.teslauncher.utils.PathUtils;
+import me.theentropyshard.teslauncher.utils.FileUtils;
 
 import java.io.*;
 import java.nio.file.Path;
@@ -56,7 +56,7 @@ public class JavaManager {
 
     public void downloadRuntime(String componentName, MinecraftDownloadListener listener) throws IOException {
         Path componentDir = this.workDir.resolve(componentName);
-        PathUtils.createDirectoryIfNotExists(componentDir);
+        FileUtils.createDirectoryIfNotExists(componentDir);
 
         String jreOsName = JavaManager.getJreOsName();
 
@@ -85,7 +85,7 @@ public class JavaManager {
                     Path savePath = componentDir.resolve(entry.getKey());
                     // TODO: there is also 'lzma' available. maybe use it and decompress?
                     if (jreFile.type.equals("directory")) {
-                        PathUtils.createDirectoryIfNotExists(savePath);
+                        FileUtils.createDirectoryIfNotExists(savePath);
                     } else if (jreFile.type.equals("file")) {
                         JreFile.Download raw = jreFile.downloads.get("raw");
                         //this.download(raw.url, savePath, raw.size, progressListener);

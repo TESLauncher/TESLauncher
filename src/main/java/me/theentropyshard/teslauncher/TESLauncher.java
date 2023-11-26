@@ -27,7 +27,7 @@ import me.theentropyshard.teslauncher.instance.InstanceManager;
 import me.theentropyshard.teslauncher.instance.InstanceManagerImpl;
 import me.theentropyshard.teslauncher.java.JavaManager;
 import me.theentropyshard.teslauncher.network.UserAgentInterceptor;
-import me.theentropyshard.teslauncher.utils.PathUtils;
+import me.theentropyshard.teslauncher.utils.FileUtils;
 import okhttp3.OkHttpClient;
 import okhttp3.Protocol;
 import org.apache.logging.log4j.LogManager;
@@ -139,14 +139,14 @@ public class TESLauncher {
 
     private void createDirectories() {
         try {
-            PathUtils.createDirectoryIfNotExists(this.workDir);
-            PathUtils.createDirectoryIfNotExists(this.runtimesDir);
-            PathUtils.createDirectoryIfNotExists(this.minecraftDir);
-            PathUtils.createDirectoryIfNotExists(this.assetsDir);
-            PathUtils.createDirectoryIfNotExists(this.librariesDir);
-            PathUtils.createDirectoryIfNotExists(this.instancesDir);
-            PathUtils.createDirectoryIfNotExists(this.versionsDir);
-            PathUtils.createDirectoryIfNotExists(this.log4jConfigsDir);
+            FileUtils.createDirectoryIfNotExists(this.workDir);
+            FileUtils.createDirectoryIfNotExists(this.runtimesDir);
+            FileUtils.createDirectoryIfNotExists(this.minecraftDir);
+            FileUtils.createDirectoryIfNotExists(this.assetsDir);
+            FileUtils.createDirectoryIfNotExists(this.librariesDir);
+            FileUtils.createDirectoryIfNotExists(this.instancesDir);
+            FileUtils.createDirectoryIfNotExists(this.versionsDir);
+            FileUtils.createDirectoryIfNotExists(this.log4jConfigsDir);
         } catch (IOException e) {
             this.logger.error("Unable to create launcher directories", e);
         }

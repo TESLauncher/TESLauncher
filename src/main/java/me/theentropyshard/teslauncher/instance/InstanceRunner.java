@@ -30,7 +30,7 @@ import me.theentropyshard.teslauncher.gui.dialogs.MinecraftDownloadDialog;
 import me.theentropyshard.teslauncher.java.JavaManager;
 import me.theentropyshard.teslauncher.minecraft.*;
 import me.theentropyshard.teslauncher.minecraft.auth.microsoft.AuthException;
-import me.theentropyshard.teslauncher.utils.PathUtils;
+import me.theentropyshard.teslauncher.utils.FileUtils;
 import me.theentropyshard.teslauncher.utils.TimeUtils;
 import org.apache.commons.text.StringSubstitutor;
 
@@ -149,7 +149,8 @@ public class InstanceRunner extends Thread {
     private List<String> getArguments(VersionInfo versionInfo, Path tmpNativesDir, Path librariesDir, Path clientsDir) throws IOException {
         TESLauncher launcher = TESLauncher.getInstance();
         InstanceManager instanceManager = launcher.getInstanceManager();
-        Path mcDirOfInstance = PathUtils.createDirectoryIfNotExists(instanceManager.getMinecraftDir(this.instance));
+        Path mcDirOfInstance = instanceManager.getMinecraftDir(this.instance);
+        FileUtils.createDirectoryIfNotExists(mcDirOfInstance);
         Path assetsDir = launcher.getAssetsDir();
 
         List<String> arguments = new ArrayList<>();

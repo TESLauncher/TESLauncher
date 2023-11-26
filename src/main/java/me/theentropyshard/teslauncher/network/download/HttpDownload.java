@@ -18,7 +18,7 @@
 
 package me.theentropyshard.teslauncher.network.download;
 
-import me.theentropyshard.teslauncher.utils.PathUtils;
+import me.theentropyshard.teslauncher.utils.FileUtils;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -64,7 +64,7 @@ public class HttpDownload {
                 builder.header("Range", "bytes=" + size + "-");
             }
 
-            PathUtils.createDirectoryIfNotExists(this.saveAs.getParent());
+            FileUtils.createDirectoryIfNotExists(this.saveAs.getParent());
 
             try (Response response = this.httpClient.newCall(builder.build()).execute();
                  InputStream is = new BufferedInputStream(Objects.requireNonNull(response.body()).byteStream())) {

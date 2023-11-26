@@ -22,7 +22,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import me.theentropyshard.teslauncher.gson.InstantTypeAdapter;
 import me.theentropyshard.teslauncher.utils.EnumOS;
-import me.theentropyshard.teslauncher.utils.PathUtils;
+import me.theentropyshard.teslauncher.utils.FileUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -104,7 +104,7 @@ public class InstanceManagerImpl implements InstanceManager {
         }
 
         Path instanceFile = instanceDir.resolve("instance.json");
-        PathUtils.writeString(instanceFile, this.gson.toJson(instance));
+        FileUtils.writeString(instanceFile, this.gson.toJson(instance));
     }
 
     @Override
@@ -118,11 +118,11 @@ public class InstanceManagerImpl implements InstanceManager {
             return;
         }
 
-        PathUtils.createDirectoryIfNotExists(instanceDir);
+        FileUtils.createDirectoryIfNotExists(instanceDir);
         Path minecraftDir = instanceDir.resolve(this.mcDirName);
-        PathUtils.createDirectoryIfNotExists(minecraftDir);
+        FileUtils.createDirectoryIfNotExists(minecraftDir);
         Path instanceFile = instanceDir.resolve("instance.json");
-        PathUtils.writeString(instanceFile, this.gson.toJson(instance));
+        FileUtils.writeString(instanceFile, this.gson.toJson(instance));
     }
 
     @Override
@@ -134,7 +134,7 @@ public class InstanceManagerImpl implements InstanceManager {
 
         Path instanceDir = this.getInstanceDir(instance);
         if (Files.exists(instanceDir)) {
-            PathUtils.deleteDirectoryRecursively(instanceDir);
+            FileUtils.deleteDirectoryRecursively(instanceDir);
         }
 
         this.instances.remove(instance);

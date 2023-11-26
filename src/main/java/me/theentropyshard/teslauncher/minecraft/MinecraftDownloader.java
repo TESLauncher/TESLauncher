@@ -31,7 +31,7 @@ import me.theentropyshard.teslauncher.network.ProgressListener;
 import me.theentropyshard.teslauncher.network.download.DownloadList;
 import me.theentropyshard.teslauncher.network.download.HttpDownload;
 import me.theentropyshard.teslauncher.utils.EnumOS;
-import me.theentropyshard.teslauncher.utils.PathUtils;
+import me.theentropyshard.teslauncher.utils.FileUtils;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.model.FileHeader;
 
@@ -72,7 +72,7 @@ public class MinecraftDownloader {
     }
 
     public void download(String url, Path savePath, long expectedSize, ProgressListener progressListener) throws IOException {
-        PathUtils.createDirectoryIfNotExists(savePath.getParent());
+        FileUtils.createDirectoryIfNotExists(savePath.getParent());
 
         if (!Files.exists(savePath)) {
             this.fileDownloader.download(url, savePath, 0, progressListener);
@@ -85,7 +85,7 @@ public class MinecraftDownloader {
     }
 
     public void downloadMinecraft(String versionId) throws IOException {
-        PathUtils.createDirectoryIfNotExists(this.versionsDir.resolve(versionId));
+        FileUtils.createDirectoryIfNotExists(this.versionsDir.resolve(versionId));
 
         //LOG.info("Downloading Minecraft " + versionId);
 
@@ -297,7 +297,7 @@ public class MinecraftDownloader {
 
         Path assetsIndexFile = this.assetsDir.resolve("indexes").resolve(vAssetIndex.id + ".json");
         if (!Files.exists(assetsIndexFile)) {
-            PathUtils.createDirectoryIfNotExists(assetsIndexFile.getParent());
+            FileUtils.createDirectoryIfNotExists(assetsIndexFile.getParent());
 
             try (HttpRequest request = new HttpRequest(TESLauncher.getInstance().getHttpClient())) {
                 Files.write(assetsIndexFile, request.asBytes(vAssetIndex.url));

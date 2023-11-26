@@ -23,7 +23,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.gui.playview.PlayViewHeader;
-import me.theentropyshard.teslauncher.utils.PathUtils;
+import me.theentropyshard.teslauncher.utils.FileUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,7 +45,7 @@ public class AccountsManager {
         this.accountsFile = workDir.resolve("accounts.json");
 
         try {
-            PathUtils.createFileIfNotExists(this.accountsFile);
+            FileUtils.createFileIfNotExists(this.accountsFile);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
