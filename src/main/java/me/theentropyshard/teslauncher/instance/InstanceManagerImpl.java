@@ -23,6 +23,7 @@ import com.google.gson.GsonBuilder;
 import me.theentropyshard.teslauncher.gson.InstantTypeAdapter;
 import me.theentropyshard.teslauncher.utils.EnumOS;
 import me.theentropyshard.teslauncher.utils.FileUtils;
+import me.theentropyshard.teslauncher.utils.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -104,7 +105,7 @@ public class InstanceManagerImpl implements InstanceManager {
         }
 
         Path instanceFile = instanceDir.resolve("instance.json");
-        FileUtils.writeString(instanceFile, this.gson.toJson(instance));
+        IOUtils.writeUtf8String(instanceFile, this.gson.toJson(instance));
     }
 
     @Override
@@ -122,7 +123,7 @@ public class InstanceManagerImpl implements InstanceManager {
         Path minecraftDir = instanceDir.resolve(this.mcDirName);
         FileUtils.createDirectoryIfNotExists(minecraftDir);
         Path instanceFile = instanceDir.resolve("instance.json");
-        FileUtils.writeString(instanceFile, this.gson.toJson(instance));
+        IOUtils.writeUtf8String(instanceFile, this.gson.toJson(instance));
     }
 
     @Override
