@@ -34,6 +34,10 @@ public class ProgressNetworkInterceptor implements Interceptor {
     @NotNull
     @Override
     public Response intercept(@NotNull Chain chain) throws IOException {
-        return null;
+        @SuppressWarnings("resource")
+        Response originalResponse = chain.proceed(chain.request());
+        return originalResponse.newBuilder()
+                .body(new ProgressResponseBody(originalResponse.body(), this.progressListener))
+                .build();
     }
 }

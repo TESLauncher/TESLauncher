@@ -23,17 +23,16 @@ import com.google.gson.GsonBuilder;
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.gson.ActionTypeAdapter;
 import me.theentropyshard.teslauncher.gson.DetailedVersionInfoDeserializer;
-import me.theentropyshard.teslauncher.http.FileDownloader;
-import me.theentropyshard.teslauncher.http.FileDownloaderIO;
 import me.theentropyshard.teslauncher.java.JavaManager;
+import me.theentropyshard.teslauncher.network.HttpClients;
 import me.theentropyshard.teslauncher.network.HttpRequest;
-import me.theentropyshard.teslauncher.network.ProgressListener;
 import me.theentropyshard.teslauncher.network.download.DownloadList;
 import me.theentropyshard.teslauncher.network.download.HttpDownload;
 import me.theentropyshard.teslauncher.utils.EnumOS;
 import me.theentropyshard.teslauncher.utils.FileUtils;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.model.FileHeader;
+import okhttp3.OkHttpClient;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -53,8 +52,6 @@ public class MinecraftDownloader {
     private final Path instanceResourcesDir;
     private final MinecraftDownloadListener minecraftDownloadListener;
 
-    private final FileDownloader fileDownloader;
-
     public MinecraftDownloader(Path versionsDir, Path assetsDir, Path librariesDir, Path nativesDir,
                                Path instanceResourcesDir, MinecraftDownloadListener minecraftDownloadListener) {
         this.versionsDir = versionsDir;
@@ -67,21 +64,6 @@ public class MinecraftDownloader {
                 .registerTypeAdapter(VersionInfo.class, new DetailedVersionInfoDeserializer(TESLauncher.getInstance()))
                 .registerTypeAdapter(Rule.Action.class, new ActionTypeAdapter())
                 .create();
-
-        this.fileDownloader = new FileDownloaderIO(TESLauncher.USER_AGENT);
-    }
-
-    public void download(String url, Path savePath, long expectedSize, ProgressListener progressListener) throws IOException {
-        FileUtils.createDirectoryIfNotExists(savePath.getParent());
-
-        if (!Files.exists(savePath)) {
-            this.fileDownloader.download(url, savePath, 0, progressListener);
-        } else {
-            long size = Files.size(savePath);
-            if (size < expectedSize) {
-                this.fileDownloader.download(url, savePath, size, progressListener);
-            }
-        }
     }
 
     public void downloadMinecraft(String versionId) throws IOException {
@@ -202,9 +184,19 @@ public class MinecraftDownloader {
         Path jarFile = this.versionsDir.resolve(version.id).resolve(version.id + ".jar");
         this.minecraftDownloadListener.onProgress(0, 0, 0);
         this.minecraftDownloadListener.onStageChanged("Downloading client");
-        this.download(client.url, jarFile, client.size, ((bytesRead, contentLength, done, fileName) -> {
+
+        OkHttpClient httpClient = HttpClients.withProgress(TESLauncher.getInstance().getHttpClient(), (contentLength, bytesRead, done) -> {
             this.minecraftDownloadListener.onProgress(0, (int) contentLength, (int) bytesRead);
-        }));
+        });
+
+        HttpDownload download = new HttpDownload.Builder()
+                .httpClient(httpClient)
+                .url(client.url)
+                .expectedSize(client.size)
+                .saveAs(jarFile)
+                .build();
+
+        download.execute();
 
         return versionInfo;
     }

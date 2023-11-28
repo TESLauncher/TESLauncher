@@ -22,7 +22,6 @@ import com.beust.jcommander.JCommander;
 import me.theentropyshard.teslauncher.accounts.AccountsManager;
 import me.theentropyshard.teslauncher.gui.AppWindow;
 import me.theentropyshard.teslauncher.gui.Gui;
-import me.theentropyshard.teslauncher.http.FileDownloaderIO;
 import me.theentropyshard.teslauncher.instance.InstanceManager;
 import me.theentropyshard.teslauncher.instance.InstanceManagerImpl;
 import me.theentropyshard.teslauncher.java.JavaManager;
@@ -110,7 +109,7 @@ public class TESLauncher {
             this.logger.error("Unable to load instances", e);
         }
 
-        this.javaManager = new JavaManager(this.runtimesDir, new FileDownloaderIO(TESLauncher.USER_AGENT));
+        this.javaManager = new JavaManager(this.runtimesDir);
 
         this.taskPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 

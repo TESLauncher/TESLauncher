@@ -21,7 +21,6 @@ package me.theentropyshard.teslauncher.java;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import me.theentropyshard.teslauncher.TESLauncher;
-import me.theentropyshard.teslauncher.http.FileDownloader;
 import me.theentropyshard.teslauncher.minecraft.MinecraftDownloadListener;
 import me.theentropyshard.teslauncher.network.HttpRequest;
 import me.theentropyshard.teslauncher.network.download.DownloadList;
@@ -29,7 +28,8 @@ import me.theentropyshard.teslauncher.network.download.HttpDownload;
 import me.theentropyshard.teslauncher.utils.EnumOS;
 import me.theentropyshard.teslauncher.utils.FileUtils;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
@@ -39,13 +39,11 @@ public class JavaManager {
     private static final String ALL_RUNTIMES = "https://launchermeta.mojang.com/v1/products/java-runtime/2ec0cc96c44e5a76b9c8b7c39df7210883d12871/all.json";
 
     private final Path workDir;
-    private final FileDownloader fileDownloader;
     private final Gson gson;
     private final String executableName;
 
-    public JavaManager(Path workDir, FileDownloader fileDownloader) {
+    public JavaManager(Path workDir) {
         this.workDir = workDir;
-        this.fileDownloader = fileDownloader;
         this.gson = new Gson();
         if (EnumOS.getOS() == EnumOS.WINDOWS) {
             this.executableName = "javaw.exe";
