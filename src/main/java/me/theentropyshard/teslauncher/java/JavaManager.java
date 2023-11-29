@@ -127,7 +127,7 @@ public class JavaManager {
             case WINDOWS:
                 if (EnumOS.getArch().equals("x64")) {
                     return "windows-x64";
-                } else if (EnumOS.getArch().equals("x32")) {
+                } else if (EnumOS.getArch().equals("x86")) {
                     return "windows-x86";
                 } else {
                     return "windows-arm64";
