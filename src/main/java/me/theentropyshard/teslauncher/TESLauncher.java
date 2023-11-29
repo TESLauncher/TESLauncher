@@ -167,9 +167,9 @@ public class TESLauncher {
 
         try {
             this.taskPool.shutdown();
-            TESLauncher.this.instanceManager.getInstances().forEach(i -> {
+            this.instanceManager.getInstances().forEach(i -> {
                 try {
-                    TESLauncher.this.instanceManager.save(i);
+                    this.instanceManager.save(i);
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
                 }
