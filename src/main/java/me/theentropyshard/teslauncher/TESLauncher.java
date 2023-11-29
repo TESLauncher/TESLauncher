@@ -25,6 +25,7 @@ import me.theentropyshard.teslauncher.gui.Gui;
 import me.theentropyshard.teslauncher.instance.InstanceManager;
 import me.theentropyshard.teslauncher.instance.InstanceManagerImpl;
 import me.theentropyshard.teslauncher.java.JavaManager;
+import me.theentropyshard.teslauncher.log4j.Log4jConfigurator;
 import me.theentropyshard.teslauncher.network.UserAgentInterceptor;
 import me.theentropyshard.teslauncher.utils.FileUtils;
 import okhttp3.OkHttpClient;
@@ -131,6 +132,8 @@ public class TESLauncher {
                 Paths.get(workDirPath)).normalize().toAbsolutePath();
 
         System.setProperty("teslauncher.workDir", workDir.toString());
+
+        Log4jConfigurator.configure();
         Logger logger = LogManager.getLogger(TESLauncher.class);
 
         new TESLauncher(args, logger, workDir);
