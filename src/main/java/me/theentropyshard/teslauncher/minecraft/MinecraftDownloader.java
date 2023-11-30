@@ -18,11 +18,7 @@
 
 package me.theentropyshard.teslauncher.minecraft;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import me.theentropyshard.teslauncher.TESLauncher;
-import me.theentropyshard.teslauncher.gson.ActionTypeAdapter;
-import me.theentropyshard.teslauncher.gson.DetailedVersionInfoDeserializer;
 import me.theentropyshard.teslauncher.java.JavaManager;
 import me.theentropyshard.teslauncher.network.HttpClients;
 import me.theentropyshard.teslauncher.network.HttpRequest;
@@ -30,6 +26,8 @@ import me.theentropyshard.teslauncher.network.download.DownloadList;
 import me.theentropyshard.teslauncher.network.download.HttpDownload;
 import me.theentropyshard.teslauncher.utils.EnumOS;
 import me.theentropyshard.teslauncher.utils.FileUtils;
+import me.theentropyshard.teslauncher.utils.IOUtils;
+import me.theentropyshard.teslauncher.utils.Json;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.model.FileHeader;
 import okhttp3.OkHttpClient;
@@ -44,7 +42,6 @@ import java.util.Map;
 public class MinecraftDownloader {
     private static final String VER_MAN_V2 = "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json";
     private static final String RESOURCES = "https://resources.download.minecraft.net/";
-    private final Gson gson;
     private final Path versionsDir;
     private final Path assetsDir;
     private final Path librariesDir;
@@ -60,10 +57,6 @@ public class MinecraftDownloader {
         this.nativesDir = nativesDir;
         this.instanceResourcesDir = instanceResourcesDir;
         this.minecraftDownloadListener = minecraftDownloadListener;
-        this.gson = new GsonBuilder()
-                .registerTypeAdapter(VersionInfo.class, new DetailedVersionInfoDeserializer(TESLauncher.getInstance()))
-                .registerTypeAdapter(Rule.Action.class, new ActionTypeAdapter())
-                .create();
     }
 
     public void downloadMinecraft(String versionId) throws IOException {
@@ -72,8 +65,8 @@ public class MinecraftDownloader {
         //LOG.info("Downloading Minecraft " + versionId);
 
         VersionManifest manifest;
-        try (HttpRequest request = new HttpRequest(TESLauncher.getInstance().getHttpClient(), this.gson)) {
-            manifest = request.asObject(MinecraftDownloader.VER_MAN_V2, VersionManifest.class);
+        try (HttpRequest request = new HttpRequest(TESLauncher.getInstance().getHttpClient())) {
+            manifest = Json.parse(request.asString(MinecraftDownloader.VER_MAN_V2), VersionManifest.class);
         }
 
         if (manifest == null) {
@@ -174,8 +167,8 @@ public class MinecraftDownloader {
 
     private VersionInfo downloadClient(VersionManifest.Version version) throws IOException {
         VersionInfo versionInfo;
-        try (HttpRequest request = new HttpRequest(TESLauncher.getInstance().getHttpClient(), this.gson)) {
-            versionInfo = request.asObject(version.url, VersionInfo.class);
+        try (HttpRequest request = new HttpRequest(TESLauncher.getInstance().getHttpClient())) {
+            versionInfo = Json.parse(request.asString(version.url), VersionInfo.class);
         }
 
         ClientDownload client = versionInfo.downloads.client;
@@ -296,7 +289,7 @@ public class MinecraftDownloader {
             }
         }
 
-        AssetIndex assetIndex = this.gson.fromJson(Files.newBufferedReader(assetsIndexFile), AssetIndex.class);
+        AssetIndex assetIndex = Json.parse(IOUtils.readUtf8String(assetsIndexFile), AssetIndex.class);
 
         this.minecraftDownloadListener.onProgress(0, 0, 0);
         this.minecraftDownloadListener.onStageChanged("Downloading assets");

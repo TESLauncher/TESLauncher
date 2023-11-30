@@ -18,20 +18,14 @@
 
 package me.theentropyshard.teslauncher.instance;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import me.theentropyshard.teslauncher.gson.InstantTypeAdapter;
 import me.theentropyshard.teslauncher.utils.EnumOS;
 import me.theentropyshard.teslauncher.utils.FileUtils;
 import me.theentropyshard.teslauncher.utils.IOUtils;
+import me.theentropyshard.teslauncher.utils.Json;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,7 +35,6 @@ import java.util.stream.Stream;
 
 public class InstanceManagerImpl implements InstanceManager {
     private final Path workDir;
-    private final Gson gson;
     private final List<Instance> instances;
     private final Map<String, Instance> instancesByName;
 
@@ -49,11 +42,6 @@ public class InstanceManagerImpl implements InstanceManager {
 
     public InstanceManagerImpl(Path workDir) {
         this.workDir = workDir;
-        this.gson = new GsonBuilder()
-                .registerTypeAdapter(Instant.class, new InstantTypeAdapter())
-                .setPrettyPrinting()
-                .disableHtmlEscaping()
-                .create();
         this.instances = new ArrayList<>();
         this.instancesByName = new HashMap<>();
 
@@ -81,12 +69,9 @@ public class InstanceManagerImpl implements InstanceManager {
                 continue;
             }
 
-            try (InputStream inputStream = Files.newInputStream(instanceFile)) {
-                InputStreamReader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
-                Instance instance = this.gson.fromJson(reader, Instance.class);
-                this.instances.add(instance);
-                this.instancesByName.put(instance.getName(), instance);
-            }
+            Instance instance = Json.parse(IOUtils.readUtf8String(instanceFile), Instance.class);
+            this.instances.add(instance);
+            this.instancesByName.put(instance.getName(), instance);
         }
     }
 
@@ -105,7 +90,7 @@ public class InstanceManagerImpl implements InstanceManager {
         }
 
         Path instanceFile = instanceDir.resolve("instance.json");
-        IOUtils.writeUtf8String(instanceFile, this.gson.toJson(instance));
+        IOUtils.writeUtf8String(instanceFile, Json.write(instance));
     }
 
     @Override
@@ -123,7 +108,7 @@ public class InstanceManagerImpl implements InstanceManager {
         Path minecraftDir = instanceDir.resolve(this.mcDirName);
         FileUtils.createDirectoryIfNotExists(minecraftDir);
         Path instanceFile = instanceDir.resolve("instance.json");
-        IOUtils.writeUtf8String(instanceFile, this.gson.toJson(instance));
+        IOUtils.writeUtf8String(instanceFile, Json.write(instance));
     }
 
     @Override

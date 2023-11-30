@@ -18,26 +18,22 @@
 
 package me.theentropyshard.teslauncher.instance;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.accounts.Account;
 import me.theentropyshard.teslauncher.accounts.MicrosoftAccount;
-import me.theentropyshard.teslauncher.gson.ActionTypeAdapter;
-import me.theentropyshard.teslauncher.gson.DetailedVersionInfoDeserializer;
-import me.theentropyshard.teslauncher.gson.InstantTypeAdapter;
 import me.theentropyshard.teslauncher.gui.dialogs.MinecraftDownloadDialog;
 import me.theentropyshard.teslauncher.java.JavaManager;
 import me.theentropyshard.teslauncher.minecraft.*;
 import me.theentropyshard.teslauncher.minecraft.auth.microsoft.AuthException;
 import me.theentropyshard.teslauncher.utils.FileUtils;
+import me.theentropyshard.teslauncher.utils.IOUtils;
+import me.theentropyshard.teslauncher.utils.Json;
 import me.theentropyshard.teslauncher.utils.TimeUtils;
 import org.apache.commons.text.StringSubstitutor;
 
 import javax.swing.*;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -48,16 +44,10 @@ import java.util.Map;
 public class InstanceRunner extends Thread {
     private final Account account;
     private final Instance instance;
-    private final Gson gson;
 
     public InstanceRunner(Account account, Instance instance) {
         this.account = account;
         this.instance = instance;
-        this.gson = new GsonBuilder()
-                .registerTypeAdapter(Instant.class, new InstantTypeAdapter())
-                .registerTypeAdapter(VersionInfo.class, new DetailedVersionInfoDeserializer(TESLauncher.getInstance()))
-                .registerTypeAdapter(Rule.Action.class, new ActionTypeAdapter())
-                .create();
     }
 
     @Override
@@ -94,10 +84,7 @@ public class InstanceRunner extends Thread {
 
             Path clientJson = versionsDir.resolve(this.instance.getMinecraftVersion())
                     .resolve(this.instance.getMinecraftVersion() + ".json");
-            VersionInfo versionInfo = this.gson.fromJson(new InputStreamReader(
-                    Files.newInputStream(clientJson),
-                    StandardCharsets.UTF_8
-            ), VersionInfo.class);
+            VersionInfo versionInfo = Json.parse(IOUtils.readUtf8String(clientJson), VersionInfo.class);
 
             List<String> arguments = this.getArguments(versionInfo, nativesDir, librariesDir, versionsDir);
             List<String> command = this.buildRunCommand(versionInfo, arguments);
@@ -166,9 +153,10 @@ public class InstanceRunner extends Thread {
         argVars.put("classpath", String.join(File.pathSeparator, classpath));
 
         VersionAssetIndex vAssetIndex = versionInfo.assetIndex;
-        AssetIndex assetIndex = this.gson.fromJson(Files.newBufferedReader(
-                assetsDir.resolve("indexes").resolve(vAssetIndex.id + ".json")
-        ), AssetIndex.class);
+        AssetIndex assetIndex = Json.parse(
+                IOUtils.readUtf8String(assetsDir.resolve("indexes").resolve(vAssetIndex.id + ".json")),
+                AssetIndex.class
+        );
 
         // Game
         if (versionInfo.newFormat) {

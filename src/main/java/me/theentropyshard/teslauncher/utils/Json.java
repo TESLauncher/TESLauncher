@@ -19,16 +19,57 @@
 package me.theentropyshard.teslauncher.utils;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.reflect.TypeToken;
+import me.theentropyshard.teslauncher.TESLauncher;
+import me.theentropyshard.teslauncher.accounts.Account;
+import me.theentropyshard.teslauncher.accounts.AccountDeserializer;
+import me.theentropyshard.teslauncher.gson.ActionTypeAdapter;
+import me.theentropyshard.teslauncher.gson.DetailedVersionInfoDeserializer;
+import me.theentropyshard.teslauncher.gson.InstantTypeAdapter;
+import me.theentropyshard.teslauncher.minecraft.Rule;
+import me.theentropyshard.teslauncher.minecraft.VersionInfo;
+
+import java.lang.reflect.Type;
+import java.time.Instant;
+import java.util.Map;
 
 public final class Json {
-    private static final Gson GSON = new Gson();
+    private static final Gson GSON = new GsonBuilder()
+            .disableHtmlEscaping()
+            //
+            .registerTypeAdapter(VersionInfo.class, new DetailedVersionInfoDeserializer(TESLauncher.getInstance()))
+            .registerTypeAdapter(Rule.Action.class, new ActionTypeAdapter())
+            .registerTypeAdapter(Instant.class, new InstantTypeAdapter())
+            .registerTypeAdapter(Account.class, new AccountDeserializer())
+            //
+            .create();
 
-    public static <T> T parse(String json, Class<T> clazz) {
+    private static final Gson PRETTY_GSON = Json.GSON.newBuilder().setPrettyPrinting().create();
+
+    public static <T> T parse(String json, Type clazz) {
         return Json.GSON.fromJson(json, clazz);
+    }
+
+    public static <T> T parse(JsonElement element, Type clazz) {
+        return Json.GSON.fromJson(element, clazz);
+    }
+
+    public static <K, V> Map<K, V> parseMap(String json) {
+        return Json.parse(json, new TypeToken<Map<K, V>>() {}.getType());
+    }
+
+    public static <K, V> Map<K, V> parseMap(JsonElement element) {
+        return Json.parse(element, new TypeToken<Map<K, V>>() {}.getType());
     }
 
     public static String write(Object o) {
         return Json.GSON.toJson(o);
+    }
+
+    public static String writePretty(Object o) {
+        return Json.PRETTY_GSON.toJson(o);
     }
 
     private Json() {

@@ -18,9 +18,13 @@
 
 package me.theentropyshard.teslauncher.gson;
 
-import com.google.gson.*;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.minecraft.*;
+import me.theentropyshard.teslauncher.utils.Json;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,11 +32,9 @@ import java.util.List;
 
 public class DetailedVersionInfoDeserializer extends AbstractJsonDeserializer<VersionInfo> {
     private final TESLauncher launcher;
-    private final Gson gson;
 
     public DetailedVersionInfoDeserializer(TESLauncher launcher) {
         this.launcher = launcher;
-        this.gson = new Gson();
     }
 
     private List<Argument> processArgs(JsonArray array) {
@@ -43,7 +45,7 @@ public class DetailedVersionInfoDeserializer extends AbstractJsonDeserializer<Ve
                 String stringArg = elem.getAsString();
                 arguments.add(Argument.withValues(stringArg));
             } else if (elem.isJsonObject()) {
-                Argument argument = this.gson.fromJson(elem.getAsJsonObject(), Argument.class);
+                Argument argument = Json.parse(elem.getAsJsonObject(), Argument.class);
                 arguments.add(argument);
             }
         }
@@ -55,12 +57,8 @@ public class DetailedVersionInfoDeserializer extends AbstractJsonDeserializer<Ve
     public VersionInfo deserialize(JsonObject root) throws JsonParseException {
         VersionInfo versionInfo = new VersionInfo();
 
-        Gson gson = new GsonBuilder()
-                .registerTypeAdapter(Rule.Action.class, new ActionTypeAdapter())
-                .create();
-
         if (root.has("javaVersion")) {
-            versionInfo.javaVersion = gson.fromJson(root.get("javaVersion"), JavaVersion.class);
+            versionInfo.javaVersion = Json.parse(root.get("javaVersion"), JavaVersion.class);
         } else {
             this.launcher.getLogger().warn("Unable to find javaVersion key");
         }
@@ -107,13 +105,11 @@ public class DetailedVersionInfoDeserializer extends AbstractJsonDeserializer<Ve
         versionInfo.type = root.get("type").getAsString();
         versionInfo.assets = root.get("assets").getAsString();
 
-        versionInfo.downloads = gson.fromJson(root.get("downloads"), ClientDownloads.class);
+        versionInfo.downloads = Json.parse(root.get("downloads"), ClientDownloads.class);
 
         JsonArray libsArray = root.getAsJsonArray("libraries");
 
-        Library[] libraries = new GsonBuilder()
-                .registerTypeAdapter(Rule.Action.class, new ActionTypeAdapter())
-                .create().fromJson(libsArray, Library[].class);
+        Library[] libraries = Json.parse(libsArray, Library[].class);
         versionInfo.libraries.addAll(Arrays.asList(libraries));
 
         if (root.has("logging")) {
@@ -127,7 +123,7 @@ public class DetailedVersionInfoDeserializer extends AbstractJsonDeserializer<Ve
 
         if (root.has("assetIndex")) {
             JsonObject assetIndex = root.getAsJsonObject("assetIndex");
-            versionInfo.assetIndex = new Gson().fromJson(assetIndex, VersionAssetIndex.class);
+            versionInfo.assetIndex = Json.parse(assetIndex, VersionAssetIndex.class);
         }
 
         return versionInfo;

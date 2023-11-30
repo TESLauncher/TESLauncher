@@ -24,6 +24,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.network.HttpRequest;
+import me.theentropyshard.teslauncher.utils.Json;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -60,8 +61,8 @@ public class McVersionsTableModel extends DefaultTableModel {
                 List<List<String>> data = new ArrayList<>();
 
                 JsonObject json;
-                try (HttpRequest request = new HttpRequest(TESLauncher.getInstance().getHttpClient(), new Gson())) {
-                    json = request.asObject(McVersionsTableModel.VM_V2, JsonObject.class);
+                try (HttpRequest request = new HttpRequest(TESLauncher.getInstance().getHttpClient())) {
+                    json = Json.parse(request.asString(McVersionsTableModel.VM_V2), JsonObject.class);
                 }
 
                 JsonArray jsonArray = json.getAsJsonArray("versions");

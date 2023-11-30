@@ -21,22 +21,21 @@ package me.theentropyshard.teslauncher.minecraft.auth.microsoft;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import me.theentropyshard.teslauncher.utils.Json;
 import okhttp3.*;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Objects;
 
 public class MicrosoftAuthenticator {
-    private final Gson gson;
     private final OkHttpClient httpClient;
     private final AuthListener listener;
 
     public MicrosoftAuthenticator(OkHttpClient httpClient, AuthListener listener) {
         this.listener = listener;
-        this.gson = new GsonBuilder()
-                .create();
         this.httpClient = httpClient;
     }
 
@@ -94,7 +93,7 @@ public class MicrosoftAuthenticator {
                 .build();
 
         try (Response response = this.httpClient.newCall(request).execute()) {
-            return this.gson.fromJson(MicrosoftAuthenticator.getReader(response.body().byteStream()), DeviceCodeResponse.class);
+            return Json.parse(Objects.requireNonNull(response.body()).string(), DeviceCodeResponse.class);
         }
     }
 
@@ -122,7 +121,7 @@ public class MicrosoftAuthenticator {
         loop:
         while (true) {
             try (Response response = this.httpClient.newCall(request).execute()) {
-                JsonObject jsonObject = this.gson.fromJson(MicrosoftAuthenticator.getReader(response.body().byteStream()), JsonObject.class);
+                JsonObject jsonObject = Json.parse(Objects.requireNonNull(response.body()).string(), JsonObject.class);
                 if (jsonObject.has("error")) {
                     String error = jsonObject.get("error").getAsString();
                     switch (error) {
@@ -143,7 +142,7 @@ public class MicrosoftAuthenticator {
                             return null;
                     }
                 } else {
-                    return this.gson.fromJson(jsonObject, OAuthCodeResponse.class);
+                    return Json.parse(jsonObject, OAuthCodeResponse.class);
                 }
             }
         }
@@ -163,7 +162,7 @@ public class MicrosoftAuthenticator {
         authRequest.relyingParty = "http://auth.xboxlive.com";
         authRequest.tokenType = "JWT";
 
-        RequestBody requestBody = RequestBody.create(this.gson.toJson(authRequest), MediaType.parse("application/json"));
+        RequestBody requestBody = RequestBody.create(Json.write(authRequest), MediaType.parse("application/json"));
 
         Request request = new Request.Builder()
                 .url(xboxAuthUrl)
@@ -171,7 +170,7 @@ public class MicrosoftAuthenticator {
                 .build();
 
         try (Response response = this.httpClient.newCall(request).execute()) {
-            return this.gson.fromJson(MicrosoftAuthenticator.getReader(response.body().byteStream()), XboxLiveAuthResponse.class);
+            return Json.parse(Objects.requireNonNull(response.body()).string(), XboxLiveAuthResponse.class);
         }
     }
 
@@ -186,7 +185,7 @@ public class MicrosoftAuthenticator {
         tokenRequest.tokenType = "JWT";
         tokenRequest.relyingParty = "rp://api.minecraftservices.com/";
 
-        RequestBody requestBody = RequestBody.create(this.gson.toJson(tokenRequest), MediaType.parse("application/json"));
+        RequestBody requestBody = RequestBody.create(Json.write(tokenRequest), MediaType.parse("application/json"));
 
         Request request = new Request.Builder()
                 .url(xstsUrl)
@@ -194,16 +193,16 @@ public class MicrosoftAuthenticator {
                 .build();
 
         try (Response response = this.httpClient.newCall(request).execute()) {
-            Reader reader = MicrosoftAuthenticator.getReader(response.body().byteStream());
+            String json = Objects.requireNonNull(response.body()).string();
 
             if (response.code() == 401) {
-                JsonObject jsonObject = this.gson.fromJson(reader, JsonObject.class);
+                JsonObject jsonObject = Json.parse(json, JsonObject.class);
                 String xErr = jsonObject.get("XErr").getAsString();
                 String errorMsg = MicrosoftAuthenticator.getXSTSErrorMessage(xErr);
                 System.out.println("Error obtaining XSTS token: " + errorMsg + " (" + xErr + ")");
                 return null;
             } else {
-                return this.gson.fromJson(reader, XSTSAuthResponse.class);
+                return Json.parse(json, XSTSAuthResponse.class);
             }
         }
     }
@@ -214,7 +213,7 @@ public class MicrosoftAuthenticator {
         //String json = String.format("{\"identityToken\": \"XBL3.0 x=%s;%s\"}", authResponse.displayClaims.xui.get(0).uhs, authResponse.token);
 
         MinecraftAuthRequest authRequest = new MinecraftAuthRequest(String.format("XBL3.0 x=%s;%s", authResponse.displayClaims.xui.get(0).uhs, authResponse.token));
-        String json = this.gson.toJson(authRequest);
+        String json = Json.write(authRequest);
 
         RequestBody requestBody = RequestBody.create(json, MediaType.parse("application/json"));
 
@@ -224,7 +223,7 @@ public class MicrosoftAuthenticator {
                 .build();
 
         try (Response response = this.httpClient.newCall(request).execute()) {
-            return this.gson.fromJson(MicrosoftAuthenticator.getReader(response.body().byteStream()), MinecraftAuthResponse.class);
+            return Json.parse(Objects.requireNonNull(response.body()).string(), MinecraftAuthResponse.class);
         }
     }
 
@@ -238,7 +237,8 @@ public class MicrosoftAuthenticator {
                 .build();
 
         try (Response response = this.httpClient.newCall(request).execute()) {
-            GameOwnershipResponse gameOwnershipResponse = this.gson.fromJson(MicrosoftAuthenticator.getReader(response.body().byteStream()), GameOwnershipResponse.class);
+            GameOwnershipResponse gameOwnershipResponse = Json.parse(
+                    Objects.requireNonNull(response.body()).string(), GameOwnershipResponse.class);
             return gameOwnershipResponse.items != null && !gameOwnershipResponse.items.isEmpty();
         }
     }
@@ -253,14 +253,11 @@ public class MicrosoftAuthenticator {
                 .build();
 
         try (Response response = this.httpClient.newCall(request).execute()) {
-            MinecraftProfile profile = this.gson.fromJson(MicrosoftAuthenticator.getReader(response.body().byteStream()), MinecraftProfile.class);
+            MinecraftProfile profile = Json.parse(
+                    Objects.requireNonNull(response.body()).string(), MinecraftProfile.class);
             profile.accessToken = mcResponse.accessToken;
             return profile;
         }
-    }
-
-    private static Reader getReader(InputStream inputStream) {
-        return new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
     }
 
     private static String getXSTSErrorMessage(String errorCode) {

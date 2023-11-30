@@ -18,8 +18,8 @@
 
 package me.theentropyshard.teslauncher;
 
-import com.google.gson.Gson;
 import me.theentropyshard.teslauncher.utils.IOUtils;
+import me.theentropyshard.teslauncher.utils.Json;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -38,11 +38,11 @@ public class Settings {
         }
 
         String content = IOUtils.readUtf8String(file);
-        return new Gson().fromJson(content, Settings.class);
+        return Json.parse(content, Settings.class);
     }
 
     public void save(Path file) throws IOException {
-        String content = new Gson().toJson(this);
+        String content = Json.write(this);
         IOUtils.writeUtf8String(file, content);
     }
 

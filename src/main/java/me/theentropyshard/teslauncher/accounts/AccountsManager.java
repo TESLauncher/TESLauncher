@@ -18,12 +18,12 @@
 
 package me.theentropyshard.teslauncher.accounts;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.gui.playview.PlayViewHeader;
 import me.theentropyshard.teslauncher.utils.FileUtils;
+import me.theentropyshard.teslauncher.utils.IOUtils;
+import me.theentropyshard.teslauncher.utils.Json;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,7 +39,6 @@ import java.util.Map;
 public class AccountsManager {
     private final Path accountsFile;
     private final Map<String, Account> accounts;
-    private final Gson gson;
 
     public AccountsManager(Path workDir) {
         this.accountsFile = workDir.resolve("accounts.json");
@@ -51,10 +50,6 @@ public class AccountsManager {
         }
 
         this.accounts = new HashMap<>();
-        this.gson = new GsonBuilder()
-                .registerTypeAdapter(Account.class, new AccountDeserializer())
-                .disableHtmlEscaping()
-                .create();
     }
 
     public static Account getCurrentAccount() {
@@ -63,10 +58,7 @@ public class AccountsManager {
     }
 
     public void loadAccounts() throws IOException {
-        InputStream inputStream = Files.newInputStream(this.accountsFile);
-        InputStreamReader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
-
-        Map<String, Account> accounts = this.gson.fromJson(reader, new TypeToken<Map<String, Account>>() {}.getType());
+        Map<String, Account> accounts = Json.parse(IOUtils.readUtf8String(this.accountsFile), new TypeToken<Map<String, Account>>() {}.getType());
         if (accounts != null) {
             this.accounts.putAll(accounts);
         }
@@ -105,7 +97,7 @@ public class AccountsManager {
     }
 
     public void save() throws IOException {
-        String json = this.gson.toJson(this.accounts);
+        String json = Json.write(this.accounts);
         Files.write(this.accountsFile, json.getBytes(StandardCharsets.UTF_8));
     }
 

@@ -18,9 +18,9 @@
 
 package me.theentropyshard.teslauncher.accounts;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import me.theentropyshard.teslauncher.gson.AbstractJsonDeserializer;
+import me.theentropyshard.teslauncher.utils.Json;
 
 public class AccountDeserializer extends AbstractJsonDeserializer<Account> {
     @Override
@@ -29,6 +29,6 @@ public class AccountDeserializer extends AbstractJsonDeserializer<Account> {
             return new OfflineAccount(root.get("username").getAsString());
         }
 
-        return new Gson().fromJson(root, MicrosoftAccount.class);
+        return Json.parse(root, MicrosoftAccount.class);
     }
 }

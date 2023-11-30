@@ -18,7 +18,6 @@
 
 package me.theentropyshard.teslauncher.java;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.minecraft.MinecraftDownloadListener;
@@ -27,6 +26,7 @@ import me.theentropyshard.teslauncher.network.download.DownloadList;
 import me.theentropyshard.teslauncher.network.download.HttpDownload;
 import me.theentropyshard.teslauncher.utils.EnumOS;
 import me.theentropyshard.teslauncher.utils.FileUtils;
+import me.theentropyshard.teslauncher.utils.Json;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,12 +39,10 @@ public class JavaManager {
     private static final String ALL_RUNTIMES = "https://launchermeta.mojang.com/v1/products/java-runtime/2ec0cc96c44e5a76b9c8b7c39df7210883d12871/all.json";
 
     private final Path workDir;
-    private final Gson gson;
     private final String executableName;
 
     public JavaManager(Path workDir) {
         this.workDir = workDir;
-        this.gson = new Gson();
         if (EnumOS.getOS() == EnumOS.WINDOWS) {
             this.executableName = "javaw.exe";
         } else {
@@ -59,19 +57,19 @@ public class JavaManager {
         String jreOsName = JavaManager.getJreOsName();
 
         JsonObject osObject;
-        try (HttpRequest request = new HttpRequest(TESLauncher.getInstance().getHttpClient(), this.gson)) {
-            osObject = request.asObject(JavaManager.ALL_RUNTIMES, JsonObject.class);
+        try (HttpRequest request = new HttpRequest(TESLauncher.getInstance().getHttpClient())) {
+            osObject = Json.parse(request.asString(JavaManager.ALL_RUNTIMES), JsonObject.class);
         }
 
         if (osObject.has(jreOsName)) {
-            JsonObject runtimesObject = this.gson.fromJson(osObject.get(jreOsName), JsonObject.class);
+            JsonObject runtimesObject = Json.parse(osObject.get(jreOsName), JsonObject.class);
             if (runtimesObject.has(componentName)) {
-                List<JavaRuntime> javaRuntimes = Arrays.asList(this.gson.fromJson(runtimesObject.get(componentName), JavaRuntime[].class));
+                List<JavaRuntime> javaRuntimes = Arrays.asList(Json.parse(runtimesObject.get(componentName), JavaRuntime[].class));
                 JavaRuntime javaRuntime = javaRuntimes.get(0);
 
                 JavaRuntimeManifest manifest;
-                try (HttpRequest request = new HttpRequest(TESLauncher.getInstance().getHttpClient(), this.gson)) {
-                    manifest = request.asObject(javaRuntime.manifest.url, JavaRuntimeManifest.class);
+                try (HttpRequest request = new HttpRequest(TESLauncher.getInstance().getHttpClient())) {
+                    manifest = Json.parse(request.asString(javaRuntime.manifest.url), JavaRuntimeManifest.class);
                 }
 
                 DownloadList downloadList = new DownloadList((total, completed) -> {
