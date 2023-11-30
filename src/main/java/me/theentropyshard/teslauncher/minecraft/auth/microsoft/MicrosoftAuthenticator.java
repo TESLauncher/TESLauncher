@@ -18,14 +18,12 @@
 
 package me.theentropyshard.teslauncher.minecraft.auth.microsoft;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import me.theentropyshard.teslauncher.network.HttpRequest;
 import me.theentropyshard.teslauncher.utils.Json;
 import okhttp3.*;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Objects;
@@ -43,27 +41,15 @@ public class MicrosoftAuthenticator {
 
     public MinecraftProfile authenticate() throws IOException {
         DeviceCodeResponse deviceCodeResponse = this.getDeviceCode("consumers", "394fd08d-cb75-4f21-9807-ae14babcb4c0", "XboxLive.signin offline_access");
-        //System.out.println(deviceCodeResponse);
         this.listener.onUserCodeReceived(deviceCodeResponse.userCode, deviceCodeResponse.verificationUri);
         System.out.println("Code: " + deviceCodeResponse.userCode);
         System.out.println("Url: " + deviceCodeResponse.verificationUri);
 
-        //System.out.println();
         OAuthCodeResponse microsoftOAuthCode = this.getMicrosoftOAuthCode(deviceCodeResponse);
-        //System.out.println(microsoftOAuthCode);
 
-        //System.out.println();
         XboxLiveAuthResponse xboxLiveAuthResponse = this.authenticateWithXboxLive(microsoftOAuthCode);
-        //System.out.println(xboxLiveAuthResponse);
-        //System.out.println();
-
         XSTSAuthResponse xstsAuthResponse = this.obtainXSTSToken(xboxLiveAuthResponse);
-        //System.out.println(xstsAuthResponse);
-        //System.out.println();
-
         MinecraftAuthResponse minecraftAuthResponse = this.authenticateWithMinecraft(xstsAuthResponse);
-        //System.out.println("Response:");
-        //System.out.println(minecraftAuthResponse);
 
         if (!this.checkGameOwnership(minecraftAuthResponse)) {
             System.err.println("Account does not own Minecraft");
@@ -74,7 +60,7 @@ public class MicrosoftAuthenticator {
     }
 
     private DeviceCodeResponse getDeviceCode(String tenant, String clientId, String scope) throws IOException {
-        String deviceCodeUrl = String.format("https://login.microsoftonline.com/%s/oauth2/v2.0/devicecode", tenant);
+        String url = String.format("https://login.microsoftonline.com/%s/oauth2/v2.0/devicecode", tenant);
 
         RequestBody requestBody = new FormBody(
                 Arrays.asList(
@@ -87,18 +73,15 @@ public class MicrosoftAuthenticator {
                 )
         );
 
-        Request request = new Request.Builder()
-                .url(deviceCodeUrl)
-                .post(requestBody)
-                .build();
+        try (HttpRequest request = new HttpRequest(this.httpClient)) {
+            String json = request.asString(url, requestBody);
 
-        try (Response response = this.httpClient.newCall(request).execute()) {
-            return Json.parse(Objects.requireNonNull(response.body()).string(), DeviceCodeResponse.class);
+            return Json.parse(json, DeviceCodeResponse.class);
         }
     }
 
     private OAuthCodeResponse getMicrosoftOAuthCode(DeviceCodeResponse deviceCodeResponse) throws IOException {
-        String tokenUrl = "https://login.microsoftonline.com/consumers/oauth2/v2.0/token";
+        String url = "https://login.microsoftonline.com/consumers/oauth2/v2.0/token";
 
         RequestBody requestBody = new FormBody(
                 Arrays.asList(
@@ -113,15 +96,10 @@ public class MicrosoftAuthenticator {
                 )
         );
 
-        Request request = new Request.Builder()
-                .url(tokenUrl)
-                .post(requestBody)
-                .build();
-
-        loop:
         while (true) {
-            try (Response response = this.httpClient.newCall(request).execute()) {
-                JsonObject jsonObject = Json.parse(Objects.requireNonNull(response.body()).string(), JsonObject.class);
+            try (HttpRequest request = new HttpRequest(this.httpClient)) {
+                JsonObject jsonObject = Json.parse(request.asString(url, requestBody), JsonObject.class);
+
                 if (jsonObject.has("error")) {
                     String error = jsonObject.get("error").getAsString();
                     switch (error) {
@@ -133,7 +111,7 @@ public class MicrosoftAuthenticator {
                             }
                             break;
                         case "authorization_declined":
-                            break loop;
+                            return null;
                         case "bad_verification_code":
                             System.out.println("Wrong verification code: " + deviceCodeResponse.deviceCode);
                             return null;
@@ -146,12 +124,10 @@ public class MicrosoftAuthenticator {
                 }
             }
         }
-
-        return null;
     }
 
     private XboxLiveAuthResponse authenticateWithXboxLive(OAuthCodeResponse oAuthCodeResponse) throws IOException {
-        String xboxAuthUrl = "https://user.auth.xboxlive.com/user/authenticate";
+        String url = "https://user.auth.xboxlive.com/user/authenticate";
 
         XboxLiveAuthRequest authRequest = new XboxLiveAuthRequest();
         XboxAuthProperties properties = new XboxAuthProperties();
@@ -164,18 +140,15 @@ public class MicrosoftAuthenticator {
 
         RequestBody requestBody = RequestBody.create(Json.write(authRequest), MediaType.parse("application/json"));
 
-        Request request = new Request.Builder()
-                .url(xboxAuthUrl)
-                .post(requestBody)
-                .build();
+        try (HttpRequest request = new HttpRequest(this.httpClient)) {
+            String json = request.asString(url, requestBody);
 
-        try (Response response = this.httpClient.newCall(request).execute()) {
-            return Json.parse(Objects.requireNonNull(response.body()).string(), XboxLiveAuthResponse.class);
+            return Json.parse(json, XboxLiveAuthResponse.class);
         }
     }
 
     private XSTSAuthResponse obtainXSTSToken(XboxLiveAuthResponse authResponse) throws IOException {
-        String xstsUrl = "https://xsts.auth.xboxlive.com/xsts/authorize";
+        String url = "https://xsts.auth.xboxlive.com/xsts/authorize";
 
         XSTSTokenRequest tokenRequest = new XSTSTokenRequest();
         XSTSProperties properties = new XSTSProperties();
@@ -187,19 +160,15 @@ public class MicrosoftAuthenticator {
 
         RequestBody requestBody = RequestBody.create(Json.write(tokenRequest), MediaType.parse("application/json"));
 
-        Request request = new Request.Builder()
-                .url(xstsUrl)
-                .post(requestBody)
-                .build();
+        try (HttpRequest request = new HttpRequest(this.httpClient)) {
+            String json = request.asString(url, requestBody);
 
-        try (Response response = this.httpClient.newCall(request).execute()) {
-            String json = Objects.requireNonNull(response.body()).string();
-
-            if (response.code() == 401) {
+            if (request.code() == 401) {
                 JsonObject jsonObject = Json.parse(json, JsonObject.class);
                 String xErr = jsonObject.get("XErr").getAsString();
                 String errorMsg = MicrosoftAuthenticator.getXSTSErrorMessage(xErr);
                 System.out.println("Error obtaining XSTS token: " + errorMsg + " (" + xErr + ")");
+
                 return null;
             } else {
                 return Json.parse(json, XSTSAuthResponse.class);
@@ -208,54 +177,37 @@ public class MicrosoftAuthenticator {
     }
 
     private MinecraftAuthResponse authenticateWithMinecraft(XSTSAuthResponse authResponse) throws IOException {
-        String mcAuthUrl = "https://api.minecraftservices.com/authentication/login_with_xbox";
+        String url = "https://api.minecraftservices.com/authentication/login_with_xbox";
 
-        //String json = String.format("{\"identityToken\": \"XBL3.0 x=%s;%s\"}", authResponse.displayClaims.xui.get(0).uhs, authResponse.token);
+        String payload = String.format("{\"identityToken\": \"XBL3.0 x=%s;%s\"}", authResponse.displayClaims.xui.get(0).uhs, authResponse.token);
+        RequestBody requestBody = RequestBody.create(payload, MediaType.parse("application/json"));
 
-        MinecraftAuthRequest authRequest = new MinecraftAuthRequest(String.format("XBL3.0 x=%s;%s", authResponse.displayClaims.xui.get(0).uhs, authResponse.token));
-        String json = Json.write(authRequest);
+        try (HttpRequest request = new HttpRequest(this.httpClient)) {
+            String json = request.asString(url, requestBody);
 
-        RequestBody requestBody = RequestBody.create(json, MediaType.parse("application/json"));
-
-        Request request = new Request.Builder()
-                .url(mcAuthUrl)
-                .post(requestBody)
-                .build();
-
-        try (Response response = this.httpClient.newCall(request).execute()) {
-            return Json.parse(Objects.requireNonNull(response.body()).string(), MinecraftAuthResponse.class);
+            return Json.parse(json, MinecraftAuthResponse.class);
         }
     }
 
     private boolean checkGameOwnership(MinecraftAuthResponse mcResponse) throws IOException {
         String url = "https://api.minecraftservices.com/entitlements/mcstore";
 
-        Request request = new Request.Builder()
-                .url(url)
-                .header("Authorization", "Bearer " + mcResponse.accessToken)
-                .get()
-                .build();
+        try (HttpRequest request = new HttpRequest(this.httpClient)) {
+            String json = request.asString(url, Headers.of("Authorization", "Bearer " + mcResponse.accessToken));
+            GameOwnershipResponse response = Json.parse(json, GameOwnershipResponse.class);
 
-        try (Response response = this.httpClient.newCall(request).execute()) {
-            GameOwnershipResponse gameOwnershipResponse = Json.parse(
-                    Objects.requireNonNull(response.body()).string(), GameOwnershipResponse.class);
-            return gameOwnershipResponse.items != null && !gameOwnershipResponse.items.isEmpty();
+            return response.items != null && !response.items.isEmpty();
         }
     }
 
     private MinecraftProfile getProfile(MinecraftAuthResponse mcResponse) throws IOException {
         String url = "https://api.minecraftservices.com/minecraft/profile";
 
-        Request request = new Request.Builder()
-                .url(url)
-                .header("Authorization", "Bearer " + mcResponse.accessToken)
-                .get()
-                .build();
-
-        try (Response response = this.httpClient.newCall(request).execute()) {
-            MinecraftProfile profile = Json.parse(
-                    Objects.requireNonNull(response.body()).string(), MinecraftProfile.class);
+        try (HttpRequest request = new HttpRequest(this.httpClient)) {
+            String json = request.asString(url, Headers.of("Authorization", "Bearer " + mcResponse.accessToken));
+            MinecraftProfile profile = Json.parse(json, MinecraftProfile.class);
             profile.accessToken = mcResponse.accessToken;
+
             return profile;
         }
     }

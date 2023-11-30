@@ -160,7 +160,7 @@ public class MinecraftDownloader {
         Path jsonFile = this.versionsDir.resolve(version.id).resolve(version.id + ".json");
         if (!Files.exists(jsonFile)) {
             try (HttpRequest request = new HttpRequest(TESLauncher.getInstance().getHttpClient())) {
-                Files.write(jsonFile, request.asBytes(version.url));
+                IOUtils.writeUtf8String(jsonFile, request.asString(version.url));
             }
         }
     }
@@ -285,7 +285,7 @@ public class MinecraftDownloader {
             FileUtils.createDirectoryIfNotExists(assetsIndexFile.getParent());
 
             try (HttpRequest request = new HttpRequest(TESLauncher.getInstance().getHttpClient())) {
-                Files.write(assetsIndexFile, request.asBytes(vAssetIndex.url));
+                IOUtils.writeUtf8String(assetsIndexFile, request.asString(vAssetIndex.url));
             }
         }
 

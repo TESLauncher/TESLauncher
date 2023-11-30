@@ -18,62 +18,64 @@
 
 package me.theentropyshard.teslauncher.network;
 
-import com.google.gson.Gson;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+import okhttp3.*;
 
 import java.io.IOException;
 import java.util.Objects;
 
 public class HttpRequest implements AutoCloseable {
     private final OkHttpClient httpClient;
-    private final Gson gson;
 
     private Response response;
 
     public HttpRequest(OkHttpClient httpClient) {
-        this(httpClient, null);
-    }
-
-    public HttpRequest(OkHttpClient httpClient, Gson gson) {
         this.httpClient = httpClient;
-        this.gson = gson;
     }
 
-    private void send(String url) throws IOException {
+    private void send(String url, RequestBody requestBody, Headers headers) throws IOException {
         if (this.response != null) {
             return;
         }
 
-        Request request = new Request.Builder()
-                .url(url)
-                .get()
-                .build();
+        Request.Builder builder = new Request.Builder().url(url).headers(headers);
 
-        this.response = this.httpClient.newCall(request).execute();
-    }
+        if (requestBody != null) {
+            builder.post(requestBody);
+        }
 
-    public byte[] asBytes(String url) throws IOException {
-        this.send(url);
-
-        return Objects.requireNonNull(this.response.body()).bytes();
+        this.response = this.httpClient.newCall(builder.build()).execute();
     }
 
     public String asString(String url) throws IOException {
-        this.send(url);
+        this.send(url, null, Headers.of());
 
         return Objects.requireNonNull(this.response.body()).string();
     }
 
-    public <T> T asObject(String url, Class<T> clazz) throws IOException {
-        if (this.gson == null) {
-            throw new IllegalStateException("HttpRequest was created without Gson");
+    public String asString(String url, Headers headers) throws IOException {
+        this.send(url, null, headers);
+
+        return Objects.requireNonNull(this.response.body()).string();
+    }
+
+    public String asString(String url, RequestBody requestBody) throws IOException {
+        this.send(url, requestBody, Headers.of());
+
+        return Objects.requireNonNull(this.response.body()).string();
+    }
+
+    public String asString(String url, RequestBody requestBody, Headers headers) throws IOException {
+        this.send(url, requestBody, headers);
+
+        return Objects.requireNonNull(this.response.body()).string();
+    }
+
+    public int code() {
+        if (this.response == null) {
+            return -1;
         }
 
-        this.send(url);
-
-        return this.gson.fromJson(Objects.requireNonNull(this.response.body()).string(), clazz);
+        return this.response.code();
     }
 
     @Override
