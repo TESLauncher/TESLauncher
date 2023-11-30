@@ -10,9 +10,11 @@ First, make sure you have [Maven](https://maven.apache.org/) installed. To check
 ```shell
 mvn -v
 ```
-If your Maven home and OS information is displayed, it means you have installed Maven correctly. Then simply run Shell or Batch script, depending on your OS:
+If your Maven home and OS information is displayed, it means you have installed Maven correctly. Then simply run these commands:
 ```shell
-build.sh
+git clone https://github.com/TESLauncher/TESLauncher
+cd TESLauncher
+mvn clean package
 ```
 If "BUILD SUCCESS" is displayed, use the following command to run the launcher:
 ```shell
