@@ -73,7 +73,7 @@ public class TESLauncher {
 
     public static AppWindow window;
 
-    private TESLauncher(Args args, Logger logger, Path workDir) {
+    public TESLauncher(Args args, Logger logger, Path workDir) {
         this.args = args;
         this.logger = logger;
         this.workDir = workDir;
@@ -120,23 +120,6 @@ public class TESLauncher {
         Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown));
 
         this.gui.showGui();
-    }
-
-    public static void start(String[] rawArgs) {
-        Args args = new Args();
-        JCommander.newBuilder().addObject(args).build().parse(rawArgs);
-
-        String workDirPath = args.getWorkDirPath();
-        Path workDir = (workDirPath == null || workDirPath.isEmpty() ?
-                Paths.get(System.getProperty("user.dir", ".")) :
-                Paths.get(workDirPath)).normalize().toAbsolutePath();
-
-        System.setProperty("teslauncher.workDir", workDir.toString());
-
-        Log4jConfigurator.configure();
-        Logger logger = LogManager.getLogger(TESLauncher.class);
-
-        new TESLauncher(args, logger, workDir);
     }
 
     private void createDirectories() {

@@ -18,8 +18,29 @@
 
 package me.theentropyshard.teslauncher;
 
+import com.beust.jcommander.JCommander;
+import me.theentropyshard.teslauncher.log4j.Log4jConfigurator;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 public class Main {
-    public static void main(String[] args) {
-        TESLauncher.start(args);
+    public static void main(String[] rawArgs) {
+        Args args = new Args();
+        JCommander.newBuilder().addObject(args).build().parse(rawArgs);
+
+        String workDirPath = args.getWorkDirPath();
+        Path workDir = (workDirPath == null || workDirPath.isEmpty() ?
+                Paths.get(System.getProperty("user.dir", ".")) :
+                Paths.get(workDirPath)).normalize().toAbsolutePath();
+
+        System.setProperty("teslauncher.workDir", workDir.toString());
+
+        Log4jConfigurator.configure();
+        Logger logger = LogManager.getLogger(TESLauncher.class);
+
+        new TESLauncher(args, logger, workDir);
     }
 }

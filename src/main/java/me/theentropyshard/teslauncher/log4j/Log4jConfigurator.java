@@ -36,8 +36,7 @@ public class Log4jConfigurator {
         Log4jConfigurator.configureLogger(builder);
         Log4jConfigurator.configureRoot(builder);
 
-        @SuppressWarnings({"resource", "unused"})
-        LoggerContext context = Configurator.initialize(builder.build());
+        Configurator.reconfigure(builder.build());
     }
 
     private static void configureConsole(ConfigurationBuilder<BuiltConfiguration> builder) {
