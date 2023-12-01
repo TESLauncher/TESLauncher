@@ -29,7 +29,7 @@ import java.io.IOException;
 public class Log4jConfigurator {
     public static void configure() {
         ConfigurationBuilder<BuiltConfiguration> builder = ConfigurationBuilderFactory.newConfigurationBuilder();
-        builder.setStatusLevel(Level.WARN);
+        builder.setStatusLevel(Level.FATAL);
 
         Log4jConfigurator.configureConsole(builder);
         Log4jConfigurator.configureFile(builder);
