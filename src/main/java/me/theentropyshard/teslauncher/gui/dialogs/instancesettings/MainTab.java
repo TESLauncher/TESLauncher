@@ -18,15 +18,21 @@
 
 package me.theentropyshard.teslauncher.gui.dialogs.instancesettings;
 
+import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.instance.Instance;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
+import java.io.IOException;
 
 public class MainTab extends Tab {
-    public MainTab(Instance instance, JDialog dialog) {
-        super(instance, dialog);
+
+    private final JTextField nameField;
+    private final JTextField groupField;
+
+    public MainTab(String name, Instance instance, JDialog dialog) {
+        super(name, instance, dialog);
 
         JPanel root = this.getRoot();
         root.setLayout(new GridBagLayout());
@@ -41,21 +47,28 @@ public class MainTab extends Tab {
         JLabel nameLabel = new JLabel("Name:");
         common.add(nameLabel);
 
-        JTextField nameField = new JTextField();
-        nameField.setText(instance.getName());
-        common.add(nameField);
+        this.nameField = new JTextField();
+        this.nameField.setText(instance.getName());
+        common.add(this.nameField);
 
         JLabel groupLabel = new JLabel("Group:");
         common.add(groupLabel);
 
-        JTextField groupField = new JTextField();
-        groupField.setText(instance.getGroupName());
-        common.add(groupField);
+        this.groupField = new JTextField();
+        this.groupField.setText(instance.getGroupName());
+        common.add(this.groupField);
 
         common.setBorder(new TitledBorder("Common"));
 
         gbc.gridy++;
         gbc.weighty = 1;
         root.add(common, gbc);
+    }
+
+    @Override
+    public void save() throws IOException {
+        Instance instance = this.getInstance();
+        instance.setName(this.nameField.getText());
+        instance.setGroupName(this.groupField.getText());
     }
 }

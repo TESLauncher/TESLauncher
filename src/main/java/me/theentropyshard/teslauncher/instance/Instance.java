@@ -22,6 +22,7 @@ import java.time.Instant;
 
 public class Instance {
     private String name;
+    private String dirName;
     private String groupName;
     private String minecraftVersion;
     private boolean wasEverPlayed;
@@ -55,6 +56,14 @@ public class Instance {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getDirName() {
+        return this.dirName;
+    }
+
+    public void setDirName(String dirName) {
+        this.dirName = dirName;
     }
 
     public String getGroupName() {

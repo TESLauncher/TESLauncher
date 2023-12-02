@@ -19,22 +19,68 @@
 package me.theentropyshard.teslauncher.gui.dialogs.instancesettings;
 
 import me.theentropyshard.teslauncher.TESLauncher;
+import me.theentropyshard.teslauncher.gui.components.InstanceItem;
 import me.theentropyshard.teslauncher.gui.dialogs.AppDialog;
+import me.theentropyshard.teslauncher.gui.playview.InstancesPanel;
 import me.theentropyshard.teslauncher.instance.Instance;
 
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class InstanceSettingsDialog extends AppDialog {
+
+    private final JTabbedPane tabbedPane;
+    private final List<Tab> tabs;
+
     public InstanceSettingsDialog(Instance instance) {
         super(TESLauncher.window.getFrame(), "Instance Settings - " + instance.getName());
 
-        JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.LEFT);
+        this.tabbedPane = new JTabbedPane(JTabbedPane.LEFT);
 
-        tabbedPane.addTab("Main", new MainTab(instance, this.getDialog()).getRoot());
-        tabbedPane.addTab("Java", new JavaTab(instance, this.getDialog()).getRoot());
+        this.tabs = new ArrayList<>();
 
-        this.setContent(tabbedPane);
+        this.addTab(new MainTab("Main", instance, this.getDialog()));
+        this.addTab(new JavaTab("Java", instance, this.getDialog()));
+
+        this.getDialog().addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                InstanceSettingsDialog.this.tabs.forEach(tab -> {
+                    try {
+                        tab.save();
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                });
+
+                InstancesPanel instancesPanel = TESLauncher.getInstance().getGui().getPlayView().getCurrentInstancesPanel();
+                JPanel itemsPanel = instancesPanel.getInstancesPanel();
+                for (Component component : itemsPanel.getComponents()) {
+                    Instance associatedInstance = ((InstanceItem) component).getAssociatedInstance();
+                    if (associatedInstance == instance) {
+                        ((InstanceItem) component).getTextLabel().setText(instance.getName());
+                        try {
+                            TESLauncher.getInstance().getInstanceManager().save(instance);
+                        } catch (IOException ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+                }
+            }
+        });
+
+        this.setContent(this.tabbedPane);
         this.center(0);
         this.setVisible(true);
+    }
+
+    public void addTab(Tab tab) {
+        this.tabs.add(tab);
+        this.tabbedPane.addTab(tab.getName(), tab.getRoot());
     }
 }

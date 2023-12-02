@@ -70,6 +70,7 @@ public class InstanceManagerImpl implements InstanceManager {
             }
 
             Instance instance = Json.parse(IOUtils.readUtf8String(instanceFile), Instance.class);
+            instance.setDirName(instance.getName());
             this.instances.add(instance);
             this.instancesByName.put(instance.getName(), instance);
         }
@@ -146,12 +147,12 @@ public class InstanceManagerImpl implements InstanceManager {
 
     @Override
     public Path getInstanceDir(Instance instance) {
-        return this.workDir.resolve(instance.getName());
+        return this.workDir.resolve(instance.getDirName());
     }
 
     @Override
     public Path getMinecraftDir(Instance instance) {
-        return this.workDir.resolve(instance.getName()).resolve(this.mcDirName);
+        return this.workDir.resolve(instance.getDirName()).resolve(this.mcDirName);
     }
 
     @Override

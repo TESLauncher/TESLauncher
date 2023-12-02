@@ -21,16 +21,25 @@ package me.theentropyshard.teslauncher.gui.dialogs.instancesettings;
 import me.theentropyshard.teslauncher.instance.Instance;
 
 import javax.swing.*;
+import java.io.IOException;
 
 public abstract class Tab {
     private final JDialog dialog;
+    private final String name;
     private final Instance instance;
     private final JPanel root;
 
-    public Tab(Instance instance, JDialog dialog) {
+    public Tab(String name, Instance instance, JDialog dialog) {
+        this.name = name;
         this.instance = instance;
         this.dialog = dialog;
         this.root = new JPanel();
+    }
+
+    public abstract void save() throws IOException;
+
+    public String getName() {
+        return this.name;
     }
 
     public Instance getInstance() {

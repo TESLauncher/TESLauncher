@@ -26,10 +26,11 @@ import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
 
 public class JavaTab extends Tab {
-    public JavaTab(Instance instance, JDialog dialog) {
-        super(instance, dialog);
+    public JavaTab(String name, Instance instance, JDialog dialog) {
+        super(name, instance, dialog);
 
         JPanel root = this.getRoot();
         root.setLayout(new GridBagLayout());
@@ -107,5 +108,10 @@ public class JavaTab extends Tab {
                 instance.setMaximumMemoryInMegabytes(maximumMemoryInMegabytes);
             }
         });
+    }
+
+    @Override
+    public void save() throws IOException {
+
     }
 }

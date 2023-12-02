@@ -52,6 +52,8 @@ public class PlayView extends View {
     private final DefaultComboBoxModel<String> model;
     private final JLabel instanceInfoLabel;
 
+    private InstancesPanel currentPanel;
+
     public PlayView() {
         JPanel root = this.getRoot();
 
@@ -67,6 +69,7 @@ public class PlayView extends View {
             new AddInstanceDialog(this, PlayView.DEFAULT_GROUP_NAME);
         }, true);
         this.defaultInstancesPanel = new InstancesPanel(defaultItem);
+        this.currentPanel = this.defaultInstancesPanel;
         this.groups.put(PlayView.DEFAULT_GROUP_NAME, this.defaultInstancesPanel);
         root.add(this.instancesPanelView, BorderLayout.CENTER);
 
@@ -85,6 +88,7 @@ public class PlayView extends View {
                 Object[] selectedObjects = e.getItemSelectable().getSelectedObjects();
                 String groupName = String.valueOf(selectedObjects[0]);
                 this.cardLayout.show(this.instancesPanelView, groupName);
+                this.currentPanel = this.groups.get(groupName);
             }
         });
 
@@ -121,6 +125,10 @@ public class PlayView extends View {
                 }
             }
         }.execute();
+    }
+
+    public InstancesPanel getCurrentInstancesPanel() {
+        return this.currentPanel;
     }
 
     public void addInstanceItem(InstanceItem item, String groupName) {
