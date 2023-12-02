@@ -70,10 +70,24 @@ public class InstanceManagerImpl implements InstanceManager {
             }
 
             Instance instance = Json.parse(IOUtils.readUtf8String(instanceFile), Instance.class);
-            instance.setDirName(instance.getName());
+            if (instance.getDirName() == null) {
+                instance.setDirName(instance.getName());
+            }
+
             this.instances.add(instance);
             this.instancesByName.put(instance.getName(), instance);
         }
+    }
+
+    private void createDirName(Instance instance) {
+        if (Files.exists(this.getInstanceDir(instance))) {
+            instance.setDirName(instance.getDirName() + "_");
+            if (!Files.exists(this.getInstanceDir(instance))) {
+                return;
+            }
+        }
+
+        this.createDirName(instance);
     }
 
     @Override
@@ -99,6 +113,9 @@ public class InstanceManagerImpl implements InstanceManager {
         Instance instance = new Instance(name, groupName, minecraftVersion);
         this.instances.add(instance);
         this.instancesByName.put(name, instance);
+
+        instance.setDirName(instance.getName());
+        this.createDirName(instance);
 
         Path instanceDir = this.getInstanceDir(instance);
         if (Files.exists(instanceDir)) {
