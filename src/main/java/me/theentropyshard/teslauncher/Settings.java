@@ -25,8 +25,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+/**
+ * I don't usually like making fields public, but ok, those are settings
+ */
 public class Settings {
-    private String language = "english";
+    public String language = "english";
+    public boolean darkTheme = false;
 
     public Settings() {
 
@@ -44,13 +48,5 @@ public class Settings {
     public void save(Path file) throws IOException {
         String content = Json.write(this);
         IOUtils.writeUtf8String(file, content);
-    }
-
-    public String getLanguage() {
-        return this.language;
-    }
-
-    public void setLanguage(String language) {
-        this.language = language;
     }
 }

@@ -34,6 +34,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
@@ -58,6 +59,9 @@ public class TESLauncher {
     private final Path instancesDir;
     private final Path versionsDir;
     private final Path log4jConfigsDir;
+
+    private final Path settingsFile;
+    private final Settings settings;
 
     private final OkHttpClient httpClient;
 
@@ -89,6 +93,18 @@ public class TESLauncher {
         this.log4jConfigsDir = this.minecraftDir.resolve("log4j");
         this.createDirectories();
 
+        this.settingsFile = this.workDir.resolve("settings.json");
+
+        Settings settings = new Settings();
+        try {
+            if (Files.exists(this.settingsFile)) {
+                settings = settings.load(this.settingsFile);
+            }
+        } catch (IOException e) {
+            this.logger.error("Unable to load settings, using defaults", e);
+        }
+        this.settings = settings;
+
         this.httpClient = new OkHttpClient.Builder()
                 .addNetworkInterceptor(new UserAgentInterceptor(TESLauncher.USER_AGENT))
                 .connectTimeout(30, TimeUnit.SECONDS)
@@ -114,7 +130,7 @@ public class TESLauncher {
 
         this.taskPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
-        this.gui = new Gui(false);
+        this.gui = new Gui(this.settings.darkTheme);
         this.gui.getAppWindow().addWindowClosingListener(this::shutdown);
 
         Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown));
@@ -148,8 +164,9 @@ public class TESLauncher {
 
         this.shutdown = true;
 
+        this.taskPool.shutdown();
+
         try {
-            this.taskPool.shutdown();
             this.instanceManager.getInstances().forEach(i -> {
                 try {
                     this.instanceManager.save(i);
@@ -158,7 +175,13 @@ public class TESLauncher {
                 }
             });
         } catch (Exception e) {
-            e.printStackTrace();
+            this.logger.error("Exception while saving instances", e);
+        }
+
+        try {
+            this.settings.save(this.settingsFile);
+        } catch (IOException e) {
+            this.logger.error("Exception while saving settings", e);
         }
     }
 
