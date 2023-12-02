@@ -29,21 +29,29 @@ import me.theentropyshard.teslauncher.utils.FileUtils;
 import me.theentropyshard.teslauncher.utils.IOUtils;
 import me.theentropyshard.teslauncher.utils.Json;
 import me.theentropyshard.teslauncher.utils.TimeUtils;
+import net.lingala.zip4j.ZipFile;
+import net.lingala.zip4j.model.ZipParameters;
 import org.apache.commons.text.StringSubstitutor;
 
 import javax.swing.*;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class InstanceRunner extends Thread {
     private final Account account;
     private final Instance instance;
+
+    private Path clientCopyTmp;
 
     public InstanceRunner(Account account, Instance instance) {
         this.account = account;
@@ -97,6 +105,10 @@ public class InstanceRunner extends Thread {
             int exitCode = this.runGameProcess(command);
             System.out.println("Minecraft process finished with exit code " + exitCode);
 
+            if (this.clientCopyTmp != null && Files.exists(this.clientCopyTmp)) {
+                Files.delete(this.clientCopyTmp);
+            }
+
             long end = System.currentTimeMillis();
 
             long timePlayedSeconds = (end - start) / 1000;
@@ -128,7 +140,66 @@ public class InstanceRunner extends Thread {
             }
         }
 
-        classpath.add(clientsDir.resolve(versionInfo.id).resolve(versionInfo.id + ".jar").toAbsolutePath().toString());
+        Path originalClientPath = clientsDir.resolve(versionInfo.id).resolve(versionInfo.id + ".jar").toAbsolutePath();
+
+        List<JarMod> jarMods = this.instance.getJarMods();
+        if (jarMods == null || jarMods.isEmpty()) {
+            classpath.add(originalClientPath.toString());
+        } else {
+            try {
+                InstanceManager instanceManager = TESLauncher.getInstance().getInstanceManager();
+                Path instanceDir = instanceManager.getInstanceDir(this.instance);
+                Path copyOfClient = Files.copy(originalClientPath, instanceDir
+                        .resolve(originalClientPath.getFileName().toString() + System.currentTimeMillis() + ".jar"));
+                this.clientCopyTmp = copyOfClient;
+
+                List<File> zipFilesToMerge = new ArrayList<>();
+
+                for (JarMod jarMod : jarMods) {
+                    if (!jarMod.isActive()) {
+                        continue;
+                    }
+
+                    zipFilesToMerge.add(Paths.get(jarMod.getFullPath()).toFile());
+                }
+
+                try (ZipFile copyZip = new ZipFile(copyOfClient.toFile())) {
+                    for (File modFile : zipFilesToMerge) {
+                        Path unpackDir = instanceDir.resolve(modFile.getName().replace(".", "_"));
+                        try (ZipFile modZip = new ZipFile(modFile)) {
+                            if (Files.exists(unpackDir)) {
+                                FileUtils.deleteDirectoryRecursively(unpackDir);
+                            }
+                            FileUtils.createDirectoryIfNotExists(unpackDir);
+
+                            modZip.extractAll(unpackDir.toAbsolutePath().toString());
+                        }
+
+                        List<Path> modFiles;
+                        try (Stream<Path> walked = Files.walk(unpackDir)) {
+                            modFiles = walked.collect(Collectors.toList());
+                        }
+
+                        ZipParameters zipParameters = new ZipParameters();
+
+                        for (Path modFileToAdd : modFiles) {
+                            String path = modFileToAdd.toAbsolutePath().toString();
+                            String base = unpackDir.toAbsolutePath().toString();
+                            String relative = new File(base).toURI().relativize(new File(path).toURI()).getPath();
+
+                            zipParameters.setFileNameInZip(relative);
+                            copyZip.addFile(modFileToAdd.toFile(), zipParameters);
+                        }
+
+                        FileUtils.deleteDirectoryRecursively(unpackDir);
+                    }
+                }
+
+                classpath.add(copyOfClient.toString());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 
         return classpath;
     }

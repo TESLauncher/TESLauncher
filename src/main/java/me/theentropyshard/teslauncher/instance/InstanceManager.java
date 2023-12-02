@@ -39,6 +39,8 @@ public interface InstanceManager {
 
     Path getMinecraftDir(Instance instance);
 
+    Path getInstanceJarModsDir(Instance instance);
+
     Instance getInstanceByName(String name);
 
     List<Instance> getInstances();

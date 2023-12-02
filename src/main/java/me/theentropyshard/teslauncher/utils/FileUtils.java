@@ -43,6 +43,14 @@ public final class FileUtils {
     };
 
     public static void deleteDirectoryRecursively(Path path) throws IOException {
+        if (!Files.exists(path)) {
+            return;
+        }
+
+        if (Files.isRegularFile(path)) {
+            Files.delete(path);
+        }
+
         Files.walkFileTree(path, FileUtils.DELETE_VISITOR);
     }
 

@@ -19,6 +19,7 @@
 package me.theentropyshard.teslauncher.instance;
 
 import java.time.Instant;
+import java.util.List;
 
 public class Instance {
     private String name;
@@ -35,6 +36,7 @@ public class Instance {
     private Instant lastTimePlayed = Instant.EPOCH;
     private long lastPlayedForSeconds;
     private long totalPlayedForSeconds;
+    private List<JarMod> jarMods;
 
     public Instance() {
 
@@ -48,6 +50,14 @@ public class Instance {
 
     public static void create(String name, String groupName, String minecraftVersion) {
 
+    }
+
+    public List<JarMod> getJarMods() {
+        return this.jarMods;
+    }
+
+    public void setJarMods(List<JarMod> jarMods) {
+        this.jarMods = jarMods;
     }
 
     public String getName() {

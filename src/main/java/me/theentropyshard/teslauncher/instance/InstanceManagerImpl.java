@@ -125,6 +125,8 @@ public class InstanceManagerImpl implements InstanceManager {
         FileUtils.createDirectoryIfNotExists(instanceDir);
         Path minecraftDir = instanceDir.resolve(this.mcDirName);
         FileUtils.createDirectoryIfNotExists(minecraftDir);
+        Path jarModsDir = this.getInstanceJarModsDir(instance);
+        FileUtils.createDirectoryIfNotExists(jarModsDir);
         Path instanceFile = instanceDir.resolve("instance.json");
         IOUtils.writeUtf8String(instanceFile, Json.write(instance));
     }
@@ -170,6 +172,11 @@ public class InstanceManagerImpl implements InstanceManager {
     @Override
     public Path getMinecraftDir(Instance instance) {
         return this.workDir.resolve(instance.getDirName()).resolve(this.mcDirName);
+    }
+
+    @Override
+    public Path getInstanceJarModsDir(Instance instance) {
+        return this.workDir.resolve(instance.getDirName()).resolve("jarmods");
     }
 
     @Override
