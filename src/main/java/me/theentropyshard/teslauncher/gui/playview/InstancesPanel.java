@@ -29,6 +29,7 @@ import java.awt.*;
 public class InstancesPanel extends View {
     private final AddInstanceItem addInstanceItem;
     private final JPanel instancesPanel;
+    private final JScrollPane scrollPane;
 
     public InstancesPanel(AddInstanceItem addInstanceItem) {
         JPanel root = this.getRoot();
@@ -40,15 +41,15 @@ public class InstancesPanel extends View {
         JPanel borderPanel = new JPanel(new BorderLayout());
         borderPanel.add(this.instancesPanel, BorderLayout.CENTER);
 
-        JScrollPane scrollPane = new JScrollPane(
+        this.scrollPane = new JScrollPane(
                 borderPanel,
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER
         );
-        scrollPane.setBorder(null);
-        scrollPane.getVerticalScrollBar().setUnitIncrement(8);
+        this.scrollPane.setBorder(null);
+        this.scrollPane.getVerticalScrollBar().setUnitIncrement(8);
 
-        root.add(scrollPane, BorderLayout.CENTER);
+        root.add(this.scrollPane, BorderLayout.CENTER);
     }
 
     public void addInstanceItem(InstanceItem item) {
@@ -62,6 +63,10 @@ public class InstancesPanel extends View {
 
     public AddInstanceItem getAddInstanceItem() {
         return this.addInstanceItem;
+    }
+
+    public JScrollPane getScrollPane() {
+        return this.scrollPane;
     }
 
     public JPanel getInstancesPanel() {

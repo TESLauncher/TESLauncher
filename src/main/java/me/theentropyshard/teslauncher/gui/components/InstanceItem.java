@@ -140,6 +140,12 @@ public class InstanceItem extends JPanel {
         super.paintComponent(g);
     }
 
+    public void updateColors() {
+        this.setDefaultColor(UIManager.getColor("InstanceItem.defaultColor"));
+        this.setHoveredColor(UIManager.getColor("InstanceItem.hoveredColor"));
+        this.setPressedColor(UIManager.getColor("InstanceItem.pressedColor"));
+    }
+
     @Override
     public Dimension getPreferredSize() {
         return InstanceItem.PREFERRED_SIZE;

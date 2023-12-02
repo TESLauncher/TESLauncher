@@ -18,6 +18,50 @@
 
 package me.theentropyshard.teslauncher.gui;
 
-public class SettingsView extends View {
+import me.theentropyshard.teslauncher.Settings;
+import me.theentropyshard.teslauncher.TESLauncher;
 
+import javax.swing.*;
+import javax.swing.border.TitledBorder;
+import java.awt.*;
+
+public class SettingsView extends View {
+    public SettingsView() {
+        JPanel root = this.getRoot();
+        root.setLayout(new GridBagLayout());
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.weightx = 2;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.NORTH;
+
+        JPanel themeSettings = new JPanel(new GridLayout(0, 1));
+        themeSettings.setBorder(new TitledBorder("Theme"));
+        JRadioButton darkThemeButton = new JRadioButton("Dark");
+        darkThemeButton.addActionListener(e -> {
+            Gui gui = TESLauncher.getInstance().getGui();
+            gui.setDarkTheme(true);
+            gui.updateLookAndFeel();
+            TESLauncher.getInstance().getSettings().darkTheme = true;
+        });
+        JRadioButton lightThemeButton = new JRadioButton("Light");
+        lightThemeButton.addActionListener(e -> {
+            Gui gui = TESLauncher.getInstance().getGui();
+            gui.setDarkTheme(false);
+            gui.updateLookAndFeel();
+            TESLauncher.getInstance().getSettings().darkTheme = false;
+        });
+        themeSettings.add(darkThemeButton);
+        themeSettings.add(lightThemeButton);
+        Settings settings = TESLauncher.getInstance().getSettings();
+        ButtonGroup buttonGroup = new ButtonGroup();
+        buttonGroup.add(darkThemeButton);
+        buttonGroup.add(lightThemeButton);
+        darkThemeButton.setSelected(settings.darkTheme);
+        lightThemeButton.setSelected(!settings.darkTheme);
+
+        gbc.gridy++;
+        gbc.weighty = 1;
+        root.add(themeSettings, gbc);
+    }
 }

@@ -186,6 +186,10 @@ public class PlayView extends View {
         return this.header;
     }
 
+    public Map<String, InstancesPanel> getGroups() {
+        return this.groups;
+    }
+
     public InstancesPanel getDefaultInstancesPanel() {
         return this.defaultInstancesPanel;
     }

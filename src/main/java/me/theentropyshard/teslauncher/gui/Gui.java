@@ -21,9 +21,12 @@ package me.theentropyshard.teslauncher.gui;
 import com.formdev.flatlaf.FlatDarculaLaf;
 import com.formdev.flatlaf.FlatIntelliJLaf;
 import me.theentropyshard.teslauncher.TESLauncher;
+import me.theentropyshard.teslauncher.gui.components.InstanceItem;
+import me.theentropyshard.teslauncher.gui.playview.InstancesPanel;
 import me.theentropyshard.teslauncher.gui.playview.PlayView;
 
 import javax.swing.*;
+import javax.swing.border.LineBorder;
 import javax.swing.plaf.ColorUIResource;
 import java.awt.*;
 
@@ -31,7 +34,9 @@ public class Gui {
     private JTabbedPane viewSelector;
     private AppWindow appWindow;
     private PlayView playView;
+
     private boolean darkTheme;
+    private boolean initialized;
 
     public Gui(boolean darkTheme) {
         this.darkTheme = darkTheme;
@@ -39,7 +44,17 @@ public class Gui {
     }
 
     public void initGui() {
-        if (this.darkTheme) {
+        this.switchTheme();
+
+        JDialog.setDefaultLookAndFeelDecorated(true);
+        JFrame.setDefaultLookAndFeelDecorated(true);
+
+        this.viewSelector = new JTabbedPane(JTabbedPane.LEFT);
+        TESLauncher.window = this.appWindow = new AppWindow(TESLauncher.TITLE, TESLauncher.WIDTH, TESLauncher.HEIGHT, this.viewSelector);
+    }
+
+    public void switchTheme() {
+        if (this.isDarkTheme()) {
             UIManager.put("InstanceItem.defaultColor", new ColorUIResource(64, 75, 93));
             UIManager.put("InstanceItem.hoveredColor", new ColorUIResource(70, 80, 100));
             UIManager.put("InstanceItem.pressedColor", new ColorUIResource(60, 70, 86));
@@ -61,11 +76,37 @@ public class Gui {
             FlatIntelliJLaf.setup();
         }
 
-        JDialog.setDefaultLookAndFeelDecorated(true);
-        JFrame.setDefaultLookAndFeelDecorated(true);
+        if (!this.initialized) {
+            return;
+        }
 
-        this.viewSelector = new JTabbedPane(JTabbedPane.LEFT);
-        TESLauncher.window = this.appWindow = new AppWindow(TESLauncher.TITLE, TESLauncher.WIDTH, TESLauncher.HEIGHT, this.viewSelector);
+        InstancesPanel defaultInstancesPanel = this.playView.getDefaultInstancesPanel();
+
+        for (Component component : defaultInstancesPanel.getInstancesPanel().getComponents()) {
+            ((InstanceItem) component).updateColors();
+        }
+        defaultInstancesPanel.getScrollPane().setBorder(null);
+        this.playView.getGroups().values().forEach(instancesPanel -> {
+
+            for (Component component : instancesPanel.getInstancesPanel().getComponents()) {
+                ((InstanceItem) component).updateColors();
+            }
+            instancesPanel.getScrollPane().setBorder(null);
+        });
+    }
+
+    public void updateLookAndFeel() {
+        this.switchTheme();
+        JFrame frame = TESLauncher.window.getFrame();
+        SwingUtilities.updateComponentTreeUI(frame);
+        frame.pack();
+
+        InstancesPanel defaultInstancesPanel = this.playView.getDefaultInstancesPanel();
+        defaultInstancesPanel.getScrollPane().setBorder(null);
+
+        this.playView.getGroups().values().forEach(instancesPanel -> {
+            instancesPanel.getScrollPane().setBorder(null);
+        });
     }
 
     public void showGui() {
@@ -78,6 +119,8 @@ public class Gui {
             this.viewSelector.addTab("About", new AboutView().getRoot());
 
             this.appWindow.setVisible(true);
+
+            this.initialized = true;
         });
     }
 

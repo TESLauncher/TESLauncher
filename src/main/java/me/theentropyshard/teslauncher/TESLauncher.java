@@ -192,6 +192,10 @@ public class TESLauncher {
         return this.httpClient;
     }
 
+    public Settings getSettings() {
+        return this.settings;
+    }
+
     public Args getArgs() {
         return this.args;
     }
