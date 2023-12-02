@@ -18,25 +18,20 @@
 
 package me.theentropyshard.teslauncher;
 
-import com.beust.jcommander.JCommander;
 import me.theentropyshard.teslauncher.accounts.AccountsManager;
 import me.theentropyshard.teslauncher.gui.AppWindow;
 import me.theentropyshard.teslauncher.gui.Gui;
 import me.theentropyshard.teslauncher.instance.InstanceManager;
 import me.theentropyshard.teslauncher.instance.InstanceManagerImpl;
 import me.theentropyshard.teslauncher.java.JavaManager;
-import me.theentropyshard.teslauncher.log4j.Log4jConfigurator;
 import me.theentropyshard.teslauncher.network.UserAgentInterceptor;
 import me.theentropyshard.teslauncher.utils.FileUtils;
 import okhttp3.OkHttpClient;
 import okhttp3.Protocol;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -97,9 +92,7 @@ public class TESLauncher {
 
         Settings settings = new Settings();
         try {
-            if (Files.exists(this.settingsFile)) {
-                settings = settings.load(this.settingsFile);
-            }
+            settings = settings.load(this.settingsFile);
         } catch (IOException e) {
             this.logger.error("Unable to load settings, using defaults", e);
         }
