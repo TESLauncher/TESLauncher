@@ -143,7 +143,8 @@ public class InstanceRunner extends Thread {
         Path originalClientPath = clientsDir.resolve(versionInfo.id).resolve(versionInfo.id + ".jar").toAbsolutePath();
 
         List<JarMod> jarMods = this.instance.getJarMods();
-        if (jarMods == null || jarMods.isEmpty()) {
+
+        if (jarMods == null || jarMods.isEmpty() || jarMods.stream().noneMatch(JarMod::isActive)) {
             classpath.add(originalClientPath.toString());
         } else {
             try {
