@@ -24,6 +24,7 @@ import me.theentropyshard.teslauncher.instance.JarMod;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -32,17 +33,24 @@ import java.util.List;
 import java.util.UUID;
 
 public class JarModsTab extends Tab {
+    private final JarModsTableModel jarModsTableModel;
+
     public JarModsTab(Instance instance, JDialog dialog) {
         super("Jar Mods", instance, dialog);
 
         JPanel root = this.getRoot();
+        root.setLayout(new BorderLayout());
+
         JButton addJarMod = new JButton("Add jar mod");
-        root.add(addJarMod);
+        root.add(addJarMod, BorderLayout.NORTH);
+
+        this.jarModsTableModel = new JarModsTableModel(instance);
 
         addJarMod.addActionListener(e -> {
             new SwingWorker<Void, Void>() {
                 @Override
                 protected Void doInBackground() throws Exception {
+                    UIManager.put("FileChooser.readOnly", Boolean.TRUE);
                     JFileChooser fileChooser = new JFileChooser();
                     fileChooser.setFileFilter(new FileNameExtensionFilter("Archives", "zip", "jar"));
 
@@ -60,18 +68,28 @@ public class JarModsTab extends Tab {
                         }
 
                         Path jarModPath = selectedFile.toPath().toAbsolutePath().normalize();
-                        jarMods.add(new JarMod(
+                        JarMod jarMod = new JarMod(
                                 true,
                                 jarModPath.toString(),
                                 UUID.randomUUID(),
                                 jarModPath.getFileName().toString()
-                        ));
+                        );
+                        jarMods.add(jarMod);
+
+                        JarModsTab.this.jarModsTableModel.add(jarMod);
                     }
 
+                    UIManager.put("FileChooser.readOnly", Boolean.FALSE);
                     return null;
                 }
             }.execute();
         });
+
+        JTable jarModsTable = new JTable(this.jarModsTableModel);
+
+        JScrollPane scrollPane = new JScrollPane(jarModsTable);
+        scrollPane.setBorder(null);
+        root.add(scrollPane, BorderLayout.CENTER);
     }
 
     @Override
