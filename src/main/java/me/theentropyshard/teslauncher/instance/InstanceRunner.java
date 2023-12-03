@@ -126,20 +126,7 @@ public class InstanceRunner extends Thread {
         }
     }
 
-    private List<String> resolveClasspath(VersionInfo versionInfo, Path librariesDir, Path clientsDir) {
-        List<String> classpath = new ArrayList<>();
-
-        for (Library library : versionInfo.libraries) {
-            DownloadArtifact artifact = library.downloads.artifact;
-            if (artifact == null) {
-                continue;
-            }
-
-            if (RuleMatcher.applyOnThisPlatform(library)) {
-                classpath.add(librariesDir.resolve(artifact.path).toAbsolutePath().toString());
-            }
-        }
-
+    private void applyJarMods(VersionInfo versionInfo, List<String> classpath, Path clientsDir) {
         Path originalClientPath = clientsDir.resolve(versionInfo.id).resolve(versionInfo.id + ".jar").toAbsolutePath();
 
         List<JarMod> jarMods = this.instance.getJarMods();
@@ -201,6 +188,23 @@ public class InstanceRunner extends Thread {
                 e.printStackTrace();
             }
         }
+    }
+
+    private List<String> resolveClasspath(VersionInfo versionInfo, Path librariesDir, Path clientsDir) {
+        List<String> classpath = new ArrayList<>();
+
+        for (Library library : versionInfo.libraries) {
+            DownloadArtifact artifact = library.downloads.artifact;
+            if (artifact == null) {
+                continue;
+            }
+
+            if (RuleMatcher.applyOnThisPlatform(library)) {
+                classpath.add(librariesDir.resolve(artifact.path).toAbsolutePath().toString());
+            }
+        }
+
+        this.applyJarMods(versionInfo, classpath, clientsDir);
 
         return classpath;
     }
