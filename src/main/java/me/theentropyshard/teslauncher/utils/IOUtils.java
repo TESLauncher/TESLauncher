@@ -29,7 +29,7 @@ public class IOUtils {
     }
 
     public static String readUtf8String(Path file) throws IOException {
-        return String.join("\n", Files.readAllLines(file));
+        return String.join(System.lineSeparator(), Files.readAllLines(file));
     }
 
     private IOUtils() {
