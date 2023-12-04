@@ -52,7 +52,7 @@ public class JarModsTab extends Tab {
                 protected Void doInBackground() throws Exception {
                     UIManager.put("FileChooser.readOnly", Boolean.TRUE);
                     JFileChooser fileChooser = new JFileChooser();
-                    fileChooser.setFileFilter(new FileNameExtensionFilter("Archives", "zip", "jar"));
+                    fileChooser.setFileFilter(new FileNameExtensionFilter("Archives (*.zip, *.jar)", "zip", "jar"));
 
                     int option = fileChooser.showOpenDialog(TESLauncher.window.getFrame());
                     if (option == JFileChooser.APPROVE_OPTION) {
