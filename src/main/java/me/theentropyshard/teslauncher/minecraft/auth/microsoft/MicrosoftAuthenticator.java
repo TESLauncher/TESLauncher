@@ -26,15 +26,19 @@ import okhttp3.*;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Objects;
 
 public class MicrosoftAuthenticator {
     private final OkHttpClient httpClient;
+    private String refreshToken;
+    private final boolean refresh;
     private final AuthListener listener;
+    private int expiresIn;
 
-    public MicrosoftAuthenticator(OkHttpClient httpClient, AuthListener listener) {
+    public MicrosoftAuthenticator(OkHttpClient httpClient, AuthListener listener, String refreshToken, boolean refresh) {
         this.listener = listener;
         this.httpClient = httpClient;
+        this.refreshToken = refreshToken;
+        this.refresh = refresh;
     }
 
     // DO NOT USE MY APPLICATION (CLIENT) ID!!! YOU MUST CREATE YOUR OWN APPLICATION!!!
@@ -45,11 +49,20 @@ public class MicrosoftAuthenticator {
         System.out.println("Code: " + deviceCodeResponse.userCode);
         System.out.println("Url: " + deviceCodeResponse.verificationUri);
 
-        OAuthCodeResponse microsoftOAuthCode = this.getMicrosoftOAuthCode(deviceCodeResponse);
+        OAuthCodeResponse microsoftOAuthCode;
+        if (this.refresh) {
+            microsoftOAuthCode = this.getMicrosoftOAuthCode(null);
+        } else {
+            microsoftOAuthCode = this.getMicrosoftOAuthCode(deviceCodeResponse);
+        }
+
+        this.refreshToken = microsoftOAuthCode.refreshToken;
 
         XboxLiveAuthResponse xboxLiveAuthResponse = this.authenticateWithXboxLive(microsoftOAuthCode);
         XSTSAuthResponse xstsAuthResponse = this.obtainXSTSToken(xboxLiveAuthResponse);
         MinecraftAuthResponse minecraftAuthResponse = this.authenticateWithMinecraft(xstsAuthResponse);
+
+        this.expiresIn = minecraftAuthResponse.expiresIn;
 
         if (!this.checkGameOwnership(minecraftAuthResponse)) {
             System.err.println("Account does not own Minecraft");
@@ -83,6 +96,8 @@ public class MicrosoftAuthenticator {
     private OAuthCodeResponse getMicrosoftOAuthCode(DeviceCodeResponse deviceCodeResponse) throws IOException {
         String url = "https://login.microsoftonline.com/consumers/oauth2/v2.0/token";
 
+        String token = this.refresh ? this.refreshToken : deviceCodeResponse.deviceCode;
+
         RequestBody requestBody = new FormBody(
                 Arrays.asList(
                         "grant_type",
@@ -92,7 +107,7 @@ public class MicrosoftAuthenticator {
                 Arrays.asList(
                         "urn:ietf:params:oauth:grant-type:device_code",
                         "394fd08d-cb75-4f21-9807-ae14babcb4c0",
-                        deviceCodeResponse.deviceCode
+                        token
                 )
         );
 
@@ -113,7 +128,7 @@ public class MicrosoftAuthenticator {
                         case "authorization_declined":
                             return null;
                         case "bad_verification_code":
-                            System.out.println("Wrong verification code: " + deviceCodeResponse.deviceCode);
+                            System.out.println("Wrong verification/refresh code: " + token);
                             return null;
                         case "expired_token":
                             System.out.println("Device code expired");
@@ -226,5 +241,17 @@ public class MicrosoftAuthenticator {
             default:
                 return "unknown error";
         }
+    }
+
+    public String getRefreshToken() {
+        return this.refreshToken;
+    }
+
+    public int getExpiresIn() {
+        return this.expiresIn;
+    }
+
+    public void setExpiresIn(int expiresIn) {
+        this.expiresIn = expiresIn;
     }
 }

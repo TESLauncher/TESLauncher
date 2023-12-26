@@ -153,7 +153,16 @@ public class PlayView extends View {
         item.addListener(e -> {
             int mouseButton = Integer.parseInt(e.getActionCommand());
             if (mouseButton == MouseEvent.BUTTON1) { // left mouse button
-                new InstanceRunner(AccountsManager.getCurrentAccount(), item.getAssociatedInstance()).start();
+                if (AccountsManager.getCurrentAccount() == null) {
+                    JOptionPane.showMessageDialog(
+                            TESLauncher.window.getFrame(),
+                            "No account selected",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE
+                    );
+                } else {
+                    new InstanceRunner(AccountsManager.getCurrentAccount(), item.getAssociatedInstance()).start();
+                }
             } else if (mouseButton == MouseEvent.BUTTON3) { // right mouse button
                 new InstanceSettingsDialog(item.getAssociatedInstance());
             }

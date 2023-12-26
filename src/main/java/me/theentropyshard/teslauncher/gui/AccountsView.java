@@ -33,6 +33,7 @@ import java.awt.datatransfer.StringSelection;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 public class AccountsView extends View {
@@ -95,7 +96,7 @@ public class AccountsView extends View {
 
                     MicrosoftAuthenticator authenticator = new MicrosoftAuthenticator(
                             TESLauncher.getInstance().getHttpClient(),
-                            authListener
+                            authListener, null, false
                     );
 
                     MinecraftProfile profile = authenticator.authenticate();
@@ -105,6 +106,10 @@ public class AccountsView extends View {
                             "(\\p{XDigit}{8})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}+)", "$1-$2-$3-$4-$5"
                     )));
                     microsoftAccount.setUsername(profile.name);
+                    microsoftAccount.setRefreshToken(authenticator.getRefreshToken());
+                    microsoftAccount.setLoggedInAt(OffsetDateTime.now());
+                    microsoftAccount.setExpiresIn(authenticator.getExpiresIn());
+
                     TESLauncher.getInstance().getAccountsManager().saveAccount(microsoftAccount);
 
                     PlayViewHeader.instance.getAccounts().addItem(microsoftAccount);
