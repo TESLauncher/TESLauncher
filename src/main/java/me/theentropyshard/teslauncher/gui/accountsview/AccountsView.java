@@ -164,4 +164,8 @@ public class AccountsView extends View {
     public JScrollPane getScrollPane() {
         return this.scrollPane;
     }
+
+    public JPanel getPanel() {
+        return this.panel;
+    }
 }

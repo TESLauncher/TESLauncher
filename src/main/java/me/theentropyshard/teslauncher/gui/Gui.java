@@ -21,7 +21,9 @@ package me.theentropyshard.teslauncher.gui;
 import com.formdev.flatlaf.FlatDarculaLaf;
 import com.formdev.flatlaf.FlatIntelliJLaf;
 import me.theentropyshard.teslauncher.TESLauncher;
+import me.theentropyshard.teslauncher.gui.accountsview.AccountItem;
 import me.theentropyshard.teslauncher.gui.accountsview.AccountsView;
+import me.theentropyshard.teslauncher.gui.accountsview.AddAccountItem;
 import me.theentropyshard.teslauncher.gui.components.InstanceItem;
 import me.theentropyshard.teslauncher.gui.playview.InstancesPanel;
 import me.theentropyshard.teslauncher.gui.playview.PlayView;
@@ -90,6 +92,17 @@ public class Gui {
         for (Component component : defaultInstancesPanel.getInstancesPanel().getComponents()) {
             ((InstanceItem) component).updateColors();
         }
+
+        for (Component component : this.accountsView.getPanel().getComponents()) {
+            if (component instanceof AccountItem) {
+                ((AccountItem) component).updateColors();
+            }
+
+            if (component instanceof AddAccountItem) {
+                ((AddAccountItem) component).updateColors();
+            }
+        }
+
         defaultInstancesPanel.getScrollPane().setBorder(null);
         this.playView.getGroups().values().forEach(instancesPanel -> {
 

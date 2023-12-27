@@ -122,6 +122,12 @@ public class AddAccountItem extends JPanel {
         super.paintComponent(g);
     }
 
+    public void updateColors() {
+        this.setDefaultColor(UIManager.getColor("InstanceItem.defaultColor"));
+        this.setHoveredColor(UIManager.getColor("InstanceItem.hoveredColor"));
+        this.setPressedColor(UIManager.getColor("InstanceItem.pressedColor"));
+    }
+
     public void setDefaultColor(Color defaultColor) {
         this.defaultColor = defaultColor;
     }
