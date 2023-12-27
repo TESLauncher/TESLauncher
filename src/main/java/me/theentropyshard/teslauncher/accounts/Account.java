@@ -28,6 +28,9 @@ public abstract class Account {
     private UUID uuid;
     private String accessToken;
 
+    // Stored in base64
+    private String headIcon;
+
     public Account() {
 
     }
@@ -56,6 +59,14 @@ public abstract class Account {
 
     public void setAccessToken(String accessToken) {
         this.accessToken = accessToken;
+    }
+
+    public String getHeadIcon() {
+        return this.headIcon;
+    }
+
+    public void setHeadIcon(String headIcon) {
+        this.headIcon = headIcon;
     }
 
     @Override

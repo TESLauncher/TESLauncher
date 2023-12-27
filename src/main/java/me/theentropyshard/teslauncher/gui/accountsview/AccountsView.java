@@ -19,11 +19,13 @@
 package me.theentropyshard.teslauncher.gui.accountsview;
 
 import me.theentropyshard.teslauncher.gui.View;
+import me.theentropyshard.teslauncher.utils.ResourceUtils;
 import me.theentropyshard.teslauncher.utils.SwingUtils;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.io.IOException;
 
 public class AccountsView extends View {
     private final JPanel panel;
@@ -49,7 +51,13 @@ public class AccountsView extends View {
         this.addAccountItem = new AddAccountItem();
         this.panel.add(this.addAccountItem);
 
-        this.addAccountItem(new AccountItem("petya", SwingUtils.getIcon("/steve_head_32.png")));
+        Icon icon = null;
+        try {
+            icon = SwingUtils.loadIconFromBase64(ResourceUtils.readToString("/steve_head_32_base64.txt"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        this.addAccountItem(new AccountItem("petya", icon));
 
         /*JLabel noticeLabel = new JLabel(
                 // @formatter:off

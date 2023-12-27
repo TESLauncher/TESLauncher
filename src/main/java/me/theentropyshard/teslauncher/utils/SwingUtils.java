@@ -24,6 +24,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -40,6 +41,11 @@ public final class SwingUtils {
         SwingUtils.ICON_CACHE.put(path, icon);
 
         return icon;
+    }
+
+    public static Icon loadIconFromBase64(String base64) {
+        byte[] decoded = Base64.getMimeDecoder().decode(base64);
+        return new ImageIcon(decoded);
     }
 
     public static BufferedImage getImage(String path) {
