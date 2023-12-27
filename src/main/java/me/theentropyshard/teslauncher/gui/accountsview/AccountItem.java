@@ -18,6 +18,8 @@
 
 package me.theentropyshard.teslauncher.gui.accountsview;
 
+import me.theentropyshard.teslauncher.utils.SwingUtils;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
@@ -56,16 +58,33 @@ public class AccountItem extends JPanel {
 
         this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
+        FlowLayout layout1 = new FlowLayout(FlowLayout.LEFT);
+        layout1.setHgap(0);
+        layout1.setVgap(0);
+        JPanel leftPanel = new JPanel(layout1);
+        leftPanel.setOpaque(false);
         JLabel headIcon = new JLabel(skinHead);
-        this.add(headIcon, BorderLayout.WEST);
-
-        JPanel centerPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        centerPanel.setOpaque(false);
-        this.add(centerPanel, BorderLayout.CENTER);
-
+        leftPanel.add(headIcon);
         JLabel nickLabel = new JLabel(nick);
-        nickLabel.setOpaque(false);
-        centerPanel.add(nickLabel);
+        nickLabel.setBorder(new EmptyBorder(0, 6, 0, 0));
+        leftPanel.add(nickLabel);
+
+        FlowLayout layout = new FlowLayout(FlowLayout.RIGHT);
+        layout.setHgap(0);
+        layout.setVgap(0);
+        JPanel rightPanel = new JPanel(layout);
+        rightPanel.setOpaque(false);
+        JLabel trashIcon = new JLabel(SwingUtils.getIcon("/trash_icon.png"));
+        rightPanel.add(trashIcon);
+        trashIcon.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+
+            }
+        });
+
+        this.add(leftPanel, BorderLayout.WEST);
+        this.add(rightPanel, BorderLayout.EAST);
 
         this.setOpaque(false);
         this.setBorder(new EmptyBorder(

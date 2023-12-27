@@ -49,6 +49,8 @@ public class AccountsView extends View {
         this.addAccountItem = new AddAccountItem();
         this.panel.add(this.addAccountItem);
 
+        this.addAccountItem(new AccountItem("petya", SwingUtils.getIcon("/steve_head_32.png")));
+
         /*JLabel noticeLabel = new JLabel(
                 // @formatter:off
                 "<html>" +
