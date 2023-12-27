@@ -18,8 +18,6 @@
 
 package me.theentropyshard.teslauncher.gui.accountsview;
 
-import me.theentropyshard.teslauncher.utils.SwingUtils;
-
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
@@ -45,7 +43,7 @@ public class AccountItem extends JPanel {
 
     protected final int border = 12;
 
-    public AccountItem() {
+    public AccountItem(String nick, Icon skinHead) {
         super(new BorderLayout());
 
         this.mouseClickListeners = new HashSet<>();
@@ -58,14 +56,14 @@ public class AccountItem extends JPanel {
 
         this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
-        JLabel headIcon = new JLabel(SwingUtils.getIcon("/steve_head_32.png"));
+        JLabel headIcon = new JLabel(skinHead);
         this.add(headIcon, BorderLayout.WEST);
 
         JPanel centerPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         centerPanel.setOpaque(false);
         this.add(centerPanel, BorderLayout.CENTER);
 
-        JLabel nickLabel = new JLabel("TheEntropyShard");
+        JLabel nickLabel = new JLabel(nick);
         nickLabel.setOpaque(false);
         centerPanel.add(nickLabel);
 

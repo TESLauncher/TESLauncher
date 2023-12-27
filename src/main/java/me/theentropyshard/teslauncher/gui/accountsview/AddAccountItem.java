@@ -51,6 +51,8 @@ public class AddAccountItem extends JPanel {
 
         this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
+        this.setPreferredSize(new Dimension(1, 56));
+
         this.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {

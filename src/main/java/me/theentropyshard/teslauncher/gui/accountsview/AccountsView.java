@@ -19,6 +19,7 @@
 package me.theentropyshard.teslauncher.gui.accountsview;
 
 import me.theentropyshard.teslauncher.gui.View;
+import me.theentropyshard.teslauncher.utils.SwingUtils;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -28,6 +29,8 @@ public class AccountsView extends View {
     private final JPanel panel;
     private final JScrollPane scrollPane;
     private final AccountItemGroup group;
+
+    private final AddAccountItem addAccountItem;
 
     public AccountsView() {
         JPanel root = this.getRoot();
@@ -43,14 +46,8 @@ public class AccountsView extends View {
         this.scrollPane.setBorder(null);
         root.add(this.scrollPane, BorderLayout.CENTER);
 
-        AccountItem item = new AccountItem();
-        item.setSelected(true);
-        this.addAccountItem(item);
-        this.addAccountItem(new AccountItem());
-        this.addAccountItem(new AccountItem());
-        this.addAccountItem(new AccountItem());
-        this.addAccountItem(new AccountItem());
-        this.addAccountItem(new AddAccountItem());
+        this.addAccountItem = new AddAccountItem();
+        this.panel.add(this.addAccountItem);
 
         /*JLabel noticeLabel = new JLabel(
                 // @formatter:off
@@ -144,7 +141,8 @@ public class AccountsView extends View {
             this.group.addAccountItem((AccountItem) item);
         }
 
-        this.panel.add(item);
+        int count = this.panel.getComponentCount();
+        this.panel.add(item, count - 1);
         this.panel.revalidate();
     }
 
