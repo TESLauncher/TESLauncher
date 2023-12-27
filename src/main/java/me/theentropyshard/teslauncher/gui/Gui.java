@@ -21,12 +21,12 @@ package me.theentropyshard.teslauncher.gui;
 import com.formdev.flatlaf.FlatDarculaLaf;
 import com.formdev.flatlaf.FlatIntelliJLaf;
 import me.theentropyshard.teslauncher.TESLauncher;
+import me.theentropyshard.teslauncher.gui.accountsview.AccountsView;
 import me.theentropyshard.teslauncher.gui.components.InstanceItem;
 import me.theentropyshard.teslauncher.gui.playview.InstancesPanel;
 import me.theentropyshard.teslauncher.gui.playview.PlayView;
 
 import javax.swing.*;
-import javax.swing.border.LineBorder;
 import javax.swing.plaf.ColorUIResource;
 import java.awt.*;
 
@@ -34,6 +34,7 @@ public class Gui {
     private JTabbedPane viewSelector;
     private AppWindow appWindow;
     private PlayView playView;
+    private AccountsView accountsView;
 
     private boolean darkTheme;
     private boolean initialized;
@@ -63,6 +64,8 @@ public class Gui {
             UIManager.put("ProgressBar.selectionForeground", Color.WHITE);
             UIManager.put("ProgressBar.foreground", new ColorUIResource(64, 75, 93));
 
+            UIManager.put("AccountItem.borderColor", new ColorUIResource(Color.decode("#4B6EAF")));
+
             FlatDarculaLaf.setup();
         } else {
             UIManager.put("InstanceItem.defaultColor", new ColorUIResource(222, 230, 237));
@@ -72,6 +75,8 @@ public class Gui {
             UIManager.put("ProgressBar.selectionBackground", Color.BLACK);
             UIManager.put("ProgressBar.selectionForeground", Color.BLACK);
             UIManager.put("ProgressBar.foreground", new ColorUIResource(222, 230, 237));
+
+            UIManager.put("AccountItem.borderColor", new ColorUIResource(Color.decode("#2675BF")));
 
             FlatIntelliJLaf.setup();
         }
@@ -107,14 +112,17 @@ public class Gui {
         this.playView.getGroups().values().forEach(instancesPanel -> {
             instancesPanel.getScrollPane().setBorder(null);
         });
+
+        this.accountsView.getScrollPane().setBorder(null);
     }
 
     public void showGui() {
         SwingUtilities.invokeLater(() -> {
             this.playView = new PlayView();
+            this.accountsView = new AccountsView();
 
             this.viewSelector.addTab("Play", this.playView.getRoot());
-            this.viewSelector.addTab("Accounts", new AccountsView().getRoot());
+            this.viewSelector.addTab("Accounts", this.accountsView.getRoot());
             this.viewSelector.addTab("Settings", new SettingsView().getRoot());
             this.viewSelector.addTab("About", new AboutView().getRoot());
 

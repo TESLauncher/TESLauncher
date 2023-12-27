@@ -18,8 +18,12 @@
 
 package me.theentropyshard.teslauncher.utils;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -36,6 +40,16 @@ public final class SwingUtils {
         SwingUtils.ICON_CACHE.put(path, icon);
 
         return icon;
+    }
+
+    public static BufferedImage getImage(String path) {
+        try (InputStream inputStream = Objects.requireNonNull(SwingUtils.class.getResourceAsStream(path))) {
+            return ImageIO.read(inputStream);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     public static void centerWindow(Window window, int screen) {

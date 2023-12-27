@@ -16,31 +16,43 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.gui;
+package me.theentropyshard.teslauncher.gui.accountsview;
 
-import com.formdev.flatlaf.FlatClientProperties;
-import me.theentropyshard.teslauncher.TESLauncher;
-import me.theentropyshard.teslauncher.accounts.MicrosoftAccount;
-import me.theentropyshard.teslauncher.accounts.OfflineAccount;
-import me.theentropyshard.teslauncher.gui.playview.PlayViewHeader;
-import me.theentropyshard.teslauncher.minecraft.auth.microsoft.AuthListener;
-import me.theentropyshard.teslauncher.minecraft.auth.microsoft.MicrosoftAuthenticator;
-import me.theentropyshard.teslauncher.minecraft.auth.microsoft.MinecraftProfile;
+import me.theentropyshard.teslauncher.gui.View;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.datatransfer.StringSelection;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.time.OffsetDateTime;
-import java.util.UUID;
 
 public class AccountsView extends View {
+    private final JPanel panel;
+    private final JScrollPane scrollPane;
+    private final AccountItemGroup group;
+
     public AccountsView() {
         JPanel root = this.getRoot();
 
-        JLabel noticeLabel = new JLabel(
+        this.group = new AccountItemGroup();
+
+        this.panel = new JPanel(new GridLayout(0, 1, 0, 1));
+        this.panel.setBorder(new EmptyBorder(4, 4, 4, 4));
+        JPanel borderPanel = new JPanel(new BorderLayout());
+        borderPanel.add(this.panel, BorderLayout.PAGE_START);
+
+        this.scrollPane = new JScrollPane(borderPanel);
+        this.scrollPane.setBorder(null);
+        root.add(this.scrollPane, BorderLayout.CENTER);
+
+        AccountItem item = new AccountItem();
+        item.setSelected(true);
+        this.addAccountItem(item);
+        this.addAccountItem(new AccountItem());
+        this.addAccountItem(new AccountItem());
+        this.addAccountItem(new AccountItem());
+        this.addAccountItem(new AccountItem());
+        this.addAccountItem(new AddAccountItem());
+
+        /*JLabel noticeLabel = new JLabel(
                 // @formatter:off
                 "<html>" +
                     "<s><strong>Notice</strong>: Only offline accounts supported for now</s>" +
@@ -120,6 +132,36 @@ public class AccountsView extends View {
         });
         centerPanel.add(addMicrosoft);
 
-        root.add(centerPanel, BorderLayout.CENTER);
+        root.add(centerPanel, BorderLayout.CENTER);*/
+    }
+
+    public void addAccountItem(JComponent item) {
+        if (!((item instanceof AccountItem) || (item instanceof AddAccountItem))) {
+            throw new IllegalArgumentException(String.valueOf(item));
+        }
+
+        if (item instanceof AccountItem) {
+            this.group.addAccountItem((AccountItem) item);
+        }
+
+        this.panel.add(item);
+        this.panel.revalidate();
+    }
+
+    public void removeAccountItem(JComponent item) {
+        if (!((item instanceof AccountItem) || (item instanceof AddAccountItem))) {
+            throw new IllegalArgumentException(String.valueOf(item));
+        }
+
+        if (item instanceof AccountItem) {
+            this.group.removeAccountItem((AccountItem) item);
+        }
+
+        this.panel.remove(item);
+        this.panel.revalidate();
+    }
+
+    public JScrollPane getScrollPane() {
+        return this.scrollPane;
     }
 }
