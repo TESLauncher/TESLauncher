@@ -18,6 +18,8 @@
 
 package me.theentropyshard.teslauncher.gui.accountsview;
 
+import me.theentropyshard.teslauncher.TESLauncher;
+import me.theentropyshard.teslauncher.accounts.Account;
 import me.theentropyshard.teslauncher.utils.SwingUtils;
 
 import javax.swing.*;
@@ -31,6 +33,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class AccountItem extends JPanel {
+    private final Account account;
+    private final JLabel nickLabel;
     protected Color defaultColor;
     protected Color hoveredColor;
     protected Color pressedColor;
@@ -45,8 +49,9 @@ public class AccountItem extends JPanel {
 
     protected final int border = 12;
 
-    public AccountItem(String nick, Icon skinHead) {
+    public AccountItem(Account account) {
         super(new BorderLayout());
+        this.account = account;
 
         this.mouseClickListeners = new HashSet<>();
 
@@ -63,11 +68,11 @@ public class AccountItem extends JPanel {
         layout1.setVgap(0);
         JPanel leftPanel = new JPanel(layout1);
         leftPanel.setOpaque(false);
-        JLabel headIcon = new JLabel(skinHead);
+        JLabel headIcon = new JLabel(SwingUtils.loadIconFromBase64(account.getHeadIcon()));
         leftPanel.add(headIcon);
-        JLabel nickLabel = new JLabel(nick);
-        nickLabel.setBorder(new EmptyBorder(0, 6, 0, 0));
-        leftPanel.add(nickLabel);
+        this.nickLabel = new JLabel(account.getUsername());
+        this.nickLabel.setBorder(new EmptyBorder(0, 6, 0, 0));
+        leftPanel.add(this.nickLabel);
 
         FlowLayout layout = new FlowLayout(FlowLayout.RIGHT);
         layout.setHgap(0);
@@ -79,7 +84,7 @@ public class AccountItem extends JPanel {
         trashIcon.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-
+                System.out.println("TODO: remove account");
             }
         });
 
@@ -170,6 +175,10 @@ public class AccountItem extends JPanel {
         this.borderColor = UIManager.getColor("AccountItem.borderColor");
     }
 
+    public Account getAccount() {
+        return this.account;
+    }
+
     public boolean isSelected() {
         return this.selected;
     }
@@ -196,5 +205,9 @@ public class AccountItem extends JPanel {
 
     public void removeMouseClickListener(ActionListener listener) {
         this.mouseClickListeners.remove(listener);
+    }
+
+    public JLabel getNickLabel() {
+        return this.nickLabel;
     }
 }

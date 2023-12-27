@@ -160,4 +160,8 @@ public class Gui {
     public PlayView getPlayView() {
         return this.playView;
     }
+
+    public AccountsView getAccountsView() {
+        return this.accountsView;
+    }
 }

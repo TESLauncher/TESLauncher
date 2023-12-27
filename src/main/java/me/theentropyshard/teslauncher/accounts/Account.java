@@ -24,12 +24,21 @@ import java.io.IOException;
 import java.util.UUID;
 
 public abstract class Account {
+    public static final String DEFAULT_HEAD = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAABB0lEQVR42u3OvUuCQRzAccdIMhKC\n" +
+            "iDIHk3gSFLQhpBKlXKQhaYkwKEgSH4RDDBTh6WXwIbAmp2dqjJp6G8LG/q3avs9veOJwv+Mz3f3u\n" +
+            "vhdKx2ewHvOlV2axthRGYmEKycVpyLvWsi9kAtqAPPhPNjGHohXFjjWPVCwC+SETmCzw4TYxHir8\n" +
+            "jByM75Rv2MZz5wi51ShMQB946p/j7daG3H9xbHjqGF+ugndRCWQC+oB89Fesgy0X77065KNyRt6V\n" +
+            "nzMBfcA728Nr7xSf1wqNQibQ96CJx0YZTjUHE9AHHmoljE4KuCxuTOS+to2r6iZMQB9o7aZglyzI\n" +
+            "Iam7n8XNYT6QnDEBbeAP9OterSp4FpcAAAAASUVORK5CYII=";
+
     private String username;
     private UUID uuid;
     private String accessToken;
 
     // Stored in base64
     private String headIcon;
+
+    private boolean selected;
 
     public Account() {
 
@@ -69,8 +78,17 @@ public abstract class Account {
         this.headIcon = headIcon;
     }
 
+    public boolean isSelected() {
+        return this.selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
+
     @Override
     public String toString() {
-        return this.username;
+        return this.getClass().getSimpleName() + "{username=" +
+                this.username + ", selected=" + this.selected + "}";
     }
 }

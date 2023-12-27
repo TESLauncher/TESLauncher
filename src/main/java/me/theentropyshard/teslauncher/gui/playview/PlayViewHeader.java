@@ -18,8 +18,8 @@
 
 package me.theentropyshard.teslauncher.gui.playview;
 
-import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.accounts.Account;
+import me.theentropyshard.teslauncher.accounts.AccountsManager;
 import me.theentropyshard.teslauncher.gui.View;
 
 import javax.swing.*;
@@ -27,7 +27,7 @@ import java.awt.*;
 
 public class PlayViewHeader extends View {
     private final JComboBox<String> instanceGroups;
-    private final JComboBox<Account> accounts;
+    private final JLabel account;
 
     public static PlayViewHeader instance;
 
@@ -48,11 +48,12 @@ public class PlayViewHeader extends View {
         JLabel accountsLabel = new JLabel("Account:");
         rightSide.add(accountsLabel);
 
-        this.accounts = new JComboBox<>(
-                TESLauncher.getInstance().getAccountsManager().getAccounts()
-                        .toArray(new Account[0])
-        );
-        rightSide.add(this.accounts);
+        this.account = new JLabel();
+        Account currentAccount = AccountsManager.getCurrentAccount();
+        if (currentAccount != null) {
+            this.account.setText(currentAccount.getUsername());
+        }
+        rightSide.add(this.account);
 
         root.add(leftSide, BorderLayout.WEST);
         root.add(rightSide, BorderLayout.EAST);
@@ -62,7 +63,7 @@ public class PlayViewHeader extends View {
         return this.instanceGroups;
     }
 
-    public JComboBox<Account> getAccounts() {
-        return this.accounts;
+    public JLabel getAccountLabel() {
+        return this.account;
     }
 }

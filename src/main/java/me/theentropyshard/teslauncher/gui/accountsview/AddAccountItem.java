@@ -21,8 +21,12 @@ package me.theentropyshard.teslauncher.gui.accountsview;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.HashSet;
+import java.util.Set;
 
 public class AddAccountItem extends JPanel {
     protected Color defaultColor;
@@ -32,6 +36,8 @@ public class AddAccountItem extends JPanel {
     protected boolean mouseOver;
     protected boolean mousePressed;
 
+    private final Set<ActionListener> mouseClickListeners;
+
     protected final int border = 12;
 
     public AddAccountItem() {
@@ -40,6 +46,8 @@ public class AddAccountItem extends JPanel {
         this.setDefaultColor(UIManager.getColor("InstanceItem.defaultColor"));
         this.setHoveredColor(UIManager.getColor("InstanceItem.hoveredColor"));
         this.setPressedColor(UIManager.getColor("InstanceItem.pressedColor"));
+
+        this.mouseClickListeners = new HashSet<>();
 
         this.setOpaque(false);
         this.setBorder(new EmptyBorder(
@@ -80,7 +88,8 @@ public class AddAccountItem extends JPanel {
 
             @Override
             public void mouseClicked(MouseEvent e) {
-
+                ActionEvent event = new ActionEvent(AddAccountItem.this, 1, String.valueOf(e.getButton()));
+                AddAccountItem.this.mouseClickListeners.forEach(listener -> listener.actionPerformed(event));
             }
         });
     }
@@ -140,5 +149,13 @@ public class AddAccountItem extends JPanel {
 
     public void setPressedColor(Color pressedColor) {
         this.pressedColor = pressedColor;
+    }
+
+    public void addMouseClickListener(ActionListener listener) {
+        this.mouseClickListeners.add(listener);
+    }
+
+    public void removeMouseClickListener(ActionListener listener) {
+        this.mouseClickListeners.remove(listener);
     }
 }

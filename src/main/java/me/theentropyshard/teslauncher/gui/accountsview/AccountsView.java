@@ -18,7 +18,12 @@
 
 package me.theentropyshard.teslauncher.gui.accountsview;
 
+import me.theentropyshard.teslauncher.TESLauncher;
+import me.theentropyshard.teslauncher.accounts.Account;
+import me.theentropyshard.teslauncher.accounts.AccountsManager;
 import me.theentropyshard.teslauncher.gui.View;
+import me.theentropyshard.teslauncher.gui.dialogs.addaccount.AddAccountDialog;
+import me.theentropyshard.teslauncher.gui.playview.PlayViewHeader;
 import me.theentropyshard.teslauncher.utils.ResourceUtils;
 import me.theentropyshard.teslauncher.utils.SwingUtils;
 
@@ -26,6 +31,7 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.io.IOException;
+import java.util.List;
 
 public class AccountsView extends View {
     private final JPanel panel;
@@ -49,97 +55,23 @@ public class AccountsView extends View {
         root.add(this.scrollPane, BorderLayout.CENTER);
 
         this.addAccountItem = new AddAccountItem();
+        this.addAccountItem.addMouseClickListener(e -> {
+            new AddAccountDialog(this);
+        });
         this.panel.add(this.addAccountItem);
 
-        Icon icon = null;
-        try {
-            icon = SwingUtils.loadIconFromBase64(ResourceUtils.readToString("/steve_head_32_base64.txt"));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        AccountsManager accountsManager = TESLauncher.getInstance().getAccountsManager();
+        List<Account> accounts = accountsManager.getAccounts();
+        for (Account account : accounts) {
+            if (account.getHeadIcon() == null) {
+                account.setHeadIcon(Account.DEFAULT_HEAD);
+            }
+            AccountItem item = new AccountItem(account);
+            this.addAccountItem(item);
+            if (account.isSelected()) {
+                this.group.makeItemSelected(item);
+            }
         }
-        this.addAccountItem(new AccountItem("petya", icon));
-
-        /*JLabel noticeLabel = new JLabel(
-                // @formatter:off
-                "<html>" +
-                    "<s><strong>Notice</strong>: Only offline accounts supported for now</s>" +
-                "</html>"
-                // @formatter:on
-        );
-        noticeLabel.setHorizontalAlignment(JLabel.CENTER);
-        noticeLabel.setFont(noticeLabel.getFont().deriveFont(14.0f));
-        root.add(noticeLabel, BorderLayout.NORTH);
-
-        JPanel centerPanel = new JPanel();
-
-        JTextField usernameField = new JTextField();
-        Dimension size = usernameField.getPreferredSize();
-        usernameField.setPreferredSize(new Dimension(250, size.height));
-        usernameField.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Your nickname. Default is Player");
-        centerPanel.add(usernameField);
-
-        JButton addButton = new JButton("Add");
-        addButton.addActionListener(e -> {
-            String nickname = usernameField.getText();
-            PlayViewHeader.instance.getAccounts().addItem(new OfflineAccount(nickname));
-            TESLauncher.getInstance().getAccountsManager().saveAccount(new OfflineAccount(nickname));
-            usernameField.setText("");
-        });
-        centerPanel.add(addButton);
-
-        JButton addMicrosoft = new JButton("Add Microsoft");
-        addMicrosoft.addActionListener(e -> {
-            new SwingWorker<Void, Void>() {
-                @Override
-                protected Void doInBackground() throws Exception {
-                    AuthListener authListener = (userCode, verificationUri) -> {
-                        JOptionPane.showMessageDialog(TESLauncher.getInstance().getGui().getAppWindow().getFrame(),
-                                "A web page will be opened now. You will need to paste the\n" +
-                                " code that I already put in your clipboard.", "Info", JOptionPane.INFORMATION_MESSAGE);
-                        if (!Desktop.isDesktopSupported()) {
-                            JOptionPane.showMessageDialog(TESLauncher.getInstance().getGui().getAppWindow().getFrame(),
-                                    "java.awt.Desktop is not supported", "Error", JOptionPane.ERROR_MESSAGE);
-                            return;
-                        }
-
-                        StringSelection selection = new StringSelection(userCode);
-                        Toolkit.getDefaultToolkit().getSystemClipboard().setContents(selection, selection);
-
-                        Desktop desktop = Desktop.getDesktop();
-                        try {
-                            desktop.browse(new URI(verificationUri));
-                        } catch (IOException | URISyntaxException ex) {
-                            throw new RuntimeException(ex);
-                        }
-                    };
-
-                    MicrosoftAuthenticator authenticator = new MicrosoftAuthenticator(
-                            TESLauncher.getInstance().getHttpClient(),
-                            authListener, null, false
-                    );
-
-                    MinecraftProfile profile = authenticator.authenticate();
-                    MicrosoftAccount microsoftAccount = new MicrosoftAccount();
-                    microsoftAccount.setAccessToken(profile.accessToken);
-                    microsoftAccount.setUuid(UUID.fromString(profile.id.replaceFirst(
-                            "(\\p{XDigit}{8})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}+)", "$1-$2-$3-$4-$5"
-                    )));
-                    microsoftAccount.setUsername(profile.name);
-                    microsoftAccount.setRefreshToken(authenticator.getRefreshToken());
-                    microsoftAccount.setLoggedInAt(OffsetDateTime.now());
-                    microsoftAccount.setExpiresIn(authenticator.getExpiresIn());
-
-                    TESLauncher.getInstance().getAccountsManager().saveAccount(microsoftAccount);
-
-                    PlayViewHeader.instance.getAccounts().addItem(microsoftAccount);
-
-                    return null;
-                }
-            }.execute();
-        });
-        centerPanel.add(addMicrosoft);
-
-        root.add(centerPanel, BorderLayout.CENTER);*/
     }
 
     public void addAccountItem(JComponent item) {
@@ -147,13 +79,44 @@ public class AccountsView extends View {
             throw new IllegalArgumentException(String.valueOf(item));
         }
 
-        if (item instanceof AccountItem) {
-            this.group.addAccountItem((AccountItem) item);
+        if (!(item instanceof AccountItem)) {
+            return;
         }
+
+        AccountItem accountItem = (AccountItem) item;
+
+        accountItem.addMouseClickListener(e -> {
+            AccountsManager accountsManager = TESLauncher.getInstance().getAccountsManager();
+            accountsManager.selectAccount(accountItem.getAccount());
+            try {
+                accountsManager.save();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+
+            PlayViewHeader header = TESLauncher.getInstance().getGui().getPlayView().getHeader();
+            header.getAccountLabel().setText(accountItem.getAccount().getUsername());
+        });
+
+        this.group.addAccountItem(accountItem);
 
         int count = this.panel.getComponentCount();
         this.panel.add(item, count - 1);
         this.panel.revalidate();
+    }
+
+    public AccountItem getByName(String name) {
+        for (Component component : this.panel.getComponents()) {
+            if (!(component instanceof AccountItem)) {
+                continue;
+            }
+
+            if (((AccountItem) component).getAccount().getUsername().equals(name)) {
+                return (AccountItem) component;
+            }
+        }
+
+        return null;
     }
 
     public void removeAccountItem(JComponent item) {
@@ -175,5 +138,9 @@ public class AccountsView extends View {
 
     public JPanel getPanel() {
         return this.panel;
+    }
+
+    public AccountItemGroup getGroup() {
+        return this.group;
     }
 }

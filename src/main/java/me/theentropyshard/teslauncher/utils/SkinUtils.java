@@ -18,22 +18,20 @@
 
 package me.theentropyshard.teslauncher.utils;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 
 public final class SkinUtils {
-    public static BufferedImage getSkinHead(BufferedImage skin) {
-        int width = skin.getWidth();
-        int height = skin.getHeight();
+    public static BufferedImage getScaledSkinHead(BufferedImage skin) {
+        BufferedImage head = skin.getSubimage(8, 8, 8, 8);
+        Image scaledHead = head.getScaledInstance(32, 32, BufferedImage.SCALE_FAST);
 
-        if (height == 32) {
+        BufferedImage result = new BufferedImage(32, 32, BufferedImage.TYPE_INT_RGB);
+        Graphics graphics = result.getGraphics();
+        graphics.drawImage(scaledHead, 0, 0, null);
+        graphics.dispose();
 
-        } else if (height == 64) {
-
-        } else {
-            return null;
-        }
-
-        return null;
+        return result;
     }
 
     private SkinUtils() {

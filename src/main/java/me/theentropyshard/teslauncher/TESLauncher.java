@@ -160,16 +160,18 @@ public class TESLauncher {
         this.taskPool.shutdown();
 
         try {
-            this.instanceManager.getInstances().forEach(i -> {
-                try {
-                    this.instanceManager.save(i);
-                } catch (IOException ex) {
-                    throw new RuntimeException(ex);
-                }
-            });
-        } catch (Exception e) {
-            this.logger.error("Exception while saving instances", e);
+            this.accountsManager.save();
+        } catch (IOException e) {
+            this.logger.error("Exception while saving accounts", e);
         }
+
+        this.instanceManager.getInstances().forEach(i -> {
+            try {
+                this.instanceManager.save(i);
+            } catch (IOException e) {
+                this.logger.error("Exception while saving instance '" + i + "'", e);
+            }
+        });
 
         try {
             this.settings.save(this.settingsFile);

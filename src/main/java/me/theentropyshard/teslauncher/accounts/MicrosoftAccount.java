@@ -19,6 +19,8 @@
 package me.theentropyshard.teslauncher.accounts;
 
 import me.theentropyshard.teslauncher.TESLauncher;
+import me.theentropyshard.teslauncher.gui.accountsview.AccountItem;
+import me.theentropyshard.teslauncher.gui.dialogs.addaccount.MicrosoftAccountCreationView;
 import me.theentropyshard.teslauncher.minecraft.auth.microsoft.AuthException;
 import me.theentropyshard.teslauncher.minecraft.auth.microsoft.AuthListener;
 import me.theentropyshard.teslauncher.minecraft.auth.microsoft.MicrosoftAuthenticator;
@@ -60,12 +62,25 @@ public class MicrosoftAccount extends Account {
             this.setUuid(UUID.fromString(profile.id.replaceFirst(
                     "(\\p{XDigit}{8})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}+)", "$1-$2-$3-$4-$5"
             )));
+
+            String oldUsername = this.getUsername();
+
+            AccountItem byName = TESLauncher.getInstance().getGui().getAccountsView().getByName(oldUsername);
+            if (byName != null) {
+                byName.getNickLabel().setText(profile.name);
+            }
+
             this.setUsername(profile.name);
             this.setRefreshToken(authenticator.getRefreshToken());
             this.setLoggedInAt(OffsetDateTime.now());
             this.setExpiresIn(authenticator.getExpiresIn());
 
-            TESLauncher.getInstance().getAccountsManager().saveAccount(this);
+            this.setHeadIcon(
+                    MicrosoftAccountCreationView.getBase64SkinHead(profile)
+            );
+
+
+            TESLauncher.getInstance().getAccountsManager().save();
         }
     }
 

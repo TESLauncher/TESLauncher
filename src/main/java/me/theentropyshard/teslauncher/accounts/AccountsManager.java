@@ -20,23 +20,15 @@ package me.theentropyshard.teslauncher.accounts;
 
 import com.google.gson.reflect.TypeToken;
 import me.theentropyshard.teslauncher.TESLauncher;
-import me.theentropyshard.teslauncher.gui.playview.PlayViewHeader;
 import me.theentropyshard.teslauncher.utils.FileUtils;
 import me.theentropyshard.teslauncher.utils.IOUtils;
 import me.theentropyshard.teslauncher.utils.Json;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.OffsetDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class AccountsManager {
     private final Path accountsFile;
@@ -51,12 +43,23 @@ public class AccountsManager {
             throw new RuntimeException(e);
         }
 
-        this.accounts = new HashMap<>();
+        this.accounts = new LinkedHashMap<>();
     }
 
     public static Account getCurrentAccount() {
         Map<String, Account> accountsMap = TESLauncher.getInstance().getAccountsManager().getAccountsMap();
-        return accountsMap.get(String.valueOf(PlayViewHeader.instance.getAccounts().getSelectedItem()));
+        for (Map.Entry<String, Account> entry : accountsMap.entrySet()) {
+            Account account = entry.getValue();
+            if (account.isSelected()) {
+                return account;
+            }
+        }
+
+        return null;
+    }
+
+    public boolean canCreateAccount(String username) {
+        return !this.accounts.containsKey(username);
     }
 
     public void loadAccounts() throws IOException {
@@ -67,7 +70,7 @@ public class AccountsManager {
     }
 
     public boolean saveAccount(Account account) {
-        if (this.accounts.containsKey(account.getUsername())) {
+        if (!this.canCreateAccount(account.getUsername())) {
             return false;
         }
 
@@ -96,6 +99,14 @@ public class AccountsManager {
         }
 
         return false;
+    }
+
+    public void selectAccount(Account account) {
+        for (Map.Entry<String, Account> entry : this.accounts.entrySet()) {
+            entry.getValue().setSelected(false);
+        }
+
+        account.setSelected(true);
     }
 
     public void save() throws IOException {

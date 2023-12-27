@@ -25,10 +25,26 @@ import me.theentropyshard.teslauncher.utils.Json;
 public class AccountDeserializer extends AbstractJsonDeserializer<Account> {
     @Override
     public Account deserialize(JsonObject root) {
+        boolean noHead = !root.has("headIcon");
+
         if (!root.has("accessToken") || root.get("accessToken").getAsString().equals("-")) {
-            return new OfflineAccount(root.get("username").getAsString());
+            OfflineAccount offlineAccount = new OfflineAccount(root.get("username").getAsString());
+
+            if (noHead) {
+                offlineAccount.setHeadIcon(Account.DEFAULT_HEAD);
+            }
+
+            offlineAccount.setSelected(root.get("selected").getAsBoolean());
+
+            return offlineAccount;
         }
 
-        return Json.parse(root, MicrosoftAccount.class);
+        Account account = Json.parse(root, MicrosoftAccount.class);
+
+        if (noHead) {
+            account.setHeadIcon(Account.DEFAULT_HEAD);
+        }
+
+        return account;
     }
 }

@@ -45,4 +45,13 @@ public class AccountItemGroup {
         this.items.remove(accountItem);
         accountItem.setSelected(false);
     }
+
+    public void makeItemSelected(AccountItem accountItem) {
+        this.items.forEach(item -> {
+            item.setSelected(false);
+            item.repaint();
+        });
+
+        accountItem.setSelected(true);
+    }
 }

@@ -24,4 +24,15 @@ public class MinecraftSkin {
     public String url;
     public String variant;
     public String alias;
+
+    @Override
+    public String toString() {
+        return "MinecraftSkin{" +
+                "id='" + this.id + '\'' +
+                ", state='" + this.state + '\'' +
+                ", url='" + this.url + '\'' +
+                ", variant='" + this.variant + '\'' +
+                ", alias='" + this.alias + '\'' +
+                '}';
+    }
 }
