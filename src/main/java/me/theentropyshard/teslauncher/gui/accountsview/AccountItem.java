@@ -18,7 +18,6 @@
 
 package me.theentropyshard.teslauncher.gui.accountsview;
 
-import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.accounts.Account;
 import me.theentropyshard.teslauncher.utils.SwingUtils;
 
@@ -41,6 +40,7 @@ public class AccountItem extends JPanel {
     private Color borderColor;
 
     private final Set<ActionListener> mouseClickListeners;
+    private final Image trashIcon;
 
     protected boolean mouseOver;
     protected boolean mousePressed;
@@ -49,11 +49,15 @@ public class AccountItem extends JPanel {
 
     protected final int border = 12;
 
+    private final Rectangle trashBounds;
+
     public AccountItem(Account account) {
         super(new BorderLayout());
         this.account = account;
 
         this.mouseClickListeners = new HashSet<>();
+        this.trashIcon = SwingUtils.getImage("/trash_icon.png");
+        this.trashBounds = new Rectangle(0, 0, 32, 32);
 
         this.borderColor = UIManager.getColor("AccountItem.borderColor");
 
@@ -79,14 +83,6 @@ public class AccountItem extends JPanel {
         layout.setVgap(0);
         JPanel rightPanel = new JPanel(layout);
         rightPanel.setOpaque(false);
-        JLabel trashIcon = new JLabel(SwingUtils.getIcon("/trash_icon.png"));
-        rightPanel.add(trashIcon);
-        trashIcon.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                System.out.println("TODO: remove account");
-            }
-        });
 
         this.add(leftPanel, BorderLayout.WEST);
         this.add(rightPanel, BorderLayout.EAST);
@@ -126,8 +122,12 @@ public class AccountItem extends JPanel {
 
             @Override
             public void mouseClicked(MouseEvent e) {
-                ActionEvent event = new ActionEvent(AccountItem.this, 1, String.valueOf(e.getButton()));
-                AccountItem.this.mouseClickListeners.forEach(listener -> listener.actionPerformed(event));
+                if (AccountItem.this.trashBounds.contains(e.getPoint())) {
+
+                } else {
+                    ActionEvent event = new ActionEvent(AccountItem.this, 1, String.valueOf(e.getButton()));
+                    AccountItem.this.mouseClickListeners.forEach(listener -> listener.actionPerformed(event));
+                }
             }
         });
     }
@@ -154,6 +154,21 @@ public class AccountItem extends JPanel {
                 this.getHeight() - this.border / 2,
                 10, 10
         );
+
+        if (this.mouseOver) {
+            Dimension size = this.getSize();
+
+            int iw = 32;
+            int ih = 32;
+
+            int x = size.width - this.border - iw;
+            int y = size.height / 2 - ih / 2;
+
+            this.trashBounds.x = x;
+            this.trashBounds.y = y;
+
+            g.drawImage(this.trashIcon, x, y, null);
+        }
 
         if (this.selected) {
             g.setColor(this.borderColor);
