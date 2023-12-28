@@ -16,35 +16,26 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.gui.dialogs.addaccount;
+package me.theentropyshard.teslauncher.gui.dialogs;
 
 import me.theentropyshard.teslauncher.TESLauncher;
-import me.theentropyshard.teslauncher.gui.accountsview.AccountsView;
-import me.theentropyshard.teslauncher.gui.dialogs.AppDialog;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class AddAccountDialog extends AppDialog {
-    private final OfflineAccountCreationView offlineView;
-    private final MicrosoftAccountCreationView microsoftView;
-
-    public AddAccountDialog(AccountsView accountsView) {
-        super(TESLauncher.window.getFrame(), "Add new account");
+public class OpenBrowserDialog extends AppDialog {
+    public OpenBrowserDialog(String userCode, String verificationUri) {
+        super(TESLauncher.window.getFrame(), "Open your browser");
 
         JPanel root = new JPanel(new BorderLayout());
 
-        JTabbedPane viewSelector = new JTabbedPane(JTabbedPane.TOP);
-        viewSelector.putClientProperty("JTabbedPane.tabAreaAlignment", "fill");
+        JTextPane textPane = new JTextPane();
+        textPane.setContentType("text/html");
+        textPane.setEditable(false);
+        textPane.setText("Please open your browser and go to <a href=\"" + verificationUri
+                + "\">" + verificationUri + "</a>, <br> paste the code <b>" + userCode + "</b> and follow further instructions.");
 
-        this.offlineView = new OfflineAccountCreationView(this, accountsView);
-        viewSelector.addTab("Offline", this.offlineView);
-
-        this.microsoftView = new MicrosoftAccountCreationView(this, accountsView);
-        viewSelector.addTab("Microsoft", this.microsoftView);
-
-        root.add(viewSelector, BorderLayout.CENTER);
-        //root.setPreferredSize(new Dimension(800, 600));
+        root.add(textPane, BorderLayout.CENTER);
 
         this.setResizable(false);
         this.setContent(root);

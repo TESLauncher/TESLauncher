@@ -48,8 +48,31 @@ public class MicrosoftAccount extends Account {
     @Override
     public void authenticate() throws IOException, AuthException {
         if (this.needToRefresh()) {
-            AuthListener authListener = (userCode, verificationUri) -> {
+            AuthListener authListener = new AuthListener() {
+                @Override
+                public void onUserCodeReceived(String userCode, String verificationUri) {
 
+                }
+
+                @Override
+                public void onMinecraftAuth() {
+
+                }
+
+                @Override
+                public void onCheckGameOwnership() {
+
+                }
+
+                @Override
+                public void onGettingSkin() {
+
+                }
+
+                @Override
+                public void onFinish() {
+
+                }
             };
 
             MicrosoftAuthenticator authenticator = new MicrosoftAuthenticator(

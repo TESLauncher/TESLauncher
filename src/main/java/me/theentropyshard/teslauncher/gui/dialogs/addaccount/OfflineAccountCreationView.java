@@ -27,6 +27,7 @@ import me.theentropyshard.teslauncher.gui.accountsview.AccountItem;
 import me.theentropyshard.teslauncher.gui.accountsview.AccountsView;
 
 import javax.swing.*;
+import java.awt.*;
 
 public class OfflineAccountCreationView extends JPanel {
     private final JTextField usernameField;
@@ -34,6 +35,7 @@ public class OfflineAccountCreationView extends JPanel {
     public OfflineAccountCreationView(AddAccountDialog dialog, AccountsView accountsView) {
         this.usernameField = new JTextField();
         this.usernameField.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Enter desired username");
+        this.usernameField.setPreferredSize(new Dimension(250, 26));
 
         this.add(this.usernameField);
 

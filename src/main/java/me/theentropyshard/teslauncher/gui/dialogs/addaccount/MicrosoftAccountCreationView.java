@@ -23,6 +23,7 @@ import me.theentropyshard.teslauncher.accounts.Account;
 import me.theentropyshard.teslauncher.accounts.MicrosoftAccount;
 import me.theentropyshard.teslauncher.gui.accountsview.AccountItem;
 import me.theentropyshard.teslauncher.gui.accountsview.AccountsView;
+import me.theentropyshard.teslauncher.gui.dialogs.OpenBrowserDialog;
 import me.theentropyshard.teslauncher.minecraft.auth.microsoft.AuthListener;
 import me.theentropyshard.teslauncher.minecraft.auth.microsoft.MicrosoftAuthenticator;
 import me.theentropyshard.teslauncher.minecraft.auth.microsoft.MinecraftProfile;
@@ -48,92 +49,174 @@ import java.util.Base64;
 import java.util.Objects;
 import java.util.UUID;
 
+//TODO: this is still big shit. fix it
 public class MicrosoftAccountCreationView extends JPanel {
+    private final CardLayout layout;
     private final AddAccountDialog dialog;
-    private final AccountsView accountsView;
 
-    private final JLabel textField;
-
-    // TODO: we might already have an offline account added with the username of the paid account
-    // what do we do in this case? we know the username of the paid account only after the authorization
     public MicrosoftAccountCreationView(AddAccountDialog dialog, AccountsView accountsView) {
         this.dialog = dialog;
-        this.accountsView = accountsView;
+        this.layout = new CardLayout();
+        this.setLayout(this.layout);
 
-        this.textField = new JLabel();
+        SecondView secondView = new SecondView(this);
+        FirstView firstView = new FirstView(this, secondView);
+        this.add(firstView, FirstView.class.getName());
+        this.add(secondView, SecondView.class.getName());
 
-        this.setLayout(new BorderLayout());
+        this.layout.show(this, "first");
+    }
 
-        JButton addMicrosoft = new JButton("Add Microsoft");
-        addMicrosoft.addActionListener(e -> {
-            this.textField.setText("Working...");
+    private static final class FirstView extends JPanel {
+        public FirstView(MicrosoftAccountCreationView v, SecondView secondView) {
+            super(new BorderLayout());
 
-            new SwingWorker<Void, Void>() {
-                @Override
-                protected Void doInBackground() throws Exception {
-                    AuthListener authListener = (userCode, verificationUri) -> {
-                        MicrosoftAccountCreationView.this.textField.setText(
-                                "A web page will open now. You will need to paste the\n" +
-                                        " code that I already put in your clipboard."
+            JPanel topPanel = new JPanel(new BorderLayout());
+
+            JTextPane textPane = new JTextPane();
+            textPane.setEditable(false);
+            textPane.setText("You are about to add Microsoft account. When you will press the Proceed button, a web page\n" +
+                    "will open, where you will need to paste a code that I will put in your clipboard.");
+
+            topPanel.add(textPane, BorderLayout.CENTER);
+            this.add(topPanel, BorderLayout.NORTH);
+
+            JPanel centerPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+            JCheckBox checkBox = new JCheckBox("I want to open browser myself");
+            checkBox.addActionListener(e -> {
+                secondView.setSelectedBox(!secondView.isSelectedBox());
+            });
+            centerPanel.add(checkBox);
+            this.add(centerPanel, BorderLayout.CENTER);
+
+            JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+            JButton proceed = new JButton("Proceed");
+            proceed.addActionListener(e -> {
+                v.layout.show(v, SecondView.class.getName());
+
+                new SwingWorker<Void, Void>() {
+                    @Override
+                    protected Void doInBackground() throws Exception {
+                        MicrosoftAuthenticator authenticator = new MicrosoftAuthenticator(
+                                TESLauncher.getInstance().getHttpClient(),
+                                secondView, null, false
                         );
 
-                        if (!Desktop.isDesktopSupported()) {
-                            JOptionPane.showMessageDialog(TESLauncher.getInstance().getGui().getAppWindow().getFrame(),
-                                    "java.awt.Desktop is not supported", "Error", JOptionPane.ERROR_MESSAGE);
-                            return;
-                        }
+                        MinecraftProfile profile = authenticator.authenticate();
+                        MicrosoftAccount microsoftAccount = new MicrosoftAccount();
+                        microsoftAccount.setAccessToken(profile.accessToken);
+                        microsoftAccount.setUuid(UUID.fromString(profile.id.replaceFirst(
+                                "(\\p{XDigit}{8})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}+)", "$1-$2-$3-$4-$5"
+                        )));
+                        microsoftAccount.setUsername(profile.name);
+                        microsoftAccount.setRefreshToken(authenticator.getRefreshToken());
+                        microsoftAccount.setLoggedInAt(OffsetDateTime.now());
+                        microsoftAccount.setExpiresIn(authenticator.getExpiresIn());
 
-                        StringSelection selection = new StringSelection(userCode);
-                        Toolkit.getDefaultToolkit().getSystemClipboard().setContents(selection, selection);
+                        secondView.onGettingSkin();
 
-                        Desktop desktop = Desktop.getDesktop();
-                        try {
-                            desktop.browse(new URI(verificationUri));
-                        } catch (IOException | URISyntaxException ex) {
-                            throw new RuntimeException(ex);
-                        }
-                    };
+                        microsoftAccount.setHeadIcon(
+                                MicrosoftAccountCreationView.getBase64SkinHead(profile)
+                        );
 
-                    MicrosoftAuthenticator authenticator = new MicrosoftAuthenticator(
-                            TESLauncher.getInstance().getHttpClient(),
-                            authListener, null, false
-                    );
+                        secondView.onFinish();
 
-                    MinecraftProfile profile = authenticator.authenticate();
-                    MicrosoftAccount microsoftAccount = new MicrosoftAccount();
-                    microsoftAccount.setAccessToken(profile.accessToken);
-                    microsoftAccount.setUuid(UUID.fromString(profile.id.replaceFirst(
-                            "(\\p{XDigit}{8})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}+)", "$1-$2-$3-$4-$5"
-                    )));
-                    microsoftAccount.setUsername(profile.name);
-                    microsoftAccount.setRefreshToken(authenticator.getRefreshToken());
-                    microsoftAccount.setLoggedInAt(OffsetDateTime.now());
-                    microsoftAccount.setExpiresIn(authenticator.getExpiresIn());
+                        TESLauncher.getInstance().getAccountsManager().saveAccount(microsoftAccount);
 
-                    MicrosoftAccountCreationView.this.textField.setText("Getting skin...");
+                        TESLauncher.getInstance().getGui().getAccountsView().addAccountItem(
+                                new AccountItem(microsoftAccount)
+                        );
 
-                    microsoftAccount.setHeadIcon(
-                            MicrosoftAccountCreationView.getBase64SkinHead(profile)
-                    );
+                        v.dialog.getDialog().dispose();
 
-                    TESLauncher.getInstance().getAccountsManager().saveAccount(microsoftAccount);
+                        return null;
+                    }
+                }.execute();
+            });
+            bottomPanel.add(proceed);
+            this.add(bottomPanel, BorderLayout.SOUTH);
+        }
+    }
 
-                    TESLauncher.getInstance().getGui().getAccountsView().addAccountItem(
-                            new AccountItem(microsoftAccount)
-                    );
+    private static final class SecondView extends JPanel implements AuthListener {
+        private final JTextPane textPane;
+        private boolean selectedBox;
 
-                    MicrosoftAccountCreationView.this.textField.setText("Done");
+        public SecondView(MicrosoftAccountCreationView v) {
+            super(new BorderLayout());
 
-                    dialog.getDialog().dispose();
+            JPanel centerPanel = new JPanel(new BorderLayout());
 
-                    return null;
+            this.textPane = new JTextPane();
+            this.textPane.setEditable(false);
+            this.textPane.setText("Waiting for the user to enter account credentials...");
+
+            centerPanel.add(this.textPane, BorderLayout.CENTER);
+            this.add(centerPanel, BorderLayout.CENTER);
+
+            JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+            JButton finish = new JButton("Finish");
+            finish.addActionListener(e -> {
+                v.dialog.getDialog().dispose();
+            });
+            bottomPanel.add(finish);
+            this.add(bottomPanel, BorderLayout.SOUTH);
+        }
+
+        @Override
+        public void onUserCodeReceived(String userCode, String verificationUri) {
+            StringSelection selection = new StringSelection(userCode);
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(selection, selection);
+
+            if (!this.isSelectedBox()) {
+                if (!Desktop.isDesktopSupported()) {
+                    JOptionPane.showMessageDialog(TESLauncher.getInstance().getGui().getAppWindow().getFrame(),
+                            "java.awt.Desktop is not supported", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
                 }
-            }.execute();
-        });
 
-        this.add(addMicrosoft, BorderLayout.NORTH);
+                Desktop desktop = Desktop.getDesktop();
+                try {
+                    desktop.browse(new URI(verificationUri));
+                } catch (IOException | URISyntaxException ex) {
+                    throw new RuntimeException(ex);
+                }
+            } else {
+                new OpenBrowserDialog(userCode, verificationUri);
+            }
+        }
 
-        this.add(this.textField, BorderLayout.CENTER);
+        @Override
+        public void onMinecraftAuth() {
+            String text = this.textPane.getText();
+            this.textPane.setText(text + "\n\n" + "Authenticating with Minecraft...");
+        }
+
+        @Override
+        public void onCheckGameOwnership() {
+            String text = this.textPane.getText();
+            this.textPane.setText(text + "\n\n" + "Checking game ownership...");
+        }
+
+        @Override
+        public void onGettingSkin() {
+            String text = this.textPane.getText();
+            this.textPane.setText(text + "\n\n" + "Getting skin...");
+        }
+
+        @Override
+        public void onFinish() {
+            String text = this.textPane.getText();
+            this.textPane.setText(text + "\n\n" + "Finished");
+        }
+
+        public boolean isSelectedBox() {
+            return this.selectedBox;
+        }
+
+        public void setSelectedBox(boolean selectedBox) {
+            this.selectedBox = selectedBox;
+        }
     }
 
     public static String getBase64SkinHead(MinecraftProfile profile) throws IOException {

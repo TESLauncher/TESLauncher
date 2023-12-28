@@ -192,6 +192,8 @@ public class MicrosoftAuthenticator {
     }
 
     private MinecraftAuthResponse authenticateWithMinecraft(XSTSAuthResponse authResponse) throws IOException {
+        this.listener.onMinecraftAuth();
+
         String url = "https://api.minecraftservices.com/authentication/login_with_xbox";
 
         String payload = String.format("{\"identityToken\": \"XBL3.0 x=%s;%s\"}", authResponse.displayClaims.xui.get(0).uhs, authResponse.token);
@@ -205,6 +207,8 @@ public class MicrosoftAuthenticator {
     }
 
     private boolean checkGameOwnership(MinecraftAuthResponse mcResponse) throws IOException {
+        this.listener.onCheckGameOwnership();
+
         String url = "https://api.minecraftservices.com/entitlements/mcstore";
 
         try (HttpRequest request = new HttpRequest(this.httpClient)) {

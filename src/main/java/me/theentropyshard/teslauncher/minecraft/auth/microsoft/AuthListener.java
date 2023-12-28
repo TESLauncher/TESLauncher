@@ -20,4 +20,12 @@ package me.theentropyshard.teslauncher.minecraft.auth.microsoft;
 
 public interface AuthListener {
     void onUserCodeReceived(String userCode, String verificationUri);
+
+    void onMinecraftAuth();
+
+    void onCheckGameOwnership();
+
+    void onGettingSkin();
+
+    void onFinish();
 }
