@@ -49,21 +49,22 @@ public class PlayViewHeader extends View {
         rightSide.add(accountsLabel);
 
         this.account = new JLabel();
-        Account currentAccount = AccountsManager.getCurrentAccount();
-        if (currentAccount != null) {
-            this.account.setText(currentAccount.getUsername());
-        }
+        this.setCurrentAccount(AccountsManager.getCurrentAccount());
         rightSide.add(this.account);
 
         root.add(leftSide, BorderLayout.WEST);
         root.add(rightSide, BorderLayout.EAST);
     }
 
-    public JComboBox<String> getInstanceGroups() {
-        return this.instanceGroups;
+    public void setCurrentAccount(Account account) {
+        if (account != null) {
+            this.account.setText(account.getUsername());
+        } else {
+            this.account.setText("No account selected");
+        }
     }
 
-    public JLabel getAccountLabel() {
-        return this.account;
+    public JComboBox<String> getInstanceGroups() {
+        return this.instanceGroups;
     }
 }

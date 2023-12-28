@@ -18,7 +18,10 @@
 
 package me.theentropyshard.teslauncher.gui.accountsview;
 
+import jdk.nashorn.internal.scripts.JO;
+import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.accounts.Account;
+import me.theentropyshard.teslauncher.gui.playview.PlayViewHeader;
 import me.theentropyshard.teslauncher.utils.SwingUtils;
 
 import javax.swing.*;
@@ -28,6 +31,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -123,7 +127,39 @@ public class AccountItem extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (AccountItem.this.trashBounds.contains(e.getPoint())) {
+                    int option = JOptionPane.showConfirmDialog(
+                            TESLauncher.window.getFrame(),
+                            "Are you sure that you want to remove account '" + account.getUsername() + "'?",
+                            "Account removal",
+                            JOptionPane.YES_NO_OPTION,
+                            JOptionPane.QUESTION_MESSAGE
+                    );
 
+                    if (option != JOptionPane.OK_OPTION) {
+                        return;
+                    }
+
+                    try {
+                        TESLauncher.getInstance().getAccountsManager().removeAccount(account);
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+
+                        JOptionPane.showMessageDialog(
+                                TESLauncher.window.getFrame(),
+                                "Unable to remove account '" + account.getUsername() + "': " + ex.getMessage(),
+                                "Error",
+                                JOptionPane.ERROR_MESSAGE
+                        );
+
+                        return;
+                    }
+
+                    TESLauncher.getInstance().getGui().getAccountsView().removeAccountItem(AccountItem.this);
+
+                    if (account.isSelected()) {
+                        PlayViewHeader header = TESLauncher.getInstance().getGui().getPlayView().getHeader();
+                        header.setCurrentAccount(null);
+                    }
                 } else {
                     ActionEvent event = new ActionEvent(AccountItem.this, 1, String.valueOf(e.getButton()));
                     AccountItem.this.mouseClickListeners.forEach(listener -> listener.actionPerformed(event));

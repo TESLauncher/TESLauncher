@@ -121,4 +121,10 @@ public class AccountsManager {
     public Map<String, Account> getAccountsMap() {
         return this.accounts;
     }
+
+    public void removeAccount(Account account) throws IOException {
+        this.accounts.remove(account.getUsername());
+
+        this.save();
+    }
 }

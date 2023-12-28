@@ -74,6 +74,20 @@ public class AccountsView extends View {
         }
     }
 
+    public AccountItem getByName(String name) {
+        for (Component component : this.panel.getComponents()) {
+            if (!(component instanceof AccountItem)) {
+                continue;
+            }
+
+            if (((AccountItem) component).getAccount().getUsername().equals(name)) {
+                return (AccountItem) component;
+            }
+        }
+
+        return null;
+    }
+
     public void addAccountItem(JComponent item) {
         if (!((item instanceof AccountItem) || (item instanceof AddAccountItem))) {
             throw new IllegalArgumentException(String.valueOf(item));
@@ -95,7 +109,7 @@ public class AccountsView extends View {
             }
 
             PlayViewHeader header = TESLauncher.getInstance().getGui().getPlayView().getHeader();
-            header.getAccountLabel().setText(accountItem.getAccount().getUsername());
+            header.setCurrentAccount(accountItem.getAccount());
         });
 
         this.group.addAccountItem(accountItem);
@@ -103,20 +117,6 @@ public class AccountsView extends View {
         int count = this.panel.getComponentCount();
         this.panel.add(item, count - 1);
         this.panel.revalidate();
-    }
-
-    public AccountItem getByName(String name) {
-        for (Component component : this.panel.getComponents()) {
-            if (!(component instanceof AccountItem)) {
-                continue;
-            }
-
-            if (((AccountItem) component).getAccount().getUsername().equals(name)) {
-                return (AccountItem) component;
-            }
-        }
-
-        return null;
     }
 
     public void removeAccountItem(JComponent item) {
