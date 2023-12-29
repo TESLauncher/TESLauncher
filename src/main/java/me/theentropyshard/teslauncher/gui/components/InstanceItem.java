@@ -29,6 +29,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.geom.Arc2D;
+import java.awt.geom.Area;
+import java.awt.geom.Ellipse2D;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -47,9 +50,12 @@ public class InstanceItem extends JPanel {
     private Color defaultColor;
     private Color hoveredColor;
     private Color pressedColor;
+    private Color arcColor;
 
     private boolean mouseOver;
     private boolean mousePressed;
+
+    private double percentComplete;
 
     public InstanceItem(Icon icon, String text) {
         super(new BorderLayout(), true);
@@ -70,6 +76,7 @@ public class InstanceItem extends JPanel {
         this.setDefaultColor(UIManager.getColor("InstanceItem.defaultColor"));
         this.setHoveredColor(UIManager.getColor("InstanceItem.hoveredColor"));
         this.setPressedColor(UIManager.getColor("InstanceItem.pressedColor"));
+        this.arcColor = UIManager.getColor("AccountItem.borderColor");
 
         this.setOpaque(false);
         this.setToolTipText(text);
@@ -138,12 +145,49 @@ public class InstanceItem extends JPanel {
         g.fillRoundRect(0, 0, this.getWidth(), this.getHeight(), 10, 10);
 
         super.paintComponent(g);
+
+        if (this instanceof AddInstanceItem) {
+            return;
+        }
+
+        Graphics2D g2 = (Graphics2D) g;
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setColor(this.arcColor);
+
+        Dimension size = this.getSize();
+
+        double degree = 360 * this.percentComplete;
+
+        int arcSize = 48;
+        Shape arc = new Arc2D.Double(
+                (double) size.width / 2 - (double) arcSize / 2,
+                (double) size.height / 2 - (double) arcSize / 2 - 8,
+                arcSize,
+                arcSize,
+                90 - degree,
+                degree,
+                Arc2D.PIE
+        );
+
+        int innerSize = 42;
+        Shape inner = new Ellipse2D.Double(
+                (double) size.width / 2 - (double) innerSize / 2,
+                (double) size.height / 2 - (double) innerSize / 2 - 8,
+                innerSize,
+                innerSize
+        );
+
+        Area area = new Area(arc);
+        area.subtract(new Area(inner));
+
+        g2.fill(area);
     }
 
     public void updateColors() {
         this.setDefaultColor(UIManager.getColor("InstanceItem.defaultColor"));
         this.setHoveredColor(UIManager.getColor("InstanceItem.hoveredColor"));
         this.setPressedColor(UIManager.getColor("InstanceItem.pressedColor"));
+        this.arcColor = UIManager.getColor("AccountItem.borderColor");
     }
 
     @Override
@@ -201,5 +245,13 @@ public class InstanceItem extends JPanel {
 
     public void setPressedColor(Color pressedColor) {
         this.pressedColor = pressedColor;
+    }
+
+    public double getPercentComplete() {
+        return this.percentComplete;
+    }
+
+    public void setPercentComplete(double percentComplete) {
+        this.percentComplete = percentComplete;
     }
 }
