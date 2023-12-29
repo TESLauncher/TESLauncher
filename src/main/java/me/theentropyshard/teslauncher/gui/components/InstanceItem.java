@@ -129,8 +129,7 @@ public class InstanceItem extends JPanel {
         return instanceManager.getInstanceByName(this.getTextLabel().getText());
     }
 
-    @Override
-    protected void paintComponent(Graphics g) {
+    protected void paintBackground(Graphics g) {
         Color color = this.defaultColor;
 
         if (this.mouseOver) {
@@ -143,14 +142,9 @@ public class InstanceItem extends JPanel {
 
         g.setColor(color);
         g.fillRoundRect(0, 0, this.getWidth(), this.getHeight(), 10, 10);
+    }
 
-        super.paintComponent(g);
-
-        if (this instanceof AddInstanceItem) {
-            return;
-        }
-
-        Graphics2D g2 = (Graphics2D) g;
+    protected void paintArc(Graphics2D g2) {
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2.setColor(this.arcColor);
 
@@ -181,6 +175,15 @@ public class InstanceItem extends JPanel {
         area.subtract(new Area(inner));
 
         g2.fill(area);
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        this.paintBackground(g);
+
+        super.paintComponent(g);
+
+        this.paintArc((Graphics2D) g);
     }
 
     public void updateColors() {

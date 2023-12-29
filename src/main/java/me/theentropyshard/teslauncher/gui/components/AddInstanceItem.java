@@ -20,10 +20,17 @@ package me.theentropyshard.teslauncher.gui.components;
 
 import me.theentropyshard.teslauncher.utils.SwingUtils;
 
+import java.awt.*;
+
 public final class AddInstanceItem extends InstanceItem {
     public AddInstanceItem() {
         super(SwingUtils.getIcon("/cross.png"), "");
 
         this.setToolTipText("Add new Minecraft instance");
+    }
+
+    @Override
+    protected void paintArc(Graphics2D g2) {
+        // Do not paint arc on AddInstanceItem
     }
 }
