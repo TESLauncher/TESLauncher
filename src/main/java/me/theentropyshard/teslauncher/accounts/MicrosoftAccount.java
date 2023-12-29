@@ -42,7 +42,7 @@ public class MicrosoftAccount extends Account {
 
     public boolean needToRefresh() {
         long between = ChronoUnit.SECONDS.between(this.loggedInAt, OffsetDateTime.now());
-        return between > this.expiresIn;
+        return between >= this.expiresIn;
     }
 
     @Override
