@@ -98,18 +98,35 @@ public class MicrosoftAuthenticator {
 
         String token = this.refresh ? this.refreshToken : deviceCodeResponse.deviceCode;
 
-        RequestBody requestBody = new FormBody(
-                Arrays.asList(
-                        "grant_type",
-                        "client_id",
-                        "device_code"
-                ),
-                Arrays.asList(
-                        "urn:ietf:params:oauth:grant-type:device_code",
-                        "394fd08d-cb75-4f21-9807-ae14babcb4c0",
-                        token
-                )
-        );
+        RequestBody requestBody;
+
+        if (this.refresh) {
+            requestBody = new FormBody(
+                    Arrays.asList(
+                            "grant_type",
+                            "client_id",
+                            "refresh_token"
+                    ),
+                    Arrays.asList(
+                            "refresh_token",
+                            "394fd08d-cb75-4f21-9807-ae14babcb4c0",
+                            token
+                    )
+            );
+        } else {
+            requestBody = new FormBody(
+                    Arrays.asList(
+                            "grant_type",
+                            "client_id",
+                            "device_code"
+                    ),
+                    Arrays.asList(
+                            "urn:ietf:params:oauth:grant-type:device_code",
+                            "394fd08d-cb75-4f21-9807-ae14babcb4c0",
+                            token
+                    )
+            );
+        }
 
         while (true) {
             try (HttpRequest request = new HttpRequest(this.httpClient)) {
