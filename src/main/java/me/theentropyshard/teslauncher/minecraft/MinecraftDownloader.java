@@ -319,6 +319,10 @@ public class MinecraftDownloader {
     }
 
     private boolean excludeFromExtract(Library library, String fileName) {
+        if (library.extract == null) {
+            return false;
+        }
+
         for (String excludeName : library.extract.exclude) {
             if (fileName.startsWith(excludeName)) {
                 return true;
