@@ -38,7 +38,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class TESLauncher {
-    public static final String USER_AGENT = "TESLauncher/1.0.0";
+    public static final String USER_AGENT = "TESLauncher/0.7.1";
     public static final String TITLE = "TESLauncher";
     public static final int WIDTH = 960;
     public static final int HEIGHT = 540;
