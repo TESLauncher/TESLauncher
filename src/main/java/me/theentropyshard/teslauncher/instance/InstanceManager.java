@@ -84,9 +84,9 @@ public class InstanceManager {
             if (!Files.exists(this.getInstanceDir(instance))) {
                 return;
             }
-        }
 
-        this.createDirName(instance);
+            this.createDirName(instance);
+        }
     }
 
     public void reload() throws IOException {
