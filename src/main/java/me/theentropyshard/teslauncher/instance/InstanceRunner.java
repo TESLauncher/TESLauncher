@@ -277,6 +277,8 @@ public class InstanceRunner extends Thread {
             }
         }
 
+        argVars.put("user_properties", "{}");
+
         argVars.put("resolution_width", "960");
         argVars.put("resolution_height", "540");
 
