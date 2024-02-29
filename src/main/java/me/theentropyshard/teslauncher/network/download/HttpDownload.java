@@ -22,6 +22,8 @@ import me.theentropyshard.teslauncher.utils.FileUtils;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -32,6 +34,8 @@ import java.nio.file.StandardCopyOption;
 import java.util.Objects;
 
 public class HttpDownload {
+    private static final Logger LOG = LogManager.getLogger(HttpDownload.class);
+
     private final OkHttpClient httpClient;
     private final String url;
     private final Path saveAs;
@@ -78,7 +82,7 @@ public class HttpDownload {
             try {
                 return Files.size(this.saveAs);
             } catch (IOException e) {
-                e.printStackTrace();
+                LOG.error(e);
             }
         }
 

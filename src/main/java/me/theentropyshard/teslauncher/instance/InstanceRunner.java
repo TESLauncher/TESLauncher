@@ -31,6 +31,8 @@ import me.theentropyshard.teslauncher.utils.TimeUtils;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.model.ZipParameters;
 import org.apache.commons.text.StringSubstitutor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import java.io.*;
@@ -47,6 +49,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class InstanceRunner extends Thread {
+    private static final Logger LOG = LogManager.getLogger(InstanceRunner.class);
+
     private final Account account;
     private final Instance instance;
 
@@ -63,6 +67,7 @@ public class InstanceRunner extends Thread {
             try {
                 this.account.authenticate();
             } catch (AuthException e) {
+                LOG.error(e);
                 JOptionPane.showMessageDialog(TESLauncher.getInstance().getGui().getAppWindow().getFrame(),
                         e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 this.join();
@@ -102,7 +107,7 @@ public class InstanceRunner extends Thread {
             long start = System.currentTimeMillis();
 
             int exitCode = this.runGameProcess(command);
-            System.out.println("Minecraft process finished with exit code " + exitCode);
+            LOG.info("Minecraft process finished with exit code " + exitCode);
 
             if (this.clientCopyTmp != null && Files.exists(this.clientCopyTmp)) {
                 Files.delete(this.clientCopyTmp);
@@ -113,7 +118,7 @@ public class InstanceRunner extends Thread {
             long timePlayedSeconds = (end - start) / 1000;
             String timePlayed = TimeUtils.getHoursMinutesSeconds(timePlayedSeconds);
             if (!timePlayed.trim().isEmpty()) {
-                System.out.println("You played for " + timePlayed + " seconds!");
+                LOG.info("You played for " + timePlayed + " seconds!");
             }
 
             this.instance.setTotalPlayedForSeconds(this.instance.getTotalPlayedForSeconds() + timePlayedSeconds);
@@ -121,7 +126,7 @@ public class InstanceRunner extends Thread {
 
             instanceManager.save(this.instance);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.error("Exception occurred while trying to start Minecraft " + this.instance.getMinecraftVersion(), e);
         }
     }
 
@@ -184,7 +189,7 @@ public class InstanceRunner extends Thread {
 
                 classpath.add(copyOfClient.toString());
             } catch (IOException e) {
-                e.printStackTrace();
+                LOG.error("Exception while applying jar mods", e);
             }
         }
     }
@@ -395,7 +400,7 @@ public class InstanceRunner extends Thread {
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
         String line;
         while ((line = reader.readLine()) != null) {
-            System.out.println(line);
+            LOG.info(line);
         }
 
         return process.waitFor();

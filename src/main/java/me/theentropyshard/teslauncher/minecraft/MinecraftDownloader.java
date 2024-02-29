@@ -30,6 +30,8 @@ import me.theentropyshard.teslauncher.utils.Json;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.model.FileHeader;
 import okhttp3.OkHttpClient;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -39,8 +41,11 @@ import java.util.List;
 import java.util.Map;
 
 public class MinecraftDownloader {
+    private static final Logger LOG = LogManager.getLogger(MinecraftDownloader.class);
+
     private static final String VER_MAN_V2 = "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json";
     private static final String RESOURCES = "https://resources.download.minecraft.net/";
+
     private final Path versionsDir;
     private final Path assetsDir;
     private final Path librariesDir;
@@ -61,7 +66,7 @@ public class MinecraftDownloader {
     public void downloadMinecraft(String versionId) throws IOException {
         FileUtils.createDirectoryIfNotExists(this.versionsDir.resolve(versionId));
 
-        //LOG.info("Downloading Minecraft " + versionId);
+        LOG.info("Downloading Minecraft " + versionId);
 
         VersionManifest manifest;
         try (HttpRequest request = new HttpRequest(TESLauncher.getInstance().getHttpClient())) {
@@ -86,7 +91,7 @@ public class MinecraftDownloader {
                 continue;
             }
 
-            //LOG.info("Found Minecraft " + versionId);
+            LOG.info("Found Minecraft " + versionId);
 
             if (version.url == null) {
                 throw new IOException("Version url is null");
@@ -94,30 +99,21 @@ public class MinecraftDownloader {
 
             this.saveClientJson(version);
 
-            //LOG.info("Downloading client...");
-            System.out.println("Downloading client...");
+            LOG.info("Downloading client...");
             VersionInfo versionInfo = this.downloadClient(version);
-            System.out.println("Downloaded client");
 
-            //LOG.info("Downloading libraries...");
-            System.out.println("Downloading libraries...");
+            LOG.info("Downloading libraries...");
             List<Library> nativeLibraries = this.downloadLibraries(versionInfo);
-            System.out.println("Downloaded libraries");
 
-            //LOG.info("Extracting natives...");
-            System.out.println("Extracting natives...");
+            LOG.info("Extracting natives...");
             this.extractNatives(nativeLibraries);
-            System.out.println("Extracted natives");
 
-            System.out.println("Downloading assets...");
+            LOG.info("Downloading assets...");
             this.downloadAssets(versionInfo);
-            System.out.println("Downloaded assets");
 
-            System.out.println("Downloading Java...");
+            LOG.info("Downloading Java...");
             this.downloadJava(versionInfo);
-            System.out.println("Downloaded Java");
 
-            //LOG.info("Done");
             break;
         }
     }
@@ -172,7 +168,6 @@ public class MinecraftDownloader {
 
         ClientDownload client = versionInfo.downloads.client;
 
-        System.out.println("Downloading " + version.id + ".jar...");
         Path jarFile = this.versionsDir.resolve(version.id).resolve(version.id + ".jar");
         this.minecraftDownloadListener.onProgress(0, 0, 0);
         this.minecraftDownloadListener.onStageChanged("Downloading client");
