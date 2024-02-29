@@ -28,9 +28,12 @@ import org.apache.logging.log4j.Logger;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
 import java.util.Objects;
 
 public class HttpDownload {
@@ -56,13 +59,17 @@ public class HttpDownload {
         }
 
         long size = this.size();
+
+        if (size == this.expectedSize) {
+            return;
+        }
+
         boolean partiallyDownloaded = this.expectedSize > size;
 
         if (partiallyDownloaded || this.forceDownload) {
             Request.Builder builder = new Request.Builder()
                     .url(this.url)
-                    .get()
-                    .header("Accept-Encoding", "identity");
+                    .get();
 
             if (partiallyDownloaded && size >= 0) {
                 builder.header("Range", "bytes=" + size + "-");
@@ -72,7 +79,13 @@ public class HttpDownload {
 
             try (Response response = this.httpClient.newCall(builder.build()).execute();
                  InputStream is = new BufferedInputStream(Objects.requireNonNull(response.body()).byteStream())) {
-                Files.copy(is, this.saveAs, StandardCopyOption.REPLACE_EXISTING);
+                if (partiallyDownloaded && size >= 0) {
+                    try (FileChannel fileChannel = FileChannel.open(this.saveAs, StandardOpenOption.APPEND)) {
+                        fileChannel.transferFrom(Channels.newChannel(is), size, Long.MAX_VALUE);
+                    }
+                } else {
+                    Files.copy(is, this.saveAs, StandardCopyOption.REPLACE_EXISTING);
+                }
             }
         }
     }
