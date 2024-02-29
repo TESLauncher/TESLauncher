@@ -48,7 +48,6 @@ public class TESLauncher {
     private final Path workDir;
 
     private final Path runtimesDir;
-    private final Path minecraftDir;
     private final Path assetsDir;
     private final Path librariesDir;
     private final Path instancesDir;
@@ -80,12 +79,11 @@ public class TESLauncher {
         TESLauncher.setInstance(this);
 
         this.runtimesDir = this.workDir.resolve("runtimes");
-        this.minecraftDir = this.workDir.resolve("minecraft");
-        this.assetsDir = this.minecraftDir.resolve("assets");
-        this.librariesDir = this.minecraftDir.resolve("libraries");
-        this.instancesDir = this.minecraftDir.resolve("instances");
-        this.versionsDir = this.minecraftDir.resolve("versions");
-        this.log4jConfigsDir = this.minecraftDir.resolve("log4j");
+        this.assetsDir = this.workDir.resolve("assets");
+        this.librariesDir = this.workDir.resolve("libraries");
+        this.instancesDir = this.workDir.resolve("instances");
+        this.versionsDir = this.workDir.resolve("versions");
+        this.log4jConfigsDir = this.workDir.resolve("log4j");
         this.createDirectories();
 
         this.settingsFile = this.workDir.resolve("settings.json");
@@ -135,7 +133,6 @@ public class TESLauncher {
         try {
             FileUtils.createDirectoryIfNotExists(this.workDir);
             FileUtils.createDirectoryIfNotExists(this.runtimesDir);
-            FileUtils.createDirectoryIfNotExists(this.minecraftDir);
             FileUtils.createDirectoryIfNotExists(this.assetsDir);
             FileUtils.createDirectoryIfNotExists(this.librariesDir);
             FileUtils.createDirectoryIfNotExists(this.instancesDir);
@@ -208,10 +205,6 @@ public class TESLauncher {
 
     public Path getWorkDir() {
         return this.workDir;
-    }
-
-    public Path getMinecraftDir() {
-        return this.minecraftDir;
     }
 
     public Path getAssetsDir() {
