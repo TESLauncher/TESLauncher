@@ -19,11 +19,12 @@
 package me.theentropyshard.teslauncher.utils;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public final class FileUtils {
     private static final FileVisitor<Path> DELETE_VISITOR = new SimpleFileVisitor<Path>() {
@@ -42,7 +43,7 @@ public final class FileUtils {
         }
     };
 
-    public static void deleteDirectoryRecursively(Path path) throws IOException {
+    public static void delete(Path path) throws IOException {
         if (!Files.exists(path)) {
             return;
         }
@@ -54,21 +55,55 @@ public final class FileUtils {
         Files.walkFileTree(path, FileUtils.DELETE_VISITOR);
     }
 
-    public static void createDirectoryIfNotExists(Path path) throws IOException {
-        if (Files.exists(path)) {
-            return;
+    public static void createDirectoryIfNotExists(Path dir) throws IOException {
+        if (FileUtils.existsButIsNotADirectory(dir)) {
+            throw new IOException(dir + " exists, but is not a directory");
         }
 
-        Files.createDirectories(path);
+        Files.createDirectories(dir);
     }
 
     public static void createFileIfNotExists(Path file) throws IOException {
+        if (FileUtils.existsButIsNotAFile(file)) {
+            throw new IOException(file + " exists, but is not a file");
+        }
+
         if (Files.exists(file)) {
             return;
         }
 
         Files.createDirectories(file.getParent());
         Files.createFile(file);
+    }
+
+    public static void writeUtf8(Path file, String s) throws IOException {
+        if (FileUtils.existsButIsNotAFile(file)) {
+            throw new IOException(file + " exists, but is not a file");
+        }
+
+        Files.write(file, s.getBytes(StandardCharsets.UTF_8));
+    }
+
+    public static String readUtf8(Path file) throws IOException {
+        return new String(Files.readAllBytes(file), StandardCharsets.UTF_8);
+    }
+
+    public static List<Path> list(Path dir) throws IOException {
+        if (FileUtils.existsButIsNotADirectory(dir)) {
+            throw new IOException(dir + " exists, but is not a directory");
+        }
+
+        try (Stream<Path> pathStream = Files.list(dir)) {
+            return pathStream.collect(Collectors.toList());
+        }
+    }
+
+    private static boolean existsButIsNotAFile(Path path) {
+        return Files.exists(path) && !Files.isRegularFile(path);
+    }
+
+    private static boolean existsButIsNotADirectory(Path path) {
+        return Files.exists(path) && !Files.isDirectory(path);
     }
 
     private FileUtils() {

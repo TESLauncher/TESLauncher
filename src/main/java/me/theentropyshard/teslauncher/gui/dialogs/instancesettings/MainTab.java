@@ -18,7 +18,6 @@
 
 package me.theentropyshard.teslauncher.gui.dialogs.instancesettings;
 
-import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.instance.Instance;
 
 import javax.swing.*;

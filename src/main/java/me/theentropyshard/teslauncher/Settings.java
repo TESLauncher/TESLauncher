@@ -18,7 +18,8 @@
 
 package me.theentropyshard.teslauncher;
 
-import me.theentropyshard.teslauncher.utils.IOUtils;
+
+import me.theentropyshard.teslauncher.utils.FileUtils;
 import me.theentropyshard.teslauncher.utils.Json;
 
 import java.io.IOException;
@@ -41,12 +42,12 @@ public class Settings {
             return this;
         }
 
-        String content = IOUtils.readUtf8String(file);
+        String content = FileUtils.readUtf8(file);
         return Json.parse(content, Settings.class);
     }
 
     public void save(Path file) throws IOException {
         String content = Json.write(this);
-        IOUtils.writeUtf8String(file, content);
+        FileUtils.writeUtf8(file, content);
     }
 }

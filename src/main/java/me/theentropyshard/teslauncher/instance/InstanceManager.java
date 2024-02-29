@@ -20,7 +20,6 @@ package me.theentropyshard.teslauncher.instance;
 
 import me.theentropyshard.teslauncher.utils.EnumOS;
 import me.theentropyshard.teslauncher.utils.FileUtils;
-import me.theentropyshard.teslauncher.utils.IOUtils;
 import me.theentropyshard.teslauncher.utils.Json;
 
 import java.io.IOException;
@@ -68,7 +67,7 @@ public class InstanceManager {
                 continue;
             }
 
-            Instance instance = Json.parse(IOUtils.readUtf8String(instanceFile), Instance.class);
+            Instance instance = Json.parse(FileUtils.readUtf8(instanceFile), Instance.class);
             if (instance.getDirName() == null) {
                 instance.setDirName(instance.getName());
             }
@@ -102,7 +101,7 @@ public class InstanceManager {
         }
 
         Path instanceFile = instanceDir.resolve("instance.json");
-        IOUtils.writeUtf8String(instanceFile, Json.write(instance));
+        FileUtils.writeUtf8(instanceFile, Json.write(instance));
     }
 
     public void createInstance(String name, String groupName, String minecraftVersion) throws IOException {
@@ -124,7 +123,7 @@ public class InstanceManager {
         Path jarModsDir = this.getInstanceJarModsDir(instance);
         FileUtils.createDirectoryIfNotExists(jarModsDir);
         Path instanceFile = instanceDir.resolve("instance.json");
-        IOUtils.writeUtf8String(instanceFile, Json.write(instance));
+        FileUtils.writeUtf8(instanceFile, Json.write(instance));
     }
 
     public void removeInstance(String name) throws IOException {
@@ -135,7 +134,7 @@ public class InstanceManager {
 
         Path instanceDir = this.getInstanceDir(instance);
         if (Files.exists(instanceDir)) {
-            FileUtils.deleteDirectoryRecursively(instanceDir);
+            FileUtils.delete(instanceDir);
         }
 
         this.instances.remove(instance);

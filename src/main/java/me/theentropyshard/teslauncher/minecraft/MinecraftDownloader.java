@@ -26,7 +26,6 @@ import me.theentropyshard.teslauncher.network.download.DownloadList;
 import me.theentropyshard.teslauncher.network.download.HttpDownload;
 import me.theentropyshard.teslauncher.utils.EnumOS;
 import me.theentropyshard.teslauncher.utils.FileUtils;
-import me.theentropyshard.teslauncher.utils.IOUtils;
 import me.theentropyshard.teslauncher.utils.Json;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.model.FileHeader;
@@ -160,7 +159,7 @@ public class MinecraftDownloader {
         Path jsonFile = this.versionsDir.resolve(version.id).resolve(version.id + ".json");
         if (!Files.exists(jsonFile)) {
             try (HttpRequest request = new HttpRequest(TESLauncher.getInstance().getHttpClient())) {
-                IOUtils.writeUtf8String(jsonFile, request.asString(version.url));
+                FileUtils.writeUtf8(jsonFile, request.asString(version.url));
             }
         }
     }
@@ -285,11 +284,11 @@ public class MinecraftDownloader {
             FileUtils.createDirectoryIfNotExists(assetsIndexFile.getParent());
 
             try (HttpRequest request = new HttpRequest(TESLauncher.getInstance().getHttpClient())) {
-                IOUtils.writeUtf8String(assetsIndexFile, request.asString(vAssetIndex.url));
+                FileUtils.writeUtf8(assetsIndexFile, request.asString(vAssetIndex.url));
             }
         }
 
-        AssetIndex assetIndex = Json.parse(IOUtils.readUtf8String(assetsIndexFile), AssetIndex.class);
+        AssetIndex assetIndex = Json.parse(FileUtils.readUtf8(assetsIndexFile), AssetIndex.class);
 
         this.minecraftDownloadListener.onProgress(0, 0, 0);
         this.minecraftDownloadListener.onStageChanged("Downloading assets");

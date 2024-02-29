@@ -24,8 +24,6 @@ import me.theentropyshard.teslauncher.accounts.AccountsManager;
 import me.theentropyshard.teslauncher.gui.View;
 import me.theentropyshard.teslauncher.gui.dialogs.addaccount.AddAccountDialog;
 import me.theentropyshard.teslauncher.gui.playview.PlayViewHeader;
-import me.theentropyshard.teslauncher.utils.ResourceUtils;
-import me.theentropyshard.teslauncher.utils.SwingUtils;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;

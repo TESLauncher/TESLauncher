@@ -18,7 +18,6 @@
 
 package me.theentropyshard.teslauncher.gui.accountsview;
 
-import jdk.nashorn.internal.scripts.JO;
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.accounts.Account;
 import me.theentropyshard.teslauncher.gui.playview.PlayViewHeader;

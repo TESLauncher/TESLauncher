@@ -21,14 +21,16 @@ package me.theentropyshard.teslauncher.accounts;
 import com.google.gson.reflect.TypeToken;
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.utils.FileUtils;
-import me.theentropyshard.teslauncher.utils.IOUtils;
 import me.theentropyshard.teslauncher.utils.Json;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public class AccountsManager {
     private final Path accountsFile;
@@ -63,7 +65,7 @@ public class AccountsManager {
     }
 
     public void loadAccounts() throws IOException {
-        Map<String, Account> accounts = Json.parse(IOUtils.readUtf8String(this.accountsFile), new TypeToken<Map<String, Account>>() {}.getType());
+        Map<String, Account> accounts = Json.parse(FileUtils.readUtf8(this.accountsFile), new TypeToken<Map<String, Account>>() {}.getType());
         if (accounts != null) {
             this.accounts.putAll(accounts);
         }

@@ -26,7 +26,6 @@ import me.theentropyshard.teslauncher.java.JavaManager;
 import me.theentropyshard.teslauncher.minecraft.*;
 import me.theentropyshard.teslauncher.minecraft.auth.microsoft.AuthException;
 import me.theentropyshard.teslauncher.utils.FileUtils;
-import me.theentropyshard.teslauncher.utils.IOUtils;
 import me.theentropyshard.teslauncher.utils.Json;
 import me.theentropyshard.teslauncher.utils.TimeUtils;
 import net.lingala.zip4j.ZipFile;
@@ -92,7 +91,7 @@ public class InstanceRunner extends Thread {
 
             Path clientJson = versionsDir.resolve(this.instance.getMinecraftVersion())
                     .resolve(this.instance.getMinecraftVersion() + ".json");
-            VersionInfo versionInfo = Json.parse(IOUtils.readUtf8String(clientJson), VersionInfo.class);
+            VersionInfo versionInfo = Json.parse(FileUtils.readUtf8(clientJson), VersionInfo.class);
 
             List<String> arguments = this.getArguments(versionInfo, nativesDir, librariesDir, versionsDir);
             List<String> command = this.buildRunCommand(versionInfo, arguments);
@@ -156,7 +155,7 @@ public class InstanceRunner extends Thread {
                         Path unpackDir = instanceDir.resolve(modFile.getName().replace(".", "_"));
                         try (ZipFile modZip = new ZipFile(modFile)) {
                             if (Files.exists(unpackDir)) {
-                                FileUtils.deleteDirectoryRecursively(unpackDir);
+                                FileUtils.delete(unpackDir);
                             }
                             FileUtils.createDirectoryIfNotExists(unpackDir);
 
@@ -179,7 +178,7 @@ public class InstanceRunner extends Thread {
                             copyZip.addFile(modFileToAdd.toFile(), zipParameters);
                         }
 
-                        FileUtils.deleteDirectoryRecursively(unpackDir);
+                        FileUtils.delete(unpackDir);
                     }
                 }
 
@@ -230,7 +229,7 @@ public class InstanceRunner extends Thread {
 
         VersionAssetIndex vAssetIndex = versionInfo.assetIndex;
         AssetIndex assetIndex = Json.parse(
-                IOUtils.readUtf8String(assetsDir.resolve("indexes").resolve(vAssetIndex.id + ".json")),
+                FileUtils.readUtf8(assetsDir.resolve("indexes").resolve(vAssetIndex.id + ".json")),
                 AssetIndex.class
         );
 
