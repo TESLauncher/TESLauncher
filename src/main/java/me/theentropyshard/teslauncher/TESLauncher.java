@@ -40,7 +40,7 @@ import java.util.concurrent.TimeUnit;
 public class TESLauncher {
     private static final Logger LOG = LogManager.getLogger(TESLauncher.class);
 
-    public static final String USER_AGENT = "TESLauncher/0.7.1";
+    public static final String USER_AGENT = "TESLauncher/0.7.2";
     public static final String TITLE = "TESLauncher";
     public static final int WIDTH = 960;
     public static final int HEIGHT = 540;
