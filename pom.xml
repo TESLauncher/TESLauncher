@@ -6,7 +6,7 @@
 
     <groupId>me.theentropyshard</groupId>
     <artifactId>TESLauncher</artifactId>
-    <version>0.7.2</version>
+    <version>0.7.3</version>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
