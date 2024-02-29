@@ -22,7 +22,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
-import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.accounts.Account;
 import me.theentropyshard.teslauncher.accounts.AccountDeserializer;
 import me.theentropyshard.teslauncher.gson.ActionTypeAdapter;
@@ -39,7 +38,7 @@ public final class Json {
     private static final Gson GSON = new GsonBuilder()
             .disableHtmlEscaping()
             //
-            .registerTypeAdapter(VersionInfo.class, new DetailedVersionInfoDeserializer(TESLauncher.getInstance()))
+            .registerTypeAdapter(VersionInfo.class, new DetailedVersionInfoDeserializer())
             .registerTypeAdapter(Rule.Action.class, new ActionTypeAdapter())
             .registerTypeAdapter(Instant.class, new InstantTypeAdapter())
             .registerTypeAdapter(Account.class, new AccountDeserializer())

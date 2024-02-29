@@ -28,6 +28,7 @@ import me.theentropyshard.teslauncher.network.UserAgentInterceptor;
 import me.theentropyshard.teslauncher.utils.FileUtils;
 import okhttp3.OkHttpClient;
 import okhttp3.Protocol;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
@@ -38,13 +39,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class TESLauncher {
+    private static final Logger LOG = LogManager.getLogger(TESLauncher.class);
+
     public static final String USER_AGENT = "TESLauncher/0.7.1";
     public static final String TITLE = "TESLauncher";
     public static final int WIDTH = 960;
     public static final int HEIGHT = 540;
 
     private final Args args;
-    private final Logger logger;
     private final Path workDir;
 
     private final Path runtimesDir;
@@ -71,9 +73,8 @@ public class TESLauncher {
 
     public static AppWindow window;
 
-    public TESLauncher(Args args, Logger logger, Path workDir) {
+    public TESLauncher(Args args, Path workDir) {
         this.args = args;
-        this.logger = logger;
         this.workDir = workDir;
 
         TESLauncher.setInstance(this);
@@ -92,7 +93,7 @@ public class TESLauncher {
         try {
             settings = settings.load(this.settingsFile);
         } catch (IOException e) {
-            this.logger.error("Unable to load settings, using defaults", e);
+            LOG.error("Unable to load settings, using defaults", e);
         }
         this.settings = settings;
 
@@ -107,14 +108,14 @@ public class TESLauncher {
         try {
             this.accountsManager.loadAccounts();
         } catch (IOException e) {
-            this.logger.error("Unable to load accounts", e);
+            LOG.error("Unable to load accounts", e);
         }
 
         this.instanceManager = new InstanceManagerImpl(this.instancesDir);
         try {
             this.instanceManager.load();
         } catch (IOException e) {
-            this.logger.error("Unable to load instances", e);
+            LOG.error("Unable to load instances", e);
         }
 
         this.javaManager = new JavaManager(this.runtimesDir);
@@ -139,7 +140,7 @@ public class TESLauncher {
             FileUtils.createDirectoryIfNotExists(this.versionsDir);
             FileUtils.createDirectoryIfNotExists(this.log4jConfigsDir);
         } catch (IOException e) {
-            this.logger.error("Unable to create launcher directories", e);
+            LOG.error("Unable to create launcher directories", e);
         }
     }
 
@@ -159,21 +160,21 @@ public class TESLauncher {
         try {
             this.accountsManager.save();
         } catch (IOException e) {
-            this.logger.error("Exception while saving accounts", e);
+            LOG.error("Exception while saving accounts", e);
         }
 
         this.instanceManager.getInstances().forEach(i -> {
             try {
                 this.instanceManager.save(i);
             } catch (IOException e) {
-                this.logger.error("Exception while saving instance '" + i + "'", e);
+                LOG.error("Exception while saving instance '" + i + "'", e);
             }
         });
 
         try {
             this.settings.save(this.settingsFile);
         } catch (IOException e) {
-            this.logger.error("Exception while saving settings", e);
+            LOG.error("Exception while saving settings", e);
         }
     }
 
@@ -197,10 +198,6 @@ public class TESLauncher {
 
     public Args getArgs() {
         return this.args;
-    }
-
-    public Logger getLogger() {
-        return this.logger;
     }
 
     public Path getWorkDir() {

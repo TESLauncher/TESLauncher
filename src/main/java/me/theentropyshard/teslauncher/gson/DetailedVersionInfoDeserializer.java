@@ -25,16 +25,18 @@ import com.google.gson.JsonParseException;
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.minecraft.*;
 import me.theentropyshard.teslauncher.utils.Json;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class DetailedVersionInfoDeserializer extends AbstractJsonDeserializer<VersionInfo> {
-    private final TESLauncher launcher;
+    private static final Logger LOG = LogManager.getLogger(DetailedVersionInfoDeserializer.class);
 
-    public DetailedVersionInfoDeserializer(TESLauncher launcher) {
-        this.launcher = launcher;
+    public DetailedVersionInfoDeserializer() {
+
     }
 
     private List<Argument> processArgs(JsonArray array) {
@@ -60,7 +62,7 @@ public class DetailedVersionInfoDeserializer extends AbstractJsonDeserializer<Ve
         if (root.has("javaVersion")) {
             versionInfo.javaVersion = Json.parse(root.get("javaVersion"), JavaVersion.class);
         } else {
-            this.launcher.getLogger().warn("Unable to find javaVersion key");
+            LOG.warn("Unable to find javaVersion key");
         }
 
         if (root.has("arguments")) {
