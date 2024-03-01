@@ -21,12 +21,15 @@ package me.theentropyshard.teslauncher.instance;
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.accounts.Account;
 import me.theentropyshard.teslauncher.accounts.MicrosoftAccount;
+import me.theentropyshard.teslauncher.gui.AppWindow;
+import me.theentropyshard.teslauncher.gui.Gui;
 import me.theentropyshard.teslauncher.gui.dialogs.MinecraftDownloadDialog;
 import me.theentropyshard.teslauncher.java.JavaManager;
 import me.theentropyshard.teslauncher.minecraft.*;
 import me.theentropyshard.teslauncher.minecraft.auth.microsoft.AuthException;
 import me.theentropyshard.teslauncher.utils.FileUtils;
 import me.theentropyshard.teslauncher.utils.Json;
+import me.theentropyshard.teslauncher.utils.SwingUtils;
 import me.theentropyshard.teslauncher.utils.TimeUtils;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.model.ZipParameters;
@@ -63,6 +66,8 @@ public class InstanceRunner extends Thread {
 
     @Override
     public void run() {
+        SwingUtilities.invokeLater(TESLauncher.getInstance().getGui()::disableBeforePlay);
+
         try {
             try {
                 this.account.authenticate();
@@ -127,6 +132,8 @@ public class InstanceRunner extends Thread {
             instanceManager.save(this.instance);
         } catch (Exception e) {
             LOG.error("Exception occurred while trying to start Minecraft " + this.instance.getMinecraftVersion(), e);
+        } finally {
+            SwingUtilities.invokeLater(TESLauncher.getInstance().getGui()::enableAfterPlay);
         }
     }
 
