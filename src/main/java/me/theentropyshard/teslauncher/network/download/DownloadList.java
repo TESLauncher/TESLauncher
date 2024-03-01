@@ -47,6 +47,10 @@ public class DownloadList {
         this.downloads.add(download);
     }
 
+    public int size() {
+        return this.downloads.size();
+    }
+
     public synchronized void downloadAll() throws IOException {
         if (this.finished) {
             throw new IllegalStateException("This download list has already finished downloading. Please consider creating a new one");

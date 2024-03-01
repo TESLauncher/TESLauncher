@@ -30,7 +30,9 @@ import me.theentropyshard.teslauncher.utils.Json;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -142,6 +144,10 @@ public class JavaManager {
             default:
                 throw new RuntimeException("Unknown os");
         }
+    }
+
+    public boolean runtimeExists(String componentName) {
+        return Files.exists(Paths.get(this.getJavaExecutable(componentName)));
     }
 
     public String getJavaExecutable(String componentName) {

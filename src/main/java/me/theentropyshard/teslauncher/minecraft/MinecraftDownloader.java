@@ -146,6 +146,10 @@ public class MinecraftDownloader {
 
         JavaManager javaManager = TESLauncher.getInstance().getJavaManager();
 
+        if (javaManager.runtimeExists(javaKey)) {
+            return;
+        }
+
         this.minecraftDownloadListener.onStageChanged("Downloading Java Runtime");
         this.minecraftDownloadListener.onProgress(0, 0, 0);
         javaManager.downloadRuntime(javaKey, this.minecraftDownloadListener);
@@ -169,6 +173,11 @@ public class MinecraftDownloader {
         ClientDownload client = versionInfo.downloads.client;
 
         Path jarFile = this.versionsDir.resolve(version.id).resolve(version.id + ".jar");
+
+        if (Files.exists(jarFile) && Files.size(jarFile) == client.size) {
+            return versionInfo;
+        }
+
         this.minecraftDownloadListener.onProgress(0, 0, 0);
         this.minecraftDownloadListener.onStageChanged("Downloading client");
 
@@ -227,13 +236,15 @@ public class MinecraftDownloader {
             if (artifact != null) {
                 Path jarFile = this.librariesDir.resolve(artifact.path);
 
-                HttpDownload download = new HttpDownload.Builder()
-                        .httpClient(TESLauncher.getInstance().getHttpClient())
-                        .url(artifact.url)
-                        .expectedSize(artifact.size)
-                        .saveAs(jarFile)
-                        .build();
-                downloadList.add(download);
+                if (!Files.exists(jarFile) || Files.size(jarFile) != artifact.size) {
+                    HttpDownload download = new HttpDownload.Builder()
+                            .httpClient(TESLauncher.getInstance().getHttpClient())
+                            .url(artifact.url)
+                            .expectedSize(artifact.size)
+                            .saveAs(jarFile)
+                            .build();
+                    downloadList.add(download);
+                }
             }
 
             DownloadArtifact classifier = this.getClassifier(library);
@@ -241,17 +252,21 @@ public class MinecraftDownloader {
                 nativeLibraries.add(library);
                 Path filePath = this.librariesDir.resolve(classifier.path);
 
-                HttpDownload download = new HttpDownload.Builder()
-                        .httpClient(TESLauncher.getInstance().getHttpClient())
-                        .url(classifier.url)
-                        .expectedSize(classifier.size)
-                        .saveAs(filePath)
-                        .build();
-                downloadList.add(download);
+                if (!Files.exists(filePath) || Files.size(filePath) != classifier.size) {
+                    HttpDownload download = new HttpDownload.Builder()
+                            .httpClient(TESLauncher.getInstance().getHttpClient())
+                            .url(classifier.url)
+                            .expectedSize(classifier.size)
+                            .saveAs(filePath)
+                            .build();
+                    downloadList.add(download);
+                }
             }
         }
 
-        downloadList.downloadAll();
+        if (downloadList.size() > 0) {
+            downloadList.downloadAll();
+        }
 
         return nativeLibraries;
     }
@@ -300,18 +315,26 @@ public class MinecraftDownloader {
 
             if (assetIndex.mapToResources) {
                 Path filePath = this.instanceResourcesDir.resolve(fileName);
-                this.downloadAsset(downloadList, filePath, assetObject);
+                if (!Files.exists(filePath) || Files.size(filePath) != assetObject.size) {
+                    this.downloadAsset(downloadList, filePath, assetObject);
+                }
             } else if (assetIndex.virtual) {
                 Path filePath = this.assetsDir.resolve("virtual").resolve("legacy").resolve(fileName);
-                this.downloadAsset(downloadList, filePath, assetObject);
+                if (!Files.exists(filePath) || Files.size(filePath) != assetObject.size) {
+                    this.downloadAsset(downloadList, filePath, assetObject);
+                }
             } else {
                 String prefix = assetObject.hash.substring(0, 2);
                 Path filePath = this.assetsDir.resolve("objects").resolve(prefix).resolve(assetObject.hash);
-                this.downloadAsset(downloadList, filePath, assetObject);
+                if (!Files.exists(filePath) || Files.size(filePath) != assetObject.size) {
+                    this.downloadAsset(downloadList, filePath, assetObject);
+                }
             }
         }
 
-        downloadList.downloadAll();
+        if (downloadList.size() > 0) {
+            downloadList.downloadAll();
+        }
     }
 
     private boolean excludeFromExtract(Library library, String fileName) {
