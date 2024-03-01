@@ -36,9 +36,15 @@ import org.apache.logging.log4j.Logger;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class MinecraftDownloader {
     private static final Logger LOG = LogManager.getLogger(MinecraftDownloader.class);
@@ -68,10 +74,7 @@ public class MinecraftDownloader {
 
         LOG.info("Downloading Minecraft " + versionId);
 
-        VersionManifest manifest;
-        try (HttpRequest request = new HttpRequest(TESLauncher.getInstance().getHttpClient())) {
-            manifest = Json.parse(request.asString(MinecraftDownloader.VER_MAN_V2), VersionManifest.class);
-        }
+        VersionManifest manifest = MinecraftDownloader.getVersionManifest(this.versionsDir);
 
         if (manifest == null) {
             throw new IOException("Unable to deserialize version manifest");
@@ -115,6 +118,30 @@ public class MinecraftDownloader {
             this.downloadJava(versionInfo);
 
             break;
+        }
+    }
+
+    public static VersionManifest getVersionManifest(Path versionsDir) throws IOException {
+        Path manifestFile = versionsDir.resolve("version_manifest_v2.json");
+        if (Files.exists(manifestFile)) {
+            BasicFileAttributes basicFileAttributes = Files.readAttributes(manifestFile, BasicFileAttributes.class);
+            Instant modifiedTime = basicFileAttributes.lastModifiedTime().toInstant();
+            if (Instant.now().minus(Duration.ofHours(3)).isAfter(modifiedTime)) {
+                try (HttpRequest request = new HttpRequest(TESLauncher.getInstance().getHttpClient())) {
+                    String string = request.asString(MinecraftDownloader.VER_MAN_V2);
+                    FileUtils.writeUtf8(manifestFile, string);
+                    return Json.parse(string, VersionManifest.class);
+                }
+            } else {
+                return Json.parse(FileUtils.readUtf8(manifestFile), VersionManifest.class);
+            }
+        } else {
+            try (HttpRequest request = new HttpRequest(TESLauncher.getInstance().getHttpClient())) {
+                String string = request.asString(MinecraftDownloader.VER_MAN_V2);
+                FileUtils.writeUtf8(manifestFile, string);
+
+                return Json.parse(string, VersionManifest.class);
+            }
         }
     }
 

@@ -18,28 +18,20 @@
 
 package me.theentropyshard.teslauncher.gui.dialogs;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import me.theentropyshard.teslauncher.TESLauncher;
-import me.theentropyshard.teslauncher.network.HttpRequest;
-import me.theentropyshard.teslauncher.utils.Json;
+import me.theentropyshard.teslauncher.minecraft.MinecraftDownloader;
+import me.theentropyshard.teslauncher.minecraft.VersionManifest;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 
 public class McVersionsTableModel extends DefaultTableModel {
-
-    public static final String VM_V2 = "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json";
-
     private final DateTimeFormatter formatter;
 
     public McVersionsTableModel(AddInstanceDialog dialog, JTable table) {
@@ -54,38 +46,21 @@ public class McVersionsTableModel extends DefaultTableModel {
             this.formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
         }
 
-        new SwingWorker<List<List<String>>, Void>() {
+        new SwingWorker<VersionManifest, Void>() {
             @Override
-            protected List<List<String>> doInBackground() throws Exception {
-                List<List<String>> data = new ArrayList<>();
-
-                JsonObject json;
-                try (HttpRequest request = new HttpRequest(TESLauncher.getInstance().getHttpClient())) {
-                    json = Json.parse(request.asString(McVersionsTableModel.VM_V2), JsonObject.class);
-                }
-
-                JsonArray jsonArray = json.getAsJsonArray("versions");
-                for (JsonElement element : jsonArray) {
-                    JsonObject versionObject = element.getAsJsonObject();
-                    data.add(Arrays.asList(
-                            versionObject.get("id").getAsString(),
-                            versionObject.get("releaseTime").getAsString(),
-                            versionObject.get("type").getAsString()
-                    ));
-                }
-
-                return data;
+            protected VersionManifest doInBackground() throws Exception {
+                return MinecraftDownloader.getVersionManifest(TESLauncher.getInstance().getVersionsDir());
             }
 
             @Override
             protected void done() {
                 try {
-                    List<List<String>> objects = this.get();
-                    for (List<String> rowData : objects) {
+                    VersionManifest versionManifest = this.get();
+                    for (VersionManifest.Version version : versionManifest.versions) {
                         McVersionsTableModel.this.addRow(new Object[]{
-                                rowData.get(0),
-                                McVersionsTableModel.this.formatter.format(OffsetDateTime.parse(rowData.get(1))),
-                                rowData.get(2)
+                                version.id,
+                                McVersionsTableModel.this.formatter.format(OffsetDateTime.parse(version.releaseTime)),
+                                version.type
                         });
                     }
 
