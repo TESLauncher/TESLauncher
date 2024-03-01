@@ -75,8 +75,6 @@ public class InstanceRunner extends Thread {
                 LOG.error(e);
                 JOptionPane.showMessageDialog(TESLauncher.getInstance().getGui().getAppWindow().getFrame(),
                         e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                this.join();
-                return;
             }
 
             TESLauncher launcher = TESLauncher.getInstance();

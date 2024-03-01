@@ -36,15 +36,12 @@ import org.apache.logging.log4j.Logger;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 public class MinecraftDownloader {
     private static final Logger LOG = LogManager.getLogger(MinecraftDownloader.class);
@@ -99,8 +96,6 @@ public class MinecraftDownloader {
             if (version.url == null) {
                 throw new IOException("Version url is null");
             }
-
-            this.saveClientJson(version);
 
             LOG.info("Downloading client...");
             VersionInfo versionInfo = this.downloadClient(version);
@@ -182,20 +177,21 @@ public class MinecraftDownloader {
         javaManager.downloadRuntime(javaKey, this.minecraftDownloadListener);
     }
 
-    private void saveClientJson(VersionManifest.Version version) throws IOException {
-        Path jsonFile = this.versionsDir.resolve(version.id).resolve(version.id + ".json");
-        if (!Files.exists(jsonFile)) {
-            try (HttpRequest request = new HttpRequest(TESLauncher.getInstance().getHttpClient())) {
-                FileUtils.writeUtf8(jsonFile, request.asString(version.url));
-            }
+    private void saveClientJson(VersionManifest.Version version, Path jsonFile) throws IOException {
+        try (HttpRequest request = new HttpRequest(TESLauncher.getInstance().getHttpClient())) {
+            FileUtils.writeUtf8(jsonFile, request.asString(version.url));
         }
     }
 
     private VersionInfo downloadClient(VersionManifest.Version version) throws IOException {
         VersionInfo versionInfo;
-        try (HttpRequest request = new HttpRequest(TESLauncher.getInstance().getHttpClient())) {
-            versionInfo = Json.parse(request.asString(version.url), VersionInfo.class);
+
+        Path jsonFile = this.versionsDir.resolve(version.id).resolve(version.id + ".json");
+        if (!Files.exists(jsonFile)) {
+            this.saveClientJson(version, jsonFile);
         }
+
+        versionInfo = Json.parse(FileUtils.readUtf8(jsonFile), VersionInfo.class);
 
         ClientDownload client = versionInfo.downloads.client;
 
