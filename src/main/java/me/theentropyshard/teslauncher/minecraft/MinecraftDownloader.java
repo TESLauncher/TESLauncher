@@ -21,9 +21,9 @@ package me.theentropyshard.teslauncher.minecraft;
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.java.JavaManager;
 import me.theentropyshard.teslauncher.network.HttpRequest;
-import me.theentropyshard.teslauncher.network.UserAgentInterceptor;
 import me.theentropyshard.teslauncher.network.download.DownloadList;
 import me.theentropyshard.teslauncher.network.download.HttpDownload;
+import me.theentropyshard.teslauncher.network.progress.ProgressNetworkInterceptor;
 import me.theentropyshard.teslauncher.utils.EnumOS;
 import me.theentropyshard.teslauncher.utils.FileUtils;
 import me.theentropyshard.teslauncher.utils.Json;
@@ -173,7 +173,9 @@ public class MinecraftDownloader {
         this.minecraftDownloadListener.onStageChanged("Downloading client");
 
         OkHttpClient httpClient = TESLauncher.getInstance().getHttpClient().newBuilder()
-                .addNetworkInterceptor(new UserAgentInterceptor(TESLauncher.USER_AGENT))
+                .addNetworkInterceptor(new ProgressNetworkInterceptor((contentLength, bytesRead, done) -> {
+                    this.minecraftDownloadListener.onProgress(0, (int) contentLength, (int) bytesRead);
+                }))
                 .build();
 
         HttpDownload download = new HttpDownload.Builder()
