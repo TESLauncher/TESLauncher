@@ -27,6 +27,7 @@ import me.theentropyshard.teslauncher.network.progress.ProgressNetworkIntercepto
 import me.theentropyshard.teslauncher.utils.EnumOS;
 import me.theentropyshard.teslauncher.utils.FileUtils;
 import me.theentropyshard.teslauncher.utils.Json;
+import me.theentropyshard.teslauncher.utils.ListUtils;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.model.FileHeader;
 import okhttp3.OkHttpClient;
@@ -69,50 +70,42 @@ public class MinecraftDownloader {
     public void downloadMinecraft(String versionId) throws IOException {
         FileUtils.createDirectoryIfNotExists(this.versionsDir.resolve(versionId));
 
-        LOG.info("Downloading Minecraft " + versionId);
+        LOG.info("Getting Manifest...");
 
         VersionManifest manifest = MinecraftDownloader.getVersionManifest(this.versionsDir);
-
         if (manifest == null) {
             throw new IOException("Unable to deserialize version manifest");
         }
 
-        VersionManifest.Version[] versions = manifest.versions;
-        if (versions == null) {
-            throw new IOException("Unable to deserialize version manifest");
+        VersionManifest.Version version = ListUtils.search(manifest.versions, v -> v.id.equals(versionId));
+        if (version == null) {
+            LOG.warn("Unable to find Minecraft " + versionId);
+            return;
         }
 
-        for (VersionManifest.Version version : versions) {
-            if (version.id == null) {
-                continue;
-            }
+        LOG.info("Found Minecraft " + versionId);
 
-            if (!version.id.equals(versionId)) {
-                continue;
-            }
+        LOG.info("Downloading client...");
+        VersionInfo versionInfo = this.downloadClient(version);
 
-            LOG.info("Found Minecraft " + versionId);
+        LOG.info("Downloading libraries...");
+        List<Library> nativeLibraries = this.downloadLibraries(versionInfo);
 
-            if (version.url == null) {
-                throw new IOException("Version url is null");
-            }
+        LOG.info("Extracting natives...");
+        this.extractNatives(nativeLibraries);
 
-            LOG.info("Downloading client...");
-            VersionInfo versionInfo = this.downloadClient(version);
+        LOG.info("Downloading assets...");
+        this.downloadAssets(versionInfo);
 
-            LOG.info("Downloading libraries...");
-            List<Library> nativeLibraries = this.downloadLibraries(versionInfo);
+        LOG.info("Downloading Java...");
+        this.downloadJava(versionInfo);
+    }
 
-            LOG.info("Extracting natives...");
-            this.extractNatives(nativeLibraries);
-
-            LOG.info("Downloading assets...");
-            this.downloadAssets(versionInfo);
-
-            LOG.info("Downloading Java...");
-            this.downloadJava(versionInfo);
-
-            break;
+    private static VersionManifest fetchAndSaveVersionManifest(Path manifestFile) throws IOException {
+        try (HttpRequest request = new HttpRequest(TESLauncher.getInstance().getHttpClient())) {
+            String string = request.asString(MinecraftDownloader.VER_MAN_V2);
+            FileUtils.writeUtf8(manifestFile, string);
+            return Json.parse(string, VersionManifest.class);
         }
     }
 
@@ -122,21 +115,12 @@ public class MinecraftDownloader {
             BasicFileAttributes basicFileAttributes = Files.readAttributes(manifestFile, BasicFileAttributes.class);
             Instant modifiedTime = basicFileAttributes.lastModifiedTime().toInstant();
             if (Instant.now().minus(Duration.ofHours(3)).isAfter(modifiedTime)) {
-                try (HttpRequest request = new HttpRequest(TESLauncher.getInstance().getHttpClient())) {
-                    String string = request.asString(MinecraftDownloader.VER_MAN_V2);
-                    FileUtils.writeUtf8(manifestFile, string);
-                    return Json.parse(string, VersionManifest.class);
-                }
+                return MinecraftDownloader.fetchAndSaveVersionManifest(manifestFile);
             } else {
                 return Json.parse(FileUtils.readUtf8(manifestFile), VersionManifest.class);
             }
         } else {
-            try (HttpRequest request = new HttpRequest(TESLauncher.getInstance().getHttpClient())) {
-                String string = request.asString(MinecraftDownloader.VER_MAN_V2);
-                FileUtils.writeUtf8(manifestFile, string);
-
-                return Json.parse(string, VersionManifest.class);
-            }
+            return MinecraftDownloader.fetchAndSaveVersionManifest(manifestFile);
         }
     }
 

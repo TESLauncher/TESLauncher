@@ -52,10 +52,7 @@ public class InstanceManager {
     }
 
     public void load() throws IOException {
-        List<Path> paths;
-        try (Stream<Path> stream = Files.list(this.workDir)) {
-            paths = stream.collect(Collectors.toList());
-        }
+        List<Path> paths = FileUtils.list(this.workDir);
 
         for (Path path : paths) {
             if (!Files.isDirectory(path)) {

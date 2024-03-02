@@ -16,26 +16,23 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.minecraft;
+package me.theentropyshard.teslauncher.utils;
 
 import java.util.List;
+import java.util.function.Predicate;
 
-public final class VersionManifest {
-    public Latest latest;
-    public List<Version> versions;
+public final class ListUtils {
+    public static <T> T search(List<T> list, Predicate<T> predicate) {
+        for (T t : list) {
+            if (predicate.test(t)) {
+                return t;
+            }
+        }
 
-    public static final class Latest {
-        public String release;
-        public String snapshot;
+        return null;
     }
 
-    public static final class Version {
-        public String id;
-        public String type;
-        public String url;
-        public String time;
-        public String releaseTime;
-        public String sha1;
-        public int complianceLevel;
+    private ListUtils() {
+        throw new UnsupportedOperationException();
     }
 }
