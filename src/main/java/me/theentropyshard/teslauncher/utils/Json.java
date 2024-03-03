@@ -55,14 +55,6 @@ public final class Json {
         return Json.GSON.fromJson(element, clazz);
     }
 
-    public static <K, V> Map<K, V> parseMap(String json) {
-        return Json.parse(json, new TypeToken<Map<K, V>>() {}.getType());
-    }
-
-    public static <K, V> Map<K, V> parseMap(JsonElement element) {
-        return Json.parse(element, new TypeToken<Map<K, V>>() {}.getType());
-    }
-
     public static String write(Object o) {
         return Json.GSON.toJson(o);
     }
