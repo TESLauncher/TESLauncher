@@ -40,6 +40,8 @@ import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalTime;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -113,8 +115,8 @@ public class MinecraftDownloader {
         Path manifestFile = versionsDir.resolve("version_manifest_v2.json");
         if (Files.exists(manifestFile)) {
             BasicFileAttributes basicFileAttributes = Files.readAttributes(manifestFile, BasicFileAttributes.class);
-            Instant modifiedTime = basicFileAttributes.lastModifiedTime().toInstant();
-            if (Instant.now().minus(Duration.ofHours(3)).isAfter(modifiedTime)) {
+            String string = basicFileAttributes.lastModifiedTime().toString();
+            if (OffsetDateTime.now().minus(Duration.ofHours(3)).isAfter(OffsetDateTime.parse(string))) {
                 return MinecraftDownloader.fetchAndSaveVersionManifest(manifestFile);
             } else {
                 return Json.parse(FileUtils.readUtf8(manifestFile), VersionManifest.class);
