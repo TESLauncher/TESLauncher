@@ -322,22 +322,19 @@ public class MinecraftDownloader {
             String fileName = entry.getKey();
             AssetObject assetObject = entry.getValue();
 
+            Path filePath;
+
             if (assetIndex.mapToResources) {
-                Path filePath = this.instanceResourcesDir.resolve(fileName);
-                if (!Files.exists(filePath) || Files.size(filePath) != assetObject.size) {
-                    this.downloadAsset(downloadList, filePath, assetObject);
-                }
+                filePath = this.instanceResourcesDir.resolve(fileName);
             } else if (assetIndex.virtual) {
-                Path filePath = this.assetsDir.resolve("virtual").resolve("legacy").resolve(fileName);
-                if (!Files.exists(filePath) || Files.size(filePath) != assetObject.size) {
-                    this.downloadAsset(downloadList, filePath, assetObject);
-                }
+                filePath = this.assetsDir.resolve("virtual").resolve("legacy").resolve(fileName);
             } else {
                 String prefix = assetObject.hash.substring(0, 2);
-                Path filePath = this.assetsDir.resolve("objects").resolve(prefix).resolve(assetObject.hash);
-                if (!Files.exists(filePath) || Files.size(filePath) != assetObject.size) {
-                    this.downloadAsset(downloadList, filePath, assetObject);
-                }
+                filePath = this.assetsDir.resolve("objects").resolve(prefix).resolve(assetObject.hash);
+            }
+
+            if (!Files.exists(filePath) || Files.size(filePath) != assetObject.size) {
+                this.downloadAsset(downloadList, filePath, assetObject);
             }
         }
 
