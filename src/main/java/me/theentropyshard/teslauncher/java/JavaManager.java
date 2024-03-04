@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -74,19 +75,17 @@ public class JavaManager {
                     manifest = Json.parse(request.asString(javaRuntime.manifest.url), JavaRuntimeManifest.class);
                 }
 
-                DownloadList downloadList = new DownloadList((total, completed) -> {
-                    listener.onProgress(0, total, completed);
-                });
+                DownloadList downloadList = new DownloadList(listener::onProgress);
 
                 for (Map.Entry<String, JreFile> entry : manifest.files.entrySet()) {
                     JreFile jreFile = entry.getValue();
                     Path savePath = componentDir.resolve(entry.getKey());
-                    // TODO: there is also 'lzma' available. maybe use it and decompress?
+
                     if (jreFile.type.equals("directory")) {
                         FileUtils.createDirectoryIfNotExists(savePath);
                     } else if (jreFile.type.equals("file")) {
+                        // TODO: there is also 'lzma' available. maybe use it and decompress?
                         JreFile.Download raw = jreFile.downloads.get("raw");
-                        //this.download(raw.url, savePath, raw.size, progressListener);
 
                         HttpDownload download = new HttpDownload.Builder()
                                 .httpClient(TESLauncher.getInstance().getHttpClient())
@@ -94,11 +93,14 @@ public class JavaManager {
                                 .expectedSize(raw.size)
                                 .saveAs(savePath)
                                 .build();
+
                         downloadList.add(download);
                     }
                 }
 
-                downloadList.downloadAll();
+                if (downloadList.size() > 0) {
+                    downloadList.downloadAll();
+                }
 
                 String javaExecutable = this.getJavaExecutable(componentName);
                 if (!new File(javaExecutable).setExecutable(true, true)) {

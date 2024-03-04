@@ -19,5 +19,5 @@
 package me.theentropyshard.teslauncher.network.download;
 
 public interface DownloadListener {
-    void onTaskFinished(int total, int completed);
+    void updateProgress(long totalSize, long downloadedBytes);
 }

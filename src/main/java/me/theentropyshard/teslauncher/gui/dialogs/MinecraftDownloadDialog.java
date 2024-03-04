@@ -21,6 +21,7 @@ package me.theentropyshard.teslauncher.gui.dialogs;
 import com.formdev.flatlaf.FlatClientProperties;
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.minecraft.MinecraftDownloadListener;
+import me.theentropyshard.teslauncher.utils.MathUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -58,10 +59,12 @@ public class MinecraftDownloadDialog extends AppDialog implements MinecraftDownl
     }
 
     @Override
-    public void onProgress(int minimum, int maximum, int value) {
-        this.progressBar.setMinimum(minimum);
-        this.progressBar.setMaximum(maximum);
-        this.progressBar.setValue(value);
+    public void onProgress(long totalSize, long downloadedBytes) {
+        this.progressBar.setMinimum(0);
+        this.progressBar.setMaximum((int) totalSize);
+        this.progressBar.setValue((int) downloadedBytes);
+        this.progressBar.setString(MathUtils.round(downloadedBytes / 1024.0D / 1024.0D, 2) +
+                " MB / " + MathUtils.round(totalSize / 1024.0D / 1024.0D, 2) + " MB");
     }
 
     public JLabel getStageLabel() {

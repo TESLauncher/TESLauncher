@@ -19,5 +19,5 @@
 package me.theentropyshard.teslauncher.network.progress;
 
 public interface ProgressListener {
-    void update(long contentLength, long bytesRead, boolean done);
+    void update(long contentLength, long totalBytesRead, long bytesReadThisTime, boolean done);
 }

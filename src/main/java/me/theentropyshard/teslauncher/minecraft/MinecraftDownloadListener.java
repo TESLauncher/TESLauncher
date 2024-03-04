@@ -21,5 +21,5 @@ package me.theentropyshard.teslauncher.minecraft;
 public interface MinecraftDownloadListener {
     void onStageChanged(String stage);
 
-    void onProgress(int minimum, int maximum, int value);
+    void onProgress(long totalSize, long downloadedBytes);
 }

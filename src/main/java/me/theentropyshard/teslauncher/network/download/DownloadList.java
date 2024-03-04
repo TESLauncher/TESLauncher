@@ -18,13 +18,18 @@
 
 package me.theentropyshard.teslauncher.network.download;
 
+import me.theentropyshard.teslauncher.TESLauncher;
+import me.theentropyshard.teslauncher.network.progress.ProgressNetworkInterceptor;
+import okhttp3.OkHttpClient;
+
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class DownloadList {
     public static final int MAX_CONNECTIONS = 8;
@@ -32,7 +37,8 @@ public class DownloadList {
     private final DownloadListener downloadListener;
     private final List<HttpDownload> downloads;
     private final ExecutorService executorService;
-    private final AtomicInteger completedTasks;
+    private final AtomicLong downloadedBytes;
+    private long totalSize;
 
     private boolean finished;
 
@@ -40,11 +46,15 @@ public class DownloadList {
         this.downloadListener = downloadListener;
         this.downloads = new ArrayList<>();
         this.executorService = Executors.newFixedThreadPool(DownloadList.MAX_CONNECTIONS);
-        this.completedTasks = new AtomicInteger(0);
+        this.downloadedBytes = new AtomicLong(0);
     }
 
     public synchronized void add(HttpDownload download) {
         this.downloads.add(download);
+    }
+
+    public synchronized void addAll(Collection<HttpDownload> downloads) {
+        this.downloads.addAll(downloads);
     }
 
     public int size() {
@@ -56,22 +66,28 @@ public class DownloadList {
             throw new IllegalStateException("This download list has already finished downloading. Please consider creating a new one");
         }
 
-        for (HttpDownload download : this.downloads) {
-            DownloadTask downloadTask = new DownloadTask(
-                    () -> {
-                        try {
-                            download.execute();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    },
-                    () -> {
-                        int completed = this.completedTasks.incrementAndGet();
-                        this.downloadListener.onTaskFinished(this.downloads.size(), completed);
-                    }
-            );
+        OkHttpClient parent = TESLauncher.getInstance().getHttpClient();
 
-            this.executorService.execute(downloadTask);
+        for (HttpDownload download : this.downloads) {
+            OkHttpClient httpClient = parent.newBuilder()
+                    .addNetworkInterceptor(new ProgressNetworkInterceptor((
+                            (contentLength, bytesRead, bytesThisTime, done) -> {
+                        this.downloadListener.updateProgress(this.totalSize, this.downloadedBytes.addAndGet(bytesThisTime));
+                    })))
+                    .build();
+            download.setHttpClient(httpClient);
+
+            this.totalSize += download.expectedSize();
+
+            Runnable runnable = () -> {
+                try {
+                    download.execute();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            };
+
+            this.executorService.execute(runnable);
         }
 
         this.executorService.shutdown();

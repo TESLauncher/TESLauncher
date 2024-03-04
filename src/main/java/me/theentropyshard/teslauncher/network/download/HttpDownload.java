@@ -39,7 +39,7 @@ import java.util.Objects;
 public class HttpDownload {
     private static final Logger LOG = LogManager.getLogger(HttpDownload.class);
 
-    private final OkHttpClient httpClient;
+    private OkHttpClient httpClient;
     private final String url;
     private final Path saveAs;
     private final boolean forceDownload;
@@ -100,6 +100,10 @@ public class HttpDownload {
         }
 
         return -1;
+    }
+
+    public void setHttpClient(OkHttpClient httpClient) {
+        this.httpClient = httpClient;
     }
 
     public long expectedSize() {

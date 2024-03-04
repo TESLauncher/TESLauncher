@@ -43,7 +43,7 @@ public class ProgressForwardingSource extends ForwardingSource {
         long bytesRead = super.read(sink, byteCount);
 
         this.totalBytesRead += bytesRead != -1 ? bytesRead : 0;
-        this.progressListener.update(this.responseBody.contentLength(), this.totalBytesRead, bytesRead == -1);
+        this.progressListener.update(this.responseBody.contentLength(), this.totalBytesRead, bytesRead, bytesRead == -1);
 
         return bytesRead;
     }
