@@ -50,11 +50,12 @@ public class DownloadList {
     }
 
     public synchronized void add(HttpDownload download) {
+        this.totalSize += download.expectedSize();
         this.downloads.add(download);
     }
 
     public synchronized void addAll(Collection<HttpDownload> downloads) {
-        this.downloads.addAll(downloads);
+        downloads.forEach(this::add);
     }
 
     public int size() {
@@ -76,8 +77,6 @@ public class DownloadList {
                     })))
                     .build();
             download.setHttpClient(httpClient);
-
-            this.totalSize += download.expectedSize();
 
             Runnable runnable = () -> {
                 try {
