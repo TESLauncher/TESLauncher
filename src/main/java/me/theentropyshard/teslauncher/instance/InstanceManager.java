@@ -93,9 +93,7 @@ public class InstanceManager {
 
     public void save(Instance instance) throws IOException {
         Path instanceDir = this.getInstanceDir(instance);
-        if (!Files.exists(instanceDir)) {
-            return;
-        }
+        FileUtils.createDirectoryIfNotExists(instanceDir);
 
         Path instanceFile = instanceDir.resolve("instance.json");
         FileUtils.writeUtf8(instanceFile, Json.write(instance));
@@ -104,6 +102,9 @@ public class InstanceManager {
     public void createInstance(String name, String groupName, String minecraftVersion) throws IOException {
         Instance instance = new Instance(name, groupName, minecraftVersion);
 
+        instance.setDirName(instance.getName());
+        this.createDirName(instance);
+
         Path instanceDir = this.getInstanceDir(instance);
         if (Files.exists(instanceDir)) {
             throw new IOException("Instance dir '" + instanceDir + "' already exists");
@@ -111,9 +112,6 @@ public class InstanceManager {
 
         this.instances.add(instance);
         this.instancesByName.put(name, instance);
-
-        instance.setDirName(instance.getName());
-        this.createDirName(instance);
 
         FileUtils.createDirectoryIfNotExists(instanceDir);
         Path minecraftDir = instanceDir.resolve(this.mcDirName);

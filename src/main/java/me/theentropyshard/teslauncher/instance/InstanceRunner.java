@@ -173,7 +173,8 @@ public class InstanceRunner extends Thread {
                         for (Path modFileToAdd : modFiles) {
                             String path = modFileToAdd.toAbsolutePath().toString();
                             String base = unpackDir.toAbsolutePath().toString();
-                            String relative = new File(base).toURI().relativize(new File(path).toURI()).getPath();
+                            //String relative = new File(base).toURI().relativize(new File(path).toURI()).getPath();
+                            String relative = Paths.get(base).toUri().relativize(Paths.get(path).toUri()).getPath();
 
                             zipParameters.setFileNameInZip(relative);
                             copyZip.addFile(modFileToAdd.toFile(), zipParameters);
