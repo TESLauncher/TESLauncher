@@ -163,11 +163,11 @@ public class TESLauncher {
             LOG.error("Exception while saving accounts", e);
         }
 
-        this.instanceManager.getInstances().forEach(i -> {
+        this.instanceManager.getInstances().forEach(instance -> {
             try {
-                this.instanceManager.save(i);
+                instance.save();
             } catch (IOException e) {
-                LOG.error("Exception while saving instance '" + i + "'", e);
+                LOG.error("Exception while saving instance '" + instance + "'", e);
             }
         });
 

@@ -103,16 +103,17 @@ public class InstanceManager {
 
     public void createInstance(String name, String groupName, String minecraftVersion) throws IOException {
         Instance instance = new Instance(name, groupName, minecraftVersion);
+
+        Path instanceDir = this.getInstanceDir(instance);
+        if (Files.exists(instanceDir)) {
+            throw new IOException("Instance dir '" + instanceDir + "' already exists");
+        }
+
         this.instances.add(instance);
         this.instancesByName.put(name, instance);
 
         instance.setDirName(instance.getName());
         this.createDirName(instance);
-
-        Path instanceDir = this.getInstanceDir(instance);
-        if (Files.exists(instanceDir)) {
-            return;
-        }
 
         FileUtils.createDirectoryIfNotExists(instanceDir);
         Path minecraftDir = instanceDir.resolve(this.mcDirName);

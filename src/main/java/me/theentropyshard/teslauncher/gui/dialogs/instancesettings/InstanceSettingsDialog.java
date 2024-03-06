@@ -66,7 +66,7 @@ public class InstanceSettingsDialog extends AppDialog {
                     if (associatedInstance == instance) {
                         ((InstanceItem) component).getTextLabel().setText(instance.getName());
                         try {
-                            TESLauncher.getInstance().getInstanceManager().save(instance);
+                            instance.save();
                         } catch (IOException ex) {
                             ex.printStackTrace();
                         }

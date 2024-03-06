@@ -18,6 +18,9 @@
 
 package me.theentropyshard.teslauncher.instance;
 
+import me.theentropyshard.teslauncher.TESLauncher;
+
+import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
 
@@ -48,8 +51,8 @@ public class Instance {
         this.minecraftVersion = minecraftVersion;
     }
 
-    public static void create(String name, String groupName, String minecraftVersion) {
-
+    public void save() throws IOException {
+        TESLauncher.getInstance().getInstanceManager().save(this);
     }
 
     public List<JarMod> getJarMods() {

@@ -21,15 +21,12 @@ package me.theentropyshard.teslauncher.instance;
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.accounts.Account;
 import me.theentropyshard.teslauncher.accounts.MicrosoftAccount;
-import me.theentropyshard.teslauncher.gui.AppWindow;
-import me.theentropyshard.teslauncher.gui.Gui;
 import me.theentropyshard.teslauncher.gui.dialogs.MinecraftDownloadDialog;
 import me.theentropyshard.teslauncher.java.JavaManager;
 import me.theentropyshard.teslauncher.minecraft.*;
 import me.theentropyshard.teslauncher.minecraft.auth.microsoft.AuthException;
 import me.theentropyshard.teslauncher.utils.FileUtils;
 import me.theentropyshard.teslauncher.utils.Json;
-import me.theentropyshard.teslauncher.utils.SwingUtils;
 import me.theentropyshard.teslauncher.utils.TimeUtils;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.model.ZipParameters;
@@ -78,20 +75,18 @@ public class InstanceRunner extends Thread {
             }
 
             TESLauncher launcher = TESLauncher.getInstance();
-            InstanceManager instanceManager = launcher.getInstanceManager();
 
             Path versionsDir = launcher.getVersionsDir();
             Path librariesDir = launcher.getLibrariesDir();
             Path assetsDir = launcher.getAssetsDir();
             Path nativesDir = versionsDir.resolve(this.instance.getMinecraftVersion()).resolve("natives");
 
-            // TODO: check version different way, not like this
             MinecraftDownloader downloader = new GuiMinecraftDownloader(
                     versionsDir,
                     assetsDir,
                     librariesDir,
                     nativesDir,
-                    instanceManager.getMinecraftDir(this.instance).resolve("resources"),
+                    launcher.getInstanceManager().getMinecraftDir(this.instance).resolve("resources"),
                     new MinecraftDownloadDialog()
             );
 
@@ -121,13 +116,12 @@ public class InstanceRunner extends Thread {
             long timePlayedSeconds = (end - start) / 1000;
             String timePlayed = TimeUtils.getHoursMinutesSeconds(timePlayedSeconds);
             if (!timePlayed.trim().isEmpty()) {
-                LOG.info("You played for " + timePlayed + " seconds!");
+                LOG.info("You played for " + timePlayed + "!");
             }
 
             this.instance.setTotalPlayedForSeconds(this.instance.getTotalPlayedForSeconds() + timePlayedSeconds);
             this.instance.setLastPlayedForSeconds(timePlayedSeconds);
-
-            instanceManager.save(this.instance);
+            this.instance.save();
         } catch (Exception e) {
             LOG.error("Exception occurred while trying to start Minecraft " + this.instance.getMinecraftVersion(), e);
         } finally {
@@ -220,8 +214,7 @@ public class InstanceRunner extends Thread {
 
     private List<String> getArguments(VersionInfo versionInfo, Path tmpNativesDir, Path librariesDir, Path clientsDir) throws IOException {
         TESLauncher launcher = TESLauncher.getInstance();
-        InstanceManager instanceManager = launcher.getInstanceManager();
-        Path mcDirOfInstance = instanceManager.getMinecraftDir(this.instance);
+        Path mcDirOfInstance = launcher.getInstanceManager().getMinecraftDir(this.instance);
         FileUtils.createDirectoryIfNotExists(mcDirOfInstance);
         Path assetsDir = launcher.getAssetsDir();
 
@@ -270,8 +263,8 @@ public class InstanceRunner extends Thread {
             argVars.put("uuid", this.account.getUuid().toString());
             argVars.put("accessToken", this.account.getAccessToken());
             if (assetIndex.mapToResources) {
-                argVars.put("assets_root", instanceManager.getMinecraftDir(this.instance).resolve("resources"));
-                argVars.put("game_assets", instanceManager.getMinecraftDir(this.instance).resolve("resources"));
+                argVars.put("assets_root", mcDirOfInstance.resolve("resources"));
+                argVars.put("game_assets", mcDirOfInstance.resolve("resources"));
             } else if ("legacy".equals(vAssetIndex.id)) {
                 Path virtualAssets = assetsDir.resolve("virtual").resolve("legacy").toAbsolutePath();
                 argVars.put("assets_root", virtualAssets.toString());
@@ -323,7 +316,6 @@ public class InstanceRunner extends Thread {
             int minorVersion = Integer.parseInt(split[1]);
             int patch = Integer.parseInt(split[2]);
 
-            // TODO this is a workaround for 1.16.5
             if (minorVersion == 16 && patch == 5 && !(this.account instanceof MicrosoftAccount)) {
                 arguments.add("-Dminecraft.api.auth.host=https://nope.invalid");
                 arguments.add("-Dminecraft.api.account.host=https://nope.invalid");
