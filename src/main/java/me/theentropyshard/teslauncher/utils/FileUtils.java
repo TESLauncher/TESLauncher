@@ -98,6 +98,16 @@ public final class FileUtils {
         }
     }
 
+    public static List<Path> walk(Path dir) throws IOException {
+        if (FileUtils.existsButIsNotADirectory(dir)) {
+            throw new IOException(dir + " exists, but is not a directory");
+        }
+
+        try (Stream<Path> walked = Files.walk(dir)) {
+            return walked.collect(Collectors.toList());
+        }
+    }
+
     private static boolean existsButIsNotAFile(Path path) {
         return Files.exists(path) && !Files.isRegularFile(path);
     }

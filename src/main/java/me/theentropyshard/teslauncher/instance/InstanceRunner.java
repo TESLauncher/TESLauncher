@@ -166,10 +166,7 @@ public class InstanceRunner extends Thread {
                             modZip.extractAll(unpackDir.toAbsolutePath().toString());
                         }
 
-                        List<Path> modFiles;
-                        try (Stream<Path> walked = Files.walk(unpackDir)) {
-                            modFiles = walked.collect(Collectors.toList());
-                        }
+                        List<Path> modFiles = FileUtils.walk(unpackDir);
 
                         ZipParameters zipParameters = new ZipParameters();
 
