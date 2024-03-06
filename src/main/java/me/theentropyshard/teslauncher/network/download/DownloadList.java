@@ -36,7 +36,6 @@ public class DownloadList {
 
     private final DownloadListener downloadListener;
     private final List<HttpDownload> downloads;
-    private final ExecutorService executorService;
     private final AtomicLong downloadedBytes;
     private long totalSize;
 
@@ -45,7 +44,6 @@ public class DownloadList {
     public DownloadList(DownloadListener downloadListener) {
         this.downloadListener = downloadListener;
         this.downloads = new ArrayList<>();
-        this.executorService = Executors.newFixedThreadPool(DownloadList.MAX_CONNECTIONS);
         this.downloadedBytes = new AtomicLong(0);
     }
 
@@ -71,6 +69,8 @@ public class DownloadList {
             throw new IllegalStateException("This download list has already finished downloading. Please consider creating a new one");
         }
 
+        ExecutorService executorService = Executors.newFixedThreadPool(DownloadList.MAX_CONNECTIONS);
+
         OkHttpClient parent = TESLauncher.getInstance().getHttpClient();
 
         for (HttpDownload download : this.downloads) {
@@ -90,16 +90,16 @@ public class DownloadList {
                 }
             };
 
-            this.executorService.execute(runnable);
+            executorService.execute(runnable);
         }
 
-        this.executorService.shutdown();
+        executorService.shutdown();
         try {
-            if (!this.executorService.awaitTermination(15, TimeUnit.MINUTES)) {
-                this.executorService.shutdownNow();
+            if (!executorService.awaitTermination(15, TimeUnit.MINUTES)) {
+                executorService.shutdownNow();
             }
         } catch (InterruptedException ex) {
-            this.executorService.shutdownNow();
+            executorService.shutdownNow();
         }
 
         this.finished = true;
