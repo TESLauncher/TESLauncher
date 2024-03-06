@@ -78,12 +78,13 @@ public class TESLauncher {
 
         TESLauncher.setInstance(this);
 
-        this.runtimesDir = this.workDir.resolve("runtimes");
-        this.assetsDir = this.workDir.resolve("assets");
-        this.librariesDir = this.workDir.resolve("libraries");
-        this.instancesDir = this.workDir.resolve("instances");
-        this.versionsDir = this.workDir.resolve("versions");
-        this.log4jConfigsDir = this.workDir.resolve("log4j");
+        Path minecraftDir = this.workDir.resolve("minecraft");
+        this.runtimesDir = minecraftDir.resolve("runtimes");
+        this.assetsDir = minecraftDir.resolve("assets");
+        this.librariesDir = minecraftDir.resolve("libraries");
+        this.instancesDir = minecraftDir.resolve("instances");
+        this.versionsDir = minecraftDir.resolve("versions");
+        this.log4jConfigsDir = minecraftDir.resolve("log4j");
         this.createDirectories();
 
         this.settingsFile = this.workDir.resolve("settings.json");
