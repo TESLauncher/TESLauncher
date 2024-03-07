@@ -101,4 +101,9 @@ public class JarModsTableModel extends AbstractTableModel {
     public JarMod jarModAt(int rowIndex) {
         return this.jarMods.get(rowIndex);
     }
+
+    public void removeRow(int rowIndex) {
+        this.jarMods.remove(rowIndex);
+        this.fireTableStructureChanged();
+    }
 }

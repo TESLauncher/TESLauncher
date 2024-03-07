@@ -18,6 +18,7 @@
 
 package me.theentropyshard.teslauncher.gui.dialogs.instancesettings;
 
+import me.theentropyshard.teslauncher.Settings;
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.instance.Instance;
 import me.theentropyshard.teslauncher.instance.JarMod;
@@ -25,6 +26,8 @@ import me.theentropyshard.teslauncher.instance.JarMod;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -34,6 +37,7 @@ import java.util.UUID;
 
 public class JarModsTab extends Tab {
     private final JarModsTableModel jarModsTableModel;
+    private final JButton deleteModButton;
 
     public JarModsTab(Instance instance, JDialog dialog) {
         super("Jar Mods", instance, dialog);
@@ -54,12 +58,19 @@ public class JarModsTab extends Tab {
                     JFileChooser fileChooser = new JFileChooser();
                     fileChooser.setFileFilter(new FileNameExtensionFilter("Archives (*.zip, *.jar)", "zip", "jar"));
 
+                    Settings settings = TESLauncher.getInstance().getSettings();
+                    if (settings.lastDir != null && !settings.lastDir.isEmpty()) {
+                        fileChooser.setCurrentDirectory(new File(settings.lastDir));
+                    }
+
                     int option = fileChooser.showOpenDialog(TESLauncher.window.getFrame());
                     if (option == JFileChooser.APPROVE_OPTION) {
                         File selectedFile = fileChooser.getSelectedFile();
                         if (selectedFile == null) {
                             return null;
                         }
+
+                        settings.lastDir = fileChooser.getCurrentDirectory().getAbsolutePath();
 
                         List<JarMod> jarMods = instance.getJarMods();
                         if (jarMods == null) {
@@ -68,6 +79,7 @@ public class JarModsTab extends Tab {
                         }
 
                         Path jarModPath = selectedFile.toPath().toAbsolutePath().normalize();
+
                         JarMod jarMod = new JarMod(
                                 true,
                                 jarModPath.toString(),
@@ -85,11 +97,39 @@ public class JarModsTab extends Tab {
             }.execute();
         });
 
+        this.deleteModButton = new JButton("Delete jar mode");
+
         JTable jarModsTable = new JTable(this.jarModsTableModel);
+        jarModsTable.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int selectedRow = jarModsTable.getSelectedRow();
+                if (selectedRow == -1) {
+                    return;
+                }
+
+                JarModsTab.this.deleteModButton.setEnabled(true);
+            }
+        });
 
         JScrollPane scrollPane = new JScrollPane(jarModsTable);
         scrollPane.setBorder(null);
         root.add(scrollPane, BorderLayout.CENTER);
+
+
+        this.deleteModButton.setEnabled(false);
+        this.deleteModButton.addActionListener(e -> {
+            int selectedRow = jarModsTable.getSelectedRow();
+            if (selectedRow == -1) {
+                return;
+            }
+
+            JarMod jarMod = this.jarModsTableModel.jarModAt(selectedRow);
+            this.jarModsTableModel.removeRow(selectedRow);
+            instance.getJarMods().remove(jarMod);
+        });
+
+        root.add(this.deleteModButton, BorderLayout.SOUTH);
     }
 
     @Override

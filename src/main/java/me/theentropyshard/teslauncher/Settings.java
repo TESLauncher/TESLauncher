@@ -32,6 +32,7 @@ import java.nio.file.Path;
 public class Settings {
     public String language = "english";
     public boolean darkTheme = false;
+    public String lastDir = System.getProperty("user.dir");
 
     public Settings() {
 
