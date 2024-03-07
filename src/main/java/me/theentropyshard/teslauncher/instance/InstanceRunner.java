@@ -155,6 +155,10 @@ public class InstanceRunner extends Thread {
                 }
 
                 try (ZipFile copyZip = new ZipFile(copyOfClient.toFile())) {
+                    copyZip.removeFile("META-INF/MANIFEST.MF");
+                    copyZip.removeFile("META-INF/MOJANG_C.DSA");
+                    copyZip.removeFile("META-INF/MOJANG_C.SF");
+
                     for (File modFile : zipFilesToMerge) {
                         Path unpackDir = instanceDir.resolve(modFile.getName().replace(".", "_"));
                         try (ZipFile modZip = new ZipFile(modFile)) {
@@ -173,7 +177,6 @@ public class InstanceRunner extends Thread {
                         for (Path modFileToAdd : modFiles) {
                             String path = modFileToAdd.toAbsolutePath().toString();
                             String base = unpackDir.toAbsolutePath().toString();
-                            //String relative = new File(base).toURI().relativize(new File(path).toURI()).getPath();
                             String relative = Paths.get(base).toUri().relativize(Paths.get(path).toUri()).getPath();
 
                             zipParameters.setFileNameInZip(relative);
