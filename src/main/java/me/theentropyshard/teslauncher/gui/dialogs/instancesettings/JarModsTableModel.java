@@ -35,7 +35,7 @@ public class JarModsTableModel extends AbstractTableModel {
         if (instance.getJarMods() == null) {
             this.jarMods = new ArrayList<>();
         } else {
-            this.jarMods = instance.getJarMods();
+            this.jarMods = new ArrayList<>(instance.getJarMods());
         }
     }
 
