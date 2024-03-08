@@ -29,31 +29,23 @@ public class OperatingSystemFilter {
     private String arch;
 
     public boolean applies() {
-        if (this.name != null) {
-            return this.nameMatches();
-        }
+        boolean nameMatches = this.nameMatches();
+        boolean archMatches = this.archMatches();
+        boolean versionMatches = this.versionMatches();
 
-        if (this.arch != null) {
-            return this.archMatches();
-        }
-
-        if (this.version != null) {
-            return this.versionMatches();
-        }
-
-        return true;
+        return nameMatches || versionMatches || archMatches;
     }
 
     private boolean nameMatches() {
-        if (this.name.equalsIgnoreCase("windows") && !OperatingSystem.isWindows()) {
+        if ("windows".equalsIgnoreCase(this.name) && !OperatingSystem.isWindows()) {
             return false;
         }
 
-        if (this.name.equalsIgnoreCase("linux") && !OperatingSystem.isLinux()) {
+        if ("linux".equalsIgnoreCase(this.name) && !OperatingSystem.isLinux()) {
             return false;
         }
 
-        if (this.name.equalsIgnoreCase("osx") && !OperatingSystem.isOSX()) {
+        if ("osx".equalsIgnoreCase(this.name) && !OperatingSystem.isOSX()) {
             return false;
         }
 
@@ -64,15 +56,19 @@ public class OperatingSystemFilter {
         boolean is64Bit = OperatingSystem.is64Bit();
 
         if (OperatingSystem.isArm()) {
-            return (!this.arch.equalsIgnoreCase("arm32") || !is64Bit) &&
-                    (!this.arch.equalsIgnoreCase("arm64") || is64Bit);
+            return (!"arm32".equalsIgnoreCase(this.arch) || !is64Bit) &&
+                    (!"arm64".equalsIgnoreCase(this.arch) || is64Bit);
         } else {
-            return (!this.arch.equalsIgnoreCase("x86") || !is64Bit) &&
-                    (!this.arch.equalsIgnoreCase("x64") || is64Bit);
+            return (!"x86".equalsIgnoreCase(this.arch) || !is64Bit) &&
+                    (!"x64".equalsIgnoreCase(this.arch) || is64Bit);
         }
     }
 
     private boolean versionMatches() {
+        if (this.version == null) {
+            return false;
+        }
+
         Pattern pattern = Pattern.compile(this.version);
         Matcher matcher = pattern.matcher(OperatingSystem.getVersion());
 

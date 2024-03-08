@@ -34,12 +34,8 @@ public class Rule {
     private FeaturesFilter features;
 
     public boolean applies() {
-        if (this.features != null) {
-            return false;
-        }
-
         if (this.operatingSystem == null) {
-            return true;
+            return this.action == Action.ALLOW;
         }
 
         if (!this.operatingSystem.applies() && this.action == Action.DISALLOW) {
