@@ -16,10 +16,9 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.minecraft;
+package me.theentropyshard.teslauncher.minecraft.oldapi;
 
-public interface MinecraftDownloadListener {
-    void onStageChanged(String stage);
-
-    void onProgress(long totalSize, long downloadedBytes);
+public class AssetObject {
+    public long size;
+    public String hash;
 }

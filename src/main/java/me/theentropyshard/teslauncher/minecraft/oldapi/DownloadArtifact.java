@@ -16,11 +16,11 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.minecraft;
+package me.theentropyshard.teslauncher.minecraft.oldapi;
 
-import java.util.Map;
-
-public class LibraryDownloads {
-    public DownloadArtifact artifact;
-    public Map<String, DownloadArtifact> classifiers;
+public class DownloadArtifact {
+    public String path;
+    public String sha1;
+    public long size;
+    public String url;
 }

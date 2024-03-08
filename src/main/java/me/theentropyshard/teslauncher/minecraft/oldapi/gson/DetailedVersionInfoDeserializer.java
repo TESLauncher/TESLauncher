@@ -16,13 +16,14 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.gson;
+package me.theentropyshard.teslauncher.minecraft.oldapi.gson;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import me.theentropyshard.teslauncher.minecraft.*;
+import me.theentropyshard.teslauncher.gson.AbstractJsonDeserializer;
+import me.theentropyshard.teslauncher.minecraft.oldapi.*;
 import me.theentropyshard.teslauncher.utils.Json;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

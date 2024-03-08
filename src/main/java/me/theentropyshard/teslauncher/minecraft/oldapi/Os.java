@@ -16,37 +16,19 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.minecraft;
+package me.theentropyshard.teslauncher.minecraft.oldapi;
 
-import com.google.gson.annotations.JsonAdapter;
-import me.theentropyshard.teslauncher.gson.AlwaysListTypeAdapterFactory;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-public class Argument implements Ruleable {
-    public List<Rule> rules;
-    @JsonAdapter(AlwaysListTypeAdapterFactory.class)
-    public List<String> value;
-
-    public static Argument withValues(String... values) {
-        Argument argument = new Argument();
-        argument.value = Arrays.asList(values);
-        argument.rules = new ArrayList<>();
-        return argument;
-    }
-
-    @Override
-    public List<Rule> getRules() {
-        return this.rules;
-    }
+public class Os {
+    public String name;
+    public String version;
+    public String arch;
 
     @Override
     public String toString() {
-        return "Argument{" +
-                "rules=" + this.rules +
-                ", value=" + this.value +
+        return "Os{" +
+                "name='" + this.name + '\'' +
+                ", version='" + this.version + '\'' +
+                ", arch='" + this.arch + '\'' +
                 '}';
     }
 }

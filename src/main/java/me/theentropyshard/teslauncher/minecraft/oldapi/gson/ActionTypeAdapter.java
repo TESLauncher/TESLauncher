@@ -16,9 +16,27 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.minecraft;
+package me.theentropyshard.teslauncher.minecraft.oldapi.gson;
 
-public class JavaVersion {
-    public String component;
-    public int majorVersion;
+import com.google.gson.TypeAdapter;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
+import me.theentropyshard.teslauncher.minecraft.oldapi.Rule;
+
+import java.io.IOException;
+
+public class ActionTypeAdapter extends TypeAdapter<Rule.Action> {
+    public ActionTypeAdapter() {
+
+    }
+
+    @Override
+    public void write(JsonWriter writer, Rule.Action action) throws IOException {
+        writer.value(action.getJsonName());
+    }
+
+    @Override
+    public Rule.Action read(JsonReader reader) throws IOException {
+        return Rule.Action.getByName(reader.nextString());
+    }
 }

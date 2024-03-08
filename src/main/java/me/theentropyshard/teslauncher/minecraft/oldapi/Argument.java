@@ -16,38 +16,37 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.minecraft;
+package me.theentropyshard.teslauncher.minecraft.oldapi;
 
-import java.util.Map;
+import com.google.gson.annotations.JsonAdapter;
+import me.theentropyshard.teslauncher.gson.AlwaysListTypeAdapterFactory;
 
-public class Rule {
-    public Action action;
-    public Map<String, Boolean> features;
-    public Os os;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
-    public enum Action {
-        ALLOW,
-        DISALLOW;
+public class Argument implements Ruleable {
+    public List<Rule> rules;
+    @JsonAdapter(AlwaysListTypeAdapterFactory.class)
+    public List<String> value;
 
-        public static Action getByName(String name) {
-            if (name.equals("allow")) {
-                return Action.ALLOW;
-            }
+    public static Argument withValues(String... values) {
+        Argument argument = new Argument();
+        argument.value = Arrays.asList(values);
+        argument.rules = new ArrayList<>();
+        return argument;
+    }
 
-            return Action.DISALLOW;
-        }
-
-        public String getJsonName() {
-            return this == Action.ALLOW ? "allow" : "disallow";
-        }
+    @Override
+    public List<Rule> getRules() {
+        return this.rules;
     }
 
     @Override
     public String toString() {
-        return "Rule{" +
-                "action=" + this.action +
-                ", features=" + this.features +
-                ", os=" + this.os +
+        return "Argument{" +
+                "rules=" + this.rules +
+                ", value=" + this.value +
                 '}';
     }
 }

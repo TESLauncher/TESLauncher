@@ -16,10 +16,10 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.minecraft;
+package me.theentropyshard.teslauncher.minecraft.oldapi;
 
 import java.util.List;
 
-public interface Ruleable {
-    List<Rule> getRules();
+public class ExtractRules {
+    public List<String> exclude;
 }

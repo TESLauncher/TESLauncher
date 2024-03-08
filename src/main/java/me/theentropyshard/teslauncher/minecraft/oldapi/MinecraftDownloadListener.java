@@ -16,12 +16,10 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.minecraft;
+package me.theentropyshard.teslauncher.minecraft.oldapi;
 
-public class VersionAssetIndex {
-    public String id;
-    public String sha1;
-    public long size;
-    public long totalSize;
-    public String url;
+public interface MinecraftDownloadListener {
+    void onStageChanged(String stage);
+
+    void onProgress(long totalSize, long downloadedBytes);
 }

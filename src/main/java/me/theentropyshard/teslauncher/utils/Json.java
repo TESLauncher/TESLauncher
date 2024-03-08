@@ -21,18 +21,16 @@ package me.theentropyshard.teslauncher.utils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
-import com.google.gson.reflect.TypeToken;
 import me.theentropyshard.teslauncher.accounts.Account;
 import me.theentropyshard.teslauncher.accounts.AccountDeserializer;
-import me.theentropyshard.teslauncher.gson.ActionTypeAdapter;
-import me.theentropyshard.teslauncher.gson.DetailedVersionInfoDeserializer;
+import me.theentropyshard.teslauncher.minecraft.oldapi.gson.ActionTypeAdapter;
+import me.theentropyshard.teslauncher.minecraft.oldapi.gson.DetailedVersionInfoDeserializer;
 import me.theentropyshard.teslauncher.gson.InstantTypeAdapter;
-import me.theentropyshard.teslauncher.minecraft.Rule;
-import me.theentropyshard.teslauncher.minecraft.VersionInfo;
+import me.theentropyshard.teslauncher.minecraft.oldapi.Rule;
+import me.theentropyshard.teslauncher.minecraft.oldapi.VersionInfo;
 
 import java.lang.reflect.Type;
 import java.time.Instant;
-import java.util.Map;
 
 public final class Json {
     private static final Gson GSON = new GsonBuilder()

@@ -23,8 +23,8 @@ import me.theentropyshard.teslauncher.accounts.Account;
 import me.theentropyshard.teslauncher.accounts.MicrosoftAccount;
 import me.theentropyshard.teslauncher.gui.dialogs.MinecraftDownloadDialog;
 import me.theentropyshard.teslauncher.java.JavaManager;
-import me.theentropyshard.teslauncher.minecraft.*;
 import me.theentropyshard.teslauncher.minecraft.auth.microsoft.AuthException;
+import me.theentropyshard.teslauncher.minecraft.oldapi.*;
 import me.theentropyshard.teslauncher.utils.FileUtils;
 import me.theentropyshard.teslauncher.utils.Json;
 import me.theentropyshard.teslauncher.utils.TimeUtils;
@@ -45,8 +45,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class InstanceRunner extends Thread {
     private static final Logger LOG = LogManager.getLogger(InstanceRunner.class);

@@ -16,9 +16,10 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.minecraft;
+package me.theentropyshard.teslauncher.minecraft.oldapi;
 
-public class AssetObject {
-    public long size;
-    public String hash;
+import java.util.List;
+
+public interface Ruleable {
+    List<Rule> getRules();
 }

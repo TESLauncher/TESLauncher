@@ -16,10 +16,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.minecraft;
+package me.theentropyshard.teslauncher.minecraft.oldapi;
 
-public class ClientDownload {
-    public String sha1;
-    public String url;
-    public long size;
+public class ClientDownloads {
+    public ClientDownload client;
 }

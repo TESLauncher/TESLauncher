@@ -19,8 +19,8 @@
 package me.theentropyshard.teslauncher.gui.dialogs;
 
 import me.theentropyshard.teslauncher.TESLauncher;
-import me.theentropyshard.teslauncher.minecraft.MinecraftDownloader;
-import me.theentropyshard.teslauncher.minecraft.VersionManifest;
+import me.theentropyshard.teslauncher.minecraft.oldapi.MinecraftDownloader;
+import me.theentropyshard.teslauncher.minecraft.oldapi.VersionManifest;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;

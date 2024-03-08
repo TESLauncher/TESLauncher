@@ -16,19 +16,12 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.minecraft;
+package me.theentropyshard.teslauncher.minecraft.oldapi;
 
-public class Os {
-    public String name;
-    public String version;
-    public String arch;
-
-    @Override
-    public String toString() {
-        return "Os{" +
-                "name='" + this.name + '\'' +
-                ", version='" + this.version + '\'' +
-                ", arch='" + this.arch + '\'' +
-                '}';
-    }
+public class VersionAssetIndex {
+    public String id;
+    public String sha1;
+    public long size;
+    public long totalSize;
+    public String url;
 }

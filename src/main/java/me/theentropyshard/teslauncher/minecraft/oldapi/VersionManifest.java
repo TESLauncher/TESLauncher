@@ -16,10 +16,26 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.minecraft;
+package me.theentropyshard.teslauncher.minecraft.oldapi;
 
 import java.util.List;
 
-public class ExtractRules {
-    public List<String> exclude;
+public final class VersionManifest {
+    public Latest latest;
+    public List<Version> versions;
+
+    public static final class Latest {
+        public String release;
+        public String snapshot;
+    }
+
+    public static final class Version {
+        public String id;
+        public String type;
+        public String url;
+        public String time;
+        public String releaseTime;
+        public String sha1;
+        public int complianceLevel;
+    }
 }

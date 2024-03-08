@@ -16,20 +16,11 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.minecraft;
+package me.theentropyshard.teslauncher.minecraft.oldapi;
 
-import java.util.List;
 import java.util.Map;
 
-public class Library implements Ruleable {
-    public String name;
-    public ExtractRules extract;
-    public List<Rule> rules;
-    public Map<String, String> natives;
-    public LibraryDownloads downloads;
-
-    @Override
-    public List<Rule> getRules() {
-        return this.rules;
-    }
+public class LibraryDownloads {
+    public DownloadArtifact artifact;
+    public Map<String, DownloadArtifact> classifiers;
 }
