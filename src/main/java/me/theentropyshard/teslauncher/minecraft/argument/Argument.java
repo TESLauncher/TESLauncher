@@ -43,6 +43,10 @@ public class Argument {
     }
 
     public boolean applies() {
+        if (this.rules == null) {
+            return true;
+        }
+
         boolean result = true;
 
         for (Rule rule : this.rules) {
