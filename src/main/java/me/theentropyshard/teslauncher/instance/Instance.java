@@ -29,7 +29,6 @@ public class Instance {
     private String dirName;
     private String groupName;
     private String minecraftVersion;
-    private boolean wasEverPlayed;
     private String javaPath;
     private int minecraftWindowWidth;
     private int minecraftWindowHeight;
@@ -93,18 +92,6 @@ public class Instance {
 
     public void setMinecraftVersion(String minecraftVersion) {
         this.minecraftVersion = minecraftVersion;
-    }
-
-    public boolean wasEverPlayed() {
-        return this.wasEverPlayed;
-    }
-
-    public void setWasEverPlayed(boolean wasEverPlayed) {
-        this.wasEverPlayed = wasEverPlayed;
-    }
-
-    public boolean isWasEverPlayed() {
-        return this.wasEverPlayed;
     }
 
     public String getJavaPath() {
