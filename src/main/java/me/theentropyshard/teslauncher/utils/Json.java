@@ -23,6 +23,11 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import me.theentropyshard.teslauncher.accounts.Account;
 import me.theentropyshard.teslauncher.accounts.AccountDeserializer;
+import me.theentropyshard.teslauncher.minecraft.DownloadType;
+import me.theentropyshard.teslauncher.minecraft.Version;
+import me.theentropyshard.teslauncher.minecraft.VersionType;
+import me.theentropyshard.teslauncher.minecraft.argument.Argument;
+import me.theentropyshard.teslauncher.minecraft.gson.*;
 import me.theentropyshard.teslauncher.minecraft.oldapi.gson.ActionTypeAdapter;
 import me.theentropyshard.teslauncher.minecraft.oldapi.gson.DetailedVersionInfoDeserializer;
 import me.theentropyshard.teslauncher.gson.InstantTypeAdapter;
@@ -40,6 +45,12 @@ public final class Json {
             .registerTypeAdapter(Rule.Action.class, new ActionTypeAdapter())
             .registerTypeAdapter(Instant.class, new InstantTypeAdapter())
             .registerTypeAdapter(Account.class, new AccountDeserializer())
+            //
+            .registerTypeAdapter(Version.class, new VersionDeserializer())
+            .registerTypeAdapter(VersionType.class, new VersionTypeTypeAdapter())
+            .registerTypeAdapter(me.theentropyshard.teslauncher.minecraft.rule.Rule.Action.class, new RuleActionTypeAdapter())
+            .registerTypeAdapter(Argument.class, new ArgumentTypeTypeAdapter())
+            .registerTypeAdapter(DownloadType.class, new DownloadTypeTypeAdapter())
             //
             .create();
 
