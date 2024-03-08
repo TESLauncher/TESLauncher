@@ -64,7 +64,7 @@ public class MinecraftDownloadDialog extends AppDialog implements MinecraftDownl
         this.progressBar.setMaximum((int) totalSize);
         this.progressBar.setValue((int) downloadedBytes);
         this.progressBar.setString(MathUtils.round(downloadedBytes / 1024.0D / 1024.0D, 2) +
-                " MB / " + MathUtils.round(totalSize / 1024.0D / 1024.0D, 2) + " MB");
+                " MiB / " + MathUtils.round(totalSize / 1024.0D / 1024.0D, 2) + " MiB");
     }
 
     public JLabel getStageLabel() {
