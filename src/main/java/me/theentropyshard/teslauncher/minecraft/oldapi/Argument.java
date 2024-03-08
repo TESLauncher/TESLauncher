@@ -19,7 +19,7 @@
 package me.theentropyshard.teslauncher.minecraft.oldapi;
 
 import com.google.gson.annotations.JsonAdapter;
-import me.theentropyshard.teslauncher.gson.AlwaysListTypeAdapterFactory;
+import me.theentropyshard.teslauncher.utils.AlwaysListTypeAdapterFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
