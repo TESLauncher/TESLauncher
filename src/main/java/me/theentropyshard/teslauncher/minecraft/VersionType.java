@@ -22,10 +22,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum VersionType {
-    RELEASE("release"),
-    SNAPSHOT("snapshot"),
-    OLD_BETA("old_beta"),
-    OLD_ALPHA("old_alpha");
+    RELEASE("Release", "release"),
+    SNAPSHOT("Snapshot", "snapshot"),
+    OLD_BETA("Beta", "old_beta"),
+    OLD_ALPHA("Alpha", "old_alpha");
 
     private static final Map<String, VersionType> lookup = new HashMap<>();
 
@@ -45,10 +45,16 @@ public enum VersionType {
         return type;
     }
 
+    private final String readableName;
     private final String jsonName;
 
-    VersionType(String jsonName) {
+    VersionType(String readableName, String jsonName) {
+        this.readableName = readableName;
         this.jsonName = jsonName;
+    }
+
+    public String getReadableName() {
+        return this.readableName;
     }
 
     public String getJsonName() {
