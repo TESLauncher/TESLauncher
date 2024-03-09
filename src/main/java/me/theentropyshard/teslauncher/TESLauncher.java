@@ -136,53 +136,6 @@ public class TESLauncher {
         Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown));
 
         this.gui.showGui();
-
-        /*Request request = new Request.Builder()
-                .url("https://piston-meta.mojang.com/mc/game/version_manifest_v2.json")
-                .build();
-
-
-        try (Response response = this.httpClient.newCall(request).execute()) {
-            VersionManifest manifest = Json.parse(response.body().string(), VersionManifest.class);
-
-            for (VersionManifest.Version mver : manifest.getVersions()) {
-                Request req = new Request.Builder()
-                        .url(mver.getUrl())
-                        .build();
-
-                this.httpClient.newCall(req).enqueue(new Callback() {
-                    @Override
-                    public void onFailure(@NotNull Call call, @NotNull IOException e) {
-
-                    }
-
-                    @Override
-                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                        Version version = Json.parse(response.body().string(), Version.class);
-
-                        EnumMap<ArgumentType, List<Argument>> arguments = version.getArguments();
-                        if (arguments != null) {
-                            List<Argument> jvm = arguments.get(ArgumentType.JVM);
-                            for (Argument argument : jvm) {
-                                System.out.println(argument.getRules());
-                            }
-
-                            List<Argument> game = arguments.get(ArgumentType.GAME);
-                            for (Argument argument : game) {
-                                System.out.println(argument.getRules());
-                            }
-                        }
-
-                        List<Library> libraries = version.getLibraries();
-                        for (Library library : libraries) {
-                            System.out.println(library.getRules());
-                        }
-                    }
-                });
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }*/
     }
 
     private void createDirectories() {
