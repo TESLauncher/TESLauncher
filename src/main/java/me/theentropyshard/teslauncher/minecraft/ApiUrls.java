@@ -22,4 +22,5 @@ public class ApiUrls {
     public static final String VERSION_MANIFEST = "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json";
     public static final String RESOURCES = "https://resources.download.minecraft.net/";
     public static final String LIBRARIES = "https://libraries.minecraft.net/";
+    public static final String ALL_RUNTIMES = "https://launchermeta.mojang.com/v1/products/java-runtime/2ec0cc96c44e5a76b9c8b7c39df7210883d12871/all.json";
 }

@@ -47,9 +47,6 @@ import java.util.Map;
 public class MinecraftDownloader {
     private static final Logger LOG = LogManager.getLogger(MinecraftDownloader.class);
 
-    private static final String VER_MAN_V2 = "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json";
-    private static final String RESOURCES = "https://resources.download.minecraft.net/";
-
     private final Path versionsDir;
     private final Path assetsDir;
     private final Path librariesDir;
@@ -103,7 +100,7 @@ public class MinecraftDownloader {
 
     private static VersionManifest fetchAndSaveVersionManifest(Path manifestFile) throws IOException {
         try (HttpRequest request = new HttpRequest(TESLauncher.getInstance().getHttpClient())) {
-            String string = request.asString(MinecraftDownloader.VER_MAN_V2);
+            String string = request.asString(ApiUrls.VERSION_MANIFEST);
             FileUtils.writeUtf8(manifestFile, string);
             return Json.parse(string, VersionManifest.class);
         }
@@ -281,7 +278,7 @@ public class MinecraftDownloader {
     private void downloadAsset(DownloadList downloadList, Path filePath, AssetObject assetObject) {
         HttpDownload download = new HttpDownload.Builder()
                 .httpClient(TESLauncher.getInstance().getHttpClient())
-                .url(MinecraftDownloader.RESOURCES + assetObject.getPrefix() + "/" + assetObject.getHash())
+                .url(ApiUrls.RESOURCES + assetObject.getPrefix() + "/" + assetObject.getHash())
                 .expectedSize(assetObject.getSize())
                 .saveAs(filePath)
                 .build();

@@ -20,6 +20,7 @@ package me.theentropyshard.teslauncher.java;
 
 import com.google.gson.JsonObject;
 import me.theentropyshard.teslauncher.TESLauncher;
+import me.theentropyshard.teslauncher.minecraft.ApiUrls;
 import me.theentropyshard.teslauncher.minecraft.MinecraftDownloadListener;
 import me.theentropyshard.teslauncher.network.HttpRequest;
 import me.theentropyshard.teslauncher.network.download.DownloadList;
@@ -38,8 +39,6 @@ import java.util.List;
 import java.util.Map;
 
 public class JavaManager {
-    private static final String ALL_RUNTIMES = "https://launchermeta.mojang.com/v1/products/java-runtime/2ec0cc96c44e5a76b9c8b7c39df7210883d12871/all.json";
-
     private final Path workDir;
     private final String executableName;
 
@@ -60,7 +59,7 @@ public class JavaManager {
 
         JsonObject osObject;
         try (HttpRequest request = new HttpRequest(TESLauncher.getInstance().getHttpClient())) {
-            osObject = Json.parse(request.asString(JavaManager.ALL_RUNTIMES), JsonObject.class);
+            osObject = Json.parse(request.asString(ApiUrls.ALL_RUNTIMES), JsonObject.class);
         }
 
         if (osObject.has(jreOsName)) {
