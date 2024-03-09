@@ -53,7 +53,7 @@ public class Gui {
         JFrame.setDefaultLookAndFeelDecorated(true);
 
         this.viewSelector = new JTabbedPane(JTabbedPane.LEFT);
-        TESLauncher.window = this.appWindow = new AppWindow(TESLauncher.TITLE, TESLauncher.WIDTH, TESLauncher.HEIGHT, this.viewSelector);
+        TESLauncher.window = this.appWindow = new AppWindow(TESLauncher.NAME, TESLauncher.WIDTH, TESLauncher.HEIGHT, this.viewSelector);
         this.appWindow.getFrame().setGlassPane(new BlockGlassPane());
     }
 
