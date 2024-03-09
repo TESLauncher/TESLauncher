@@ -103,9 +103,6 @@ public class InstanceRunner extends Thread {
 
             long start = System.currentTimeMillis();
 
-            LOG.debug("Arguments: {}", arguments);
-            LOG.debug("Starting Minecraft with command: {}", command);
-
             int exitCode = this.runGameProcess(command);
             LOG.info("Minecraft process finished with exit code " + exitCode);
 
