@@ -223,8 +223,8 @@ public class InstanceRunner extends Thread {
 
         // JVM
         argVars.put("natives_directory", tmpNativesDir.toAbsolutePath().toString());
-        argVars.put("launcher_name", "TESLauncher");
-        argVars.put("launcher_version", "1.0.0");
+        argVars.put("launcher_name", TESLauncher.NAME);
+        argVars.put("launcher_version", TESLauncher.VERSION);
         argVars.put("classpath", String.join(File.pathSeparator, classpath));
 
         Version.AssetIndex vAssetIndex = version.getAssetIndex();
