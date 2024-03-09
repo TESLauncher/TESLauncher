@@ -16,11 +16,20 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.minecraft.oldapi;
+package me.theentropyshard.teslauncher.gui.dialogs.addinstance;
 
-import java.util.Map;
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 
-public class LibraryDownloads {
-    public DownloadArtifact artifact;
-    public Map<String, DownloadArtifact> classifiers;
+public class McVersionsTableModel extends DefaultTableModel {
+    public McVersionsTableModel(AddInstanceDialog dialog, JTable table) {
+        super(new Object[][]{}, new Object[]{"Version", "Date released", "Type"});
+
+        new LoadVersionsWorker(this, dialog, table).execute();
+    }
+
+    @Override
+    public boolean isCellEditable(int row, int column) {
+        return false;
+    }
 }

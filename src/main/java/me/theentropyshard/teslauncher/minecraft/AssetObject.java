@@ -16,8 +16,25 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.minecraft.oldapi;
+package me.theentropyshard.teslauncher.minecraft;
 
-public class ClientDownloads {
-    public ClientDownload client;
+public class AssetObject {
+    private long size;
+    private String hash;
+
+    public AssetObject() {
+
+    }
+
+    public long getSize() {
+        return this.size;
+    }
+
+    public String getHash() {
+        return this.hash;
+    }
+
+    public String getPrefix() {
+        return this.getHash().substring(0, 2);
+    }
 }

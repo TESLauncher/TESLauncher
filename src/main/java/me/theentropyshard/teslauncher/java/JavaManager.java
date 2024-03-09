@@ -20,7 +20,7 @@ package me.theentropyshard.teslauncher.java;
 
 import com.google.gson.JsonObject;
 import me.theentropyshard.teslauncher.TESLauncher;
-import me.theentropyshard.teslauncher.minecraft.oldapi.MinecraftDownloadListener;
+import me.theentropyshard.teslauncher.minecraft.MinecraftDownloadListener;
 import me.theentropyshard.teslauncher.network.HttpRequest;
 import me.theentropyshard.teslauncher.network.download.DownloadList;
 import me.theentropyshard.teslauncher.network.download.HttpDownload;

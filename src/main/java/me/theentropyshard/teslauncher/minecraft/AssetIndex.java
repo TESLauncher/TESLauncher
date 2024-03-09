@@ -16,38 +16,31 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.minecraft.oldapi;
+package me.theentropyshard.teslauncher.minecraft;
+
+import com.google.gson.annotations.SerializedName;
 
 import java.util.Map;
 
-public class Rule {
-    public Action action;
-    public Map<String, Boolean> features;
-    public Os os;
+public class AssetIndex {
+    @SerializedName("map_to_resources")
+    private boolean mapToResources;
+    private boolean virtual;
+    private Map<String, AssetObject> objects;
 
-    public enum Action {
-        ALLOW,
-        DISALLOW;
+    public AssetIndex() {
 
-        public static Action getByName(String name) {
-            if (name.equals("allow")) {
-                return Action.ALLOW;
-            }
-
-            return Action.DISALLOW;
-        }
-
-        public String getJsonName() {
-            return this == Action.ALLOW ? "allow" : "disallow";
-        }
     }
 
-    @Override
-    public String toString() {
-        return "Rule{" +
-                "action=" + this.action +
-                ", features=" + this.features +
-                ", os=" + this.os +
-                '}';
+    public boolean isMapToResources() {
+        return this.mapToResources;
+    }
+
+    public boolean isVirtual() {
+        return this.virtual;
+    }
+
+    public Map<String, AssetObject> getObjects() {
+        return this.objects;
     }
 }

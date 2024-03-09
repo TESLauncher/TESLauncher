@@ -28,51 +28,20 @@ public class OperatingSystemFilter {
     private String version;
     private String arch;
 
-    public boolean applies() {
-        boolean nameMatches = this.nameMatches();
-        boolean archMatches = this.archMatches();
-        boolean versionMatches = this.versionMatches();
+    public OperatingSystemFilter() {
 
-        return nameMatches || versionMatches || archMatches;
     }
 
-    private boolean nameMatches() {
-        if ("windows".equalsIgnoreCase(this.name) && !OperatingSystem.isWindows()) {
-            return false;
-        }
-
-        if ("linux".equalsIgnoreCase(this.name) && !OperatingSystem.isLinux()) {
-            return false;
-        }
-
-        if ("osx".equalsIgnoreCase(this.name) && !OperatingSystem.isOSX()) {
-            return false;
-        }
-
-        return true;
+    public String getName() {
+        return this.name;
     }
 
-    private boolean archMatches() {
-        boolean is64Bit = OperatingSystem.is64Bit();
-
-        if (OperatingSystem.isArm()) {
-            return (!"arm32".equalsIgnoreCase(this.arch) || !is64Bit) &&
-                    (!"arm64".equalsIgnoreCase(this.arch) || is64Bit);
-        } else {
-            return (!"x86".equalsIgnoreCase(this.arch) || !is64Bit) &&
-                    (!"x64".equalsIgnoreCase(this.arch) || is64Bit);
-        }
+    public String getVersion() {
+        return this.version;
     }
 
-    private boolean versionMatches() {
-        if (this.version == null) {
-            return false;
-        }
-
-        Pattern pattern = Pattern.compile(this.version);
-        Matcher matcher = pattern.matcher(OperatingSystem.getVersion());
-
-        return matcher.find();
+    public String getArch() {
+        return this.arch;
     }
 
     @Override

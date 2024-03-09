@@ -23,8 +23,10 @@ import me.theentropyshard.teslauncher.accounts.Account;
 import me.theentropyshard.teslauncher.accounts.MicrosoftAccount;
 import me.theentropyshard.teslauncher.gui.dialogs.MinecraftDownloadDialog;
 import me.theentropyshard.teslauncher.java.JavaManager;
+import me.theentropyshard.teslauncher.minecraft.argument.Argument;
+import me.theentropyshard.teslauncher.minecraft.argument.ArgumentType;
 import me.theentropyshard.teslauncher.minecraft.auth.microsoft.AuthException;
-import me.theentropyshard.teslauncher.minecraft.oldapi.*;
+import me.theentropyshard.teslauncher.minecraft.*;
 import me.theentropyshard.teslauncher.utils.FileUtils;
 import me.theentropyshard.teslauncher.utils.Json;
 import me.theentropyshard.teslauncher.utils.TimeUtils;
@@ -92,15 +94,17 @@ public class InstanceRunner extends Thread {
 
             Path clientJson = versionsDir.resolve(this.instance.getMinecraftVersion())
                     .resolve(this.instance.getMinecraftVersion() + ".json");
-            VersionInfo versionInfo = Json.parse(FileUtils.readUtf8(clientJson), VersionInfo.class);
+            Version version = Json.parse(FileUtils.readUtf8(clientJson), Version.class);
 
-            List<String> arguments = this.getArguments(versionInfo, nativesDir, librariesDir, versionsDir);
-            List<String> command = this.buildRunCommand(versionInfo, arguments);
-            //System.out.println("Starting Minecraft with the command:\n" + command);
+            List<String> arguments = this.getArguments(version, nativesDir, librariesDir, versionsDir);
+            List<String> command = this.buildRunCommand(version, arguments);
 
             this.instance.setLastTimePlayed(Instant.now());
 
             long start = System.currentTimeMillis();
+
+            LOG.debug("Arguments: {}", arguments);
+            LOG.debug("Starting Minecraft with command: {}", command);
 
             int exitCode = this.runGameProcess(command);
             LOG.info("Minecraft process finished with exit code " + exitCode);
@@ -127,8 +131,8 @@ public class InstanceRunner extends Thread {
         }
     }
 
-    private void applyJarMods(VersionInfo versionInfo, List<String> classpath, Path clientsDir) {
-        Path originalClientPath = clientsDir.resolve(versionInfo.id).resolve(versionInfo.id + ".jar").toAbsolutePath();
+    private void applyJarMods(Version version, List<String> classpath, Path clientsDir) {
+        Path originalClientPath = clientsDir.resolve(version.getId()).resolve(version.getId() + ".jar").toAbsolutePath();
 
         List<JarMod> jarMods = this.instance.getJarMods();
 
@@ -189,26 +193,26 @@ public class InstanceRunner extends Thread {
         }
     }
 
-    private List<String> resolveClasspath(VersionInfo versionInfo, Path librariesDir, Path clientsDir) {
+    private List<String> resolveClasspath(Version version, Path librariesDir, Path clientsDir) {
         List<String> classpath = new ArrayList<>();
 
-        for (Library library : versionInfo.libraries) {
-            DownloadArtifact artifact = library.downloads.artifact;
+        for (Library library : version.getLibraries()) {
+            Library.Artifact artifact = library.getDownloads().getArtifact();
             if (artifact == null) {
                 continue;
             }
 
             if (RuleMatcher.applyOnThisPlatform(library)) {
-                classpath.add(librariesDir.resolve(artifact.path).toAbsolutePath().toString());
+                classpath.add(librariesDir.resolve(artifact.getPath()).toAbsolutePath().toString());
             }
         }
 
-        this.applyJarMods(versionInfo, classpath, clientsDir);
+        this.applyJarMods(version, classpath, clientsDir);
 
         return classpath;
     }
 
-    private List<String> getArguments(VersionInfo versionInfo, Path tmpNativesDir, Path librariesDir, Path clientsDir) throws IOException {
+    private List<String> getArguments(Version version, Path tmpNativesDir, Path librariesDir, Path clientsDir) throws IOException {
         TESLauncher launcher = TESLauncher.getInstance();
         Path mcDirOfInstance = launcher.getInstanceManager().getMinecraftDir(this.instance);
         FileUtils.createDirectoryIfNotExists(mcDirOfInstance);
@@ -216,7 +220,7 @@ public class InstanceRunner extends Thread {
 
         List<String> arguments = new ArrayList<>();
 
-        List<String> classpath = this.resolveClasspath(versionInfo, librariesDir, clientsDir);
+        List<String> classpath = this.resolveClasspath(version, librariesDir, clientsDir);
 
         Map<String, Object> argVars = new HashMap<>();
 
@@ -226,43 +230,45 @@ public class InstanceRunner extends Thread {
         argVars.put("launcher_version", "1.0.0");
         argVars.put("classpath", String.join(File.pathSeparator, classpath));
 
-        VersionAssetIndex vAssetIndex = versionInfo.assetIndex;
+        Version.AssetIndex vAssetIndex = version.getAssetIndex();
         AssetIndex assetIndex = Json.parse(
-                FileUtils.readUtf8(assetsDir.resolve("indexes").resolve(vAssetIndex.id + ".json")),
+                FileUtils.readUtf8(assetsDir.resolve("indexes").resolve(vAssetIndex.getId() + ".json")),
                 AssetIndex.class
         );
 
+        boolean newFormat = version.getMinecraftArguments() == null;
+
         // Game
-        if (versionInfo.newFormat) {
+        if (newFormat) {
             argVars.put("client", "-");
             argVars.put("auth_xuid", "-");
             argVars.put("auth_player_name", this.account.getUsername());
-            argVars.put("version_name", versionInfo.id);
+            argVars.put("version_name", version.getId());
             argVars.put("game_directory", mcDirOfInstance.toAbsolutePath().toString());
             argVars.put("assets_root", assetsDir.toAbsolutePath().toString());
-            argVars.put("assets_index_name", versionInfo.assets);
+            argVars.put("assets_index_name", version.getAssets());
             argVars.put("auth_uuid", this.account.getUuid().toString());
             argVars.put("auth_access_token", this.account.getAccessToken());
             argVars.put("user_type", "msa");
-            argVars.put("version_type", versionInfo.type);
+            argVars.put("version_type", version.getType().getJsonName());
         } else {
             argVars.put("auth_uuid", this.account.getUuid().toString());
             argVars.put("auth_access_token", this.account.getAccessToken());
             argVars.put("auth_session", "-");
             argVars.put("user_properties", "-");
             argVars.put("game_directory", mcDirOfInstance.toAbsolutePath().toString());
-            argVars.put("version_type", versionInfo.type);
+            argVars.put("version_type", version.getType().getJsonName());
             argVars.put("user_type", "msa");
-            argVars.put("assets_index_name", versionInfo.assets);
-            argVars.put("version_name", versionInfo.id);
+            argVars.put("assets_index_name", version.getAssets());
+            argVars.put("version_name", version.getId());
             argVars.put("auth_player_name", this.account.getUsername());
             argVars.put("uuid", this.account.getUuid().toString());
             argVars.put("accessToken", this.account.getAccessToken());
-            if (assetIndex.mapToResources) {
+            if (assetIndex.isMapToResources()) {
                 argVars.put("assets_root", mcDirOfInstance.resolve("resources"));
                 argVars.put("game_assets", mcDirOfInstance.resolve("resources"));
-            } else if ("legacy".equals(vAssetIndex.id)) {
-                Path virtualAssets = assetsDir.resolve("virtual").resolve("legacy").toAbsolutePath();
+            } else if (assetIndex.isVirtual()) {
+                Path virtualAssets = assetsDir.resolve("virtual").resolve(vAssetIndex.getId()).toAbsolutePath();
                 argVars.put("assets_root", virtualAssets.toString());
                 argVars.put("game_assets", virtualAssets.toString());
             } else {
@@ -299,16 +305,24 @@ public class InstanceRunner extends Thread {
         arguments.add("-Xms" + minimumMemoryInMegabytes + "m");
         arguments.add("-Xmx" + maximumMemoryInMegabytes + "m");
 
-        for (Argument argument : versionInfo.jvmArgs) {
-            if (RuleMatcher.applyOnThisPlatform(argument)) {
-                for (String value : argument.value) {
-                    arguments.add(substitutor.replace(value));
+        if (newFormat) {
+            for (Argument argument : version.getArguments().get(ArgumentType.JVM)) {
+                if (RuleMatcher.applyOnThisPlatform(argument)) {
+                    for (String value : argument.getValue()) {
+                        arguments.add(substitutor.replace(value));
+                    }
                 }
             }
+        } else {
+            // Old format does not have any JVM args preset, so we set it manually here
+            arguments.add(substitutor.replace("-Djava.library.path=${natives_directory}"));
+
+            arguments.add(substitutor.replace("-cp"));
+            arguments.add(substitutor.replace("${classpath}"));
         }
 
         try {
-            String[] split = versionInfo.id.split("\\.");
+            String[] split = version.getId().split("\\.");
             int minorVersion = Integer.parseInt(split[1]);
             int patch = Integer.parseInt(split[2]);
 
@@ -322,13 +336,19 @@ public class InstanceRunner extends Thread {
 
         }
 
-        arguments.add(versionInfo.mainClass);
+        arguments.add(version.getMainClass());
 
-        for (Argument argument : versionInfo.gameArgs) {
-            if (RuleMatcher.applyOnThisPlatform(argument)) {
-                for (String value : argument.value) {
-                    arguments.add(substitutor.replace(value));
+        if (newFormat) {
+            for (Argument argument : version.getArguments().get(ArgumentType.GAME)) {
+                if (RuleMatcher.applyOnThisPlatform(argument)) {
+                    for (String value : argument.getValue()) {
+                        arguments.add(substitutor.replace(value));
+                    }
                 }
+            }
+        } else {
+            for (String arg : version.getMinecraftArguments().split("\\s")) {
+                arguments.add(substitutor.replace(arg));
             }
         }
 
@@ -349,15 +369,17 @@ public class InstanceRunner extends Thread {
         return arguments;
     }
 
-    private List<String> buildRunCommand(VersionInfo versionInfo, List<String> arguments) {
+    private List<String> buildRunCommand(Version version, List<String> arguments) {
         List<String> command = new ArrayList<>();
 
         String javaExecutable;
-        if (versionInfo.javaVersion != null) {
-            javaExecutable = this.getJavaExecutable(versionInfo.javaVersion.component);
+
+        Version.JavaVersion javaVersion = version.getJavaVersion();
+        if (javaVersion != null) {
+            javaExecutable = this.getJavaExecutable(javaVersion.getComponent());
         } else {
             try {
-                String[] split = versionInfo.id.split("\\.");
+                String[] split = version.getId().split("\\.");
                 int minorVersion = Integer.parseInt(split[1]);
 
                 if (minorVersion >= 17) {

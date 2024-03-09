@@ -23,7 +23,7 @@ import me.theentropyshard.teslauncher.minecraft.rule.Rule;
 import java.util.List;
 import java.util.Map;
 
-public class Library {
+public class Library implements Ruleable {
     private String name;
     private DownloadList downloads;
     private List<Rule> rules;
@@ -32,20 +32,6 @@ public class Library {
 
     public Library() {
 
-    }
-
-    public boolean applies() {
-        if (this.rules == null) {
-            return true;
-        }
-
-        boolean result = true;
-
-        for (Rule rule : this.rules) {
-            result = rule.applies();
-        }
-
-        return result;
     }
 
     public String getName() {

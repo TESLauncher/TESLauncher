@@ -53,6 +53,11 @@ public enum VersionType {
         this.jsonName = jsonName;
     }
 
+    @Override
+    public String toString() {
+        return this.getReadableName();
+    }
+
     public String getReadableName() {
         return this.readableName;
     }

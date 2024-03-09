@@ -16,19 +16,27 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.minecraft.oldapi;
+package me.theentropyshard.teslauncher.utils;
 
-public class Os {
-    public String name;
-    public String version;
-    public String arch;
+import com.google.gson.TypeAdapter;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
+
+import java.io.IOException;
+import java.time.OffsetDateTime;
+
+public class OffsetDateTimeTypeAdapter extends TypeAdapter<OffsetDateTime> {
+    public OffsetDateTimeTypeAdapter() {
+
+    }
 
     @Override
-    public String toString() {
-        return "Os{" +
-                "name='" + this.name + '\'' +
-                ", version='" + this.version + '\'' +
-                ", arch='" + this.arch + '\'' +
-                '}';
+    public void write(JsonWriter writer, OffsetDateTime dateTime) throws IOException {
+        writer.value(dateTime.toString());
+    }
+
+    @Override
+    public OffsetDateTime read(JsonReader reader) throws IOException {
+        return OffsetDateTime.parse(reader.nextString());
     }
 }

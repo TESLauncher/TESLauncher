@@ -16,10 +16,23 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.minecraft.oldapi;
+package me.theentropyshard.teslauncher.gui.dialogs.addinstance;
 
-import java.util.List;
+import me.theentropyshard.teslauncher.minecraft.VersionType;
 
-public interface Ruleable {
-    List<Rule> getRules();
+import javax.swing.*;
+
+public class VersionTypeRowFilter extends RowFilter<McVersionsTableModel, Integer> {
+    private final JCheckBox checkBox;
+    private final VersionType versionType;
+
+    public VersionTypeRowFilter(JCheckBox checkBox, VersionType versionType) {
+        this.checkBox = checkBox;
+        this.versionType = versionType;
+    }
+
+    @Override
+    public boolean include(Entry<? extends McVersionsTableModel, ? extends Integer> entry) {
+        return this.checkBox.isSelected() && entry.getValue(2) == this.versionType;
+    }
 }

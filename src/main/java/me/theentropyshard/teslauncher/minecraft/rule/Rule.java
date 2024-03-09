@@ -33,16 +33,8 @@ public class Rule {
     @SerializedName("features")
     private FeaturesFilter features;
 
-    public boolean applies() {
-        if (this.operatingSystem == null) {
-            return this.action == Action.ALLOW;
-        }
+    public Rule() {
 
-        if (!this.operatingSystem.applies() && this.action == Action.DISALLOW) {
-            return true;
-        }
-
-        return this.action == Action.ALLOW && this.operatingSystem.applies();
     }
 
     @Override
@@ -52,6 +44,18 @@ public class Rule {
                 ", os=" + this.operatingSystem +
                 ", features=" + this.features +
                 '}';
+    }
+
+    public Action getAction() {
+        return this.action;
+    }
+
+    public OperatingSystemFilter getOperatingSystem() {
+        return this.operatingSystem;
+    }
+
+    public FeaturesFilter getFeatures() {
+        return this.features;
     }
 
     public enum Action {

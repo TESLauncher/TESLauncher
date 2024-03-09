@@ -19,6 +19,7 @@
 package me.theentropyshard.teslauncher.minecraft.argument;
 
 import com.google.gson.annotations.JsonAdapter;
+import me.theentropyshard.teslauncher.minecraft.Ruleable;
 import me.theentropyshard.teslauncher.minecraft.rule.Rule;
 import me.theentropyshard.teslauncher.utils.AlwaysListTypeAdapterFactory;
 
@@ -26,7 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class Argument {
+public class Argument implements Ruleable {
     @JsonAdapter(AlwaysListTypeAdapterFactory.class)
     private List<String> value;
     private List<Rule> rules;
@@ -42,18 +43,12 @@ public class Argument {
         return argument;
     }
 
-    public boolean applies() {
-        if (this.rules == null) {
-            return true;
-        }
-
-        boolean result = true;
-
-        for (Rule rule : this.rules) {
-            result = rule.applies();
-        }
-
-        return result;
+    @Override
+    public String toString() {
+        return "Argument{" +
+                "value=" + this.value +
+                ", rules=" + this.rules +
+                '}';
     }
 
     public List<String> getValue() {

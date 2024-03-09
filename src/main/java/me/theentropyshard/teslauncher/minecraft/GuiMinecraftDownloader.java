@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.minecraft.oldapi;
+package me.theentropyshard.teslauncher.minecraft;
 
 import me.theentropyshard.teslauncher.gui.dialogs.MinecraftDownloadDialog;
 

@@ -16,12 +16,12 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.minecraft.oldapi;
+package me.theentropyshard.teslauncher.minecraft;
 
-public class VersionAssetIndex {
-    public String id;
-    public String sha1;
-    public long size;
-    public long totalSize;
-    public String url;
+import me.theentropyshard.teslauncher.minecraft.rule.Rule;
+
+import java.util.List;
+
+public interface Ruleable {
+    List<Rule> getRules();
 }

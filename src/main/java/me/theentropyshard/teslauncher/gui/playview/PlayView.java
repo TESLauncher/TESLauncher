@@ -23,7 +23,7 @@ import me.theentropyshard.teslauncher.accounts.AccountsManager;
 import me.theentropyshard.teslauncher.gui.View;
 import me.theentropyshard.teslauncher.gui.components.AddInstanceItem;
 import me.theentropyshard.teslauncher.gui.components.InstanceItem;
-import me.theentropyshard.teslauncher.gui.dialogs.AddInstanceDialog;
+import me.theentropyshard.teslauncher.gui.dialogs.addinstance.AddInstanceDialog;
 import me.theentropyshard.teslauncher.gui.dialogs.instancesettings.InstanceSettingsDialog;
 import me.theentropyshard.teslauncher.instance.Instance;
 import me.theentropyshard.teslauncher.instance.InstanceManager;

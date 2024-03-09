@@ -23,16 +23,24 @@ import me.theentropyshard.teslauncher.gui.AppWindow;
 import me.theentropyshard.teslauncher.gui.Gui;
 import me.theentropyshard.teslauncher.instance.InstanceManager;
 import me.theentropyshard.teslauncher.java.JavaManager;
+import me.theentropyshard.teslauncher.minecraft.Library;
+import me.theentropyshard.teslauncher.minecraft.Version;
+import me.theentropyshard.teslauncher.minecraft.VersionManifest;
+import me.theentropyshard.teslauncher.minecraft.argument.Argument;
+import me.theentropyshard.teslauncher.minecraft.argument.ArgumentType;
 import me.theentropyshard.teslauncher.network.UserAgentInterceptor;
 import me.theentropyshard.teslauncher.utils.FileUtils;
-import okhttp3.OkHttpClient;
-import okhttp3.Protocol;
+import me.theentropyshard.teslauncher.utils.Json;
+import okhttp3.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collections;
+import java.util.EnumMap;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -128,6 +136,53 @@ public class TESLauncher {
         Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown));
 
         this.gui.showGui();
+
+        /*Request request = new Request.Builder()
+                .url("https://piston-meta.mojang.com/mc/game/version_manifest_v2.json")
+                .build();
+
+
+        try (Response response = this.httpClient.newCall(request).execute()) {
+            VersionManifest manifest = Json.parse(response.body().string(), VersionManifest.class);
+
+            for (VersionManifest.Version mver : manifest.getVersions()) {
+                Request req = new Request.Builder()
+                        .url(mver.getUrl())
+                        .build();
+
+                this.httpClient.newCall(req).enqueue(new Callback() {
+                    @Override
+                    public void onFailure(@NotNull Call call, @NotNull IOException e) {
+
+                    }
+
+                    @Override
+                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                        Version version = Json.parse(response.body().string(), Version.class);
+
+                        EnumMap<ArgumentType, List<Argument>> arguments = version.getArguments();
+                        if (arguments != null) {
+                            List<Argument> jvm = arguments.get(ArgumentType.JVM);
+                            for (Argument argument : jvm) {
+                                System.out.println(argument.getRules());
+                            }
+
+                            List<Argument> game = arguments.get(ArgumentType.GAME);
+                            for (Argument argument : game) {
+                                System.out.println(argument.getRules());
+                            }
+                        }
+
+                        List<Library> libraries = version.getLibraries();
+                        for (Library library : libraries) {
+                            System.out.println(library.getRules());
+                        }
+                    }
+                });
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }*/
     }
 
     private void createDirectories() {

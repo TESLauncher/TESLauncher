@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.minecraft.oldapi;
+package me.theentropyshard.teslauncher.minecraft;
 
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.java.JavaManager;
@@ -77,8 +77,8 @@ public class MinecraftDownloader {
             throw new IOException("Unable to deserialize version manifest");
         }
 
-        VersionManifest.Version version = ListUtils.search(manifest.versions, v -> v.id.equals(versionId));
-        if (version == null) {
+        VersionManifest.Version manifestVersion = ListUtils.search(manifest.getVersions(), v -> v.getId().equals(versionId));
+        if (manifestVersion == null) {
             LOG.warn("Unable to find Minecraft " + versionId);
             return;
         }
@@ -86,19 +86,19 @@ public class MinecraftDownloader {
         LOG.info("Found Minecraft " + versionId);
 
         LOG.info("Downloading client...");
-        VersionInfo versionInfo = this.downloadClient(version);
+        Version version = this.downloadClient(manifestVersion);
 
         LOG.info("Downloading libraries...");
-        List<Library> nativeLibraries = this.downloadLibraries(versionInfo);
+        List<Library> nativeLibraries = this.downloadLibraries(version);
 
         LOG.info("Extracting natives...");
         this.extractNatives(nativeLibraries);
 
         LOG.info("Downloading assets...");
-        this.downloadAssets(versionInfo);
+        this.downloadAssets(version);
 
         LOG.info("Downloading Java...");
-        this.downloadJava(versionInfo);
+        this.downloadJava(version);
     }
 
     private static VersionManifest fetchAndSaveVersionManifest(Path manifestFile) throws IOException {
@@ -124,12 +124,12 @@ public class MinecraftDownloader {
         }
     }
 
-    private static String getJavaKey(VersionInfo versionInfo) {
+    private static String getJavaKey(Version version) {
         String javaKey;
-        JavaVersion javaVersion = versionInfo.javaVersion;
+        Version.JavaVersion javaVersion = version.getJavaVersion();
         if (javaVersion == null) {
             try {
-                String[] split = versionInfo.id.split("\\.");
+                String[] split = version.getId().split("\\.");
                 int minorVersion = Integer.parseInt(split[1]);
 
                 if (minorVersion >= 17) {
@@ -141,14 +141,14 @@ public class MinecraftDownloader {
                 javaKey = "jre-legacy";
             }
         } else {
-            javaKey = javaVersion.component;
+            javaKey = javaVersion.getComponent();
         }
 
         return javaKey;
     }
 
-    private void downloadJava(VersionInfo versionInfo) throws IOException {
-        String javaKey = MinecraftDownloader.getJavaKey(versionInfo);
+    private void downloadJava(Version version) throws IOException {
+        String javaKey = MinecraftDownloader.getJavaKey(version);
 
         JavaManager javaManager = TESLauncher.getInstance().getJavaManager();
 
@@ -163,26 +163,26 @@ public class MinecraftDownloader {
 
     private void saveClientJson(VersionManifest.Version version, Path jsonFile) throws IOException {
         try (HttpRequest request = new HttpRequest(TESLauncher.getInstance().getHttpClient())) {
-            FileUtils.writeUtf8(jsonFile, request.asString(version.url));
+            FileUtils.writeUtf8(jsonFile, request.asString(version.getUrl()));
         }
     }
 
-    private VersionInfo downloadClient(VersionManifest.Version version) throws IOException {
-        VersionInfo versionInfo;
+    private Version downloadClient(VersionManifest.Version manifestVersion) throws IOException {
+        Version version;
 
-        Path jsonFile = this.versionsDir.resolve(version.id).resolve(version.id + ".json");
+        Path jsonFile = this.versionsDir.resolve(manifestVersion.getId()).resolve(manifestVersion.getId() + ".json");
         if (!Files.exists(jsonFile)) {
-            this.saveClientJson(version, jsonFile);
+            this.saveClientJson(manifestVersion, jsonFile);
         }
 
-        versionInfo = Json.parse(FileUtils.readUtf8(jsonFile), VersionInfo.class);
+        version = Json.parse(FileUtils.readUtf8(jsonFile), Version.class);
 
-        ClientDownload client = versionInfo.downloads.client;
+        Version.Download client = version.getDownloads().get(DownloadType.CLIENT);
 
-        Path jarFile = this.versionsDir.resolve(version.id).resolve(version.id + ".jar");
+        Path jarFile = this.versionsDir.resolve(version.getId()).resolve(version.getId() + ".jar");
 
-        if (Files.exists(jarFile) && Files.size(jarFile) == client.size) {
-            return versionInfo;
+        if (Files.exists(jarFile) && Files.size(jarFile) == client.getSize()) {
+            return version;
         }
 
         this.minecraftDownloadListener.onProgress(0, 0);
@@ -196,24 +196,26 @@ public class MinecraftDownloader {
 
         HttpDownload download = new HttpDownload.Builder()
                 .httpClient(httpClient)
-                .url(client.url)
-                .expectedSize(client.size)
+                .url(client.getUrl())
+                .expectedSize(client.getSize())
                 .saveAs(jarFile)
                 .build();
 
         download.execute();
 
-        return versionInfo;
+        return version;
     }
 
-    private DownloadArtifact getClassifier(Library library) {
-        if (library.downloads.classifiers != null) {
+    private Library.Artifact getClassifier(Library library) {
+        Map<String, Library.Artifact> classifiers = library.getDownloads().getClassifiers();
+
+        if (classifiers != null) {
             String key = "natives-" + EnumOS.getOsName();
-            DownloadArtifact classifier = library.downloads.classifiers.get(key);
+            Library.Artifact classifier = classifiers.get(key);
 
             if (classifier == null) {
                 key = key + "-" + EnumOS.getBits();
-                classifier = library.downloads.classifiers.get(key);
+                classifier = classifiers.get(key);
             }
 
             return classifier;
@@ -222,7 +224,7 @@ public class MinecraftDownloader {
         return null;
     }
 
-    private List<Library> downloadLibraries(VersionInfo versionInfo) throws IOException {
+    private List<Library> downloadLibraries(Version version) throws IOException {
         List<Library> nativeLibraries = new ArrayList<>();
 
         this.minecraftDownloadListener.onProgress(0, 0);
@@ -230,38 +232,38 @@ public class MinecraftDownloader {
 
         DownloadList downloadList = new DownloadList(this.minecraftDownloadListener::onProgress);
 
-        for (Library library : versionInfo.libraries) {
+        for (Library library : version.getLibraries()) {
             if (!RuleMatcher.applyOnThisPlatform(library)) {
                 continue;
             }
 
-            LibraryDownloads downloads = library.downloads;
-            DownloadArtifact artifact = downloads.artifact;
+            Library.DownloadList downloads = library.getDownloads();
+            Library.Artifact artifact = downloads.getArtifact();
 
             if (artifact != null) {
-                Path jarFile = this.librariesDir.resolve(artifact.path);
+                Path jarFile = this.librariesDir.resolve(artifact.getPath());
 
-                if (!Files.exists(jarFile) || Files.size(jarFile) != artifact.size) {
+                if (!Files.exists(jarFile) || Files.size(jarFile) != artifact.getSize()) {
                     HttpDownload download = new HttpDownload.Builder()
                             .httpClient(TESLauncher.getInstance().getHttpClient())
-                            .url(artifact.url)
-                            .expectedSize(artifact.size)
+                            .url(artifact.getUrl())
+                            .expectedSize(artifact.getSize())
                             .saveAs(jarFile)
                             .build();
                     downloadList.add(download);
                 }
             }
 
-            DownloadArtifact classifier = this.getClassifier(library);
+            Library.Artifact classifier = this.getClassifier(library);
             if (classifier != null) {
                 nativeLibraries.add(library);
-                Path filePath = this.librariesDir.resolve(classifier.path);
+                Path filePath = this.librariesDir.resolve(classifier.getPath());
 
-                if (!Files.exists(filePath) || Files.size(filePath) != classifier.size) {
+                if (!Files.exists(filePath) || Files.size(filePath) != classifier.getSize()) {
                     HttpDownload download = new HttpDownload.Builder()
                             .httpClient(TESLauncher.getInstance().getHttpClient())
-                            .url(classifier.url)
-                            .expectedSize(classifier.size)
+                            .url(classifier.getUrl())
+                            .expectedSize(classifier.getSize())
                             .saveAs(filePath)
                             .build();
                     downloadList.add(download);
@@ -277,31 +279,29 @@ public class MinecraftDownloader {
     }
 
     private void downloadAsset(DownloadList downloadList, Path filePath, AssetObject assetObject) {
-        String prefix = assetObject.hash.substring(0, 2);
-        String url = MinecraftDownloader.RESOURCES + prefix + "/" + assetObject.hash;
-
         HttpDownload download = new HttpDownload.Builder()
                 .httpClient(TESLauncher.getInstance().getHttpClient())
-                .url(url)
-                .expectedSize(assetObject.size)
+                .url(MinecraftDownloader.RESOURCES + assetObject.getPrefix() + "/" + assetObject.getHash())
+                .expectedSize(assetObject.getSize())
                 .saveAs(filePath)
                 .build();
+
         downloadList.add(download);
     }
 
-    private void downloadAssets(VersionInfo versionInfo) throws IOException {
-        VersionAssetIndex vAssetIndex = versionInfo.assetIndex;
+    private void downloadAssets(Version version) throws IOException {
+        Version.AssetIndex vAssetIndex = version.getAssetIndex();
 
         if (vAssetIndex == null) {
             return;
         }
 
-        Path assetsIndexFile = this.assetsDir.resolve("indexes").resolve(vAssetIndex.id + ".json");
+        Path assetsIndexFile = this.assetsDir.resolve("indexes").resolve(vAssetIndex.getId() + ".json");
         if (!Files.exists(assetsIndexFile)) {
             FileUtils.createDirectoryIfNotExists(assetsIndexFile.getParent());
 
             try (HttpRequest request = new HttpRequest(TESLauncher.getInstance().getHttpClient())) {
-                FileUtils.writeUtf8(assetsIndexFile, request.asString(vAssetIndex.url));
+                FileUtils.writeUtf8(assetsIndexFile, request.asString(vAssetIndex.getUrl()));
             }
         }
 
@@ -312,22 +312,21 @@ public class MinecraftDownloader {
 
         DownloadList downloadList = new DownloadList(this.minecraftDownloadListener::onProgress);
 
-        for (Map.Entry<String, AssetObject> entry : assetIndex.objects.entrySet()) {
+        for (Map.Entry<String, AssetObject> entry : assetIndex.getObjects().entrySet()) {
             String fileName = entry.getKey();
             AssetObject assetObject = entry.getValue();
 
             Path filePath;
 
-            if (assetIndex.mapToResources) {
+            if (assetIndex.isMapToResources()) {
                 filePath = this.instanceResourcesDir.resolve(fileName);
-            } else if (assetIndex.virtual) {
+            } else if (assetIndex.isVirtual()) {
                 filePath = this.assetsDir.resolve("virtual").resolve("legacy").resolve(fileName);
             } else {
-                String prefix = assetObject.hash.substring(0, 2);
-                filePath = this.assetsDir.resolve("objects").resolve(prefix).resolve(assetObject.hash);
+                filePath = this.assetsDir.resolve("objects").resolve(assetObject.getPrefix()).resolve(assetObject.getHash());
             }
 
-            if (!Files.exists(filePath) || Files.size(filePath) != assetObject.size) {
+            if (!Files.exists(filePath) || Files.size(filePath) != assetObject.getSize()) {
                 this.downloadAsset(downloadList, filePath, assetObject);
             }
         }
@@ -338,11 +337,11 @@ public class MinecraftDownloader {
     }
 
     private boolean excludeFromExtract(Library library, String fileName) {
-        if (library.extract == null) {
+        if (library.getExtract() == null) {
             return false;
         }
 
-        for (String excludeName : library.extract.exclude) {
+        for (String excludeName : library.getExtract().getExclude()) {
             if (fileName.startsWith(excludeName)) {
                 return true;
             }
@@ -353,13 +352,13 @@ public class MinecraftDownloader {
 
     private void extractNatives(List<Library> nativeLibraries) throws IOException {
         for (Library library : nativeLibraries) {
-            DownloadArtifact classifier = this.getClassifier(library);
+            Library.Artifact classifier = this.getClassifier(library);
             if (classifier == null) {
                 continue;
             }
 
             String extractPath = this.nativesDir.normalize().toAbsolutePath().toString();
-            Path path = this.librariesDir.resolve(classifier.path).toAbsolutePath();
+            Path path = this.librariesDir.resolve(classifier.getPath()).toAbsolutePath();
 
             try (ZipFile zipFile = new ZipFile(path.toFile())) {
                 List<FileHeader> fileHeaders = zipFile.getFileHeaders();

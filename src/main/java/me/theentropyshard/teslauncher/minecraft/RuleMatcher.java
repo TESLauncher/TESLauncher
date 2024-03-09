@@ -16,8 +16,10 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.minecraft.oldapi;
+package me.theentropyshard.teslauncher.minecraft;
 
+import me.theentropyshard.teslauncher.minecraft.rule.OperatingSystemFilter;
+import me.theentropyshard.teslauncher.minecraft.rule.Rule;
 import me.theentropyshard.teslauncher.utils.EnumOS;
 
 import java.util.List;
@@ -31,15 +33,15 @@ public class RuleMatcher {
             lastAction = Rule.Action.ALLOW;
         } else {
             for (Rule rule : rules) {
-                Os os = rule.os;
+                OperatingSystemFilter os = rule.getOperatingSystem();
                 if (os == null) {
-                    lastAction = rule.action;
+                    lastAction = rule.getAction();
                 } else {
-                    boolean versionMatches = os.version != null &&
-                            Pattern.compile(os.version).matcher(EnumOS.getVersion()).matches();
-                    if (EnumOS.getOsName().equals(os.name) ||
-                            versionMatches || EnumOS.getArch().equals(os.arch)) {
-                        lastAction = rule.action;
+                    boolean versionMatches = os.getVersion() != null &&
+                            Pattern.compile(os.getVersion()).matcher(EnumOS.getVersion()).matches();
+                    if (EnumOS.getOsName().equals(os.getName()) ||
+                            versionMatches || EnumOS.getArch().equals(os.getArch())) {
+                        lastAction = rule.getAction();
                     }
                 }
             }
