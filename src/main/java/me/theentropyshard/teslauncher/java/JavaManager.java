@@ -29,7 +29,6 @@ import me.theentropyshard.teslauncher.utils.FileUtils;
 import me.theentropyshard.teslauncher.utils.Json;
 import me.theentropyshard.teslauncher.utils.OperatingSystem;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -83,6 +82,7 @@ public class JavaManager {
                                 .httpClient(TESLauncher.getInstance().getHttpClient())
                                 .url(raw.url)
                                 .expectedSize(raw.size)
+                                .executable(jreFile.executable)
                                 .saveAs(savePath)
                                 .build();
 
@@ -92,11 +92,6 @@ public class JavaManager {
 
                 if (downloadList.size() > 0) {
                     downloadList.downloadAll();
-                }
-
-                String javaExecutable = this.getJavaExecutable(componentName);
-                if (!new File(javaExecutable).setExecutable(true, true)) {
-                    System.err.println("Unable to make '" + javaExecutable + "' executable. Operating system: " + OperatingSystem.getCurrent());
                 }
             } else {
                 throw new IOException("Unable to find JRE for component '" + componentName + "'");

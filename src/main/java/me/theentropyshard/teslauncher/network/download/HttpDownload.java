@@ -26,6 +26,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.Channels;
@@ -43,13 +44,15 @@ public class HttpDownload {
     private final String url;
     private final Path saveAs;
     private final boolean forceDownload;
+    private final boolean executable;
     private final long expectedSize;
 
-    private HttpDownload(OkHttpClient httpClient, String url, Path saveAs, boolean forceDownload, long expectedSize) {
+    private HttpDownload(OkHttpClient httpClient, String url, Path saveAs, boolean forceDownload, boolean executable, long expectedSize) {
         this.httpClient = httpClient;
         this.url = url;
         this.saveAs = saveAs;
         this.forceDownload = forceDownload;
+        this.executable = executable;
         this.expectedSize = expectedSize;
     }
 
@@ -87,6 +90,8 @@ public class HttpDownload {
                     Files.copy(is, this.saveAs, StandardCopyOption.REPLACE_EXISTING);
                 }
             }
+
+            new File(this.saveAs.toString()).setExecutable(true);
         }
     }
 
@@ -119,6 +124,7 @@ public class HttpDownload {
         private String url;
         private Path saveAs;
         private boolean forceDownload;
+        private boolean executable;
         private long expectedSize;
 
         public Builder() {
@@ -145,13 +151,18 @@ public class HttpDownload {
             return this;
         }
 
+        public Builder executable(boolean executable) {
+            this.executable = executable;
+            return this;
+        }
+
         public Builder expectedSize(long expectedSize) {
             this.expectedSize = expectedSize;
             return this;
         }
 
         public HttpDownload build() {
-            return new HttpDownload(this.httpClient, this.url, this.saveAs, this.forceDownload, this.expectedSize);
+            return new HttpDownload(this.httpClient, this.url, this.saveAs, this.forceDownload, this.executable, this.expectedSize);
         }
     }
 }
