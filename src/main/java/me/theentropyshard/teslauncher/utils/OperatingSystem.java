@@ -29,6 +29,14 @@ public enum OperatingSystem {
     MACOS,
     UNKNOWN;
 
+    public String getJavaExecutableName() {
+        if (this == OperatingSystem.WINDOWS) {
+            return "javaw.exe";
+        }
+
+        return "java";
+    }
+
     public static OperatingSystem getCurrent() {
         if (OperatingSystem.isWindows()) {
             return OperatingSystem.WINDOWS;

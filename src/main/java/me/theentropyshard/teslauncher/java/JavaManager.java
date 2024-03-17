@@ -40,15 +40,9 @@ import java.util.Map;
 
 public class JavaManager {
     private final Path workDir;
-    private final String executableName;
 
     public JavaManager(Path workDir) {
         this.workDir = workDir;
-        if (OperatingSystem.isWindows()) {
-            this.executableName = "javaw.exe";
-        } else {
-            this.executableName = "java";
-        }
     }
 
     public void downloadRuntime(String componentName, MinecraftDownloadListener listener) throws IOException {
@@ -150,9 +144,14 @@ public class JavaManager {
 
     public String getJavaExecutable(String componentName) {
         Path componentDir = this.workDir.resolve(componentName);
+
         if (OperatingSystem.isMacOS()) {
             componentDir = componentDir.resolve("jre.bundle").resolve("Contents").resolve("Home");
         }
-        return componentDir.resolve("bin").resolve(this.executableName).toString();
+
+        return componentDir
+                .resolve("bin")
+                .resolve(OperatingSystem.getCurrent().getJavaExecutableName())
+                .toString();
     }
 }
