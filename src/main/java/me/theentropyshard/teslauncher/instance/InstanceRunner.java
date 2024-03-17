@@ -404,7 +404,7 @@ public class InstanceRunner extends Thread {
         InstanceManager manager = TESLauncher.getInstance().getInstanceManager();
 
         ProcessBuilder processBuilder = new ProcessBuilder(command);
-        Path runDir = manager.getMinecraftDir(this.instance).getParent().toAbsolutePath();
+        Path runDir = manager.getMinecraftDir(this.instance).toAbsolutePath();
         processBuilder.environment().put("APPDATA", runDir.toString());
         processBuilder.directory(runDir.toFile());
         processBuilder.redirectErrorStream(true);
