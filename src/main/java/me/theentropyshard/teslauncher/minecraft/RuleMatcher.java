@@ -20,7 +20,7 @@ package me.theentropyshard.teslauncher.minecraft;
 
 import me.theentropyshard.teslauncher.minecraft.rule.OperatingSystemFilter;
 import me.theentropyshard.teslauncher.minecraft.rule.Rule;
-import me.theentropyshard.teslauncher.utils.EnumOS;
+import me.theentropyshard.teslauncher.utils.OperatingSystem;
 
 import java.util.List;
 import java.util.regex.Pattern;
@@ -38,9 +38,9 @@ public class RuleMatcher {
                     lastAction = rule.getAction();
                 } else {
                     boolean versionMatches = os.getVersion() != null &&
-                            Pattern.compile(os.getVersion()).matcher(EnumOS.getVersion()).matches();
-                    if (EnumOS.getOsName().equals(os.getName()) ||
-                            versionMatches || EnumOS.getArch().equals(os.getArch())) {
+                            Pattern.compile(os.getVersion()).matcher(OperatingSystem.getVersion()).matches();
+                    if (OperatingSystem.getName().equals(os.getName()) ||
+                            versionMatches || OperatingSystem.getArch().equals(os.getArch())) {
                         lastAction = rule.getAction();
                     }
                 }

@@ -24,10 +24,7 @@ import me.theentropyshard.teslauncher.network.HttpRequest;
 import me.theentropyshard.teslauncher.network.download.DownloadList;
 import me.theentropyshard.teslauncher.network.download.HttpDownload;
 import me.theentropyshard.teslauncher.network.progress.ProgressNetworkInterceptor;
-import me.theentropyshard.teslauncher.utils.EnumOS;
-import me.theentropyshard.teslauncher.utils.FileUtils;
-import me.theentropyshard.teslauncher.utils.Json;
-import me.theentropyshard.teslauncher.utils.ListUtils;
+import me.theentropyshard.teslauncher.utils.*;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.model.FileHeader;
 import okhttp3.OkHttpClient;
@@ -207,11 +204,11 @@ public class MinecraftDownloader {
         Map<String, Library.Artifact> classifiers = library.getDownloads().getClassifiers();
 
         if (classifiers != null) {
-            String key = "natives-" + EnumOS.getOsName();
+            String key = "natives-" + OperatingSystem.getName();
             Library.Artifact classifier = classifiers.get(key);
 
             if (classifier == null) {
-                key = key + "-" + EnumOS.getBits();
+                key = key + "-" + OperatingSystem.getBits();
                 classifier = classifiers.get(key);
             }
 

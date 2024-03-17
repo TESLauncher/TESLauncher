@@ -25,9 +25,9 @@ import me.theentropyshard.teslauncher.minecraft.MinecraftDownloadListener;
 import me.theentropyshard.teslauncher.network.HttpRequest;
 import me.theentropyshard.teslauncher.network.download.DownloadList;
 import me.theentropyshard.teslauncher.network.download.HttpDownload;
-import me.theentropyshard.teslauncher.utils.EnumOS;
 import me.theentropyshard.teslauncher.utils.FileUtils;
 import me.theentropyshard.teslauncher.utils.Json;
+import me.theentropyshard.teslauncher.utils.OperatingSystem;
 
 import java.io.File;
 import java.io.IOException;
@@ -44,7 +44,7 @@ public class JavaManager {
 
     public JavaManager(Path workDir) {
         this.workDir = workDir;
-        if (EnumOS.getOS() == EnumOS.WINDOWS) {
+        if (OperatingSystem.isWindows()) {
             this.executableName = "javaw.exe";
         } else {
             this.executableName = "java";
@@ -102,7 +102,7 @@ public class JavaManager {
 
                 String javaExecutable = this.getJavaExecutable(componentName);
                 if (!new File(javaExecutable).setExecutable(true, true)) {
-                    System.err.println("Unable to make '" + javaExecutable + "' executable. Operating system: " + EnumOS.getOS());
+                    System.err.println("Unable to make '" + javaExecutable + "' executable. Operating system: " + OperatingSystem.getCurrent());
                 }
             } else {
                 throw new IOException("Unable to find JRE for component '" + componentName + "'");
@@ -113,36 +113,34 @@ public class JavaManager {
     }
 
     private static String getJreOsName() {
-        switch (EnumOS.getOS()) {
-            case SOLARIS:
+        switch (OperatingSystem.getCurrent()) {
             case LINUX:
-                if (EnumOS.getArch().equals("x86")) {
+                if (OperatingSystem.getArch().equals("x86")) {
                     return "linux-i386";
-                } else if (EnumOS.getArch().equals("x64")) {
+                } else if (OperatingSystem.getArch().equals("x64")) {
                     return "linux";
-                } else {
-                    throw new RuntimeException("unknown linux architecture");
                 }
 
             case WINDOWS:
-                if (EnumOS.getArch().equals("x64")) {
+                if (OperatingSystem.getArch().equals("x64")) {
                     return "windows-x64";
-                } else if (EnumOS.getArch().equals("x86")) {
+                } else if (OperatingSystem.getArch().equals("x86")) {
                     return "windows-x86";
-                } else {
+                }
+
+                if (OperatingSystem.isArm()) {
                     return "windows-arm64";
                 }
 
             case MACOS:
-                if (EnumOS.getArch().equals("x64")) {
+                if (OperatingSystem.getArch().equals("x64")) {
                     return "mac-os";
                 } else {
                     return "mac-os-arm64";
                 }
 
-            case UNKNOWN:
             default:
-                throw new RuntimeException("Unknown os");
+                throw new RuntimeException("Unreachable");
         }
     }
 
@@ -152,7 +150,7 @@ public class JavaManager {
 
     public String getJavaExecutable(String componentName) {
         Path componentDir = this.workDir.resolve(componentName);
-        if (EnumOS.getOS() == EnumOS.MACOS) {
+        if (OperatingSystem.isMacOS()) {
             componentDir = componentDir.resolve("jre.bundle").resolve("Contents").resolve("Home");
         }
         return componentDir.resolve("bin").resolve(this.executableName).toString();

@@ -18,9 +18,9 @@
 
 package me.theentropyshard.teslauncher.instance;
 
-import me.theentropyshard.teslauncher.utils.EnumOS;
 import me.theentropyshard.teslauncher.utils.FileUtils;
 import me.theentropyshard.teslauncher.utils.Json;
+import me.theentropyshard.teslauncher.utils.OperatingSystem;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -29,8 +29,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class InstanceManager {
     private final Path workDir;
@@ -45,7 +43,7 @@ public class InstanceManager {
         this.instancesByName = new HashMap<>();
 
         String mcDirName = "minecraft";
-        if (EnumOS.getOS() != EnumOS.MACOS) {
+        if (!OperatingSystem.isMacOS()) {
             mcDirName = "." + mcDirName;
         }
         this.mcDirName = mcDirName;

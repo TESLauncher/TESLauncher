@@ -26,7 +26,20 @@ import java.awt.datatransfer.StringSelection;
 public enum OperatingSystem {
     WINDOWS,
     LINUX,
-    OSX;
+    MACOS,
+    UNKNOWN;
+
+    public static OperatingSystem getCurrent() {
+        if (OperatingSystem.isWindows()) {
+            return OperatingSystem.WINDOWS;
+        } else if (OperatingSystem.isLinux()) {
+            return OperatingSystem.LINUX;
+        } else if (OperatingSystem.isMacOS()) {
+            return OperatingSystem.MACOS;
+        } else {
+            return OperatingSystem.UNKNOWN;
+        }
+    }
 
     public static boolean isWindows() {
         return Platform.isWindows();
@@ -36,7 +49,7 @@ public enum OperatingSystem {
         return Platform.isLinux();
     }
 
-    public static boolean isOSX() {
+    public static boolean isMacOS() {
         return Platform.isMac();
     }
 
@@ -58,6 +71,14 @@ public enum OperatingSystem {
         }
 
         return "x86";
+    }
+
+    public static String getBits() {
+        if (OperatingSystem.is64Bit()) {
+            return "64";
+        }
+
+        return "32";
     }
 
     public static void copyToClipboard(String text) {

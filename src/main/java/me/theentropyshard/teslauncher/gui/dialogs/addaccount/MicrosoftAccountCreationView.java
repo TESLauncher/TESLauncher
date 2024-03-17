@@ -28,6 +28,7 @@ import me.theentropyshard.teslauncher.minecraft.auth.microsoft.AuthListener;
 import me.theentropyshard.teslauncher.minecraft.auth.microsoft.MicrosoftAuthenticator;
 import me.theentropyshard.teslauncher.minecraft.auth.microsoft.MinecraftProfile;
 import me.theentropyshard.teslauncher.minecraft.auth.microsoft.MinecraftSkin;
+import me.theentropyshard.teslauncher.utils.OperatingSystem;
 import me.theentropyshard.teslauncher.utils.SkinUtils;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -165,8 +166,7 @@ public class MicrosoftAccountCreationView extends JPanel {
 
         @Override
         public void onUserCodeReceived(String userCode, String verificationUri) {
-            StringSelection selection = new StringSelection(userCode);
-            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(selection, selection);
+            OperatingSystem.copyToClipboard(userCode);
 
             if (!this.isSelectedBox()) {
                 if (!Desktop.isDesktopSupported()) {
