@@ -26,28 +26,32 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public final class HashUtils {
-    public static String sha1(Path path) throws IOException {
-        try (InputStream inputStream = Files.newInputStream(path)) {
-            MessageDigest md = MessageDigest.getInstance("SHA-1");
+    public static byte[] hash(Path file, String algorithm) throws IOException {
+        try (InputStream inputStream = Files.newInputStream(file)) {
+            MessageDigest md = MessageDigest.getInstance(algorithm);
 
-            byte[] dataBytes = new byte[1024];
+            byte[] buffer = new byte[4096];
 
             int numRead;
-            while ((numRead = inputStream.read(dataBytes)) != -1) {
-                md.update(dataBytes, 0, numRead);
+            while ((numRead = inputStream.read(buffer)) != -1) {
+                md.update(buffer, 0, numRead);
             }
 
-            byte[] mdBytes = md.digest();
-
-            StringBuilder sb = new StringBuilder();
-            for (byte b : mdBytes) {
-                sb.append(Integer.toString((b & 0xff) + 0x100, 16).substring(1));
-            }
-
-            return sb.toString();
+            return md.digest();
         } catch (NoSuchAlgorithmException ex) {
-            throw new IOException("SHA-1 algorithm is not available in your JRE", ex);
+            throw new IOException(algorithm + " algorithm is not available in your JRE", ex);
         }
+    }
+
+    public static String sha1(Path file) throws IOException {
+        byte[] mdBytes = HashUtils.hash(file, "SHA-1");
+
+        StringBuilder sb = new StringBuilder();
+        for (byte b : mdBytes) {
+            sb.append(Integer.toString((b & 0xff) + 0x100, 16).substring(1));
+        }
+
+        return sb.toString();
     }
 
     private HashUtils() {
