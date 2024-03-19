@@ -139,7 +139,7 @@ public class HttpDownload {
         private String sha1;
         private boolean forceDownload;
         private boolean executable;
-        private long expectedSize;
+        private long expectedSize = -1L;
 
         public Builder() {
 
