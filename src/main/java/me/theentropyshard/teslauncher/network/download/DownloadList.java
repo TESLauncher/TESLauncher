@@ -21,6 +21,8 @@ package me.theentropyshard.teslauncher.network.download;
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.network.progress.ProgressNetworkInterceptor;
 import okhttp3.OkHttpClient;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -32,6 +34,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class DownloadList {
+    private static final Logger LOG = LogManager.getLogger(DownloadList.class);
+
     public static final int MAX_CONNECTIONS = 8;
 
     private final DownloadListener downloadListener;
@@ -64,7 +68,7 @@ public class DownloadList {
         return this.totalSize;
     }
 
-    public synchronized void downloadAll() throws IOException {
+    public synchronized void downloadAll() {
         if (this.finished) {
             throw new IllegalStateException("This download list has already finished downloading. Please consider creating a new one");
         }
@@ -86,7 +90,7 @@ public class DownloadList {
                 try {
                     download.execute();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    LOG.error(e);
                 }
             };
 

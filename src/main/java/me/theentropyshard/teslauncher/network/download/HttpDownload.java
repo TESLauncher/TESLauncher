@@ -19,6 +19,7 @@
 package me.theentropyshard.teslauncher.network.download;
 
 import me.theentropyshard.teslauncher.utils.FileUtils;
+import me.theentropyshard.teslauncher.utils.HashUtils;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -44,14 +45,16 @@ public class HttpDownload {
     private final String url;
     private final Path saveAs;
     private final boolean forceDownload;
+    private final String sha1;
     private final boolean executable;
     private final long expectedSize;
 
-    private HttpDownload(OkHttpClient httpClient, String url, Path saveAs, boolean forceDownload, boolean executable, long expectedSize) {
+    private HttpDownload(OkHttpClient httpClient, String url, Path saveAs, boolean forceDownload, String sha1, boolean executable, long expectedSize) {
         this.httpClient = httpClient;
         this.url = url;
         this.saveAs = saveAs;
         this.forceDownload = forceDownload;
+        this.sha1 = sha1;
         this.executable = executable;
         this.expectedSize = expectedSize;
     }
@@ -91,7 +94,17 @@ public class HttpDownload {
                 }
             }
 
-            new File(this.saveAs.toString()).setExecutable(true);
+            if (this.sha1 != null) {
+                String sha1 = HashUtils.sha1(this.saveAs);
+                if (!this.sha1.equals(sha1)) {
+                    FileUtils.delete(this.saveAs);
+                    throw new IOException("SHA-1 does not match for file '" + this.saveAs + "'. Bad file was deleted");
+                }
+            }
+
+            if (this.executable) {
+                new File(this.saveAs.toString()).setExecutable(true);
+            }
         }
     }
 
@@ -123,6 +136,7 @@ public class HttpDownload {
         private OkHttpClient httpClient;
         private String url;
         private Path saveAs;
+        private String sha1;
         private boolean forceDownload;
         private boolean executable;
         private long expectedSize;
@@ -156,13 +170,18 @@ public class HttpDownload {
             return this;
         }
 
+        public Builder sha1(String sha1) {
+            this.sha1 = sha1;
+            return this;
+        }
+
         public Builder expectedSize(long expectedSize) {
             this.expectedSize = expectedSize;
             return this;
         }
 
         public HttpDownload build() {
-            return new HttpDownload(this.httpClient, this.url, this.saveAs, this.forceDownload, this.executable, this.expectedSize);
+            return new HttpDownload(this.httpClient, this.url, this.saveAs, this.forceDownload, this.sha1, this.executable, this.expectedSize);
         }
     }
 }
