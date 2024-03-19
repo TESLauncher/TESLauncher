@@ -72,7 +72,7 @@ public class HttpDownload {
 
         boolean partiallyDownloaded = this.expectedSize > size;
 
-        if (partiallyDownloaded || this.forceDownload) {
+        if (partiallyDownloaded || this.forceDownload || !Files.exists(this.saveAs)) {
             Request.Builder builder = new Request.Builder()
                     .url(this.url)
                     .get();
