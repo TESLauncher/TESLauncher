@@ -66,7 +66,7 @@ public class HttpDownload {
 
         long size = this.size();
 
-        if (size == this.expectedSize) {
+        if (size == this.expectedSize && this.expectedSize != -1) {
             return;
         }
 
