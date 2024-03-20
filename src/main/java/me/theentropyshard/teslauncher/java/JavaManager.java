@@ -82,6 +82,7 @@ public class JavaManager {
                                 .httpClient(TESLauncher.getInstance().getHttpClient())
                                 .url(raw.url)
                                 .expectedSize(raw.size)
+                                .sha1(raw.sha1)
                                 .executable(jreFile.executable)
                                 .saveAs(savePath)
                                 .build();

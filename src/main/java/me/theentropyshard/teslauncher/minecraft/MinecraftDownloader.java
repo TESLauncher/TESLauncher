@@ -192,6 +192,7 @@ public class MinecraftDownloader {
                 .httpClient(httpClient)
                 .url(client.getUrl())
                 .expectedSize(client.getSize())
+                .sha1(client.getSha1())
                 .saveAs(jarFile)
                 .build();
 
@@ -241,6 +242,7 @@ public class MinecraftDownloader {
                     HttpDownload download = new HttpDownload.Builder()
                             .httpClient(TESLauncher.getInstance().getHttpClient())
                             .url(artifact.getUrl())
+                            .sha1(artifact.getSha1())
                             .expectedSize(artifact.getSize())
                             .saveAs(jarFile)
                             .build();
@@ -257,6 +259,7 @@ public class MinecraftDownloader {
                     HttpDownload download = new HttpDownload.Builder()
                             .httpClient(TESLauncher.getInstance().getHttpClient())
                             .url(classifier.getUrl())
+                            .sha1(classifier.getSha1())
                             .expectedSize(classifier.getSize())
                             .saveAs(filePath)
                             .build();
@@ -277,6 +280,7 @@ public class MinecraftDownloader {
                 .httpClient(TESLauncher.getInstance().getHttpClient())
                 .url(ApiUrls.RESOURCES + assetObject.getPrefix() + "/" + assetObject.getHash())
                 .expectedSize(assetObject.getSize())
+                .sha1(assetObject.getHash())
                 .saveAs(filePath)
                 .build();
 
