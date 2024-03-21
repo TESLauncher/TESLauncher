@@ -72,6 +72,12 @@ public class SettingsView extends View {
             uiSettings.setBorder(new TitledBorder("UI"));
 
             JComboBox<String> options = new JComboBox<>(new String[]{"Dialog", "Circle"});
+            if (TESLauncher.getInstance().getSettings().useDownloadDialog) {
+                options.setSelectedIndex(0);
+            } else {
+                options.setSelectedIndex(1);
+            }
+
             options.addItemListener(e -> {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     switch (e.getItem().toString()) {
