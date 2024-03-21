@@ -201,11 +201,26 @@ public class MinecraftDownloader {
         return version;
     }
 
+    private static String getMcName() {
+        switch (OperatingSystem.getCurrent()) {
+            case WINDOWS:
+                return "windows";
+            case LINUX:
+                return "linux";
+            case MACOS:
+                return "osx";
+            case UNKNOWN:
+                throw new RuntimeException("Unsupported OS: " + OperatingSystem.getName());
+            default:
+                throw new RuntimeException("Unreachable");
+        }
+    }
+
     private Library.Artifact getClassifier(Library library) {
         Map<String, Library.Artifact> classifiers = library.getDownloads().getClassifiers();
 
         if (classifiers != null) {
-            String key = "natives-" + OperatingSystem.getName();
+            String key = "natives-" + MinecraftDownloader.getMcName();
             Library.Artifact classifier = classifiers.get(key);
 
             if (classifier == null) {
