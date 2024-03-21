@@ -67,6 +67,11 @@ public class MinecraftDownloadDialog extends AppDialog implements MinecraftDownl
                 " MiB / " + MathUtils.round(totalSize / 1024.0D / 1024.0D, 2) + " MiB");
     }
 
+    @Override
+    public void onFinish() {
+
+    }
+
     public JLabel getStageLabel() {
         return this.stageLabel;
     }

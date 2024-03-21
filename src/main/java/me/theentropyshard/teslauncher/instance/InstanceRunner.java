@@ -21,6 +21,7 @@ package me.theentropyshard.teslauncher.instance;
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.accounts.Account;
 import me.theentropyshard.teslauncher.accounts.MicrosoftAccount;
+import me.theentropyshard.teslauncher.gui.components.InstanceItem;
 import me.theentropyshard.teslauncher.gui.dialogs.MinecraftDownloadDialog;
 import me.theentropyshard.teslauncher.java.JavaManager;
 import me.theentropyshard.teslauncher.minecraft.argument.Argument;
@@ -53,17 +54,23 @@ public class InstanceRunner extends Thread {
 
     private final Account account;
     private final Instance instance;
+    private final InstanceItem item;
 
     private Path clientCopyTmp;
 
-    public InstanceRunner(Account account, Instance instance) {
+    public InstanceRunner(Account account, InstanceItem item) {
         this.account = account;
-        this.instance = instance;
+        this.instance = item.getAssociatedInstance();
+        this.item = item;
     }
 
     @Override
     public void run() {
-        SwingUtilities.invokeLater(TESLauncher.getInstance().getGui()::disableBeforePlay);
+        boolean useDialog = TESLauncher.getInstance().getSettings().useDownloadDialog;
+
+        if (useDialog) {
+            SwingUtilities.invokeLater(TESLauncher.getInstance().getGui()::disableBeforePlay);
+        }
 
         try {
             try {
@@ -81,14 +88,26 @@ public class InstanceRunner extends Thread {
             Path assetsDir = launcher.getAssetsDir();
             Path nativesDir = versionsDir.resolve(this.instance.getMinecraftVersion()).resolve("natives");
 
-            MinecraftDownloader downloader = new GuiMinecraftDownloader(
-                    versionsDir,
-                    assetsDir,
-                    librariesDir,
-                    nativesDir,
-                    launcher.getInstanceManager().getMinecraftDir(this.instance).resolve("resources"),
-                    new MinecraftDownloadDialog()
-            );
+            MinecraftDownloader downloader;
+            if (useDialog) {
+                downloader = new GuiMinecraftDownloader(
+                        versionsDir,
+                        assetsDir,
+                        librariesDir,
+                        nativesDir,
+                        launcher.getInstanceManager().getMinecraftDir(this.instance).resolve("resources"),
+                        new MinecraftDownloadDialog()
+                );
+            } else {
+                downloader = new MinecraftDownloader(
+                        versionsDir,
+                        assetsDir,
+                        librariesDir,
+                        nativesDir,
+                        launcher.getInstanceManager().getMinecraftDir(this.instance).resolve("resources"),
+                        this.item
+                );
+            }
 
             downloader.downloadMinecraft(this.instance.getMinecraftVersion());
 
@@ -124,7 +143,9 @@ public class InstanceRunner extends Thread {
         } catch (Exception e) {
             LOG.error("Exception occurred while trying to start Minecraft " + this.instance.getMinecraftVersion(), e);
         } finally {
-            SwingUtilities.invokeLater(TESLauncher.getInstance().getGui()::enableAfterPlay);
+            if (useDialog) {
+                SwingUtilities.invokeLater(TESLauncher.getInstance().getGui()::enableAfterPlay);
+            }
         }
     }
 
@@ -404,7 +425,7 @@ public class InstanceRunner extends Thread {
         InstanceManager manager = TESLauncher.getInstance().getInstanceManager();
 
         ProcessBuilder processBuilder = new ProcessBuilder(command);
-        Path runDir = manager.getMinecraftDir(this.instance).toAbsolutePath();
+        Path runDir = manager.getInstanceDir(this.instance).toAbsolutePath();
         processBuilder.environment().put("APPDATA", runDir.toString());
         processBuilder.directory(runDir.toFile());
         processBuilder.redirectErrorStream(true);

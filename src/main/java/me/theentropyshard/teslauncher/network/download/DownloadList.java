@@ -53,6 +53,9 @@ public class DownloadList {
 
     public synchronized void add(HttpDownload download) {
         this.totalSize += download.expectedSize();
+        if (download.size() != -1L) {
+            this.downloadedBytes.addAndGet(download.size());
+        }
         this.downloads.add(download);
     }
 
@@ -71,6 +74,10 @@ public class DownloadList {
     public synchronized void downloadAll() {
         if (this.finished) {
             throw new IllegalStateException("This download list has already finished downloading. Please consider creating a new one");
+        }
+
+        if (this.size() == 0) {
+            return;
         }
 
         ExecutorService executorService = Executors.newFixedThreadPool(DownloadList.MAX_CONNECTIONS);

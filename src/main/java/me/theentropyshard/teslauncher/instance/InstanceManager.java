@@ -156,11 +156,11 @@ public class InstanceManager {
     }
 
     public Path getMinecraftDir(Instance instance) {
-        return this.workDir.resolve(instance.getDirName()).resolve(this.mcDirName);
+        return this.getInstanceDir(instance).resolve(this.mcDirName);
     }
 
     public Path getInstanceJarModsDir(Instance instance) {
-        return this.workDir.resolve(instance.getDirName()).resolve("jarmods");
+        return this.getInstanceDir(instance).resolve("jarmods");
     }
 
     public Instance getInstanceByName(String name) {

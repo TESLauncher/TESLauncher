@@ -44,7 +44,7 @@ public class JavaManager {
         this.workDir = workDir;
     }
 
-    public void downloadRuntime(String componentName, MinecraftDownloadListener listener) throws IOException {
+    public void downloadRuntime(String componentName, DownloadList javaList) throws IOException {
         Path componentDir = this.workDir.resolve(componentName);
         FileUtils.createDirectoryIfNotExists(componentDir);
 
@@ -66,8 +66,6 @@ public class JavaManager {
                     manifest = Json.parse(request.asString(javaRuntime.manifest.url), JavaRuntimeManifest.class);
                 }
 
-                DownloadList downloadList = new DownloadList(listener::onProgress);
-
                 for (Map.Entry<String, JreFile> entry : manifest.files.entrySet()) {
                     JreFile jreFile = entry.getValue();
                     Path savePath = componentDir.resolve(entry.getKey());
@@ -87,12 +85,8 @@ public class JavaManager {
                                 .saveAs(savePath)
                                 .build();
 
-                        downloadList.add(download);
+                        javaList.add(download);
                     }
-                }
-
-                if (downloadList.size() > 0) {
-                    downloadList.downloadAll();
                 }
             } else {
                 throw new IOException("Unable to find JRE for component '" + componentName + "'");

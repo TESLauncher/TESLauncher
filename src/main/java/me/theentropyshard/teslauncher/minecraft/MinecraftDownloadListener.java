@@ -22,4 +22,6 @@ public interface MinecraftDownloadListener {
     void onStageChanged(String stage);
 
     void onProgress(long totalSize, long downloadedBytes);
+
+    void onFinish();
 }

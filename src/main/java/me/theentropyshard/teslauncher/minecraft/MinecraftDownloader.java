@@ -27,6 +27,7 @@ import me.theentropyshard.teslauncher.network.progress.ProgressNetworkIntercepto
 import me.theentropyshard.teslauncher.utils.*;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.model.FileHeader;
+import net.lingala.zip4j.progress.ProgressMonitor;
 import okhttp3.OkHttpClient;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -79,20 +80,64 @@ public class MinecraftDownloader {
 
         LOG.info("Found Minecraft " + versionId);
 
-        LOG.info("Downloading client...");
-        Version version = this.downloadClient(manifestVersion);
+        if (TESLauncher.getInstance().getSettings().useDownloadDialog) {
+            LOG.info("Downloading client...");
+            this.minecraftDownloadListener.onProgress(0, 0);
+            this.minecraftDownloadListener.onStageChanged("Downloading client");
+            DownloadList clientList = new DownloadList(this.minecraftDownloadListener::onProgress);
+            Version version = this.downloadClient(manifestVersion, clientList);
+            clientList.downloadAll();
 
-        LOG.info("Downloading libraries...");
-        List<Library> nativeLibraries = this.downloadLibraries(version);
+            LOG.info("Downloading libraries...");
+            this.minecraftDownloadListener.onProgress(0, 0);
+            this.minecraftDownloadListener.onStageChanged("Downloading libraries");
+            DownloadList librariesList = new DownloadList(this.minecraftDownloadListener::onProgress);
+            List<Library> nativeLibraries = this.downloadLibraries(version, librariesList);
+            librariesList.downloadAll();
 
-        LOG.info("Extracting natives...");
-        this.extractNatives(nativeLibraries);
+            LOG.info("Extracting natives...");
+            this.minecraftDownloadListener.onProgress(0, 0);
+            this.minecraftDownloadListener.onStageChanged("Extracting natives");
+            this.extractNatives(nativeLibraries);
 
-        LOG.info("Downloading assets...");
-        this.downloadAssets(version);
+            LOG.info("Downloading assets...");
+            this.minecraftDownloadListener.onProgress(0, 0);
+            this.minecraftDownloadListener.onStageChanged("Downloading assets");
+            DownloadList assetsList = new DownloadList(this.minecraftDownloadListener::onProgress);
+            this.downloadAssets(version, assetsList);
+            assetsList.downloadAll();
 
-        LOG.info("Downloading Java...");
-        this.downloadJava(version);
+            LOG.info("Downloading Java...");
+            this.minecraftDownloadListener.onProgress(0, 0);
+            this.minecraftDownloadListener.onStageChanged("Downloading Java");
+            DownloadList javaList = new DownloadList(this.minecraftDownloadListener::onProgress);
+            this.downloadJava(version, javaList);
+            javaList.downloadAll();
+
+            this.minecraftDownloadListener.onFinish();
+        } else {
+            this.minecraftDownloadListener.onProgress(0, 0);
+            DownloadList list = new DownloadList(this.minecraftDownloadListener::onProgress);
+
+            LOG.info("Downloading client...");
+            Version version = this.downloadClient(manifestVersion, list);
+
+            LOG.info("Downloading libraries...");
+            List<Library> nativeLibraries = this.downloadLibraries(version, list);
+
+            LOG.info("Extracting natives...");
+            this.extractNatives(nativeLibraries);
+
+            LOG.info("Downloading assets...");
+            this.downloadAssets(version, list);
+
+            LOG.info("Downloading Java...");
+            this.downloadJava(version, list);
+
+            list.downloadAll();
+
+            this.minecraftDownloadListener.onFinish();
+        }
     }
 
     private static VersionManifest fetchAndSaveVersionManifest(Path manifestFile) throws IOException {
@@ -141,18 +186,16 @@ public class MinecraftDownloader {
         return javaKey;
     }
 
-    private void downloadJava(Version version) throws IOException {
+    private void downloadJava(Version version, DownloadList javaList) throws IOException {
         String javaKey = MinecraftDownloader.getJavaKey(version);
 
         JavaManager javaManager = TESLauncher.getInstance().getJavaManager();
 
-        if (javaManager.runtimeExists(javaKey)) {
+        /*if (javaManager.runtimeExists(javaKey)) { TODO: implement proper check
             return;
-        }
+        }*/
 
-        this.minecraftDownloadListener.onStageChanged("Downloading Java Runtime");
-        this.minecraftDownloadListener.onProgress(0, 0);
-        javaManager.downloadRuntime(javaKey, this.minecraftDownloadListener);
+        javaManager.downloadRuntime(javaKey, javaList);
     }
 
     private void saveClientJson(VersionManifest.Version version, Path jsonFile) throws IOException {
@@ -161,7 +204,7 @@ public class MinecraftDownloader {
         }
     }
 
-    private Version downloadClient(VersionManifest.Version manifestVersion) throws IOException {
+    private Version downloadClient(VersionManifest.Version manifestVersion, DownloadList clientList) throws IOException {
         Version version;
 
         Path jsonFile = this.versionsDir.resolve(manifestVersion.getId()).resolve(manifestVersion.getId() + ".json");
@@ -179,9 +222,6 @@ public class MinecraftDownloader {
             return version;
         }
 
-        this.minecraftDownloadListener.onProgress(0, 0);
-        this.minecraftDownloadListener.onStageChanged("Downloading client");
-
         OkHttpClient httpClient = TESLauncher.getInstance().getHttpClient().newBuilder()
                 .addNetworkInterceptor(new ProgressNetworkInterceptor((contentLength, bytesRead, bytesThisTime, done) -> {
                     this.minecraftDownloadListener.onProgress(contentLength, bytesRead);
@@ -196,7 +236,7 @@ public class MinecraftDownloader {
                 .saveAs(jarFile)
                 .build();
 
-        download.execute();
+        clientList.add(download);
 
         return version;
     }
@@ -234,13 +274,8 @@ public class MinecraftDownloader {
         return null;
     }
 
-    private List<Library> downloadLibraries(Version version) throws IOException {
+    private List<Library> downloadLibraries(Version version, DownloadList librariesList) throws IOException {
         List<Library> nativeLibraries = new ArrayList<>();
-
-        this.minecraftDownloadListener.onProgress(0, 0);
-        this.minecraftDownloadListener.onStageChanged("Downloading libraries");
-
-        DownloadList downloadList = new DownloadList(this.minecraftDownloadListener::onProgress);
 
         for (Library library : version.getLibraries()) {
             if (!RuleMatcher.applyOnThisPlatform(library)) {
@@ -261,7 +296,7 @@ public class MinecraftDownloader {
                             .expectedSize(artifact.getSize())
                             .saveAs(jarFile)
                             .build();
-                    downloadList.add(download);
+                    librariesList.add(download);
                 }
             }
 
@@ -278,13 +313,9 @@ public class MinecraftDownloader {
                             .expectedSize(classifier.getSize())
                             .saveAs(filePath)
                             .build();
-                    downloadList.add(download);
+                    librariesList.add(download);
                 }
             }
-        }
-
-        if (downloadList.size() > 0) {
-            downloadList.downloadAll();
         }
 
         return nativeLibraries;
@@ -302,7 +333,7 @@ public class MinecraftDownloader {
         downloadList.add(download);
     }
 
-    private void downloadAssets(Version version) throws IOException {
+    private void downloadAssets(Version version, DownloadList assetsList) throws IOException {
         Version.AssetIndex vAssetIndex = version.getAssetIndex();
 
         if (vAssetIndex == null) {
@@ -320,11 +351,6 @@ public class MinecraftDownloader {
 
         AssetIndex assetIndex = Json.parse(FileUtils.readUtf8(assetsIndexFile), AssetIndex.class);
 
-        this.minecraftDownloadListener.onProgress(0, 0);
-        this.minecraftDownloadListener.onStageChanged("Downloading assets");
-
-        DownloadList downloadList = new DownloadList(this.minecraftDownloadListener::onProgress);
-
         for (Map.Entry<String, AssetObject> entry : assetIndex.getObjects().entrySet()) {
             String fileName = entry.getKey();
             AssetObject assetObject = entry.getValue();
@@ -340,12 +366,8 @@ public class MinecraftDownloader {
             }
 
             if (!Files.exists(filePath) || Files.size(filePath) != assetObject.getSize()) {
-                this.downloadAsset(downloadList, filePath, assetObject);
+                this.downloadAsset(assetsList, filePath, assetObject);
             }
-        }
-
-        if (downloadList.size() > 0) {
-            downloadList.downloadAll();
         }
     }
 

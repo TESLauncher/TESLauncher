@@ -161,7 +161,7 @@ public class PlayView extends View {
                             JOptionPane.ERROR_MESSAGE
                     );
                 } else {
-                    new InstanceRunner(AccountsManager.getCurrentAccount(), item.getAssociatedInstance()).start();
+                    new InstanceRunner(AccountsManager.getCurrentAccount(), item).start();
                 }
             } else if (mouseButton == MouseEvent.BUTTON3) { // right mouse button
                 new InstanceSettingsDialog(item.getAssociatedInstance());

@@ -21,6 +21,7 @@ package me.theentropyshard.teslauncher.gui.components;
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.instance.Instance;
 import me.theentropyshard.teslauncher.instance.InstanceManager;
+import me.theentropyshard.teslauncher.minecraft.MinecraftDownloadListener;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -35,7 +36,7 @@ import java.awt.geom.Ellipse2D;
 import java.util.HashSet;
 import java.util.Set;
 
-public class InstanceItem extends JPanel {
+public class InstanceItem extends JPanel implements MinecraftDownloadListener {
     private static final int SIDE_SIZE = 100;
     private static final Dimension PREFERRED_SIZE = new Dimension(InstanceItem.SIDE_SIZE, InstanceItem.SIDE_SIZE);
 
@@ -256,5 +257,26 @@ public class InstanceItem extends JPanel {
 
     public void setPercentComplete(double percentComplete) {
         this.percentComplete = percentComplete;
+    }
+
+    @Override
+    public void onStageChanged(String stage) {
+
+    }
+
+    @Override
+    public void onProgress(long totalSize, long downloadedBytes) {
+        SwingUtilities.invokeLater(() -> {
+            this.setPercentComplete((double) downloadedBytes / (double) totalSize);
+            this.repaint();
+        });
+    }
+
+    @Override
+    public void onFinish() {
+        SwingUtilities.invokeLater(() -> {
+            this.setPercentComplete(0.0D);
+            this.repaint();
+        });
     }
 }
