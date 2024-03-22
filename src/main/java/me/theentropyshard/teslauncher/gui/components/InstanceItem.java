@@ -145,10 +145,7 @@ public class InstanceItem extends JPanel implements MinecraftDownloadListener {
         g.fillRoundRect(0, 0, this.getWidth(), this.getHeight(), 10, 10);
     }
 
-    protected void paintArc(Graphics2D g2) {
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2.setColor(this.arcColor);
-
+    private Area getProgressArc() {
         Dimension size = this.getSize();
 
         double degree = 360 * this.percentComplete;
@@ -175,7 +172,49 @@ public class InstanceItem extends JPanel implements MinecraftDownloadListener {
         Area area = new Area(arc);
         area.subtract(new Area(inner));
 
-        g2.fill(area);
+        return area;
+    }
+
+    private Area getBackgroundArc() {
+        Dimension size = this.getSize();
+
+        double degree = 360;
+
+        int arcSize = 48;
+        Shape arc = new Arc2D.Double(
+                (double) size.width / 2 - (double) arcSize / 2,
+                (double) size.height / 2 - (double) arcSize / 2 - 8,
+                arcSize,
+                arcSize,
+                90 - degree,
+                degree,
+                Arc2D.PIE
+        );
+
+        int innerSize = 42;
+        Shape inner = new Ellipse2D.Double(
+                (double) size.width / 2 - (double) innerSize / 2,
+                (double) size.height / 2 - (double) innerSize / 2 - 8,
+                innerSize,
+                innerSize
+        );
+
+        Area area = new Area(arc);
+        area.subtract(new Area(inner));
+
+        return area;
+    }
+
+    protected void paintArc(Graphics2D g2) {
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        if (this.percentComplete > 0.0D) {
+            g2.setColor(Color.LIGHT_GRAY);
+            g2.fill(this.getBackgroundArc());
+        }
+
+        g2.setColor(this.arcColor);
+        g2.fill(this.getProgressArc());
     }
 
     @Override
