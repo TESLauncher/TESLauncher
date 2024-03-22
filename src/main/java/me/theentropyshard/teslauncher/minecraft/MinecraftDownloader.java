@@ -264,7 +264,19 @@ public class MinecraftDownloader {
             Library.Artifact classifier = classifiers.get(key);
 
             if (classifier == null) {
-                key = key + "-" + OperatingSystem.getBits();
+                String qualifier;
+
+                if (OperatingSystem.isArm()) {
+                    if (OperatingSystem.is64Bit()) {
+                        qualifier = "arm64";
+                    } else {
+                        qualifier = "arm32";
+                    }
+                } else {
+                    qualifier = OperatingSystem.getArch();
+                }
+
+                key = key + "-" + qualifier;
                 classifier = classifiers.get(key);
             }
 
