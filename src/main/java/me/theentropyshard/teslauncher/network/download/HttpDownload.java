@@ -59,6 +59,10 @@ public class HttpDownload {
         this.expectedSize = expectedSize;
     }
 
+    public Path getSaveAs() {
+        return this.saveAs;
+    }
+
     public void execute() throws IOException {
         if (this.saveAs == null) {
             throw new NullPointerException("saveAs == null");

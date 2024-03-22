@@ -56,6 +56,8 @@ public class DownloadList {
         if (download.size() != -1L) {
             this.downloadedBytes.addAndGet(download.size());
         }
+
+        this.downloads.removeIf(d -> d.getSaveAs().equals(download.getSaveAs()));
         this.downloads.add(download);
     }
 
