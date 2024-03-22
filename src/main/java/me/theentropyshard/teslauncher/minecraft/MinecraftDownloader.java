@@ -256,6 +256,22 @@ public class MinecraftDownloader {
         }
     }
 
+    private static String getQualifierOS() {
+        String qualifier;
+
+        if (OperatingSystem.isArm()) {
+            if (OperatingSystem.is64Bit()) {
+                qualifier = "arm64";
+            } else {
+                qualifier = "arm32";
+            }
+        } else {
+            qualifier = OperatingSystem.getArch();
+        }
+
+        return qualifier;
+    }
+
     private Library.Artifact getClassifier(Library library) {
         Map<String, Library.Artifact> classifiers = library.getDownloads().getClassifiers();
 
@@ -264,20 +280,7 @@ public class MinecraftDownloader {
             Library.Artifact classifier = classifiers.get(key);
 
             if (classifier == null) {
-                String qualifier;
-
-                if (OperatingSystem.isArm()) {
-                    if (OperatingSystem.is64Bit()) {
-                        qualifier = "arm64";
-                    } else {
-                        qualifier = "arm32";
-                    }
-                } else {
-                    qualifier = OperatingSystem.getArch();
-                }
-
-                key = key + "-" + qualifier;
-                classifier = classifiers.get(key);
+                classifier = classifiers.get(key + "-" + MinecraftDownloader.getQualifierOS());
             }
 
             return classifier;
