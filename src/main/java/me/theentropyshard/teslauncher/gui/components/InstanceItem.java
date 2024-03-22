@@ -145,40 +145,10 @@ public class InstanceItem extends JPanel implements MinecraftDownloadListener {
         g.fillRoundRect(0, 0, this.getWidth(), this.getHeight(), 10, 10);
     }
 
-    private Area getProgressArc() {
+    private Area getArc(double progress) {
         Dimension size = this.getSize();
 
-        double degree = 360 * this.percentComplete;
-
-        int arcSize = 48;
-        Shape arc = new Arc2D.Double(
-                (double) size.width / 2 - (double) arcSize / 2,
-                (double) size.height / 2 - (double) arcSize / 2 - 8,
-                arcSize,
-                arcSize,
-                90 - degree,
-                degree,
-                Arc2D.PIE
-        );
-
-        int innerSize = 42;
-        Shape inner = new Ellipse2D.Double(
-                (double) size.width / 2 - (double) innerSize / 2,
-                (double) size.height / 2 - (double) innerSize / 2 - 8,
-                innerSize,
-                innerSize
-        );
-
-        Area area = new Area(arc);
-        area.subtract(new Area(inner));
-
-        return area;
-    }
-
-    private Area getBackgroundArc() {
-        Dimension size = this.getSize();
-
-        double degree = 360;
+        double degree = 360 * progress;
 
         int arcSize = 48;
         Shape arc = new Arc2D.Double(
@@ -210,11 +180,11 @@ public class InstanceItem extends JPanel implements MinecraftDownloadListener {
 
         if (this.percentComplete > 0.0D) {
             g2.setColor(Color.LIGHT_GRAY);
-            g2.fill(this.getBackgroundArc());
+            g2.fill(this.getArc(1.0D));
         }
 
         g2.setColor(this.arcColor);
-        g2.fill(this.getProgressArc());
+        g2.fill(this.getArc(this.percentComplete));
     }
 
     @Override
