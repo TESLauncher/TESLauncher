@@ -36,8 +36,8 @@ public class Instance {
     private int minimumMemoryInMegabytes = 512;
     private int maximumMemoryInMegabytes = 2048;
     private Instant lastTimePlayed = Instant.EPOCH;
-    private long lastPlayedForSeconds;
-    private long totalPlayedForSeconds;
+    private long lastPlaytime;
+    private long totalPlaytime;
     private List<JarMod> jarMods;
 
     public Instance() {
@@ -52,6 +52,11 @@ public class Instance {
 
     public void save() throws IOException {
         TESLauncher.getInstance().getInstanceManager().save(this);
+    }
+
+    public void updatePlaytime(long seconds) {
+        this.lastPlaytime = seconds;
+        this.totalPlaytime += seconds;
     }
 
     public List<JarMod> getJarMods() {
@@ -150,19 +155,19 @@ public class Instance {
         this.lastTimePlayed = lastTimePlayed;
     }
 
-    public long getLastPlayedForSeconds() {
-        return this.lastPlayedForSeconds;
+    public long getLastPlaytime() {
+        return this.lastPlaytime;
     }
 
-    public void setLastPlayedForSeconds(long lastPlayedForSeconds) {
-        this.lastPlayedForSeconds = lastPlayedForSeconds;
+    public void setLastPlaytime(long lastPlaytime) {
+        this.lastPlaytime = lastPlaytime;
     }
 
-    public long getTotalPlayedForSeconds() {
-        return this.totalPlayedForSeconds;
+    public long getTotalPlaytime() {
+        return this.totalPlaytime;
     }
 
-    public void setTotalPlayedForSeconds(long totalPlayedForSeconds) {
-        this.totalPlayedForSeconds = totalPlayedForSeconds;
+    public void setTotalPlaytime(long totalPlaytime) {
+        this.totalPlaytime = totalPlaytime;
     }
 }

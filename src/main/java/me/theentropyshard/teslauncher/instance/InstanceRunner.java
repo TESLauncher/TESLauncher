@@ -24,10 +24,10 @@ import me.theentropyshard.teslauncher.accounts.MicrosoftAccount;
 import me.theentropyshard.teslauncher.gui.components.InstanceItem;
 import me.theentropyshard.teslauncher.gui.dialogs.MinecraftDownloadDialog;
 import me.theentropyshard.teslauncher.java.JavaManager;
+import me.theentropyshard.teslauncher.minecraft.*;
 import me.theentropyshard.teslauncher.minecraft.argument.Argument;
 import me.theentropyshard.teslauncher.minecraft.argument.ArgumentType;
 import me.theentropyshard.teslauncher.minecraft.auth.microsoft.AuthException;
-import me.theentropyshard.teslauncher.minecraft.*;
 import me.theentropyshard.teslauncher.utils.FileUtils;
 import me.theentropyshard.teslauncher.utils.Json;
 import me.theentropyshard.teslauncher.utils.TimeUtils;
@@ -123,29 +123,39 @@ public class InstanceRunner extends Thread {
             long start = System.currentTimeMillis();
 
             int exitCode = this.runGameProcess(command);
-            LOG.info("Minecraft process finished with exit code " + exitCode);
-
-            if (this.clientCopyTmp != null && Files.exists(this.clientCopyTmp)) {
-                Files.delete(this.clientCopyTmp);
-            }
 
             long end = System.currentTimeMillis();
 
-            long timePlayedSeconds = (end - start) / 1000;
-            String timePlayed = TimeUtils.getHoursMinutesSeconds(timePlayedSeconds);
+            LOG.info("Minecraft process finished with exit code " + exitCode);
+
+            long seconds = (end - start) / 1000;
+            String timePlayed = TimeUtils.getHoursMinutesSeconds(seconds);
             if (!timePlayed.trim().isEmpty()) {
                 LOG.info("You played for " + timePlayed + "!");
             }
 
-            this.instance.setTotalPlayedForSeconds(this.instance.getTotalPlayedForSeconds() + timePlayedSeconds);
-            this.instance.setLastPlayedForSeconds(timePlayedSeconds);
+            this.instance.updatePlaytime(seconds);
             this.instance.save();
         } catch (Exception e) {
             LOG.error("Exception occurred while trying to start Minecraft " + this.instance.getMinecraftVersion(), e);
         } finally {
+            this.removeTempClient();
+
             if (useDialog) {
                 SwingUtilities.invokeLater(TESLauncher.getInstance().getGui()::enableAfterPlay);
             }
+        }
+    }
+
+    private void removeTempClient() {
+        if (this.clientCopyTmp == null || !Files.exists(this.clientCopyTmp)) {
+            return;
+        }
+
+        try {
+            FileUtils.delete(this.clientCopyTmp);
+        } catch (IOException e) {
+            LOG.error("Unable to delete temporary copy of the client '{}'", this.clientCopyTmp, e);
         }
     }
 

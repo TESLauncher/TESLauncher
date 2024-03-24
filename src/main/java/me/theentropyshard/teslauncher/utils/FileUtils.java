@@ -48,11 +48,11 @@ public final class FileUtils {
             return;
         }
 
-        if (Files.isRegularFile(path)) {
+        if (Files.isDirectory(path)) {
+            Files.walkFileTree(path, FileUtils.DELETE_VISITOR);
+        } else {
             Files.delete(path);
         }
-
-        Files.walkFileTree(path, FileUtils.DELETE_VISITOR);
     }
 
     public static void createDirectoryIfNotExists(Path dir) throws IOException {
