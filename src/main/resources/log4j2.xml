@@ -3,7 +3,7 @@
     <Appenders>
         <Console name="ConsoleLogger" target="SYSTEM_OUT">
             <PatternLayout disableAnsi="false"
-                           pattern="%highlight{%d{HH:mm:ss} [%t] %level %logger{36} - %msg%n}{INFO=default}"/>
+                           pattern="%highlight{%d{HH:mm:ss} [%t] %level %c{1.1.1.*} - %msg%n}{INFO=default}"/>
         </Console>
 
         <RollingRandomAccessFile name="FileLogger" fileName="${sys:teslauncher.logsDir}/latest.log"
