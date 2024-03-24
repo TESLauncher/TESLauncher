@@ -21,7 +21,7 @@ package me.theentropyshard.teslauncher.instance;
 import me.theentropyshard.teslauncher.TESLauncher;
 
 import java.io.IOException;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class Instance {
@@ -35,7 +35,7 @@ public class Instance {
     private String customWindowString;
     private int minimumMemoryInMegabytes = 512;
     private int maximumMemoryInMegabytes = 2048;
-    private Instant lastTimePlayed = Instant.EPOCH;
+    private LocalDateTime lastTimePlayed = LocalDateTime.MIN;
     private long lastPlaytime;
     private long totalPlaytime;
     private List<JarMod> jarMods;
@@ -147,11 +147,11 @@ public class Instance {
         this.maximumMemoryInMegabytes = maximumMemoryInMegabytes;
     }
 
-    public Instant getLastTimePlayed() {
+    public LocalDateTime getLastTimePlayed() {
         return this.lastTimePlayed;
     }
 
-    public void setLastTimePlayed(Instant lastTimePlayed) {
+    public void setLastTimePlayed(LocalDateTime lastTimePlayed) {
         this.lastTimePlayed = lastTimePlayed;
     }
 

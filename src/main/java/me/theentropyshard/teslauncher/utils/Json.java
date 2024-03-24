@@ -29,9 +29,11 @@ import me.theentropyshard.teslauncher.minecraft.Version;
 import me.theentropyshard.teslauncher.minecraft.VersionType;
 import me.theentropyshard.teslauncher.minecraft.argument.ArgumentType;
 import me.theentropyshard.teslauncher.minecraft.gson.*;
+import me.theentropyshard.teslauncher.minecraft.rule.Rule;
 
 import java.lang.reflect.Type;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 
 public final class Json {
@@ -39,12 +41,13 @@ public final class Json {
             .disableHtmlEscaping()
             //
             .registerTypeAdapter(Instant.class, new InstantTypeAdapter())
-            .registerTypeAdapter(Account.class, new AccountDeserializer())
-            //
+            .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeTypeAdapter())
             .registerTypeAdapter(OffsetDateTime.class, new OffsetDateTimeTypeAdapter())
+            //
+            .registerTypeAdapter(Account.class, new AccountDeserializer())
             .registerTypeAdapter(Version.class, new VersionDeserializer())
             .registerTypeAdapter(VersionType.class, new VersionTypeTypeAdapter())
-            .registerTypeAdapter(me.theentropyshard.teslauncher.minecraft.rule.Rule.Action.class, new RuleActionTypeAdapter())
+            .registerTypeAdapter(Rule.Action.class, new RuleActionTypeAdapter())
             .registerTypeAdapter(ArgumentType.class, new ArgumentTypeTypeAdapter())
             .registerTypeAdapter(DownloadType.class, new DownloadTypeTypeAdapter())
             //

@@ -35,7 +35,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.MouseEvent;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -99,21 +99,23 @@ public class PlayView extends View {
 
         new SwingWorker<List<Instance>, Void>() {
             @Override
-            protected List<Instance> doInBackground() throws Exception {
+            protected List<Instance> doInBackground() {
                 InstanceManager instanceManager = TESLauncher.getInstance().getInstanceManager();
-                instanceManager.reload();
-                return instanceManager.getInstances();
+
+                List<Instance> instances = instanceManager.getInstances();
+                instances.sort((instance1, instance2) -> {
+                    LocalDateTime lastTimePlayed1 = instance1.getLastTimePlayed();
+                    LocalDateTime lastTimePlayed2 = instance2.getLastTimePlayed();
+                    return lastTimePlayed2.compareTo(lastTimePlayed1);
+                });
+
+                return instances;
             }
 
             @Override
             protected void done() {
                 try {
                     List<Instance> instances = this.get();
-                    instances.sort((instance1, instance2) -> {
-                        Instant lastTimePlayed1 = instance1.getLastTimePlayed();
-                        Instant lastTimePlayed2 = instance2.getLastTimePlayed();
-                        return lastTimePlayed2.compareTo(lastTimePlayed1);
-                    });
 
                     for (Instance instance : instances) {
                         Icon icon = SwingUtils.getIcon("/grass_icon.png");

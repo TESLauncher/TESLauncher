@@ -43,7 +43,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -119,7 +119,7 @@ public class InstanceRunner extends Thread {
             List<String> command = this.buildRunCommand(version, arguments);
             Path runDir = launcher.getInstanceManager().getInstanceDir(this.instance).toAbsolutePath();
 
-            this.instance.setLastTimePlayed(Instant.now());
+            this.instance.setLastTimePlayed(LocalDateTime.now());
             this.instance.save();
 
             long start = System.currentTimeMillis();
