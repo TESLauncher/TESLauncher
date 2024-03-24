@@ -117,12 +117,14 @@ public class InstanceRunner extends Thread {
 
             List<String> arguments = this.getArguments(version, nativesDir, librariesDir, versionsDir);
             List<String> command = this.buildRunCommand(version, arguments);
+            Path runDir = launcher.getInstanceManager().getInstanceDir(this.instance).toAbsolutePath();
 
             this.instance.setLastTimePlayed(Instant.now());
+            this.instance.save();
 
             long start = System.currentTimeMillis();
 
-            int exitCode = this.runGameProcess(command);
+            int exitCode = this.runGameProcess(command, runDir);
 
             long end = System.currentTimeMillis();
 
@@ -431,16 +433,14 @@ public class InstanceRunner extends Thread {
         return command;
     }
 
-    private int runGameProcess(List<String> command) throws IOException, InterruptedException {
-        InstanceManager manager = TESLauncher.getInstance().getInstanceManager();
-
+    private int runGameProcess(List<String> command, Path runDir) throws IOException {
         ProcessBuilder processBuilder = new ProcessBuilder(command);
-        Path runDir = manager.getInstanceDir(this.instance).toAbsolutePath();
         processBuilder.environment().put("APPDATA", runDir.toString());
         processBuilder.directory(runDir.toFile());
         processBuilder.redirectErrorStream(true);
 
         Process process = processBuilder.start();
+
         InputStream inputStream = process.getInputStream();
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
         String line;
@@ -448,7 +448,11 @@ public class InstanceRunner extends Thread {
             LOG.info(line);
         }
 
-        return process.waitFor();
+        try {
+            return process.waitFor();
+        } catch (InterruptedException e) {
+            throw new IOException("Unable to wait for process to end");
+        }
     }
 
     private String getJavaExecutable(String componentName) {
