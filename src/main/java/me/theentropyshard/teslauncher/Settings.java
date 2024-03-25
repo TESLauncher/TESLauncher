@@ -1,6 +1,6 @@
 /*
  * TESLauncher - https://github.com/TESLauncher/TESLauncher
- * Copyright (C) 2023 TESLauncher
+ * Copyright (C) 2023-2024 TESLauncher
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
