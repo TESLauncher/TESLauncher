@@ -26,7 +26,6 @@ import okhttp3.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -47,15 +46,17 @@ public class HttpDownload {
     private OkHttpClient httpClient;
     private final String url;
     private final Path saveAs;
+    private final Path copyTo;
     private final boolean forceDownload;
     private final String sha1;
     private final boolean executable;
     private final long expectedSize;
 
-    private HttpDownload(OkHttpClient httpClient, String url, Path saveAs, boolean forceDownload, String sha1, boolean executable, long expectedSize) {
+    private HttpDownload(OkHttpClient httpClient, String url, Path saveAs, Path copyTo, boolean forceDownload, String sha1, boolean executable, long expectedSize) {
         this.httpClient = Objects.requireNonNull(httpClient, "httpClient == null");
         this.url = Objects.requireNonNull(url, "url == null");
         this.saveAs = Objects.requireNonNull(saveAs, "saveAs == null");
+        this.copyTo = copyTo;
         this.forceDownload = forceDownload;
         this.sha1 = sha1;
         this.executable = executable;
@@ -116,6 +117,8 @@ public class HttpDownload {
             if (this.executable) {
                 new File(this.saveAs.toString()).setExecutable(true);
             }
+
+            this.copyFile();
         }
     }
 
@@ -143,6 +146,18 @@ public class HttpDownload {
         }
     }
 
+    public void copyFile() throws IOException {
+        if (this.copyTo == null) {
+            return;
+        }
+
+        if (Files.exists(this.copyTo) && Files.size(this.copyTo) == this.expectedSize && HashUtils.sha1(this.copyTo).equals(this.sha1)) {
+            return;
+        }
+
+        Files.copy(this.saveAs, this.copyTo, StandardCopyOption.REPLACE_EXISTING);
+    }
+
     public long size() {
         if (Files.exists(this.saveAs)) {
             try {
@@ -167,6 +182,7 @@ public class HttpDownload {
         private OkHttpClient httpClient;
         private String url;
         private Path saveAs;
+        private Path copyTo;
         private String sha1;
         private boolean forceDownload;
         private boolean executable;
@@ -191,6 +207,11 @@ public class HttpDownload {
             return this;
         }
 
+        public Builder copyTo(Path copyTo) {
+            this.copyTo = copyTo;
+            return this;
+        }
+
         public Builder forceDownload() {
             this.forceDownload = true;
             return this;
@@ -212,7 +233,11 @@ public class HttpDownload {
         }
 
         public HttpDownload build() {
-            return new HttpDownload(this.httpClient, this.url, this.saveAs, this.forceDownload, this.sha1, this.executable, this.expectedSize);
+            return new HttpDownload(
+                    this.httpClient, this.url, this.saveAs,
+                    this.copyTo, this.forceDownload, this.sha1,
+                    this.executable, this.expectedSize
+            );
         }
     }
 }
