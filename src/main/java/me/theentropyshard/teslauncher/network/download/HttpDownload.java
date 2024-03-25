@@ -97,7 +97,7 @@ public class HttpDownload {
         }
 
         long size = this.size();
-        boolean partiallyDownloaded = this.expectedSize > size && size != HttpDownload.EXPECTED_SIZE_NOT_SET;
+        boolean partiallyDownloaded = this.expectedSize > size && Files.exists(this.saveAs);
 
         if (partiallyDownloaded || this.forceDownload || !Files.exists(this.saveAs) || needsDownload) {
             Request.Builder builder = new Request.Builder()
@@ -124,7 +124,7 @@ public class HttpDownload {
              InputStream is = Objects.requireNonNull(response.body()).byteStream()) {
             if (partiallyDownloaded && size >= 0) {
                 try (FileChannel fileChannel = FileChannel.open(this.saveAs, StandardOpenOption.APPEND);
-                     ReadableByteChannel src = Channels.newChannel(new BufferedInputStream(is))) {
+                     ReadableByteChannel src = Channels.newChannel(is)) {
                     fileChannel.transferFrom(src, size, Long.MAX_VALUE);
                 }
             } else {
