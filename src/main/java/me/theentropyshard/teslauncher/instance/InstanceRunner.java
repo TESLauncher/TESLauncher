@@ -68,10 +68,6 @@ public class InstanceRunner extends Thread {
     public void run() {
         boolean useDialog = TESLauncher.getInstance().getSettings().useDownloadDialog;
 
-        if (useDialog) {
-            SwingUtilities.invokeLater(TESLauncher.getInstance().getGui()::disableBeforePlay);
-        }
-
         try {
             try {
                 this.account.authenticate();
@@ -142,10 +138,6 @@ public class InstanceRunner extends Thread {
             LOG.error("Exception occurred while trying to start Minecraft " + this.instance.getMinecraftVersion(), e);
         } finally {
             this.removeTempClient();
-
-            if (useDialog) {
-                SwingUtilities.invokeLater(TESLauncher.getInstance().getGui()::enableAfterPlay);
-            }
         }
     }
 

@@ -47,7 +47,6 @@ public class MinecraftDownloadDialog extends AppDialog implements MinecraftDownl
         this.progressBar.setStringPainted(true);
         root.add(this.progressBar, BorderLayout.SOUTH);
 
-        this.getDialog().setModal(false);
         this.setResizable(false);
         this.setContent(root);
         this.center(0);

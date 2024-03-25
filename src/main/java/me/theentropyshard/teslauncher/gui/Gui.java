@@ -54,7 +54,6 @@ public class Gui {
 
         this.viewSelector = new JTabbedPane(JTabbedPane.LEFT);
         TESLauncher.window = this.appWindow = new AppWindow(TESLauncher.NAME, TESLauncher.WIDTH, TESLauncher.HEIGHT, this.viewSelector);
-        this.appWindow.getFrame().setGlassPane(new BlockGlassPane());
     }
 
     public void switchTheme() {
@@ -114,18 +113,6 @@ public class Gui {
         });
     }
 
-    public void enableAfterPlay() {
-        this.getViewSelector().setEnabled(true);
-        this.getPlayView().getHeader().getInstanceGroups().setEnabled(true);
-        this.appWindow.getFrame().getGlassPane().setVisible(false);
-    }
-
-    public void disableBeforePlay() {
-        this.getViewSelector().setEnabled(false);
-        this.getPlayView().getHeader().getInstanceGroups().setEnabled(false);
-        this.appWindow.getFrame().getGlassPane().setVisible(true);
-    }
-
     public void updateLookAndFeel() {
         this.switchTheme();
         JFrame frame = TESLauncher.window.getFrame();
@@ -156,10 +143,6 @@ public class Gui {
 
             this.initialized = true;
         });
-    }
-
-    public JTabbedPane getViewSelector() {
-        return this.viewSelector;
     }
 
     public AppWindow getAppWindow() {

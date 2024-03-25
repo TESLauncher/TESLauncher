@@ -20,6 +20,7 @@ package me.theentropyshard.teslauncher.minecraft;
 
 import me.theentropyshard.teslauncher.gui.dialogs.MinecraftDownloadDialog;
 
+import javax.swing.*;
 import java.io.IOException;
 import java.nio.file.Path;
 
@@ -34,8 +35,8 @@ public class GuiMinecraftDownloader extends MinecraftDownloader {
 
     @Override
     public void downloadMinecraft(String versionId) throws IOException {
-        this.dialog.setVisible(true);
+        SwingUtilities.invokeLater(() -> this.dialog.setVisible(true));
         super.downloadMinecraft(versionId);
-        this.dialog.getDialog().dispose();
+        SwingUtilities.invokeLater(() -> this.dialog.getDialog().dispose());
     }
 }
