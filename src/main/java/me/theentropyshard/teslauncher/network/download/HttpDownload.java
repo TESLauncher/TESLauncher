@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -40,6 +41,8 @@ import java.util.Objects;
 
 public class HttpDownload {
     private static final Logger LOG = LogManager.getLogger(HttpDownload.class);
+
+    private static final long EXPECTED_SIZE_NOT_SET = -1L;
 
     private OkHttpClient httpClient;
     private final String url;
@@ -50,9 +53,9 @@ public class HttpDownload {
     private final long expectedSize;
 
     private HttpDownload(OkHttpClient httpClient, String url, Path saveAs, boolean forceDownload, String sha1, boolean executable, long expectedSize) {
-        this.httpClient = httpClient;
-        this.url = url;
-        this.saveAs = saveAs;
+        this.httpClient = Objects.requireNonNull(httpClient, "httpClient == null");
+        this.url = Objects.requireNonNull(url, "url == null");
+        this.saveAs = Objects.requireNonNull(saveAs, "saveAs == null");
         this.forceDownload = forceDownload;
         this.sha1 = sha1;
         this.executable = executable;
@@ -64,19 +67,39 @@ public class HttpDownload {
     }
 
     public void execute() throws IOException {
-        if (this.saveAs == null) {
-            throw new NullPointerException("saveAs == null");
+        boolean needsDownload = false;
+
+        if (Files.exists(this.saveAs)) {
+            long size = Files.size(this.saveAs);
+            boolean hashMatches = HashUtils.sha1(this.saveAs).equals(this.sha1);
+
+            if (this.expectedSize == size) {
+                if (this.sha1 == null) {
+                    return;
+                } else {
+                    if (hashMatches) {
+                        return;
+                    } else {
+                        LOG.debug("File '{}' exists, size matches, but SHA-1 does not match", this.saveAs);
+                    }
+
+                    needsDownload = true;
+                }
+            } else if (this.expectedSize != HttpDownload.EXPECTED_SIZE_NOT_SET) {
+                if (hashMatches) {
+                    LOG.debug("File '{}' exists, SHA-1 matches, but size does not match", this.saveAs);
+                } else {
+                    LOG.debug("File '{}' exists, but size and SHA-1 do not match", this.saveAs);
+                }
+
+                needsDownload = true;
+            }
         }
 
         long size = this.size();
+        boolean partiallyDownloaded = this.expectedSize > size && size != HttpDownload.EXPECTED_SIZE_NOT_SET;
 
-        if (size == this.expectedSize && this.expectedSize != -1) {
-            return;
-        }
-
-        boolean partiallyDownloaded = this.expectedSize > size;
-
-        if (partiallyDownloaded || this.forceDownload || !Files.exists(this.saveAs)) {
+        if (partiallyDownloaded || this.forceDownload || !Files.exists(this.saveAs) || needsDownload) {
             Request.Builder builder = new Request.Builder()
                     .url(this.url)
                     .get();
@@ -87,24 +110,8 @@ public class HttpDownload {
 
             FileUtils.createDirectoryIfNotExists(this.saveAs.getParent());
 
-            try (Response response = this.httpClient.newCall(builder.build()).execute();
-                 InputStream is = new BufferedInputStream(Objects.requireNonNull(response.body()).byteStream())) {
-                if (partiallyDownloaded && size >= 0) {
-                    try (FileChannel fileChannel = FileChannel.open(this.saveAs, StandardOpenOption.APPEND)) {
-                        fileChannel.transferFrom(Channels.newChannel(is), size, Long.MAX_VALUE);
-                    }
-                } else {
-                    Files.copy(is, this.saveAs, StandardCopyOption.REPLACE_EXISTING);
-                }
-            }
-
-            if (this.sha1 != null) {
-                String sha1 = HashUtils.sha1(this.saveAs);
-                if (!this.sha1.equals(sha1)) {
-                    FileUtils.delete(this.saveAs);
-                    throw new IOException("SHA-1 does not match for file '" + this.saveAs + "'. Bad file was deleted");
-                }
-            }
+            this.downloadFile(builder.build(), partiallyDownloaded, size);
+            this.checkHash();
 
             if (this.executable) {
                 new File(this.saveAs.toString()).setExecutable(true);
@@ -112,8 +119,32 @@ public class HttpDownload {
         }
     }
 
+    public void downloadFile(Request request, boolean partiallyDownloaded, long size) throws IOException {
+        try (Response response = this.httpClient.newCall(request).execute();
+             InputStream is = Objects.requireNonNull(response.body()).byteStream()) {
+            if (partiallyDownloaded && size >= 0) {
+                try (FileChannel fileChannel = FileChannel.open(this.saveAs, StandardOpenOption.APPEND);
+                     ReadableByteChannel src = Channels.newChannel(new BufferedInputStream(is))) {
+                    fileChannel.transferFrom(src, size, Long.MAX_VALUE);
+                }
+            } else {
+                Files.copy(is, this.saveAs, StandardCopyOption.REPLACE_EXISTING);
+            }
+        }
+    }
+
+    public void checkHash() throws IOException {
+        if (this.sha1 != null) {
+            String sha1 = HashUtils.sha1(this.saveAs);
+            if (!this.sha1.equals(sha1)) {
+                FileUtils.delete(this.saveAs);
+                throw new IOException("SHA-1 does not match for file '" + this.saveAs + "'. Bad file was deleted");
+            }
+        }
+    }
+
     public long size() {
-        if (this.exists()) {
+        if (Files.exists(this.saveAs)) {
             try {
                 return Files.size(this.saveAs);
             } catch (IOException e) {
@@ -132,10 +163,6 @@ public class HttpDownload {
         return this.expectedSize;
     }
 
-    public boolean exists() {
-        return this.saveAs != null && Files.exists(this.saveAs);
-    }
-
     public static final class Builder {
         private OkHttpClient httpClient;
         private String url;
@@ -143,7 +170,7 @@ public class HttpDownload {
         private String sha1;
         private boolean forceDownload;
         private boolean executable;
-        private long expectedSize = -1L;
+        private long expectedSize = HttpDownload.EXPECTED_SIZE_NOT_SET;
 
         public Builder() {
 
