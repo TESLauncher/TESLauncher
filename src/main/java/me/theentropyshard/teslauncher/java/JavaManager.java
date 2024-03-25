@@ -21,40 +21,73 @@ package me.theentropyshard.teslauncher.java;
 import com.google.gson.JsonObject;
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.minecraft.ApiUrls;
-import me.theentropyshard.teslauncher.minecraft.MinecraftDownloadListener;
 import me.theentropyshard.teslauncher.network.HttpRequest;
 import me.theentropyshard.teslauncher.network.download.DownloadList;
 import me.theentropyshard.teslauncher.network.download.HttpDownload;
 import me.theentropyshard.teslauncher.utils.FileUtils;
 import me.theentropyshard.teslauncher.utils.Json;
 import me.theentropyshard.teslauncher.utils.OperatingSystem;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.time.Duration;
+import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 public class JavaManager {
+    private static final Logger LOG = LogManager.getLogger(JavaManager.class);
+
     private final Path workDir;
 
     public JavaManager(Path workDir) {
         this.workDir = workDir;
     }
 
+    private static JsonObject fetchAndSaveAllRuntimes(Path runtimesFile) throws IOException {
+        try (HttpRequest request = new HttpRequest(TESLauncher.getInstance().getHttpClient())) {
+            String string = request.asString(ApiUrls.ALL_RUNTIMES);
+            FileUtils.writeUtf8(runtimesFile, string);
+
+            return Json.parse(string, JsonObject.class);
+        }
+    }
+
+    private static JsonObject getAllRuntimesObject(Path runtimesFile) throws IOException {
+        if (Files.exists(runtimesFile)) {
+            JsonObject jsonObject = Json.parse(FileUtils.readUtf8(runtimesFile), JsonObject.class);
+
+            BasicFileAttributes basicFileAttributes = Files.readAttributes(runtimesFile, BasicFileAttributes.class);
+            String string = basicFileAttributes.lastModifiedTime().toString();
+            if (OffsetDateTime.now().minus(Duration.ofHours(24)).isAfter(OffsetDateTime.parse(string))) {
+                try {
+                    return JavaManager.fetchAndSaveAllRuntimes(runtimesFile);
+                } catch (IOException e) {
+                    LOG.error(e);
+
+                    return jsonObject;
+                }
+            } else {
+                return jsonObject;
+            }
+        } else {
+            return JavaManager.fetchAndSaveAllRuntimes(runtimesFile);
+        }
+    }
+
     public void downloadRuntime(String componentName, DownloadList javaList) throws IOException {
         Path componentDir = this.workDir.resolve(componentName);
         FileUtils.createDirectoryIfNotExists(componentDir);
 
+        JsonObject osObject = JavaManager.getAllRuntimesObject(this.workDir.resolve("all_runtimes.json"));
+
         String jreOsName = JavaManager.getJreOsName();
-
-        JsonObject osObject;
-        try (HttpRequest request = new HttpRequest(TESLauncher.getInstance().getHttpClient())) {
-            osObject = Json.parse(request.asString(ApiUrls.ALL_RUNTIMES), JsonObject.class);
-        }
-
         if (osObject.has(jreOsName)) {
             JsonObject runtimesObject = Json.parse(osObject.get(jreOsName), JsonObject.class);
             if (runtimesObject.has(componentName)) {
@@ -62,8 +95,16 @@ public class JavaManager {
                 JavaRuntime javaRuntime = javaRuntimes.get(0);
 
                 JavaRuntimeManifest manifest;
-                try (HttpRequest request = new HttpRequest(TESLauncher.getInstance().getHttpClient())) {
-                    manifest = Json.parse(request.asString(javaRuntime.manifest.url), JavaRuntimeManifest.class);
+
+                Path componentInfoFile = componentDir.resolve("component.json");
+                if (Files.exists(componentInfoFile)) {
+                    manifest = Json.parse(FileUtils.readUtf8(componentInfoFile), JavaRuntimeManifest.class);
+                } else {
+                    try (HttpRequest request = new HttpRequest(TESLauncher.getInstance().getHttpClient())) {
+                        String string = request.asString(javaRuntime.manifest.url);
+                        FileUtils.writeUtf8(componentInfoFile, string);
+                        manifest = Json.parse(string, JavaRuntimeManifest.class);
+                    }
                 }
 
                 for (Map.Entry<String, JreFile> entry : manifest.files.entrySet()) {

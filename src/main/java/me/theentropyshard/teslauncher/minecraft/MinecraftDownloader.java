@@ -151,12 +151,20 @@ public class MinecraftDownloader {
     public static VersionManifest getVersionManifest(Path versionsDir) throws IOException {
         Path manifestFile = versionsDir.resolve("version_manifest_v2.json");
         if (Files.exists(manifestFile)) {
+            VersionManifest manifest = Json.parse(FileUtils.readUtf8(manifestFile), VersionManifest.class);
+
             BasicFileAttributes basicFileAttributes = Files.readAttributes(manifestFile, BasicFileAttributes.class);
             String string = basicFileAttributes.lastModifiedTime().toString();
             if (OffsetDateTime.now().minus(Duration.ofHours(3)).isAfter(OffsetDateTime.parse(string))) {
-                return MinecraftDownloader.fetchAndSaveVersionManifest(manifestFile);
+                try {
+                    return MinecraftDownloader.fetchAndSaveVersionManifest(manifestFile);
+                } catch (IOException e) {
+                    LOG.error(e);
+
+                    return manifest;
+                }
             } else {
-                return Json.parse(FileUtils.readUtf8(manifestFile), VersionManifest.class);
+                return manifest;
             }
         } else {
             return MinecraftDownloader.fetchAndSaveVersionManifest(manifestFile);
