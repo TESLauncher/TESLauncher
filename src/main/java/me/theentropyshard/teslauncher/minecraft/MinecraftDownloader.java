@@ -27,7 +27,6 @@ import me.theentropyshard.teslauncher.network.progress.ProgressNetworkIntercepto
 import me.theentropyshard.teslauncher.utils.*;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.model.FileHeader;
-import net.lingala.zip4j.progress.ProgressMonitor;
 import okhttp3.OkHttpClient;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -35,6 +34,7 @@ import org.apache.logging.log4j.Logger;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.time.Duration;
 import java.time.OffsetDateTime;
@@ -336,18 +336,6 @@ public class MinecraftDownloader {
         return nativeLibraries;
     }
 
-    private void downloadAsset(DownloadList downloadList, Path filePath, AssetObject assetObject) {
-        HttpDownload download = new HttpDownload.Builder()
-                .httpClient(TESLauncher.getInstance().getHttpClient())
-                .url(ApiUrls.RESOURCES + assetObject.getPrefix() + "/" + assetObject.getHash())
-                .expectedSize(assetObject.getSize())
-                .sha1(assetObject.getHash())
-                .saveAs(filePath)
-                .build();
-
-        downloadList.add(download);
-    }
-
     private void downloadAssets(Version version, DownloadList assetsList) throws IOException {
         Version.AssetIndex vAssetIndex = version.getAssetIndex();
 
@@ -370,19 +358,54 @@ public class MinecraftDownloader {
             String fileName = entry.getKey();
             AssetObject assetObject = entry.getValue();
 
-            Path filePath;
+            HttpDownload.Builder builder = new HttpDownload.Builder()
+                    .httpClient(TESLauncher.getInstance().getHttpClient())
+                    .url(ApiUrls.RESOURCES + assetObject.getPrefix() + "/" + assetObject.getHash())
+                    .expectedSize(assetObject.getSize())
+                    .sha1(assetObject.getHash());
+
+            Path saveAs;
+            Path copyTo = null;
 
             if (assetIndex.isMapToResources()) {
-                filePath = this.instanceResourcesDir.resolve(fileName);
+                saveAs = this.instanceResourcesDir.resolve(fileName);
+
+                Path resourcesFile = this.assetsDir.resolve("resources").resolve(fileName);
+
+                if (!Files.exists(saveAs)) {
+                    if (Files.exists(resourcesFile) &&
+                            Files.size(resourcesFile) == assetObject.getSize() &&
+                            HashUtils.sha1(resourcesFile).equals(assetObject.getHash())) {
+
+                        FileUtils.createDirectoryIfNotExists(saveAs.getParent());
+                        Files.copy(resourcesFile, saveAs, StandardCopyOption.REPLACE_EXISTING);
+
+                        continue;
+                    } else {
+                        copyTo = saveAs;
+                        saveAs = resourcesFile;
+                    }
+                } else {
+                    if (Files.size(saveAs) == assetObject.getSize() && HashUtils.sha1(saveAs).equals(assetObject.getHash())) {
+                        continue;
+                    } else {
+                        copyTo = saveAs;
+                        saveAs = resourcesFile;
+                    }
+                }
             } else if (assetIndex.isVirtual()) {
-                filePath = this.assetsDir.resolve("virtual").resolve("legacy").resolve(fileName);
+                saveAs = this.assetsDir.resolve("virtual").resolve(vAssetIndex.getId()).resolve(fileName);
             } else {
-                filePath = this.assetsDir.resolve("objects").resolve(assetObject.getPrefix()).resolve(assetObject.getHash());
+                saveAs = this.assetsDir.resolve("objects").resolve(assetObject.getPrefix()).resolve(assetObject.getHash());
             }
 
-            if (!Files.exists(filePath) || Files.size(filePath) != assetObject.getSize()) {
-                this.downloadAsset(assetsList, filePath, assetObject);
+            FileUtils.createDirectoryIfNotExists(saveAs.getParent());
+            builder.saveAs(saveAs);
+            if (copyTo != null) {
+                FileUtils.createDirectoryIfNotExists(copyTo.getParent());
+                builder.copyTo(copyTo);
             }
+            assetsList.add(builder.build());
         }
     }
 
