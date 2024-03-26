@@ -38,12 +38,7 @@ public class AppWindow {
         contentPane.add(content, BorderLayout.CENTER);
 
         this.frame.pack();
-        this.frame.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                System.exit(0);
-            }
-        });
+        this.frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         this.center(0);
     }
 

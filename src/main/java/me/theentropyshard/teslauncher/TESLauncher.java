@@ -126,8 +126,6 @@ public class TESLauncher {
         this.gui = new Gui(this.settings.darkTheme);
         this.gui.getAppWindow().addWindowClosingListener(this::shutdown);
 
-        Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown));
-
         this.gui.showGui();
     }
 
@@ -177,6 +175,8 @@ public class TESLauncher {
         } catch (IOException e) {
             LOG.error("Exception while saving settings", e);
         }
+
+        System.exit(0);
     }
 
     private static TESLauncher instance;
