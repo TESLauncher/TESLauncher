@@ -28,13 +28,18 @@ import me.theentropyshard.teslauncher.gui.dialogs.instancesettings.InstanceSetti
 import me.theentropyshard.teslauncher.instance.Instance;
 import me.theentropyshard.teslauncher.instance.InstanceManager;
 import me.theentropyshard.teslauncher.instance.InstanceRunner;
+import me.theentropyshard.teslauncher.swing.MouseClickListener;
+import me.theentropyshard.teslauncher.swing.MouseEnterExitListener;
 import me.theentropyshard.teslauncher.utils.SwingUtils;
 import me.theentropyshard.teslauncher.utils.TimeUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -42,6 +47,8 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 public class PlayView extends View {
+    private static final Logger LOG = LogManager.getLogger(PlayView.class);
+
     public static final String DEFAULT_GROUP_NAME = "<default>";
 
     private final PlayViewHeader header;
@@ -65,9 +72,9 @@ public class PlayView extends View {
         root.add(this.header.getRoot(), BorderLayout.NORTH);
 
         AddInstanceItem defaultItem = new AddInstanceItem();
-        defaultItem.addListener(e -> {
+        defaultItem.addMouseListener(new MouseClickListener(e -> {
             new AddInstanceDialog(this, PlayView.DEFAULT_GROUP_NAME);
-        }, true);
+        }));
         this.defaultInstancesPanel = new InstancesPanel(defaultItem);
         this.currentPanel = this.defaultInstancesPanel;
         this.groups.put(PlayView.DEFAULT_GROUP_NAME, this.defaultInstancesPanel);
@@ -129,10 +136,6 @@ public class PlayView extends View {
         }.execute();
     }
 
-    public InstancesPanel getCurrentInstancesPanel() {
-        return this.currentPanel;
-    }
-
     public void addInstanceItem(InstanceItem item, String groupName) {
         if (item instanceof AddInstanceItem) {
             throw new IllegalArgumentException("Adding AddInstanceItem is not allowed");
@@ -141,10 +144,9 @@ public class PlayView extends View {
         InstancesPanel panel = this.groups.get(groupName);
         if (panel == null) {
             AddInstanceItem addInstanceItem = new AddInstanceItem();
-            addInstanceItem.addListener(e -> {
+            addInstanceItem.addMouseListener(new MouseClickListener(e -> {
                 new AddInstanceDialog(this, groupName);
-            }, true);
-
+            }));
             panel = new InstancesPanel(addInstanceItem);
             this.groups.put(groupName, panel);
             this.model.addElement(groupName);
@@ -152,8 +154,8 @@ public class PlayView extends View {
         }
         panel.addInstanceItem(item);
 
-        item.addListener(e -> {
-            int mouseButton = Integer.parseInt(e.getActionCommand());
+        item.addMouseListener(new MouseClickListener(e -> {
+            int mouseButton = e.getButton();
             if (mouseButton == MouseEvent.BUTTON1) { // left mouse button
                 if (AccountsManager.getCurrentAccount() == null) {
                     JOptionPane.showMessageDialog(
@@ -166,39 +168,87 @@ public class PlayView extends View {
                     new InstanceRunner(AccountsManager.getCurrentAccount(), item).start();
                 }
             } else if (mouseButton == MouseEvent.BUTTON3) { // right mouse button
-                new InstanceSettingsDialog(item.getAssociatedInstance());
+                int x = e.getX();
+                int y = e.getY();
+
+                JPopupMenu popupMenu = new JPopupMenu();
+
+                JMenuItem editMenuItem = new JMenuItem("Edit");
+                editMenuItem.addActionListener(edit -> {
+                    new InstanceSettingsDialog(item.getAssociatedInstance());
+                });
+
+                popupMenu.add(editMenuItem);
+
+                JMenuItem deleteMenuItem = new JMenuItem("Delete");
+                deleteMenuItem.addActionListener(delete -> {
+                    this.deleteInstance(item);
+                });
+
+                popupMenu.add(deleteMenuItem);
+
+                popupMenu.show(item, x, y);
             }
-        }, true);
+        }));
 
-        item.addMouseEnteredListener(e -> {
-            this.instanceInfoLabel.setVisible(true);
+        item.addMouseListener(new MouseEnterExitListener(
+                enter -> {
+                    this.instanceInfoLabel.setVisible(true);
 
-            Instance instance = item.getAssociatedInstance();
+                    Instance instance = item.getAssociatedInstance();
 
-            String lastPlayedTime = TimeUtils.getHoursMinutesSeconds(instance.getLastPlaytime());
-            String totalPlayedTime = TimeUtils.getHoursMinutesSeconds(instance.getTotalPlaytime());
+                    String lastPlayedTime = TimeUtils.getHoursMinutesSeconds(instance.getLastPlaytime());
+                    String totalPlayedTime = TimeUtils.getHoursMinutesSeconds(instance.getTotalPlaytime());
 
-            String timeString = "";
+                    String timeString = "";
 
-            if (!lastPlayedTime.isEmpty()) {
-                timeString = " - Last played for " + lastPlayedTime;
-            }
+                    if (!lastPlayedTime.isEmpty()) {
+                        timeString = " - Last played for " + lastPlayedTime;
+                    }
 
-            if (!totalPlayedTime.isEmpty()) {
-                if (lastPlayedTime.isEmpty()) {
-                    timeString = " - Total played for " + totalPlayedTime;
-                } else {
-                    timeString = timeString + ", Total played for " + totalPlayedTime;
+                    if (!totalPlayedTime.isEmpty()) {
+                        if (lastPlayedTime.isEmpty()) {
+                            timeString = " - Total played for " + totalPlayedTime;
+                        } else {
+                            timeString = timeString + ", Total played for " + totalPlayedTime;
+                        }
+                    }
+
+                    this.instanceInfoLabel.setText(instance.getName() + timeString);
+                },
+
+                exit -> {
+                    this.instanceInfoLabel.setVisible(false);
+                    this.instanceInfoLabel.setText("");
                 }
+        ));
+    }
+
+    public void deleteInstance(InstanceItem item) {
+        int option = JOptionPane.showConfirmDialog(
+                TESLauncher.window.getFrame(),
+                "Are you sure you want to delete instance '" + item.getAssociatedInstance().getName() + "'",
+                "Delete instance",
+                JOptionPane.YES_NO_OPTION
+        );
+
+        if (option == JOptionPane.YES_OPTION) {
+            InstanceManager instanceManager = TESLauncher.getInstance().getInstanceManager();
+            try {
+                instanceManager.removeInstance(item.getAssociatedInstance().getName());
+            } catch (IOException ex) {
+                LOG.error(ex);
+                return;
             }
 
-            this.instanceInfoLabel.setText(instance.getName() + timeString);
-        });
+            JPanel instancesPanel = this.currentPanel.getInstancesPanel();
+            instancesPanel.remove(item);
+            instancesPanel.revalidate();
+        }
+    }
 
-        item.addMouseExitedListener(e -> {
-            this.instanceInfoLabel.setVisible(false);
-            this.instanceInfoLabel.setText("");
-        });
+    public InstancesPanel getCurrentInstancesPanel() {
+        return this.currentPanel;
     }
 
     public PlayViewHeader getHeader() {
