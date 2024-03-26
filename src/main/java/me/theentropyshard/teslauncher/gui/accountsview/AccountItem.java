@@ -59,7 +59,7 @@ public class AccountItem extends JPanel {
         this.account = account;
 
         this.mouseClickListeners = new HashSet<>();
-        this.trashIcon = SwingUtils.getImage("/trash_icon.png");
+        this.trashIcon = SwingUtils.getImage("/assets/trash_icon.png");
         this.trashBounds = new Rectangle(0, 0, 32, 32);
 
         this.borderColor = UIManager.getColor("AccountItem.borderColor");

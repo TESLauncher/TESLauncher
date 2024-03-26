@@ -24,7 +24,7 @@ import java.awt.*;
 
 public final class AddInstanceItem extends InstanceItem {
     public AddInstanceItem() {
-        super(SwingUtils.getIcon("/cross.png"), "");
+        super(SwingUtils.getIcon("/assets/cross.png"), "");
 
         this.setToolTipText("Add new Minecraft instance");
     }

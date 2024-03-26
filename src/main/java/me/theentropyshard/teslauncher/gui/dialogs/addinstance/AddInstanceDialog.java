@@ -152,7 +152,7 @@ public class AddInstanceDialog extends AppDialog {
             }
 
             String chosenGroupName = this.groupField.getText();
-            playView.addInstanceItem(new InstanceItem(SwingUtils.getIcon("/grass_icon.png"), instanceName), chosenGroupName);
+            playView.addInstanceItem(new InstanceItem(SwingUtils.getIcon("/assets/grass_icon.png"), instanceName), chosenGroupName);
             this.getDialog().dispose();
             TableModel model = versionsTable.getModel();
             int selectedRow = versionsTable.getSelectedRow();

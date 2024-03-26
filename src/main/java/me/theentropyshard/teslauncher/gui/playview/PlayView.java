@@ -125,7 +125,7 @@ public class PlayView extends View {
                     List<Instance> instances = this.get();
 
                     for (Instance instance : instances) {
-                        Icon icon = SwingUtils.getIcon("/grass_icon.png");
+                        Icon icon = SwingUtils.getIcon("/assets/grass_icon.png");
                         InstanceItem item = new InstanceItem(icon, instance.getName());
                         PlayView.this.addInstanceItem(item, instance.getGroupName());
                     }
