@@ -43,6 +43,10 @@ public final class FileUtils {
         }
     };
 
+    public static String sanitizeFileName(String dirtyName) {
+        return dirtyName.replaceAll("[^a-zA-Z0-9_.]", "");
+    }
+
     public static void delete(Path path) throws IOException {
         if (!Files.exists(path)) {
             return;
