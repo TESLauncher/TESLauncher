@@ -75,7 +75,7 @@ public class InstanceRunner extends Thread {
                 this.account.authenticate();
             } catch (AuthException e) {
                 LOG.error(e);
-                JOptionPane.showMessageDialog(TESLauncher.getInstance().getGui().getAppWindow().getFrame(),
+                JOptionPane.showMessageDialog(TESLauncher.frame,
                         e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
 

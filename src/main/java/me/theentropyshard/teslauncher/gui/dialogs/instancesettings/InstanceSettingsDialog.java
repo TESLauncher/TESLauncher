@@ -38,7 +38,7 @@ public class InstanceSettingsDialog extends AppDialog {
     private final List<Tab> tabs;
 
     public InstanceSettingsDialog(Instance instance) {
-        super(TESLauncher.window.getFrame(), "Instance Settings - " + instance.getName());
+        super(TESLauncher.frame, "Instance Settings - " + instance.getName());
 
         this.tabbedPane = new JTabbedPane(JTabbedPane.LEFT);
 

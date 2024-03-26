@@ -44,7 +44,7 @@ public class OfflineAccountCreationView extends JPanel {
             String text = this.usernameField.getText();
             if (text.isEmpty()) {
                 JOptionPane.showMessageDialog(
-                        TESLauncher.window.getFrame(),
+                        TESLauncher.frame,
                         "Enter a username",
                         "Error",
                         JOptionPane.ERROR_MESSAGE
@@ -58,7 +58,7 @@ public class OfflineAccountCreationView extends JPanel {
             Account account = new OfflineAccount(text);
             if (!accountsManager.canCreateAccount(account.getUsername())) {
                 JOptionPane.showMessageDialog(
-                        TESLauncher.window.getFrame(),
+                        TESLauncher.frame,
                         "Account with username '" + account.getUsername() + "' already exists",
                         "Error",
                         JOptionPane.ERROR_MESSAGE

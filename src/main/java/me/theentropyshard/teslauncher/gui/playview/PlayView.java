@@ -159,7 +159,7 @@ public class PlayView extends View {
             if (mouseButton == MouseEvent.BUTTON1) { // left mouse button
                 if (AccountsManager.getCurrentAccount() == null) {
                     JOptionPane.showMessageDialog(
-                            TESLauncher.window.getFrame(),
+                            TESLauncher.frame,
                             "No account selected",
                             "Error",
                             JOptionPane.ERROR_MESSAGE
@@ -226,7 +226,7 @@ public class PlayView extends View {
 
     public void deleteInstance(InstanceItem item) {
         int option = JOptionPane.showConfirmDialog(
-                TESLauncher.window.getFrame(),
+                TESLauncher.frame,
                 "Are you sure you want to delete instance '" + item.getAssociatedInstance().getName() + "'?",
                 "Delete instance",
                 JOptionPane.YES_NO_OPTION

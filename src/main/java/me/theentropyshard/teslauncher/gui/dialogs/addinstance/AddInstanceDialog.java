@@ -41,7 +41,7 @@ public class AddInstanceDialog extends AppDialog {
     private final JCheckBox alphasBox;
 
     public AddInstanceDialog(PlayView playView, String groupName) {
-        super(TESLauncher.window.getFrame(), "Add New Instance");
+        super(TESLauncher.frame, "Add New Instance");
 
         JPanel root = new JPanel(new BorderLayout());
 

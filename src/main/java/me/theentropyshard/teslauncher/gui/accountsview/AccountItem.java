@@ -127,7 +127,7 @@ public class AccountItem extends JPanel {
             public void mouseClicked(MouseEvent e) {
                 if (AccountItem.this.trashBounds.contains(e.getPoint())) {
                     int option = JOptionPane.showConfirmDialog(
-                            TESLauncher.window.getFrame(),
+                            TESLauncher.frame,
                             "Are you sure that you want to remove account '" + account.getUsername() + "'?",
                             "Account removal",
                             JOptionPane.YES_NO_OPTION,
@@ -144,7 +144,7 @@ public class AccountItem extends JPanel {
                         ex.printStackTrace();
 
                         JOptionPane.showMessageDialog(
-                                TESLauncher.window.getFrame(),
+                                TESLauncher.frame,
                                 "Unable to remove account '" + account.getUsername() + "': " + ex.getMessage(),
                                 "Error",
                                 JOptionPane.ERROR_MESSAGE

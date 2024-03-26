@@ -31,7 +31,7 @@ public class MinecraftDownloadDialog extends AppDialog implements MinecraftDownl
     private final JProgressBar progressBar;
 
     public MinecraftDownloadDialog() {
-        super(TESLauncher.window.getFrame(), "Downloading Minecraft");
+        super(TESLauncher.frame, "Downloading Minecraft");
 
         JPanel root = new JPanel(new BorderLayout());
         root.setPreferredSize(new Dimension(450, 270));

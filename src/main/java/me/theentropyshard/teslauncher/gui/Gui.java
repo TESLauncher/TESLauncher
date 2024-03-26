@@ -27,14 +27,16 @@ import me.theentropyshard.teslauncher.gui.accountsview.AddAccountItem;
 import me.theentropyshard.teslauncher.gui.components.InstanceItem;
 import me.theentropyshard.teslauncher.gui.playview.InstancesPanel;
 import me.theentropyshard.teslauncher.gui.playview.PlayView;
+import me.theentropyshard.teslauncher.utils.SwingUtils;
 
 import javax.swing.*;
 import javax.swing.plaf.ColorUIResource;
 import java.awt.*;
 
 public class Gui {
-    private JTabbedPane viewSelector;
-    private AppWindow appWindow;
+    private final JTabbedPane viewSelector;
+    private final JFrame frame;
+
     private PlayView playView;
     private AccountsView accountsView;
 
@@ -43,17 +45,19 @@ public class Gui {
 
     public Gui(boolean darkTheme) {
         this.darkTheme = darkTheme;
-        this.initGui();
-    }
 
-    public void initGui() {
         this.switchTheme();
 
         JDialog.setDefaultLookAndFeelDecorated(true);
         JFrame.setDefaultLookAndFeelDecorated(true);
 
         this.viewSelector = new JTabbedPane(JTabbedPane.LEFT);
-        TESLauncher.window = this.appWindow = new AppWindow(TESLauncher.NAME, TESLauncher.WIDTH, TESLauncher.HEIGHT, this.viewSelector);
+        this.viewSelector.setPreferredSize(new Dimension(TESLauncher.WIDTH, TESLauncher.HEIGHT));
+
+        TESLauncher.frame = this.frame = new JFrame(TESLauncher.NAME);
+        this.frame.add(this.viewSelector, BorderLayout.CENTER);
+        this.frame.pack();
+        SwingUtils.centerWindow(this.frame, 0);
     }
 
     public void switchTheme() {
@@ -115,9 +119,9 @@ public class Gui {
 
     public void updateLookAndFeel() {
         this.switchTheme();
-        JFrame frame = TESLauncher.window.getFrame();
-        SwingUtilities.updateComponentTreeUI(frame);
-        frame.pack();
+
+        SwingUtilities.updateComponentTreeUI(this.frame);
+        this.frame.pack();
 
         InstancesPanel defaultInstancesPanel = this.playView.getDefaultInstancesPanel();
         defaultInstancesPanel.getScrollPane().setBorder(null);
@@ -139,14 +143,14 @@ public class Gui {
             this.viewSelector.addTab("Settings", new SettingsView().getRoot());
             this.viewSelector.addTab("About", new AboutView().getRoot());
 
-            this.appWindow.setVisible(true);
+            this.frame.setVisible(true);
 
             this.initialized = true;
         });
     }
 
-    public AppWindow getAppWindow() {
-        return this.appWindow;
+    public JFrame getFrame() {
+        return this.frame;
     }
 
     public boolean isDarkTheme() {

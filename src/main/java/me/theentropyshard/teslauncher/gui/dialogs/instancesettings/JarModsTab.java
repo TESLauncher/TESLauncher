@@ -63,7 +63,7 @@ public class JarModsTab extends Tab {
                         fileChooser.setCurrentDirectory(new File(settings.lastDir));
                     }
 
-                    int option = fileChooser.showOpenDialog(TESLauncher.window.getFrame());
+                    int option = fileChooser.showOpenDialog(TESLauncher.frame);
                     if (option == JFileChooser.APPROVE_OPTION) {
                         File selectedFile = fileChooser.getSelectedFile();
                         if (selectedFile == null) {

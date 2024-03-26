@@ -37,7 +37,6 @@ import okhttp3.Response;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.datatransfer.StringSelection;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -170,7 +169,7 @@ public class MicrosoftAccountCreationView extends JPanel {
 
             if (!this.isSelectedBox()) {
                 if (!Desktop.isDesktopSupported()) {
-                    JOptionPane.showMessageDialog(TESLauncher.getInstance().getGui().getAppWindow().getFrame(),
+                    JOptionPane.showMessageDialog(TESLauncher.frame,
                             "java.awt.Desktop is not supported", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }

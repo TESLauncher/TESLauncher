@@ -19,7 +19,6 @@
 package me.theentropyshard.teslauncher;
 
 import me.theentropyshard.teslauncher.accounts.AccountsManager;
-import me.theentropyshard.teslauncher.gui.AppWindow;
 import me.theentropyshard.teslauncher.gui.Gui;
 import me.theentropyshard.teslauncher.instance.InstanceManager;
 import me.theentropyshard.teslauncher.java.JavaManager;
@@ -30,6 +29,9 @@ import okhttp3.Protocol;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.swing.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collections;
@@ -71,7 +73,7 @@ public class TESLauncher {
 
     private volatile boolean shutdown;
 
-    public static AppWindow window;
+    public static JFrame frame;
 
     public TESLauncher(Args args, Path workDir) {
         this.args = args;
@@ -124,7 +126,12 @@ public class TESLauncher {
         this.taskPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
         this.gui = new Gui(this.settings.darkTheme);
-        this.gui.getAppWindow().addWindowClosingListener(this::shutdown);
+        this.gui.getFrame().addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                TESLauncher.this.shutdown();
+            }
+        });
 
         this.gui.showGui();
     }

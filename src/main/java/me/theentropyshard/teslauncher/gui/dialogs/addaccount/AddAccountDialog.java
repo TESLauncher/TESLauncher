@@ -30,7 +30,7 @@ public class AddAccountDialog extends AppDialog {
     private final MicrosoftAccountCreationView microsoftView;
 
     public AddAccountDialog(AccountsView accountsView) {
-        super(TESLauncher.window.getFrame(), "Add new account");
+        super(TESLauncher.frame, "Add new account");
 
         JPanel root = new JPanel(new BorderLayout());
 

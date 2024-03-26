@@ -25,7 +25,7 @@ import java.awt.*;
 
 public class OpenBrowserDialog extends AppDialog {
     public OpenBrowserDialog(String userCode, String verificationUri) {
-        super(TESLauncher.window.getFrame(), "Open your browser");
+        super(TESLauncher.frame, "Open your browser");
 
         JPanel root = new JPanel(new BorderLayout());
 
