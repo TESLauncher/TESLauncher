@@ -62,6 +62,8 @@ public class InstanceRunner extends Thread {
         this.account = account;
         this.instance = item.getAssociatedInstance();
         this.item = item;
+
+        this.setName("Instance '" + this.instance.getName() + "'");
     }
 
     @Override
