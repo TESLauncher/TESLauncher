@@ -227,7 +227,7 @@ public class PlayView extends View {
     public void deleteInstance(InstanceItem item) {
         int option = JOptionPane.showConfirmDialog(
                 TESLauncher.window.getFrame(),
-                "Are you sure you want to delete instance '" + item.getAssociatedInstance().getName() + "'",
+                "Are you sure you want to delete instance '" + item.getAssociatedInstance().getName() + "'?",
                 "Delete instance",
                 JOptionPane.YES_NO_OPTION
         );
