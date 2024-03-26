@@ -100,7 +100,11 @@ public class InstanceManager {
     public void createInstance(String name, String groupName, String minecraftVersion) throws IOException {
         Instance instance = new Instance(name, groupName, minecraftVersion);
 
-        instance.setDirName(instance.getName());
+        String replaced = instance.getName().replaceAll("[^a-zA-Z0-9._]", "");
+        if (replaced.isEmpty()) {
+            replaced = "instance" + minecraftVersion;
+        }
+        instance.setDirName(replaced);
         this.createDirName(instance);
 
         Path instanceDir = this.getInstanceDir(instance);
