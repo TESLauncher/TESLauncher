@@ -121,7 +121,7 @@ public class InstanceRunner extends Thread {
 
             long start = System.currentTimeMillis();
 
-            int exitCode = this.runGameProcess(command, this.instance.getWorkDir());
+            int exitCode = this.runGameProcess(command, this.instance.getMinecraftDir());
 
             long end = System.currentTimeMillis();
 
