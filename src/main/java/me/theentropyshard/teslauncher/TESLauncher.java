@@ -23,6 +23,7 @@ import me.theentropyshard.teslauncher.gui.Gui;
 import me.theentropyshard.teslauncher.instance.InstanceManager;
 import me.theentropyshard.teslauncher.java.JavaManager;
 import me.theentropyshard.teslauncher.network.UserAgentInterceptor;
+import me.theentropyshard.teslauncher.swing.WindowClosingListener;
 import me.theentropyshard.teslauncher.utils.FileUtils;
 import okhttp3.OkHttpClient;
 import okhttp3.Protocol;
@@ -126,12 +127,7 @@ public class TESLauncher {
         this.taskPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
         this.gui = new Gui(this.settings.darkTheme);
-        this.gui.getFrame().addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                TESLauncher.this.shutdown();
-            }
-        });
+        this.gui.getFrame().addWindowListener(new WindowClosingListener(e -> TESLauncher.this.shutdown()));
 
         this.gui.showGui();
     }
