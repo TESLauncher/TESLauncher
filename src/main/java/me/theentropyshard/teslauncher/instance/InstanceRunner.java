@@ -93,7 +93,7 @@ public class InstanceRunner extends Thread {
                         assetsDir,
                         librariesDir,
                         nativesDir,
-                        launcher.getInstanceManager().getMinecraftDir(this.instance).resolve("resources"),
+                        this.instance.getMinecraftDir().resolve("resources"),
                         new MinecraftDownloadDialog()
                 );
             } else {
@@ -102,7 +102,7 @@ public class InstanceRunner extends Thread {
                         assetsDir,
                         librariesDir,
                         nativesDir,
-                        launcher.getInstanceManager().getMinecraftDir(this.instance).resolve("resources"),
+                        this.instance.getMinecraftDir().resolve("resources"),
                         this.item
                 );
             }
@@ -115,14 +115,13 @@ public class InstanceRunner extends Thread {
 
             List<String> arguments = this.getArguments(version, nativesDir, librariesDir, versionsDir);
             List<String> command = this.buildRunCommand(version, arguments);
-            Path runDir = launcher.getInstanceManager().getInstanceDir(this.instance).toAbsolutePath();
 
             this.instance.setLastTimePlayed(LocalDateTime.now());
             this.instance.save();
 
             long start = System.currentTimeMillis();
 
-            int exitCode = this.runGameProcess(command, runDir);
+            int exitCode = this.runGameProcess(command, this.instance.getWorkDir());
 
             long end = System.currentTimeMillis();
 
@@ -151,7 +150,7 @@ public class InstanceRunner extends Thread {
         try {
             FileUtils.delete(this.clientCopyTmp);
         } catch (IOException e) {
-            LOG.error("Unable to delete temporary copy of the client '{}'", this.clientCopyTmp, e);
+            LOG.warn("Unable to delete temporary copy of the client '{}'", this.clientCopyTmp, e);
         }
     }
 
@@ -164,9 +163,7 @@ public class InstanceRunner extends Thread {
             classpath.add(originalClientPath.toString());
         } else {
             try {
-                InstanceManager instanceManager = TESLauncher.getInstance().getInstanceManager();
-                Path instanceDir = instanceManager.getInstanceDir(this.instance);
-                Path copyOfClient = Files.copy(originalClientPath, instanceDir
+                Path copyOfClient = Files.copy(originalClientPath, this.instance.getWorkDir()
                         .resolve(originalClientPath.getFileName().toString() + System.currentTimeMillis() + ".jar"));
                 this.clientCopyTmp = copyOfClient;
 
@@ -186,7 +183,7 @@ public class InstanceRunner extends Thread {
                     copyZip.removeFile("META-INF/MOJANG_C.SF");
 
                     for (File modFile : zipFilesToMerge) {
-                        Path unpackDir = instanceDir.resolve(modFile.getName().replace(".", "_"));
+                        Path unpackDir = this.instance.getWorkDir().resolve(modFile.getName().replace(".", "_"));
                         try (ZipFile modZip = new ZipFile(modFile)) {
                             if (Files.exists(unpackDir)) {
                                 FileUtils.delete(unpackDir);
@@ -212,7 +209,7 @@ public class InstanceRunner extends Thread {
 
                 classpath.add(copyOfClient.toString());
             } catch (IOException e) {
-                LOG.error("Exception while applying jar mods", e);
+                LOG.warn("Cannot apply jar mods", e);
             }
         }
     }
@@ -238,8 +235,7 @@ public class InstanceRunner extends Thread {
 
     private List<String> getArguments(Version version, Path tmpNativesDir, Path librariesDir, Path clientsDir) throws IOException {
         TESLauncher launcher = TESLauncher.getInstance();
-        Path mcDirOfInstance = launcher.getInstanceManager().getMinecraftDir(this.instance);
-        FileUtils.createDirectoryIfNotExists(mcDirOfInstance);
+        FileUtils.createDirectoryIfNotExists(this.instance.getMinecraftDir());
         Path assetsDir = launcher.getAssetsDir();
 
         List<String> arguments = new ArrayList<>();
@@ -268,7 +264,7 @@ public class InstanceRunner extends Thread {
             argVars.put("auth_xuid", "-");
             argVars.put("auth_player_name", this.account.getUsername());
             argVars.put("version_name", version.getId());
-            argVars.put("game_directory", mcDirOfInstance.toAbsolutePath().toString());
+            argVars.put("game_directory", this.instance.getMinecraftDir().toAbsolutePath().toString());
             argVars.put("assets_root", assetsDir.toAbsolutePath().toString());
             argVars.put("assets_index_name", version.getAssets());
             argVars.put("auth_uuid", this.account.getUuid().toString());
@@ -280,7 +276,7 @@ public class InstanceRunner extends Thread {
             argVars.put("auth_access_token", this.account.getAccessToken());
             argVars.put("auth_session", "-");
             argVars.put("user_properties", "-");
-            argVars.put("game_directory", mcDirOfInstance.toAbsolutePath().toString());
+            argVars.put("game_directory", this.instance.getMinecraftDir().toAbsolutePath().toString());
             argVars.put("version_type", version.getType().getJsonName());
             argVars.put("user_type", "msa");
             argVars.put("assets_index_name", version.getAssets());
@@ -289,8 +285,8 @@ public class InstanceRunner extends Thread {
             argVars.put("uuid", this.account.getUuid().toString());
             argVars.put("accessToken", this.account.getAccessToken());
             if (assetIndex.isMapToResources()) {
-                argVars.put("assets_root", mcDirOfInstance.resolve("resources"));
-                argVars.put("game_assets", mcDirOfInstance.resolve("resources"));
+                argVars.put("assets_root", this.instance.getMinecraftDir().resolve("resources"));
+                argVars.put("game_assets", this.instance.getMinecraftDir().resolve("resources"));
             } else if (assetIndex.isVirtual()) {
                 Path virtualAssets = assetsDir.resolve("virtual").resolve(vAssetIndex.getId()).toAbsolutePath();
                 argVars.put("assets_root", virtualAssets.toString());

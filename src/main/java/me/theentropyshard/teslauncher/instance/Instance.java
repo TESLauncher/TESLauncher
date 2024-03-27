@@ -18,15 +18,19 @@
 
 package me.theentropyshard.teslauncher.instance;
 
-import me.theentropyshard.teslauncher.TESLauncher;
+import me.theentropyshard.teslauncher.utils.FileUtils;
+import me.theentropyshard.teslauncher.utils.Json;
+import me.theentropyshard.teslauncher.utils.OperatingSystem;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.List;
 
 public class Instance {
+    private transient Path workDir;
+
     private String name;
-    private String dirName;
     private String groupName;
     private String minecraftVersion;
     private String javaPath;
@@ -51,12 +55,29 @@ public class Instance {
     }
 
     public void save() throws IOException {
-        TESLauncher.getInstance().getInstanceManager().save(this);
+        FileUtils.createDirectoryIfNotExists(this.getWorkDir());
+        FileUtils.writeUtf8(this.getWorkDir().resolve("instance.json"), Json.write(this));
     }
 
     public void updatePlaytime(long seconds) {
         this.lastPlaytime = seconds;
         this.totalPlaytime += seconds;
+    }
+
+    public Path getWorkDir() {
+        return this.workDir;
+    }
+
+    public void setWorkDir(Path workDir) {
+        this.workDir = workDir;
+    }
+
+    public Path getMinecraftDir() {
+        return this.workDir.resolve(OperatingSystem.isMacOS() ? "minecraft" : ".minecraft");
+    }
+
+    public Path getJarModsDir() {
+        return this.workDir.resolve("jarmods");
     }
 
     public List<JarMod> getJarMods() {
@@ -73,14 +94,6 @@ public class Instance {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getDirName() {
-        return this.dirName;
-    }
-
-    public void setDirName(String dirName) {
-        this.dirName = dirName;
     }
 
     public String getGroupName() {

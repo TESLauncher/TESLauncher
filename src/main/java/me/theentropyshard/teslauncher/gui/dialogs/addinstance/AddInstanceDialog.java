@@ -22,8 +22,11 @@ import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.gui.components.InstanceItem;
 import me.theentropyshard.teslauncher.gui.dialogs.AppDialog;
 import me.theentropyshard.teslauncher.gui.playview.PlayView;
+import me.theentropyshard.teslauncher.instance.InstanceAlreadyExistsException;
 import me.theentropyshard.teslauncher.instance.InstanceManager;
 import me.theentropyshard.teslauncher.utils.SwingUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -32,6 +35,8 @@ import java.awt.*;
 import java.io.IOException;
 
 public class AddInstanceDialog extends AppDialog {
+    private static final Logger LOG = LogManager.getLogger(AddInstanceDialog.class);
+
     private final JTextField nameField;
     private final JTextField groupField;
     private final JButton addButton;
@@ -160,10 +165,20 @@ public class AddInstanceDialog extends AppDialog {
             String mcVersion = String.valueOf(model.getValueAt(selectedRow, 0));
             TESLauncher.getInstance().doTask(() -> {
                 InstanceManager instanceManager = TESLauncher.getInstance().getInstanceManager();
+
                 try {
                     instanceManager.createInstance(instanceName, chosenGroupName, mcVersion);
+                } catch (InstanceAlreadyExistsException ex) {
+                    JOptionPane.showMessageDialog(
+                            AddInstanceDialog.this.getDialog(),
+                            ex.getMessage(),
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE
+                    );
+
+                    LOG.warn(ex);
                 } catch (IOException ex) {
-                    throw new RuntimeException("Unable to create new instance", ex);
+                    LOG.error("Unable to create new instance", ex);
                 }
             });
         });

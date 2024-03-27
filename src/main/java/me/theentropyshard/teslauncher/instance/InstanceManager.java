@@ -21,6 +21,9 @@ package me.theentropyshard.teslauncher.instance;
 import me.theentropyshard.teslauncher.utils.FileUtils;
 import me.theentropyshard.teslauncher.utils.Json;
 import me.theentropyshard.teslauncher.utils.OperatingSystem;
+import me.theentropyshard.teslauncher.utils.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -31,22 +34,16 @@ import java.util.List;
 import java.util.Map;
 
 public class InstanceManager {
+    private static final Logger LOG = LogManager.getLogger(InstanceManager.class);
+
     private final Path workDir;
     private final List<Instance> instances;
     private final Map<String, Instance> instancesByName;
-
-    private final String mcDirName;
 
     public InstanceManager(Path workDir) {
         this.workDir = workDir;
         this.instances = new ArrayList<>();
         this.instancesByName = new HashMap<>();
-
-        String mcDirName = "minecraft";
-        if (!OperatingSystem.isMacOS()) {
-            mcDirName = "." + mcDirName;
-        }
-        this.mcDirName = mcDirName;
     }
 
     public void load() throws IOException {
@@ -63,80 +60,107 @@ public class InstanceManager {
             }
 
             Instance instance = Json.parse(FileUtils.readUtf8(instanceFile), Instance.class);
-            if (instance.getDirName() == null) {
-                instance.setDirName(instance.getName());
-            }
+            instance.setWorkDir(path);
 
-            this.instances.add(instance);
-            this.instancesByName.put(instance.getName(), instance);
-        }
-    }
-
-    private void createDirName(Instance instance) {
-        if (Files.exists(this.getInstanceDir(instance))) {
-            instance.setDirName(instance.getDirName() + "_");
-            if (!Files.exists(this.getInstanceDir(instance))) {
-                return;
-            }
-
-            this.createDirName(instance);
+            this.cacheInstance(instance);
         }
     }
 
     public void reload() throws IOException {
-        this.instances.clear();
-        this.instancesByName.clear();
+        this.uncacheAll();
         this.load();
     }
 
-    public void save(Instance instance) throws IOException {
-        Path instanceDir = this.getInstanceDir(instance);
-        FileUtils.createDirectoryIfNotExists(instanceDir);
-
-        Path instanceFile = instanceDir.resolve("instance.json");
-        FileUtils.writeUtf8(instanceFile, Json.write(instance));
-    }
-
-    public void createInstance(String name, String groupName, String minecraftVersion) throws IOException {
-        Instance instance = new Instance(name, groupName, minecraftVersion);
-
-        String replaced = instance.getName().replaceAll("[^a-zA-Z0-9._]", "");
-        if (replaced.isEmpty()) {
-            replaced = "instance" + minecraftVersion;
-        }
-        instance.setDirName(replaced);
-        this.createDirName(instance);
-
-        Path instanceDir = this.getInstanceDir(instance);
-        if (Files.exists(instanceDir)) {
-            throw new IOException("Instance dir '" + instanceDir + "' already exists");
+    private void cacheInstance(Instance instance) {
+        if (this.instancesByName.containsKey(instance.getName())) {
+            return;
         }
 
         this.instances.add(instance);
-        this.instancesByName.put(name, instance);
+        this.instancesByName.put(instance.getName(), instance);
+    }
 
-        FileUtils.createDirectoryIfNotExists(instanceDir);
-        Path minecraftDir = instanceDir.resolve(this.mcDirName);
-        FileUtils.createDirectoryIfNotExists(minecraftDir);
-        Path jarModsDir = this.getInstanceJarModsDir(instance);
-        FileUtils.createDirectoryIfNotExists(jarModsDir);
-        Path instanceFile = instanceDir.resolve("instance.json");
-        FileUtils.writeUtf8(instanceFile, Json.write(instance));
+    private void uncacheInstance(Instance instance) {
+        if (!this.instancesByName.containsKey(instance.getName())) {
+            return;
+        }
+
+        this.instances.remove(instance);
+        this.instancesByName.remove(instance.getName());
+    }
+
+    private void uncacheAll() {
+        this.instances.clear();
+        this.instancesByName.clear();
+    }
+
+    private Path findFreeName(String suggestion) {
+        Path path = this.workDir.resolve(suggestion);
+
+        if (Files.exists(path)) {
+            suggestion = suggestion + "_";
+            path = this.workDir.resolve(suggestion);
+
+            if (!Files.exists(path)) {
+                return path;
+            }
+
+            return this.findFreeName(suggestion);
+        }
+
+        return path;
+    }
+
+    private Path getInstanceWorkDir(Instance instance) {
+        String cleanName = FileUtils.sanitizeFileName(instance.getName());
+
+        if (cleanName.isEmpty()) {
+            cleanName = "instance" + instance.getMinecraftVersion();
+        }
+
+        Path freeName;
+
+        try {
+            freeName = this.findFreeName(cleanName);
+        } catch (Exception e) {
+            LOG.warn("Unable to find free name for instance");
+
+            freeName = this.workDir.resolve(StringUtils.getRandomString(10));
+        }
+
+        return freeName;
+    }
+
+    public void createInstance(String name, String groupName, String minecraftVersion) throws
+            IOException,
+            InstanceAlreadyExistsException {
+
+        if (this.instancesByName.containsKey(name)) {
+            throw new InstanceAlreadyExistsException(name);
+        }
+
+        Instance instance = new Instance(name, groupName, minecraftVersion);
+        instance.setWorkDir(this.getInstanceWorkDir(instance));
+
+        this.cacheInstance(instance);
+
+        FileUtils.createDirectoryIfNotExists(instance.getWorkDir());
+        FileUtils.createDirectoryIfNotExists(instance.getMinecraftDir());
+        FileUtils.createDirectoryIfNotExists(instance.getJarModsDir());
+
+        FileUtils.writeUtf8(instance.getWorkDir().resolve("instance.json"), Json.write(instance));
     }
 
     public void removeInstance(String name) throws IOException {
         Instance instance = this.getInstanceByName(name);
+
         if (instance == null) {
             return;
         }
 
-        Path instanceDir = this.getInstanceDir(instance);
-        if (Files.exists(instanceDir)) {
-            FileUtils.delete(instanceDir);
-        }
+        FileUtils.delete(instance.getWorkDir());
 
-        this.instances.remove(instance);
-        this.instancesByName.remove(name);
+        this.uncacheInstance(instance);
     }
 
     public boolean instanceExists(String name) {
@@ -145,26 +169,13 @@ public class InstanceManager {
             return false;
         }
 
-        Path instanceDir = this.getInstanceDir(instance);
-        if (Files.exists(instanceDir)) {
+        if (Files.exists(instance.getWorkDir())) {
             return true;
         } else {
-            this.instances.remove(instance);
-            this.instancesByName.remove(name);
+            this.uncacheInstance(instance);
+
             return false;
         }
-    }
-
-    public Path getInstanceDir(Instance instance) {
-        return this.workDir.resolve(instance.getDirName());
-    }
-
-    public Path getMinecraftDir(Instance instance) {
-        return this.getInstanceDir(instance).resolve(this.mcDirName);
-    }
-
-    public Path getInstanceJarModsDir(Instance instance) {
-        return this.getInstanceDir(instance).resolve("jarmods");
     }
 
     public Instance getInstanceByName(String name) {
