@@ -99,7 +99,7 @@ public class DownloadList {
                 try {
                     download.execute();
                 } catch (IOException e) {
-                    LOG.error(e);
+                    LOG.error("Download failed", e);
                 }
             };
 
