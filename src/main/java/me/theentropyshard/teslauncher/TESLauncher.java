@@ -103,6 +103,7 @@ public class TESLauncher {
                 .addNetworkInterceptor(new UserAgentInterceptor(TESLauncher.USER_AGENT))
                 .connectTimeout(30, TimeUnit.SECONDS)
                 .readTimeout(5, TimeUnit.MINUTES)
+                .writeTimeout(5, TimeUnit.MINUTES)
                 .protocols(Collections.singletonList(Protocol.HTTP_1_1))
                 .build();
 
