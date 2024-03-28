@@ -39,10 +39,7 @@ public class GrayscaleImageGenerator {
         Random random = new Random();
 
         for (int i = 0; i < pixels.length; i++) {
-            pixels[i] = 0xFF << 24 |
-                    random.nextInt(256) << 16 |
-                    random.nextInt(256) << 8 |
-                    random.nextInt(256);
+            pixels[i] = getRandomGrayColorRGB(random, 75, 210);
         }
 
         JPanel drawPanel = new JPanel() {
@@ -68,21 +65,7 @@ public class GrayscaleImageGenerator {
         JButton generateButtons = new JButton("Generate");
         generateButtons.addActionListener(e -> {
             for (int i = 0; i < pixels.length; i++) {
-                int color = getRandomGrayColorRGB(random);
-
-                int r = color & 0xFF;
-
-                while (r < 75 || r > 210) {
-                    color = getRandomGrayColorRGB(random);
-                    r = color & 0xFF;
-                }
-
-                int g = (color >> 8) & 0xFF;
-                int b = (color >> 16) & 0xFF;
-
-                color = (r << 16 | g << 8 | b);
-
-                pixels[i] = 0xFF << 24 | color;
+                pixels[i] = 0xFF << 24 | getRandomGrayColorRGB(random, 75, 210);
             }
 
             drawPanel.repaint();
@@ -118,13 +101,13 @@ public class GrayscaleImageGenerator {
         frame.setVisible(true);
     }
 
-    private static int getRandomGrayColorRGB(Random random) {
-        int r = random.nextInt(256);
-        int g = random.nextInt(256);
-        int b = random.nextInt(256);
+    private static int getRandomGrayColorRGB(Random random, int min, int max) {
+        int r = random.nextInt(max - min) + min;
+        int g = random.nextInt(max - min) + min;
+        int b = random.nextInt(max - min) + min;
 
         r = g = b = (r + g + b) / 3;
 
-        return (r << 16 | g << 8 | b);
+        return (0xFF << 24) | (r << 16 | g << 8 | b);
     }
 }
