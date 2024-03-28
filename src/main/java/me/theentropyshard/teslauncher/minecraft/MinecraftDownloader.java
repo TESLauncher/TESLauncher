@@ -249,7 +249,7 @@ public class MinecraftDownloader {
         return version;
     }
 
-    private static String getMcName() {
+    public static String getMcName() {
         switch (OperatingSystem.getCurrent()) {
             case WINDOWS:
                 return "windows";
@@ -303,6 +303,14 @@ public class MinecraftDownloader {
         for (Library library : version.getLibraries()) {
             if (!RuleMatcher.applyOnThisPlatform(library)) {
                 continue;
+            }
+
+            if (!OperatingSystem.isArm()) {
+                if (OperatingSystem.is64Bit() && library.getName().endsWith("arm64")) {
+                    continue;
+                } else if (library.getName().endsWith("x86")){
+                    continue;
+                }
             }
 
             Library.DownloadList downloads = library.getDownloads();

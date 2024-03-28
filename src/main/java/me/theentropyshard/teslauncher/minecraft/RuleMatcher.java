@@ -39,7 +39,7 @@ public class RuleMatcher {
                 } else {
                     boolean versionMatches = os.getVersion() != null &&
                             Pattern.compile(os.getVersion()).matcher(OperatingSystem.getVersion()).matches();
-                    if (OperatingSystem.getName().equals(os.getName()) ||
+                    if (MinecraftDownloader.getMcName().equals(os.getName()) ||
                             versionMatches || OperatingSystem.getArch().equals(os.getArch())) {
                         lastAction = rule.getAction();
                     }

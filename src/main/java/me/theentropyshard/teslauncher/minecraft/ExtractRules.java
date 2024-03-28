@@ -27,6 +27,13 @@ public class ExtractRules {
 
     }
 
+    @Override
+    public String toString() {
+        return "ExtractRules{" +
+                "exclude=" + this.exclude +
+                '}';
+    }
+
     public List<String> getExclude() {
         return this.exclude;
     }

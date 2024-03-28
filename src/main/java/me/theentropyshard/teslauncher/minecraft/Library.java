@@ -34,6 +34,17 @@ public class Library implements Ruleable {
 
     }
 
+    @Override
+    public String toString() {
+        return "Library{" +
+                "name='" + this.name + '\'' +
+                ", downloads=" + this.downloads +
+                ", rules=" + this.rules +
+                ", natives=" + this.natives +
+                ", extract=" + this.extract +
+                '}';
+    }
+
     public String getName() {
         return this.name;
     }
@@ -64,6 +75,16 @@ public class Library implements Ruleable {
 
         }
 
+        @Override
+        public String toString() {
+            return "Artifact{" +
+                    "path='" + this.path + '\'' +
+                    ", sha1='" + this.sha1 + '\'' +
+                    ", size=" + this.size +
+                    ", url='" + this.url + '\'' +
+                    '}';
+        }
+
         public String getPath() {
             return this.path;
         }
@@ -87,6 +108,14 @@ public class Library implements Ruleable {
 
         public DownloadList() {
 
+        }
+
+        @Override
+        public String toString() {
+            return "DownloadList{" +
+                    "artifact=" + this.artifact +
+                    ", classifiers=" + this.classifiers +
+                    '}';
         }
 
         public Artifact getArtifact() {
