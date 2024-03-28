@@ -83,7 +83,6 @@ public class JavaManager {
 
     public void downloadRuntime(String componentName, DownloadList javaList) throws IOException {
         Path componentDir = this.workDir.resolve(componentName);
-        FileUtils.createDirectoryIfNotExists(componentDir);
 
         JsonObject osObject = JavaManager.getAllRuntimesObject(this.workDir.resolve("all_runtimes.json"));
 

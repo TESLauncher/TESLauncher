@@ -55,7 +55,6 @@ public class Instance {
     }
 
     public void save() throws IOException {
-        FileUtils.createDirectoryIfNotExists(this.getWorkDir());
         FileUtils.writeUtf8(this.getWorkDir().resolve("instance.json"), Json.write(this));
     }
 

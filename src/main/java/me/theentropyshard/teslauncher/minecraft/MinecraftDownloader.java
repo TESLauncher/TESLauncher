@@ -353,8 +353,6 @@ public class MinecraftDownloader {
 
         Path assetsIndexFile = this.assetsDir.resolve("indexes").resolve(vAssetIndex.getId() + ".json");
         if (!Files.exists(assetsIndexFile)) {
-            FileUtils.createDirectoryIfNotExists(assetsIndexFile.getParent());
-
             try (HttpRequest request = new HttpRequest(TESLauncher.getInstance().getHttpClient())) {
                 FileUtils.writeUtf8(assetsIndexFile, request.asString(vAssetIndex.getUrl()));
             }

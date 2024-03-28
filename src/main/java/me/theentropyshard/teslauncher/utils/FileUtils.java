@@ -85,6 +85,7 @@ public final class FileUtils {
             throw new IOException(file + " exists, but is not a file");
         }
 
+        Files.createDirectories(file.getParent());
         Files.write(file, s.getBytes(StandardCharsets.UTF_8));
     }
 
