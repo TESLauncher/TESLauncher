@@ -39,6 +39,7 @@ import java.time.OffsetDateTime;
 public final class Json {
     private static final Gson GSON = new GsonBuilder()
             .disableHtmlEscaping()
+            .disableJdkUnsafe()
             //
             .registerTypeAdapter(Instant.class, new InstantTypeAdapter())
             .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeTypeAdapter())
