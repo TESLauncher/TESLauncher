@@ -29,7 +29,7 @@ import me.theentropyshard.teslauncher.minecraft.argument.Argument;
 import me.theentropyshard.teslauncher.minecraft.argument.ArgumentType;
 import me.theentropyshard.teslauncher.minecraft.auth.microsoft.AuthException;
 import me.theentropyshard.teslauncher.utils.FileUtils;
-import me.theentropyshard.teslauncher.utils.Json;
+import me.theentropyshard.teslauncher.utils.json.Json;
 import me.theentropyshard.teslauncher.utils.TimeUtils;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.model.ZipParameters;

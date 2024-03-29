@@ -21,7 +21,7 @@ package me.theentropyshard.teslauncher.minecraft.argument;
 import com.google.gson.annotations.JsonAdapter;
 import me.theentropyshard.teslauncher.minecraft.Ruleable;
 import me.theentropyshard.teslauncher.minecraft.rule.Rule;
-import me.theentropyshard.teslauncher.utils.AlwaysListTypeAdapterFactory;
+import me.theentropyshard.teslauncher.utils.json.type.AlwaysListTypeAdapterFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;

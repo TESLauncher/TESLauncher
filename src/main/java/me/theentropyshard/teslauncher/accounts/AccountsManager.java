@@ -21,7 +21,7 @@ package me.theentropyshard.teslauncher.accounts;
 import com.google.gson.reflect.TypeToken;
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.utils.FileUtils;
-import me.theentropyshard.teslauncher.utils.Json;
+import me.theentropyshard.teslauncher.utils.json.Json;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

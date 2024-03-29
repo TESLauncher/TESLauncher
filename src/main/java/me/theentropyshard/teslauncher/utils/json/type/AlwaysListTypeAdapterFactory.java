@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.utils;
+package me.theentropyshard.teslauncher.utils.json.type;
 
 import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;

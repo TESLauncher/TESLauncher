@@ -25,7 +25,7 @@ import me.theentropyshard.teslauncher.network.HttpRequest;
 import me.theentropyshard.teslauncher.network.download.DownloadList;
 import me.theentropyshard.teslauncher.network.download.HttpDownload;
 import me.theentropyshard.teslauncher.utils.FileUtils;
-import me.theentropyshard.teslauncher.utils.Json;
+import me.theentropyshard.teslauncher.utils.json.Json;
 import me.theentropyshard.teslauncher.utils.OperatingSystem;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

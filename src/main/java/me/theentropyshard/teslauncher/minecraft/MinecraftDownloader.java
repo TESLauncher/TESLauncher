@@ -25,6 +25,7 @@ import me.theentropyshard.teslauncher.network.download.DownloadList;
 import me.theentropyshard.teslauncher.network.download.HttpDownload;
 import me.theentropyshard.teslauncher.network.progress.ProgressNetworkInterceptor;
 import me.theentropyshard.teslauncher.utils.*;
+import me.theentropyshard.teslauncher.utils.json.Json;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.model.FileHeader;
 import okhttp3.OkHttpClient;

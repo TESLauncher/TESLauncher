@@ -20,7 +20,7 @@ package me.theentropyshard.teslauncher.minecraft.auth.microsoft;
 
 import com.google.gson.JsonObject;
 import me.theentropyshard.teslauncher.network.HttpRequest;
-import me.theentropyshard.teslauncher.utils.Json;
+import me.theentropyshard.teslauncher.utils.json.Json;
 import okhttp3.*;
 
 import java.io.IOException;

@@ -20,7 +20,7 @@ package me.theentropyshard.teslauncher.accounts;
 
 import com.google.gson.JsonObject;
 import me.theentropyshard.teslauncher.gson.AbstractJsonDeserializer;
-import me.theentropyshard.teslauncher.utils.Json;
+import me.theentropyshard.teslauncher.utils.json.Json;
 
 public class AccountDeserializer extends AbstractJsonDeserializer<Account> {
     @Override

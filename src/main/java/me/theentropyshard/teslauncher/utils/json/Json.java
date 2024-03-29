@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.utils;
+package me.theentropyshard.teslauncher.utils.json;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -30,6 +30,8 @@ import me.theentropyshard.teslauncher.minecraft.VersionType;
 import me.theentropyshard.teslauncher.minecraft.argument.ArgumentType;
 import me.theentropyshard.teslauncher.minecraft.gson.*;
 import me.theentropyshard.teslauncher.minecraft.rule.Rule;
+import me.theentropyshard.teslauncher.utils.json.type.LocalDateTimeTypeAdapter;
+import me.theentropyshard.teslauncher.utils.json.type.OffsetDateTimeTypeAdapter;
 
 import java.lang.reflect.Type;
 import java.time.Instant;

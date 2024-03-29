@@ -20,7 +20,7 @@ package me.theentropyshard.teslauncher;
 
 
 import me.theentropyshard.teslauncher.utils.FileUtils;
-import me.theentropyshard.teslauncher.utils.Json;
+import me.theentropyshard.teslauncher.utils.json.Json;
 
 import java.io.IOException;
 import java.nio.file.Files;
