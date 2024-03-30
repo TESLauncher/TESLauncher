@@ -87,22 +87,6 @@ public class AccountsManager {
         }
     }
 
-    public boolean deleteAccount(String nickname) {
-        if (this.accounts.containsKey(nickname)) {
-            this.accounts.remove(nickname);
-
-            try {
-                this.save();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
-            return true;
-        }
-
-        return false;
-    }
-
     public void selectAccount(Account account) {
         for (Map.Entry<String, Account> entry : this.accounts.entrySet()) {
             entry.getValue().setSelected(false);
