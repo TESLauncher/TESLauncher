@@ -18,13 +18,23 @@
 
 package me.theentropyshard.teslauncher.accounts;
 
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import me.theentropyshard.teslauncher.gson.AbstractJsonDeserializer;
 import me.theentropyshard.teslauncher.utils.json.Json;
 
-public class AccountDeserializer extends AbstractJsonDeserializer<Account> {
+import java.lang.reflect.Type;
+
+public class AccountDeserializer implements JsonDeserializer<Account> {
+    public AccountDeserializer() {
+
+    }
+
     @Override
-    public Account deserialize(JsonObject root) {
+    public Account deserialize(JsonElement element, Type type, JsonDeserializationContext ctx) {
+        JsonObject root = element.getAsJsonObject();
+
         boolean noHead = !root.has("headIcon");
 
         if (!root.has("accessToken") || root.get("accessToken").getAsString().equals("-")) {

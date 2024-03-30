@@ -23,7 +23,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import me.theentropyshard.teslauncher.accounts.Account;
 import me.theentropyshard.teslauncher.accounts.AccountDeserializer;
-import me.theentropyshard.teslauncher.gson.InstantTypeAdapter;
+import me.theentropyshard.teslauncher.utils.json.type.InstantTypeAdapter;
 import me.theentropyshard.teslauncher.minecraft.DownloadType;
 import me.theentropyshard.teslauncher.minecraft.Version;
 import me.theentropyshard.teslauncher.minecraft.VersionType;
