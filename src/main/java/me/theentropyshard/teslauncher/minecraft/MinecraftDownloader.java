@@ -152,7 +152,16 @@ public class MinecraftDownloader {
     }
 
     public static VersionManifest getVersionManifest(Path versionsDir) throws IOException {
+        return MinecraftDownloader.getVersionManifest(versionsDir, false);
+    }
+
+    public static VersionManifest getVersionManifest(Path versionsDir, boolean forceNetwork) throws IOException {
         Path manifestFile = versionsDir.resolve("version_manifest_v2.json");
+
+        if (forceNetwork) {
+            return MinecraftDownloader.fetchAndSaveVersionManifest(manifestFile);
+        }
+
         if (Files.exists(manifestFile)) {
             VersionManifest manifest = Json.parse(FileUtils.readUtf8(manifestFile), VersionManifest.class);
 
