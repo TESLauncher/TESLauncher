@@ -22,6 +22,7 @@ import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.minecraft.MinecraftDownloader;
 import me.theentropyshard.teslauncher.minecraft.VersionManifest;
 import me.theentropyshard.teslauncher.minecraft.VersionType;
+import me.theentropyshard.teslauncher.utils.SwingUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -38,13 +39,15 @@ public class LoadVersionsWorker extends SwingWorker<VersionManifest, Void> {
     private final McVersionsTableModel model;
     private final AddInstanceDialog dialog;
     private final JTable table;
+    private final boolean forceNetwork;
 
     private final DateTimeFormatter formatter;
 
-    public LoadVersionsWorker(McVersionsTableModel model, AddInstanceDialog dialog, JTable table) {
+    public LoadVersionsWorker(McVersionsTableModel model, AddInstanceDialog dialog, JTable table, boolean forceNetwork) {
         this.model = model;
         this.dialog = dialog;
         this.table = table;
+        this.forceNetwork = forceNetwork;
 
         if (Locale.getDefault().getLanguage().equalsIgnoreCase("en")) {
             this.formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
@@ -55,10 +58,8 @@ public class LoadVersionsWorker extends SwingWorker<VersionManifest, Void> {
 
     @Override
     protected VersionManifest doInBackground() throws Exception {
-        return MinecraftDownloader.getVersionManifest(TESLauncher.getInstance().getVersionsDir());
+        return MinecraftDownloader.getVersionManifest(TESLauncher.getInstance().getVersionsDir(), this.forceNetwork);
     }
-
-
 
     @Override
     protected void done() {
@@ -84,15 +85,26 @@ public class LoadVersionsWorker extends SwingWorker<VersionManifest, Void> {
 
         TableRowSorter<McVersionsTableModel> rowSorter = new TableRowSorter<>(this.model);
 
-        this.dialog.getReleasesBox().addActionListener(e -> rowSorter.sort());
-        this.dialog.getSnapshotsBox().addActionListener(e -> rowSorter.sort());
-        this.dialog.getBetasBox().addActionListener(e -> rowSorter.sort());
-        this.dialog.getAlphasBox().addActionListener(e -> rowSorter.sort());
+        JCheckBox releasesBox = this.dialog.getReleasesBox();
+        SwingUtils.removeActionListeners(releasesBox);
+        releasesBox.addActionListener(e -> rowSorter.sort());
+
+        JCheckBox snapshotsBox = this.dialog.getSnapshotsBox();
+        SwingUtils.removeActionListeners(snapshotsBox);
+        snapshotsBox.addActionListener(e -> rowSorter.sort());
+
+        JCheckBox betasBox = this.dialog.getBetasBox();
+        SwingUtils.removeActionListeners(betasBox);
+        betasBox.addActionListener(e -> rowSorter.sort());
+
+        JCheckBox alphasBox = this.dialog.getAlphasBox();
+        SwingUtils.removeActionListeners(alphasBox);
+        alphasBox.addActionListener(e -> rowSorter.sort());
 
         rowSorter.setRowFilter(RowFilter.orFilter(Arrays.asList(
-                new VersionTypeRowFilter(this.dialog.getReleasesBox(), VersionType.RELEASE),
-                new VersionTypeRowFilter(this.dialog.getSnapshotsBox(), VersionType.SNAPSHOT),
-                new VersionTypeRowFilter(this.dialog.getBetasBox(), VersionType.OLD_BETA),
+                new VersionTypeRowFilter(releasesBox, VersionType.RELEASE),
+                new VersionTypeRowFilter(snapshotsBox, VersionType.SNAPSHOT),
+                new VersionTypeRowFilter(betasBox, VersionType.OLD_BETA),
                 new VersionTypeRowFilter(this.dialog.getAlphasBox(), VersionType.OLD_ALPHA)
         )));
 

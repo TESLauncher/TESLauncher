@@ -79,15 +79,17 @@ public class AddInstanceDialog extends AppDialog {
         root.add(headerPanel, BorderLayout.NORTH);
 
         JTable versionsTable = new JTable();
+
         McVersionsTableModel tableModel = new McVersionsTableModel(this, versionsTable);
         versionsTable.setModel(tableModel);
 
-        ListSelectionModel selectionModel = versionsTable.getSelectionModel();
-        selectionModel.addListSelectionListener(e -> {
+        versionsTable.getSelectionModel().addListSelectionListener(e -> {
             int selectedRow = versionsTable.getSelectedRow();
-            selectedRow = versionsTable.convertRowIndexToModel(selectedRow);
-            String mcVersion = String.valueOf(versionsTable.getModel().getValueAt(selectedRow, 0));
-            this.nameField.setText(mcVersion);
+
+            if (selectedRow != -1) {
+                selectedRow = versionsTable.convertRowIndexToModel(selectedRow);
+                this.nameField.setText(String.valueOf(versionsTable.getModel().getValueAt(selectedRow, 0)));
+            }
         });
 
         JScrollPane scrollPane = new JScrollPane(versionsTable);
@@ -131,7 +133,30 @@ public class AddInstanceDialog extends AppDialog {
         centerPanel.add(scrollPane, BorderLayout.CENTER);
         centerPanel.add(filterPanel, BorderLayout.EAST);
 
-        JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JPanel buttonsPanel = new JPanel(new BorderLayout());
+
+        FlowLayout leftLayout = new FlowLayout(FlowLayout.LEFT);
+        leftLayout.setHgap(0);
+        leftLayout.setVgap(0);
+
+        JPanel leftButtonsPanel = new JPanel(leftLayout);
+        buttonsPanel.add(leftButtonsPanel, BorderLayout.WEST);
+
+        JButton refreshManifest = new JButton("Refresh");
+        refreshManifest.addActionListener(e -> {
+            tableModel.reload(true);
+            root.revalidate();
+        });
+
+        leftButtonsPanel.add(refreshManifest);
+
+        FlowLayout rightLayout = new FlowLayout(FlowLayout.RIGHT);
+        rightLayout.setHgap(0);
+        rightLayout.setVgap(0);
+
+        JPanel rightButtonsPanel = new JPanel(rightLayout);
+        buttonsPanel.add(rightButtonsPanel, BorderLayout.EAST);
+
         this.addButton = new JButton("Add");
         this.addButton.setEnabled(false);
         this.addButton.addActionListener(e -> {
@@ -182,13 +207,13 @@ public class AddInstanceDialog extends AppDialog {
                 }
             });
         });
-        buttonsPanel.add(this.addButton);
+        rightButtonsPanel.add(this.addButton);
         JButton cancelButton = new JButton("Cancel");
         cancelButton.addActionListener(e -> {
             this.getDialog().dispose();
         });
-        buttonsPanel.add(cancelButton);
-        buttonsPanel.setBorder(new EmptyBorder(0, 10, 6, 6));
+        rightButtonsPanel.add(cancelButton);
+        buttonsPanel.setBorder(new EmptyBorder(6, 10, 10, 10));
         root.add(buttonsPanel, BorderLayout.SOUTH);
 
         root.add(centerPanel, BorderLayout.CENTER);

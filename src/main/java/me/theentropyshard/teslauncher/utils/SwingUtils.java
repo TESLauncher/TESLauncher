@@ -21,6 +21,7 @@ package me.theentropyshard.teslauncher.utils;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -75,5 +76,11 @@ public final class SwingUtils {
                 ((bounds.width - window.getWidth()) / 2) + bounds.x,
                 ((bounds.height - window.getHeight()) / 2) + bounds.y
         );
+    }
+
+    public static void removeActionListeners(AbstractButton button) {
+        for (ActionListener listener : button.getActionListeners()) {
+            button.removeActionListener(listener);
+        }
     }
 }

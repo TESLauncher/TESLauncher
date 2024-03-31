@@ -22,10 +22,29 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
 public class McVersionsTableModel extends DefaultTableModel {
+    private final AddInstanceDialog dialog;
+    private final JTable table;
+
     public McVersionsTableModel(AddInstanceDialog dialog, JTable table) {
         super(new Object[][]{}, new Object[]{"Version", "Date released", "Type"});
 
-        new LoadVersionsWorker(this, dialog, table).execute();
+        this.dialog = dialog;
+        this.table = table;
+
+        this.load(false);
+    }
+
+    public void load(boolean forceNetwork) {
+        new LoadVersionsWorker(this, this.dialog, this.table, forceNetwork).execute();
+    }
+
+    public void reload(boolean forceNetwork) {
+        int rowCount = this.getRowCount();
+
+        this.dataVector.clear();
+        this.fireTableRowsDeleted(0, rowCount - 1);
+
+        this.load(forceNetwork);
     }
 
     @Override
