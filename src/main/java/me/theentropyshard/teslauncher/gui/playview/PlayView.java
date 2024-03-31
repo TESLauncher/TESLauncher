@@ -30,6 +30,7 @@ import me.theentropyshard.teslauncher.instance.InstanceManager;
 import me.theentropyshard.teslauncher.instance.InstanceRunner;
 import me.theentropyshard.teslauncher.swing.MouseClickListener;
 import me.theentropyshard.teslauncher.swing.MouseEnterExitListener;
+import me.theentropyshard.teslauncher.utils.OperatingSystem;
 import me.theentropyshard.teslauncher.utils.SwingUtils;
 import me.theentropyshard.teslauncher.utils.TimeUtils;
 import org.apache.logging.log4j.LogManager;
@@ -168,26 +169,35 @@ public class PlayView extends View {
                     new InstanceRunner(AccountsManager.getCurrentAccount(), item).start();
                 }
             } else if (mouseButton == MouseEvent.BUTTON3) { // right mouse button
-                int x = e.getX();
-                int y = e.getY();
-
                 JPopupMenu popupMenu = new JPopupMenu();
 
                 JMenuItem editMenuItem = new JMenuItem("Edit");
                 editMenuItem.addActionListener(edit -> {
                     new InstanceSettingsDialog(item.getAssociatedInstance());
                 });
-
                 popupMenu.add(editMenuItem);
 
                 JMenuItem deleteMenuItem = new JMenuItem("Delete");
                 deleteMenuItem.addActionListener(delete -> {
                     this.deleteInstance(item);
                 });
-
                 popupMenu.add(deleteMenuItem);
 
-                popupMenu.show(item, x, y);
+                popupMenu.addSeparator();
+
+                JMenuItem openInstanceFolder = new JMenuItem("Open instance folder");
+                openInstanceFolder.addActionListener(open -> {
+                    OperatingSystem.open(item.getAssociatedInstance().getWorkDir());
+                });
+                popupMenu.add(openInstanceFolder);
+
+                JMenuItem openMinecraftFolder = new JMenuItem("Open Minecraft folder");
+                openMinecraftFolder.addActionListener(open -> {
+                    OperatingSystem.open(item.getAssociatedInstance().getMinecraftDir());
+                });
+                popupMenu.add(openMinecraftFolder);
+
+                popupMenu.show(item, e.getX(), e.getY());
             }
         }));
 
