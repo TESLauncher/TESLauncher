@@ -46,6 +46,8 @@ import java.util.Map;
 public class MinecraftDownloader {
     private static final Logger LOG = LogManager.getLogger(MinecraftDownloader.class);
 
+    private static final Duration MANIFEST_UPDATE_INTERVAL = Duration.ofHours(12);
+
     private final Path versionsDir;
     private final Path assetsDir;
     private final Path librariesDir;
@@ -155,8 +157,8 @@ public class MinecraftDownloader {
             VersionManifest manifest = Json.parse(FileUtils.readUtf8(manifestFile), VersionManifest.class);
 
             BasicFileAttributes basicFileAttributes = Files.readAttributes(manifestFile, BasicFileAttributes.class);
-            String string = basicFileAttributes.lastModifiedTime().toString();
-            if (OffsetDateTime.now().minus(Duration.ofHours(3)).isAfter(OffsetDateTime.parse(string))) {
+            OffsetDateTime lastModified = OffsetDateTime.parse(basicFileAttributes.lastModifiedTime().toString());
+            if (OffsetDateTime.now().minus(MinecraftDownloader.MANIFEST_UPDATE_INTERVAL).isAfter(lastModified)) {
                 try {
                     return MinecraftDownloader.fetchAndSaveVersionManifest(manifestFile);
                 } catch (IOException e) {
