@@ -42,7 +42,7 @@ public class TESLauncher {
     private static final Logger LOG = LogManager.getLogger(TESLauncher.class);
 
     public static final String NAME = "TESLauncher";
-    public static final String VERSION = "0.10.0";
+    public static final String VERSION = "0.11.0";
     public static final String USER_AGENT = TESLauncher.NAME + "/" + TESLauncher.VERSION;
     public static final int WIDTH = 960;
     public static final int HEIGHT = 540;
