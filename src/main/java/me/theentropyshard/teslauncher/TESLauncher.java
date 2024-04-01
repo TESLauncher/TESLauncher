@@ -70,7 +70,7 @@ public class TESLauncher {
 
     private final Gui gui;
 
-    private volatile boolean shutdown;
+    private volatile boolean triedShutdown;
 
     public static JFrame frame;
 
@@ -125,8 +125,10 @@ public class TESLauncher {
 
         this.taskPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> this.shutdown(false)));
+
         this.gui = new Gui(this.settings.darkTheme);
-        this.gui.getFrame().addWindowListener(new WindowClosingListener(e -> TESLauncher.this.shutdown()));
+        this.gui.getFrame().addWindowListener(new WindowClosingListener(e -> TESLauncher.this.shutdown(true)));
 
         this.gui.showGui();
     }
@@ -149,12 +151,12 @@ public class TESLauncher {
         this.taskPool.submit(r);
     }
 
-    public void shutdown() {
-        if (this.shutdown) {
+    public synchronized void shutdown(boolean exit) {
+        if (this.triedShutdown) {
             return;
         }
 
-        this.shutdown = true;
+        this.triedShutdown = true;
 
         this.taskPool.shutdown();
 
@@ -178,7 +180,9 @@ public class TESLauncher {
             LOG.error("Exception while saving settings", e);
         }
 
-        System.exit(0);
+        if (exit) {
+            System.exit(0);
+        }
     }
 
     private static TESLauncher instance;
