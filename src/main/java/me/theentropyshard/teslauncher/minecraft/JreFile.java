@@ -16,26 +16,18 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.java;
+package me.theentropyshard.teslauncher.minecraft;
 
-public class JavaRuntime {
-    public Availability availability;
-    public Manifest manifest;
-    public Version version;
+import java.util.Map;
 
-    public static class Availability {
-        public int group;
-        public int progress;
-    }
+public class JreFile {
+    public String type;
+    public boolean executable;
+    public Map<String, Download> downloads;
 
-    public static class Manifest {
+    public static class Download {
         public String sha1;
         public long size;
         public String url;
-    }
-
-    public static class Version {
-        public String name;
-        public String released;
     }
 }

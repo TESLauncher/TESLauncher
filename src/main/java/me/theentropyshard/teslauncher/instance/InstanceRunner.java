@@ -23,14 +23,14 @@ import me.theentropyshard.teslauncher.accounts.Account;
 import me.theentropyshard.teslauncher.accounts.MicrosoftAccount;
 import me.theentropyshard.teslauncher.gui.components.InstanceItem;
 import me.theentropyshard.teslauncher.gui.dialogs.MinecraftDownloadDialog;
-import me.theentropyshard.teslauncher.java.JavaManager;
 import me.theentropyshard.teslauncher.minecraft.*;
 import me.theentropyshard.teslauncher.minecraft.argument.Argument;
 import me.theentropyshard.teslauncher.minecraft.argument.ArgumentType;
 import me.theentropyshard.teslauncher.minecraft.auth.microsoft.AuthException;
 import me.theentropyshard.teslauncher.utils.FileUtils;
-import me.theentropyshard.teslauncher.utils.json.Json;
+import me.theentropyshard.teslauncher.utils.OperatingSystem;
 import me.theentropyshard.teslauncher.utils.TimeUtils;
+import me.theentropyshard.teslauncher.utils.json.Json;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.model.ZipParameters;
 import org.apache.commons.text.StringSubstitutor;
@@ -84,6 +84,7 @@ public class InstanceRunner extends Thread {
             Path versionsDir = launcher.getVersionsDir();
             Path librariesDir = launcher.getLibrariesDir();
             Path assetsDir = launcher.getAssetsDir();
+            Path runtimesDir = launcher.getRuntimesDir();
             Path nativesDir = versionsDir.resolve(this.instance.getMinecraftVersion()).resolve("natives");
 
             MinecraftDownloader downloader;
@@ -93,6 +94,7 @@ public class InstanceRunner extends Thread {
                         assetsDir,
                         librariesDir,
                         nativesDir,
+                        runtimesDir,
                         this.instance.getMinecraftDir().resolve("resources"),
                         new MinecraftDownloadDialog()
                 );
@@ -102,6 +104,7 @@ public class InstanceRunner extends Thread {
                         assetsDir,
                         librariesDir,
                         nativesDir,
+                        runtimesDir,
                         this.instance.getMinecraftDir().resolve("resources"),
                         this.item
                 );
@@ -114,7 +117,7 @@ public class InstanceRunner extends Thread {
             Version version = Json.parse(FileUtils.readUtf8(clientJson), Version.class);
 
             List<String> arguments = this.getArguments(version, nativesDir, librariesDir, versionsDir);
-            List<String> command = this.buildRunCommand(version, arguments);
+            List<String> command = this.buildRunCommand(version, arguments, runtimesDir);
 
             this.instance.setLastTimePlayed(LocalDateTime.now());
             this.instance.save();
@@ -389,26 +392,26 @@ public class InstanceRunner extends Thread {
         return arguments;
     }
 
-    private List<String> buildRunCommand(Version version, List<String> arguments) {
+    private List<String> buildRunCommand(Version version, List<String> arguments, Path runtimesDir) {
         List<String> command = new ArrayList<>();
 
         String javaExecutable;
 
         Version.JavaVersion javaVersion = version.getJavaVersion();
         if (javaVersion != null) {
-            javaExecutable = this.getJavaExecutable(javaVersion.getComponent());
+            javaExecutable = this.getJavaExecutable(javaVersion.getComponent(), runtimesDir);
         } else {
             try {
                 String[] split = version.getId().split("\\.");
                 int minorVersion = Integer.parseInt(split[1]);
 
                 if (minorVersion >= 17) {
-                    javaExecutable = this.getJavaExecutable("java-runtime-gamma");
+                    javaExecutable = this.getJavaExecutable("java-runtime-gamma", runtimesDir);
                 } else {
-                    javaExecutable = this.getJavaExecutable("jre-legacy");
+                    javaExecutable = this.getJavaExecutable("jre-legacy", runtimesDir);
                 }
             } catch (Exception ignored) {
-                javaExecutable = this.getJavaExecutable("jre-legacy");
+                javaExecutable = this.getJavaExecutable("jre-legacy", runtimesDir);
             }
         }
         String javaPath = this.instance.getJavaPath();
@@ -445,8 +448,16 @@ public class InstanceRunner extends Thread {
         }
     }
 
-    private String getJavaExecutable(String componentName) {
-        JavaManager javaManager = TESLauncher.getInstance().getJavaManager();
-        return javaManager.getJavaExecutable(componentName);
+    private String getJavaExecutable(String componentName, Path runtimesDir) {
+        Path componentDir = runtimesDir.resolve(componentName);
+
+        if (OperatingSystem.isMacOS()) {
+            componentDir = componentDir.resolve("jre.bundle").resolve("Contents").resolve("Home");
+        }
+
+        return componentDir
+                .resolve("bin")
+                .resolve(OperatingSystem.getCurrent().getJavaExecutableName())
+                .toString();
     }
 }

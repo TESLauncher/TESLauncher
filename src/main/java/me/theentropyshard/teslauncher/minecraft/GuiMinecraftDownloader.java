@@ -27,9 +27,9 @@ import java.nio.file.Path;
 public class GuiMinecraftDownloader extends MinecraftDownloader {
     private final MinecraftDownloadDialog dialog;
 
-    public GuiMinecraftDownloader(Path versionsDir, Path assetsDir, Path librariesDir, Path nativesDir,
+    public GuiMinecraftDownloader(Path versionsDir, Path assetsDir, Path librariesDir, Path nativesDir, Path runtimesDir,
                                   Path instanceResourcesDir, MinecraftDownloadDialog dialog) {
-        super(versionsDir, assetsDir, librariesDir, nativesDir, instanceResourcesDir, dialog);
+        super(versionsDir, assetsDir, librariesDir, nativesDir, runtimesDir, instanceResourcesDir, dialog);
         this.dialog = dialog;
     }
 

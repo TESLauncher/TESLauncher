@@ -16,18 +16,10 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.java;
+package me.theentropyshard.teslauncher.minecraft;
 
 import java.util.Map;
 
-public class JreFile {
-    public String type;
-    public boolean executable;
-    public Map<String, Download> downloads;
-
-    public static class Download {
-        public String sha1;
-        public long size;
-        public String url;
-    }
+public class JavaRuntimeManifest {
+    public Map<String, JreFile> files;
 }
