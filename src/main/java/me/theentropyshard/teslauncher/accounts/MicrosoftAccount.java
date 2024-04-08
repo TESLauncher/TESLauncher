@@ -25,6 +25,7 @@ import me.theentropyshard.teslauncher.minecraft.auth.microsoft.AuthException;
 import me.theentropyshard.teslauncher.minecraft.auth.microsoft.AuthListener;
 import me.theentropyshard.teslauncher.minecraft.auth.microsoft.MicrosoftAuthenticator;
 import me.theentropyshard.teslauncher.minecraft.auth.microsoft.MinecraftProfile;
+import me.theentropyshard.teslauncher.utils.UndashedUUID;
 
 import java.io.IOException;
 import java.time.OffsetDateTime;
@@ -82,9 +83,7 @@ public class MicrosoftAccount extends Account {
 
             MinecraftProfile profile = authenticator.authenticate();
             this.setAccessToken(profile.accessToken);
-            this.setUuid(UUID.fromString(profile.id.replaceFirst(
-                    "(\\p{XDigit}{8})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}+)", "$1-$2-$3-$4-$5"
-            )));
+            this.setUuid(UndashedUUID.fromString(profile.id));
 
             String oldUsername = this.getUsername();
 
