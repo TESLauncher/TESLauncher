@@ -30,7 +30,6 @@ import me.theentropyshard.teslauncher.utils.UndashedUUID;
 import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.UUID;
 
 public class MicrosoftAccount extends Account {
     private String refreshToken;

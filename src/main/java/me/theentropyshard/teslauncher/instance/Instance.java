@@ -19,8 +19,8 @@
 package me.theentropyshard.teslauncher.instance;
 
 import me.theentropyshard.teslauncher.utils.FileUtils;
-import me.theentropyshard.teslauncher.utils.json.Json;
 import me.theentropyshard.teslauncher.utils.OperatingSystem;
+import me.theentropyshard.teslauncher.utils.json.Json;
 
 import java.io.IOException;
 import java.nio.file.Path;

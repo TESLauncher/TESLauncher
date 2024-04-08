@@ -19,8 +19,8 @@
 package me.theentropyshard.teslauncher.instance;
 
 import me.theentropyshard.teslauncher.utils.FileUtils;
-import me.theentropyshard.teslauncher.utils.json.Json;
 import me.theentropyshard.teslauncher.utils.StringUtils;
+import me.theentropyshard.teslauncher.utils.json.Json;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

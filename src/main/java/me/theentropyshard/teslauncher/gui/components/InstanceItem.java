@@ -26,12 +26,11 @@ import me.theentropyshard.teslauncher.minecraft.MinecraftDownloadListener;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
-import java.util.HashSet;
-import java.util.Set;
 
 public class InstanceItem extends JPanel implements MinecraftDownloadListener {
     private static final int SIDE_SIZE = 100;

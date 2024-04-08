@@ -18,11 +18,6 @@
 
 package me.theentropyshard.teslauncher.minecraft.rule;
 
-import me.theentropyshard.teslauncher.utils.OperatingSystem;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 public class OperatingSystemFilter {
     private String name;
     private String version;

@@ -23,13 +23,13 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import me.theentropyshard.teslauncher.accounts.Account;
 import me.theentropyshard.teslauncher.accounts.AccountDeserializer;
-import me.theentropyshard.teslauncher.utils.json.type.InstantTypeAdapter;
 import me.theentropyshard.teslauncher.minecraft.DownloadType;
 import me.theentropyshard.teslauncher.minecraft.Version;
 import me.theentropyshard.teslauncher.minecraft.VersionType;
 import me.theentropyshard.teslauncher.minecraft.argument.ArgumentType;
 import me.theentropyshard.teslauncher.minecraft.gson.*;
 import me.theentropyshard.teslauncher.minecraft.rule.Rule;
+import me.theentropyshard.teslauncher.utils.json.type.InstantTypeAdapter;
 import me.theentropyshard.teslauncher.utils.json.type.LocalDateTimeTypeAdapter;
 import me.theentropyshard.teslauncher.utils.json.type.OffsetDateTimeTypeAdapter;
 

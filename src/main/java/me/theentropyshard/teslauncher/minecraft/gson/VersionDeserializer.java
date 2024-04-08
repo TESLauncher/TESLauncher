@@ -18,8 +18,8 @@
 
 package me.theentropyshard.teslauncher.minecraft.gson;
 
-import com.google.gson.reflect.TypeToken;
 import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
 import me.theentropyshard.teslauncher.minecraft.DownloadType;
 import me.theentropyshard.teslauncher.minecraft.Library;
 import me.theentropyshard.teslauncher.minecraft.Version;
