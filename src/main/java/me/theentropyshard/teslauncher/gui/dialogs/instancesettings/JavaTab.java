@@ -83,10 +83,27 @@ public class JavaTab extends Tab {
                     maxMemory = "2048";
                 }
 
-                int minimumMemoryInMegabytes = Integer.parseInt(minMemory);
-                int maximumMemoryInMegabytes = Integer.parseInt(maxMemory);
+                int minimumMemoryInMegabytes = 512;
+                try {
+                    minimumMemoryInMegabytes = Integer.parseInt(minMemory);
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(JavaTab.this.getDialog(),
+                            "Too many megabytes! (" + ex.getMessage() + ")",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE);
+                }
 
-                if (minimumMemoryInMegabytes >= maximumMemoryInMegabytes) {
+                int maximumMemoryInMegabytes = 2048;
+                try {
+                    maximumMemoryInMegabytes = Integer.parseInt(maxMemory);
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(JavaTab.this.getDialog(),
+                            "Too many megabytes! (" + ex.getMessage() + ")",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE);
+                }
+
+                if (minimumMemoryInMegabytes > maximumMemoryInMegabytes) {
                     JOptionPane.showMessageDialog(JavaTab.this.getDialog(),
                             "Minimum amount of RAM cannot be larger than maximum",
                             "Error",
@@ -101,6 +118,7 @@ public class JavaTab extends Tab {
                             "Error",
                             JOptionPane.ERROR_MESSAGE
                     );
+                    return;
                 }
 
                 instance.setJavaPath(javaPathTextField.getText());
