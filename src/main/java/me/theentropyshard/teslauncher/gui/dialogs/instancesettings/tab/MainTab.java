@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.gui.dialogs.instancesettings;
+package me.theentropyshard.teslauncher.gui.dialogs.instancesettings.tab;
 
 import me.theentropyshard.teslauncher.instance.Instance;
 
@@ -25,7 +25,7 @@ import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.io.IOException;
 
-public class MainTab extends Tab {
+public class MainTab extends SettingsTab {
 
     private final JTextField nameField;
     private final JTextField groupField;

@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.gui.dialogs.instancesettings;
+package me.theentropyshard.teslauncher.gui.dialogs.instancesettings.tab;
 
 import me.theentropyshard.teslauncher.Settings;
 import me.theentropyshard.teslauncher.TESLauncher;
@@ -35,7 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class JarModsTab extends Tab {
+public class JarModsTab extends SettingsTab {
     private final JarModsTableModel jarModsTableModel;
     private final JButton deleteModButton;
 

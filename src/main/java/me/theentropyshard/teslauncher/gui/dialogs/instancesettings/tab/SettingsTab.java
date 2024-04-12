@@ -16,20 +16,20 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.gui.dialogs.instancesettings;
+package me.theentropyshard.teslauncher.gui.dialogs.instancesettings.tab;
 
 import me.theentropyshard.teslauncher.instance.Instance;
 
 import javax.swing.*;
 import java.io.IOException;
 
-public abstract class Tab {
+public abstract class SettingsTab {
     private final JDialog dialog;
     private final String name;
     private final Instance instance;
     private final JPanel root;
 
-    public Tab(String name, Instance instance, JDialog dialog) {
+    public SettingsTab(String name, Instance instance, JDialog dialog) {
         this.name = name;
         this.instance = instance;
         this.dialog = dialog;

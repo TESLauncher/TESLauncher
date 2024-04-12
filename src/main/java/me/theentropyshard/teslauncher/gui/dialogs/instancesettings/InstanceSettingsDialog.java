@@ -21,6 +21,10 @@ package me.theentropyshard.teslauncher.gui.dialogs.instancesettings;
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.gui.components.InstanceItem;
 import me.theentropyshard.teslauncher.gui.dialogs.AppDialog;
+import me.theentropyshard.teslauncher.gui.dialogs.instancesettings.tab.JarModsTab;
+import me.theentropyshard.teslauncher.gui.dialogs.instancesettings.tab.JavaTab;
+import me.theentropyshard.teslauncher.gui.dialogs.instancesettings.tab.MainTab;
+import me.theentropyshard.teslauncher.gui.dialogs.instancesettings.tab.SettingsTab;
 import me.theentropyshard.teslauncher.gui.playview.InstancesPanel;
 import me.theentropyshard.teslauncher.instance.Instance;
 
@@ -35,7 +39,7 @@ import java.util.List;
 public class InstanceSettingsDialog extends AppDialog {
 
     private final JTabbedPane tabbedPane;
-    private final List<Tab> tabs;
+    private final List<SettingsTab> tabs;
 
     public InstanceSettingsDialog(Instance instance) {
         super(TESLauncher.frame, "Instance Settings - " + instance.getName());
@@ -80,7 +84,7 @@ public class InstanceSettingsDialog extends AppDialog {
         this.setVisible(true);
     }
 
-    public void addTab(Tab tab) {
+    public void addTab(SettingsTab tab) {
         this.tabs.add(tab);
         this.tabbedPane.addTab(tab.getName(), tab.getRoot());
     }
