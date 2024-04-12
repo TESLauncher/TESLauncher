@@ -427,6 +427,8 @@ public class InstanceRunner extends Thread {
     }
 
     private int runGameProcess(List<String> command, Path runDir) throws IOException {
+        LOG.debug("Running the game with command '{}'", command);
+
         ProcessBuilder processBuilder = new ProcessBuilder(command);
         processBuilder.environment().put("APPDATA", runDir.toString());
         processBuilder.directory(runDir.toFile());
@@ -438,6 +440,15 @@ public class InstanceRunner extends Thread {
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
         String line;
         while ((line = reader.readLine()) != null) {
+            if (line.contains("Could not reserve enough space for object heap") ||
+                    line.contains("There is insufficient memory for the Java Runtime Environment to continue")) {
+                JOptionPane.showMessageDialog(TESLauncher.frame,
+                        "Java Runtime Environment could not allocate enough memory",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE
+                );
+            }
+
             LOG.info(line);
         }
 
