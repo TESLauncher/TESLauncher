@@ -45,6 +45,7 @@ public class InstanceSettingsDialog extends AppDialog {
         super(TESLauncher.frame, "Instance Settings - " + instance.getName());
 
         this.tabbedPane = new JTabbedPane(JTabbedPane.LEFT);
+        this.tabbedPane.setPreferredSize(new Dimension(900, 480));
 
         this.tabs = new ArrayList<>();
 
