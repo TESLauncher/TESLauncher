@@ -26,7 +26,7 @@ public final class MessageBox {
         JOptionPane.showMessageDialog(parent, message, "Error", JOptionPane.ERROR_MESSAGE);
     }
 
-    public static boolean showConfirmDialog(Component parent, String title, String message) {
+    public static boolean showConfirmMessage(Component parent, String title, String message) {
         return JOptionPane.showConfirmDialog(
                 parent,
                 message,

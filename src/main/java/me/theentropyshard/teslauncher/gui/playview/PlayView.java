@@ -235,7 +235,7 @@ public class PlayView extends View {
     }
 
     public void deleteInstance(InstanceItem item) {
-        boolean ok = MessageBox.showConfirmDialog(
+        boolean ok = MessageBox.showConfirmMessage(
                 TESLauncher.frame,
                 "Delete instance",
                 "Are you sure you want to delete instance '" + item.getAssociatedInstance().getName() + "'?"

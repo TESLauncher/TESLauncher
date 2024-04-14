@@ -127,7 +127,7 @@ public class AccountItem extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (AccountItem.this.trashBounds.contains(e.getPoint())) {
-                    boolean ok = MessageBox.showConfirmDialog(
+                    boolean ok = MessageBox.showConfirmMessage(
                             TESLauncher.frame,
                             "Account removal",
                             "Are you sure that you want to remove account '" + account.getUsername() + "'?"
