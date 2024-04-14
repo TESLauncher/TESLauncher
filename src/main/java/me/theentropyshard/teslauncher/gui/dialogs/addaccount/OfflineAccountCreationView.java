@@ -25,6 +25,7 @@ import me.theentropyshard.teslauncher.accounts.AccountsManager;
 import me.theentropyshard.teslauncher.accounts.OfflineAccount;
 import me.theentropyshard.teslauncher.gui.accountsview.AccountItem;
 import me.theentropyshard.teslauncher.gui.accountsview.AccountsView;
+import me.theentropyshard.teslauncher.swing.MessageBox;
 
 import javax.swing.*;
 import java.awt.*;
@@ -43,12 +44,7 @@ public class OfflineAccountCreationView extends JPanel {
         button.addActionListener(e -> {
             String text = this.usernameField.getText();
             if (text.isEmpty()) {
-                JOptionPane.showMessageDialog(
-                        TESLauncher.frame,
-                        "Enter a username",
-                        "Error",
-                        JOptionPane.ERROR_MESSAGE
-                );
+                MessageBox.showErrorMessage(TESLauncher.frame, "Enter a username");
 
                 return;
             }
@@ -57,12 +53,7 @@ public class OfflineAccountCreationView extends JPanel {
 
             Account account = new OfflineAccount(text);
             if (!accountsManager.canCreateAccount(account.getUsername())) {
-                JOptionPane.showMessageDialog(
-                        TESLauncher.frame,
-                        "Account with username '" + account.getUsername() + "' already exists",
-                        "Error",
-                        JOptionPane.ERROR_MESSAGE
-                );
+                MessageBox.showErrorMessage(TESLauncher.frame, "Account with username '" + account.getUsername() + "' already exists");
 
                 return;
             }

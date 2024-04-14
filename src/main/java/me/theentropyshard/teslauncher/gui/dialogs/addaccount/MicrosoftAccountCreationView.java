@@ -28,6 +28,7 @@ import me.theentropyshard.teslauncher.minecraft.auth.microsoft.AuthListener;
 import me.theentropyshard.teslauncher.minecraft.auth.microsoft.MicrosoftAuthenticator;
 import me.theentropyshard.teslauncher.minecraft.auth.microsoft.MinecraftProfile;
 import me.theentropyshard.teslauncher.minecraft.auth.microsoft.MinecraftSkin;
+import me.theentropyshard.teslauncher.swing.MessageBox;
 import me.theentropyshard.teslauncher.utils.OperatingSystem;
 import me.theentropyshard.teslauncher.utils.SkinUtils;
 import okhttp3.OkHttpClient;
@@ -169,8 +170,7 @@ public class MicrosoftAccountCreationView extends JPanel {
 
             if (!this.isSelectedBox()) {
                 if (!Desktop.isDesktopSupported()) {
-                    JOptionPane.showMessageDialog(TESLauncher.frame,
-                            "java.awt.Desktop is not supported", "Error", JOptionPane.ERROR_MESSAGE);
+                    MessageBox.showErrorMessage(TESLauncher.frame, "java.awt.Desktop is not supported");
                     return;
                 }
 

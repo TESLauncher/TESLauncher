@@ -24,6 +24,7 @@ import me.theentropyshard.teslauncher.gui.dialogs.AppDialog;
 import me.theentropyshard.teslauncher.gui.playview.PlayView;
 import me.theentropyshard.teslauncher.instance.InstanceAlreadyExistsException;
 import me.theentropyshard.teslauncher.instance.InstanceManager;
+import me.theentropyshard.teslauncher.swing.MessageBox;
 import me.theentropyshard.teslauncher.utils.SwingUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -162,22 +163,20 @@ public class AddInstanceDialog extends AppDialog {
         this.addButton.addActionListener(e -> {
             String instanceName = this.nameField.getText();
             if (instanceName.trim().isEmpty()) {
-                JOptionPane.showMessageDialog(
+                MessageBox.showErrorMessage(
                         AddInstanceDialog.this.getDialog(),
-                        "Instance name cannot be empty",
-                        "Error",
-                        JOptionPane.ERROR_MESSAGE
+                        "Instance name cannot be empty"
                 );
+
                 return;
             }
 
             if (versionsTable.getSelectedRow() == -1) {
-                JOptionPane.showMessageDialog(
+                MessageBox.showErrorMessage(
                         AddInstanceDialog.this.getDialog(),
-                        "Minecraft version is not selected",
-                        "Error",
-                        JOptionPane.ERROR_MESSAGE
+                        "Minecraft version is not selected"
                 );
+
                 return;
             }
 
@@ -194,11 +193,9 @@ public class AddInstanceDialog extends AppDialog {
                 try {
                     instanceManager.createInstance(instanceName, chosenGroupName, mcVersion);
                 } catch (InstanceAlreadyExistsException ex) {
-                    JOptionPane.showMessageDialog(
+                    MessageBox.showErrorMessage(
                             AddInstanceDialog.this.getDialog(),
-                            ex.getMessage(),
-                            "Error",
-                            JOptionPane.ERROR_MESSAGE
+                            ex.getMessage()
                     );
 
                     LOG.warn(ex);

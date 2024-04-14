@@ -21,6 +21,7 @@ package me.theentropyshard.teslauncher.gui.accountsview;
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.accounts.Account;
 import me.theentropyshard.teslauncher.gui.playview.PlayViewHeader;
+import me.theentropyshard.teslauncher.swing.MessageBox;
 import me.theentropyshard.teslauncher.utils.SwingUtils;
 
 import javax.swing.*;
@@ -126,15 +127,13 @@ public class AccountItem extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (AccountItem.this.trashBounds.contains(e.getPoint())) {
-                    int option = JOptionPane.showConfirmDialog(
+                    boolean ok = MessageBox.showConfirmDialog(
                             TESLauncher.frame,
-                            "Are you sure that you want to remove account '" + account.getUsername() + "'?",
                             "Account removal",
-                            JOptionPane.YES_NO_OPTION,
-                            JOptionPane.QUESTION_MESSAGE
+                            "Are you sure that you want to remove account '" + account.getUsername() + "'?"
                     );
 
-                    if (option != JOptionPane.OK_OPTION) {
+                    if (!ok) {
                         return;
                     }
 
@@ -143,11 +142,9 @@ public class AccountItem extends JPanel {
                     } catch (IOException ex) {
                         ex.printStackTrace();
 
-                        JOptionPane.showMessageDialog(
+                        MessageBox.showErrorMessage(
                                 TESLauncher.frame,
-                                "Unable to remove account '" + account.getUsername() + "': " + ex.getMessage(),
-                                "Error",
-                                JOptionPane.ERROR_MESSAGE
+                                "Unable to remove account '" + account.getUsername() + "': " + ex.getMessage()
                         );
 
                         return;

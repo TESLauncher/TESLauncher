@@ -27,6 +27,7 @@ import me.theentropyshard.teslauncher.gui.accountsview.AddAccountItem;
 import me.theentropyshard.teslauncher.gui.components.InstanceItem;
 import me.theentropyshard.teslauncher.gui.playview.InstancesPanel;
 import me.theentropyshard.teslauncher.gui.playview.PlayView;
+import me.theentropyshard.teslauncher.swing.MessageBox;
 import me.theentropyshard.teslauncher.utils.SwingUtils;
 
 import javax.swing.*;

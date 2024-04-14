@@ -28,6 +28,7 @@ import me.theentropyshard.teslauncher.gui.dialogs.instancesettings.InstanceSetti
 import me.theentropyshard.teslauncher.instance.Instance;
 import me.theentropyshard.teslauncher.instance.InstanceManager;
 import me.theentropyshard.teslauncher.instance.InstanceRunner;
+import me.theentropyshard.teslauncher.swing.MessageBox;
 import me.theentropyshard.teslauncher.swing.MouseClickListener;
 import me.theentropyshard.teslauncher.swing.MouseEnterExitListener;
 import me.theentropyshard.teslauncher.utils.OperatingSystem;
@@ -159,12 +160,7 @@ public class PlayView extends View {
             int mouseButton = e.getButton();
             if (mouseButton == MouseEvent.BUTTON1) { // left mouse button
                 if (AccountsManager.getCurrentAccount() == null) {
-                    JOptionPane.showMessageDialog(
-                            TESLauncher.frame,
-                            "No account selected",
-                            "Error",
-                            JOptionPane.ERROR_MESSAGE
-                    );
+                    MessageBox.showErrorMessage(TESLauncher.frame, "No account selected");
                 } else {
                     new InstanceRunner(AccountsManager.getCurrentAccount(), item).start();
                 }
@@ -239,14 +235,13 @@ public class PlayView extends View {
     }
 
     public void deleteInstance(InstanceItem item) {
-        int option = JOptionPane.showConfirmDialog(
+        boolean ok = MessageBox.showConfirmDialog(
                 TESLauncher.frame,
-                "Are you sure you want to delete instance '" + item.getAssociatedInstance().getName() + "'?",
                 "Delete instance",
-                JOptionPane.YES_NO_OPTION
+                "Are you sure you want to delete instance '" + item.getAssociatedInstance().getName() + "'?"
         );
 
-        if (option == JOptionPane.YES_OPTION) {
+        if (ok) {
             InstanceManager instanceManager = TESLauncher.getInstance().getInstanceManager();
             try {
                 instanceManager.removeInstance(item.getAssociatedInstance().getName());

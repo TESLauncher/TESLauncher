@@ -27,6 +27,7 @@ import me.theentropyshard.teslauncher.minecraft.*;
 import me.theentropyshard.teslauncher.minecraft.argument.Argument;
 import me.theentropyshard.teslauncher.minecraft.argument.ArgumentType;
 import me.theentropyshard.teslauncher.minecraft.auth.microsoft.AuthException;
+import me.theentropyshard.teslauncher.swing.MessageBox;
 import me.theentropyshard.teslauncher.utils.FileUtils;
 import me.theentropyshard.teslauncher.utils.OperatingSystem;
 import me.theentropyshard.teslauncher.utils.TimeUtils;
@@ -37,7 +38,6 @@ import org.apache.commons.text.StringSubstitutor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.swing.*;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -75,8 +75,7 @@ public class InstanceRunner extends Thread {
                 this.account.authenticate();
             } catch (AuthException e) {
                 LOG.error(e);
-                JOptionPane.showMessageDialog(TESLauncher.frame,
-                        e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                MessageBox.showErrorMessage(TESLauncher.frame, e.getMessage());
             }
 
             TESLauncher launcher = TESLauncher.getInstance();
@@ -440,10 +439,8 @@ public class InstanceRunner extends Thread {
         while ((line = reader.readLine()) != null) {
             if (line.contains("Could not reserve enough space for object heap") ||
                     line.contains("There is insufficient memory for the Java Runtime Environment to continue")) {
-                JOptionPane.showMessageDialog(TESLauncher.frame,
-                        "Java Runtime Environment could not allocate enough memory",
-                        "Error",
-                        JOptionPane.ERROR_MESSAGE
+                MessageBox.showErrorMessage(TESLauncher.frame,
+                        "Java Runtime Environment could not allocate enough memory"
                 );
             }
 
