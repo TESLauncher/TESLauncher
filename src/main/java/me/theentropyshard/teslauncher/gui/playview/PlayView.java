@@ -207,6 +207,10 @@ public class PlayView extends View {
 
                     Instance instance = item.getAssociatedInstance();
 
+                    if (instance == null) {
+                        return;
+                    }
+
                     String lastPlayedTime = TimeUtils.getHoursMinutesSeconds(instance.getLastPlaytime());
                     String totalPlayedTime = TimeUtils.getHoursMinutesSeconds(instance.getTotalPlaytime());
 
