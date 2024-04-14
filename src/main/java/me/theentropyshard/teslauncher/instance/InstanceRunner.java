@@ -427,8 +427,6 @@ public class InstanceRunner extends Thread {
     }
 
     private int runGameProcess(List<String> command, Path runDir) throws IOException {
-        LOG.debug("Running the game with command '{}'", command);
-
         ProcessBuilder processBuilder = new ProcessBuilder(command);
         processBuilder.environment().put("APPDATA", runDir.toString());
         processBuilder.directory(runDir.toFile());
