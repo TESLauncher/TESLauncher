@@ -115,6 +115,9 @@
                             <addClasspath>true</addClasspath>
                             <mainClass>me.theentropyshard.teslauncher.Main</mainClass>
                         </manifest>
+                        <manifestEntries>
+                            <Implementation-Version>${project.version}</Implementation-Version>
+                        </manifestEntries>
                     </archive>
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
