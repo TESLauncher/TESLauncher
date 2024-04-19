@@ -80,6 +80,7 @@ public class AddInstanceDialog extends AppDialog {
         root.add(headerPanel, BorderLayout.NORTH);
 
         JTable versionsTable = new JTable();
+        versionsTable.getTableHeader().setEnabled(false);
 
         McVersionsTableModel tableModel = new McVersionsTableModel(this, versionsTable);
         versionsTable.setModel(tableModel);
