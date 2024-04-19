@@ -23,11 +23,11 @@ java -jar target/TESLauncher-0.11.0.jar
 ```
 
 ### Warning
-Launcher will create its folders in the current working directory. That means that if you run <br>
+Launcher will create its folders in the directory where `java` command was executed. That means that if you run <br>
 ```shell
 java -jar target/TESLauncher-0.11.0.jar
 ```
-launcher will run in current directory. If you want to run the launcher in any other place, specify a path to the working directory using `--workDir` parameter. <br>
+launcher will run in project's root directory. If you want to run the launcher in any other place, specify a path to the working directory using `--workDir` parameter. <br>
 Example:
 ```shell
 java -jar target/TESLauncher-0.11.0.jar --workDir C:\Users\User\Documents\TESLauncher
