@@ -131,6 +131,11 @@ public class PlayView extends View {
                         InstanceItem item = new InstanceItem(icon, instance.getName());
                         PlayView.this.addInstanceItem(item, instance.getGroupName());
                     }
+
+                    String group = TESLauncher.getInstance().getSettings().lastInstanceGroup;
+                    if (group != null && !group.isEmpty()) {
+                        PlayView.this.model.setSelectedItem(group);
+                    }
                 } catch (InterruptedException | ExecutionException e) {
                     e.printStackTrace();
                 }
@@ -254,6 +259,10 @@ public class PlayView extends View {
             instancesPanel.remove(item);
             instancesPanel.revalidate();
         }
+    }
+
+    public DefaultComboBoxModel<String> getModel() {
+        return this.model;
     }
 
     public InstancesPanel getCurrentInstancesPanel() {

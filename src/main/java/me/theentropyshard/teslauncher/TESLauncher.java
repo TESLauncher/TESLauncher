@@ -169,6 +169,8 @@ public class TESLauncher {
             }
         });
 
+        this.settings.lastInstanceGroup = String.valueOf(this.gui.getPlayView().getModel().getSelectedItem());
+
         try {
             this.settings.save(this.settingsFile);
         } catch (IOException e) {
