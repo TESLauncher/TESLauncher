@@ -18,7 +18,6 @@
 
 package me.theentropyshard.teslauncher.gui.dialogs.addinstance;
 
-import com.formdev.flatlaf.FlatClientProperties;
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.gui.components.InstanceItem;
 import me.theentropyshard.teslauncher.gui.dialogs.AppDialog;
@@ -34,6 +33,8 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableModel;
 import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 
 public class AddInstanceDialog extends AppDialog {
@@ -46,6 +47,8 @@ public class AddInstanceDialog extends AppDialog {
     private final JCheckBox snapshotsBox;
     private final JCheckBox betasBox;
     private final JCheckBox alphasBox;
+
+    private boolean nameEdited;
 
     public AddInstanceDialog(PlayView playView, String groupName) {
         super(TESLauncher.frame, "Add New Instance");
@@ -70,6 +73,12 @@ public class AddInstanceDialog extends AppDialog {
         headerPanelRightPanel.setLayout(new GridLayout(2, 1));
 
         this.nameField = new JTextField();
+        this.nameField.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                AddInstanceDialog.this.nameEdited = true;
+            }
+        });
         headerPanelRightPanel.add(this.nameField);
 
         this.groupField = new JTextField(groupName);
@@ -87,6 +96,10 @@ public class AddInstanceDialog extends AppDialog {
         versionsTable.setModel(tableModel);
 
         versionsTable.getSelectionModel().addListSelectionListener(e -> {
+            if (this.nameEdited) {
+                return;
+            }
+
             int selectedRow = versionsTable.getSelectedRow();
 
             if (selectedRow != -1) {
