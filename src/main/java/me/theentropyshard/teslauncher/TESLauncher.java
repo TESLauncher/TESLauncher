@@ -79,8 +79,6 @@ public class TESLauncher {
 
         TESLauncher.setInstance(this);
 
-        System.out.println(VERSION);
-
         Path minecraftDir = this.workDir.resolve("minecraft");
         this.runtimesDir = minecraftDir.resolve("runtimes");
         this.assetsDir = minecraftDir.resolve("assets");
