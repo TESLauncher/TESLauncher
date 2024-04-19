@@ -91,6 +91,7 @@ public class AddInstanceDialog extends AppDialog {
 
         JTable versionsTable = new JTable();
         versionsTable.getTableHeader().setEnabled(false);
+        versionsTable.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         McVersionsTableModel tableModel = new McVersionsTableModel(this, versionsTable);
         versionsTable.setModel(tableModel);
