@@ -18,6 +18,7 @@
 
 package me.theentropyshard.teslauncher.gui.dialogs.addinstance;
 
+import com.formdev.flatlaf.FlatClientProperties;
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.gui.components.InstanceItem;
 import me.theentropyshard.teslauncher.gui.dialogs.AppDialog;
@@ -160,6 +161,7 @@ public class AddInstanceDialog extends AppDialog {
         buttonsPanel.add(rightButtonsPanel, BorderLayout.EAST);
 
         this.addButton = new JButton("Add");
+        this.getDialog().getRootPane().setDefaultButton(this.addButton);
         this.addButton.setEnabled(false);
         this.addButton.addActionListener(e -> {
             String instanceName = this.nameField.getText();
