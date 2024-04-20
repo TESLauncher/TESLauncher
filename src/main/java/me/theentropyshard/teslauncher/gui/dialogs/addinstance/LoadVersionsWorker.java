@@ -68,7 +68,7 @@ public class LoadVersionsWorker extends SwingWorker<VersionManifest, Void> {
         try {
             versionManifest = this.get();
         } catch (InterruptedException | ExecutionException e) {
-            LOG.error(e);
+            LOG.error("Unexpected error", e);
 
             return;
         }

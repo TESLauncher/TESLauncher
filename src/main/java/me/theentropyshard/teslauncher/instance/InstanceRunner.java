@@ -74,7 +74,7 @@ public class InstanceRunner extends Thread {
             try {
                 this.account.authenticate();
             } catch (AuthException e) {
-                LOG.error(e);
+                LOG.error("Could not authenticate", e);
                 MessageBox.showErrorMessage(TESLauncher.frame, e.getMessage());
             }
 

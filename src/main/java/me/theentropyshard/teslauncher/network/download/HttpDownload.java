@@ -163,7 +163,7 @@ public class HttpDownload {
             try {
                 return Files.size(this.saveAs);
             } catch (IOException e) {
-                LOG.error(e);
+                LOG.error("Could not get file size of {}", this.saveAs, e);
             }
         }
 

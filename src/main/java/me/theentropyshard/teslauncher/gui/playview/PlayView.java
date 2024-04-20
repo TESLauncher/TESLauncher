@@ -240,18 +240,21 @@ public class PlayView extends View {
     }
 
     public void deleteInstance(InstanceItem item) {
+        Instance instance = item.getAssociatedInstance();
+
         boolean ok = MessageBox.showConfirmMessage(
                 TESLauncher.frame,
                 "Delete instance",
-                "Are you sure you want to delete instance '" + item.getAssociatedInstance().getName() + "'?"
+                "Are you sure you want to delete instance '" + instance.getName() + "'?"
         );
 
         if (ok) {
             InstanceManager instanceManager = TESLauncher.getInstance().getInstanceManager();
             try {
-                instanceManager.removeInstance(item.getAssociatedInstance().getName());
+                instanceManager.removeInstance(instance.getName());
             } catch (IOException ex) {
-                LOG.error(ex);
+                LOG.error("Could not remove instance instance {}", instance.getWorkDir(), ex);
+
                 return;
             }
 
