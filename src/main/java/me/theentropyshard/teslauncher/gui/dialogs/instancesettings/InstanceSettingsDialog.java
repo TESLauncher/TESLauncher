@@ -21,6 +21,7 @@ package me.theentropyshard.teslauncher.gui.dialogs.instancesettings;
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.gui.components.InstanceItem;
 import me.theentropyshard.teslauncher.gui.dialogs.AppDialog;
+import me.theentropyshard.teslauncher.gui.dialogs.addinstance.AddInstanceDialog;
 import me.theentropyshard.teslauncher.gui.dialogs.instancesettings.tab.JarModsTab;
 import me.theentropyshard.teslauncher.gui.dialogs.instancesettings.tab.JavaTab;
 import me.theentropyshard.teslauncher.gui.dialogs.instancesettings.tab.MainTab;
@@ -30,6 +31,8 @@ import me.theentropyshard.teslauncher.instance.Instance;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
@@ -46,6 +49,17 @@ public class InstanceSettingsDialog extends AppDialog {
 
         this.tabbedPane = new JTabbedPane(JTabbedPane.LEFT);
         this.tabbedPane.setPreferredSize(new Dimension(900, 480));
+
+        InputMap inputMap = this.tabbedPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "ESCAPE");
+
+        ActionMap actionMap = this.tabbedPane.getActionMap();
+        actionMap.put("ESCAPE", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                InstanceSettingsDialog.this.getDialog().dispose();
+            }
+        });
 
         this.tabs = new ArrayList<>();
 
