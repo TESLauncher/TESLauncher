@@ -19,7 +19,7 @@
 package me.theentropyshard.teslauncher.gui.dialogs.addaccount;
 
 import me.theentropyshard.teslauncher.TESLauncher;
-import me.theentropyshard.teslauncher.gui.accountsview.AccountsView;
+import me.theentropyshard.teslauncher.gui.view.accountsview.AccountsView;
 import me.theentropyshard.teslauncher.gui.dialogs.AppDialog;
 
 import javax.swing.*;

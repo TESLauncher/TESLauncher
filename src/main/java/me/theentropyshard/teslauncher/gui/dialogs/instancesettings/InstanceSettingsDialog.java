@@ -25,7 +25,7 @@ import me.theentropyshard.teslauncher.gui.dialogs.instancesettings.tab.JarModsTa
 import me.theentropyshard.teslauncher.gui.dialogs.instancesettings.tab.JavaTab;
 import me.theentropyshard.teslauncher.gui.dialogs.instancesettings.tab.MainTab;
 import me.theentropyshard.teslauncher.gui.dialogs.instancesettings.tab.SettingsTab;
-import me.theentropyshard.teslauncher.gui.playview.InstancesPanel;
+import me.theentropyshard.teslauncher.gui.view.playview.InstancesPanel;
 import me.theentropyshard.teslauncher.instance.Instance;
 
 import javax.swing.*;

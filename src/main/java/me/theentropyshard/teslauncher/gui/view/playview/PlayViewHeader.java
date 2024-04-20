@@ -16,11 +16,11 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.gui.playview;
+package me.theentropyshard.teslauncher.gui.view.playview;
 
 import me.theentropyshard.teslauncher.accounts.Account;
 import me.theentropyshard.teslauncher.accounts.AccountsManager;
-import me.theentropyshard.teslauncher.gui.View;
+import me.theentropyshard.teslauncher.gui.view.View;
 
 import javax.swing.*;
 import java.awt.*;

@@ -16,9 +16,9 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.gui.playview;
+package me.theentropyshard.teslauncher.gui.view.playview;
 
-import me.theentropyshard.teslauncher.gui.View;
+import me.theentropyshard.teslauncher.gui.view.View;
 import me.theentropyshard.teslauncher.gui.components.AddInstanceItem;
 import me.theentropyshard.teslauncher.gui.components.InstanceItem;
 import me.theentropyshard.teslauncher.gui.layouts.WrapLayout;

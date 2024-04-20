@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.gui.accountsview;
+package me.theentropyshard.teslauncher.gui.view.accountsview;
 
 import java.util.HashSet;
 import java.util.Set;
