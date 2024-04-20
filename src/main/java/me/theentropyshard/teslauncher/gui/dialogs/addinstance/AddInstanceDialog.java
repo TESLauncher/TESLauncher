@@ -127,7 +127,11 @@ public class AddInstanceDialog extends AppDialog {
             }
         });
 
-        JScrollPane scrollPane = new JScrollPane(versionsTable);
+        JScrollPane scrollPane = new JScrollPane(
+                versionsTable,
+                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER
+        );
 
         JPanel filterPanel = new JPanel();
         filterPanel.setLayout(new GridBagLayout());
