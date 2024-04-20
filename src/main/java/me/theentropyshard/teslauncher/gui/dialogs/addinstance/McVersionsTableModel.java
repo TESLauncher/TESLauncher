@@ -42,7 +42,10 @@ public class McVersionsTableModel extends DefaultTableModel {
         int rowCount = this.getRowCount();
 
         this.dataVector.clear();
-        this.fireTableRowsDeleted(0, rowCount - 1);
+
+        if (rowCount != 0) {
+            this.fireTableRowsDeleted(0, rowCount - 1);
+        }
 
         this.load(forceNetwork);
     }
