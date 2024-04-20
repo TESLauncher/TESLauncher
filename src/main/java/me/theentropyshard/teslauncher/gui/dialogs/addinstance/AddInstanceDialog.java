@@ -129,7 +129,7 @@ public class AddInstanceDialog extends AppDialog {
 
         JScrollPane scrollPane = new JScrollPane(
                 versionsTable,
-                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
                 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER
         );
 
