@@ -49,6 +49,10 @@ public class Instance {
     private long totalPlaytime;
     private final List<JarMod> jarMods;
 
+    public Instance() {
+        this(null, null, null);
+    }
+
     public Instance(String name, String groupName, String minecraftVersion) {
         this.name = name;
         this.groupName = groupName;
