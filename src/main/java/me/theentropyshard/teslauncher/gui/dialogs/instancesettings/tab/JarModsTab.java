@@ -73,10 +73,6 @@ public class JarModsTab extends SettingsTab {
                         settings.lastDir = fileChooser.getCurrentDirectory().getAbsolutePath();
 
                         List<JarMod> jarMods = instance.getJarMods();
-                        if (jarMods == null) {
-                            jarMods = new ArrayList<>();
-                            instance.setJarMods(jarMods);
-                        }
 
                         Path jarModPath = selectedFile.toPath().toAbsolutePath().normalize();
 

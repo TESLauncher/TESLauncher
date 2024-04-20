@@ -25,9 +25,12 @@ import me.theentropyshard.teslauncher.utils.json.Json;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Instance {
+    private static final String INSTANCE_FILE_NAME = "instance.json";
+
     private transient Path workDir;
 
     private String name;
@@ -42,20 +45,18 @@ public class Instance {
     private LocalDateTime lastTimePlayed = LocalDateTime.MIN;
     private long lastPlaytime;
     private long totalPlaytime;
-    private List<JarMod> jarMods;
-
-    public Instance() {
-
-    }
+    private final List<JarMod> jarMods;
 
     public Instance(String name, String groupName, String minecraftVersion) {
         this.name = name;
         this.groupName = groupName;
         this.minecraftVersion = minecraftVersion;
+
+        this.jarMods = new ArrayList<>();
     }
 
     public void save() throws IOException {
-        FileUtils.writeUtf8(this.getWorkDir().resolve("instance.json"), Json.write(this));
+        FileUtils.writeUtf8(this.getWorkDir().resolve(Instance.INSTANCE_FILE_NAME), Json.write(this));
     }
 
     public void updatePlaytime(long seconds) {
@@ -81,10 +82,6 @@ public class Instance {
 
     public List<JarMod> getJarMods() {
         return this.jarMods;
-    }
-
-    public void setJarMods(List<JarMod> jarMods) {
-        this.jarMods = jarMods;
     }
 
     public String getName() {
