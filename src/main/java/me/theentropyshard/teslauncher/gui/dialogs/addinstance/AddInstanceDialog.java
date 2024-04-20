@@ -31,6 +31,7 @@ import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
@@ -90,6 +91,23 @@ public class AddInstanceDialog extends AppDialog {
         root.add(headerPanel, BorderLayout.NORTH);
 
         JTable versionsTable = new JTable();
+        versionsTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+
+                if (c instanceof JLabel) {
+                    if (column == 0) {
+                        ((JLabel) c).setHorizontalAlignment(JLabel.LEFT);
+                    } else {
+                        ((JLabel) c).setHorizontalAlignment(JLabel.CENTER);
+                    }
+                }
+
+                return c;
+            }
+        });
+        SwingUtils.setJTableColumnsWidth(versionsTable, 70, 15, 15);
         versionsTable.getTableHeader().setEnabled(false);
         versionsTable.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 

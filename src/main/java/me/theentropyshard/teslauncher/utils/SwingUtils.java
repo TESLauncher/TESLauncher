@@ -20,6 +20,8 @@ package me.theentropyshard.teslauncher.utils;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
@@ -81,6 +83,20 @@ public final class SwingUtils {
     public static void removeActionListeners(AbstractButton button) {
         for (ActionListener listener : button.getActionListeners()) {
             button.removeActionListener(listener);
+        }
+    }
+
+    public static void setJTableColumnsWidth(JTable table, double... percentages) {
+        TableColumnModel columnModel = table.getColumnModel();
+        int tablePreferredWidth = columnModel.getTotalColumnWidth();
+
+        double total = 0;
+        for (int i = 0; i < columnModel.getColumnCount(); i++) {
+            total += percentages[i];
+        }
+
+        for (int i = 0; i < columnModel.getColumnCount(); i++) {
+            columnModel.getColumn(i).setPreferredWidth((int) (tablePreferredWidth * (percentages[i] / total)));
         }
     }
 }

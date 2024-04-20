@@ -111,5 +111,7 @@ public class LoadVersionsWorker extends SwingWorker<VersionManifest, Void> {
         this.table.setRowSorter(rowSorter);
 
         this.dialog.getAddButton().setEnabled(true);
+
+        SwingUtils.setJTableColumnsWidth(this.table, 70, 15, 15);
     }
 }
