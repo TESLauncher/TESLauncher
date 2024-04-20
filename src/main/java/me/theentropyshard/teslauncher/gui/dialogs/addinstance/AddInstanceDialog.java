@@ -253,7 +253,7 @@ public class AddInstanceDialog extends AppDialog {
         root.add(buttonsPanel, BorderLayout.SOUTH);
 
         root.add(centerPanel, BorderLayout.CENTER);
-        root.setPreferredSize(new Dimension(800, 600));
+        root.setPreferredSize(new Dimension(900, 480));
 
         this.setResizable(false);
         this.setContent(root);
