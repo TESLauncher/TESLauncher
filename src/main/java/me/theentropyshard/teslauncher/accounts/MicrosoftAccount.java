@@ -19,14 +19,17 @@
 package me.theentropyshard.teslauncher.accounts;
 
 import me.theentropyshard.teslauncher.TESLauncher;
+import me.theentropyshard.teslauncher.gui.dialogs.MinecraftDownloadDialog;
 import me.theentropyshard.teslauncher.gui.view.accountsview.AccountItem;
 import me.theentropyshard.teslauncher.gui.dialogs.addaccount.MicrosoftAccountCreationView;
 import me.theentropyshard.teslauncher.minecraft.auth.microsoft.AuthException;
 import me.theentropyshard.teslauncher.minecraft.auth.microsoft.AuthListener;
 import me.theentropyshard.teslauncher.minecraft.auth.microsoft.MicrosoftAuthenticator;
 import me.theentropyshard.teslauncher.minecraft.auth.microsoft.MinecraftProfile;
+import me.theentropyshard.teslauncher.utils.SwingUtils;
 import me.theentropyshard.teslauncher.utils.UndashedUUID;
 
+import javax.swing.*;
 import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
@@ -48,6 +51,12 @@ public class MicrosoftAccount extends Account {
     @Override
     public void authenticate() throws IOException, AuthException {
         if (this.needToRefresh()) {
+            MinecraftDownloadDialog dialog = new MinecraftDownloadDialog();
+            dialog.getDialog().setTitle("Authenticating...");
+            dialog.onStageChanged("Refreshing auth token...");
+
+            SwingUtilities.invokeLater(() -> dialog.setVisible(true));
+
             AuthListener authListener = new AuthListener() {
                 @Override
                 public void onUserCodeReceived(String userCode, String verificationUri) {
@@ -96,12 +105,14 @@ public class MicrosoftAccount extends Account {
             this.setLoggedInAt(OffsetDateTime.now());
             this.setExpiresIn(authenticator.getExpiresIn());
 
+            dialog.onStageChanged("Getting skin...");
             this.setHeadIcon(
                     MicrosoftAccountCreationView.getBase64SkinHead(profile)
             );
 
-
             TESLauncher.getInstance().getAccountsManager().save();
+
+            SwingUtilities.invokeLater(() -> dialog.getDialog().dispose());
         }
     }
 
