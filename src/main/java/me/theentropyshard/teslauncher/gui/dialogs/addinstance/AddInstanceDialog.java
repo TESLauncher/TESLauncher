@@ -202,7 +202,7 @@ public class AddInstanceDialog extends AppDialog {
         leftButtonsPanel.add(refreshManifest);
 
         FlowLayout rightLayout = new FlowLayout(FlowLayout.RIGHT);
-        rightLayout.setHgap(0);
+        rightLayout.setHgap(10);
         rightLayout.setVgap(0);
 
         JPanel rightButtonsPanel = new JPanel(rightLayout);
@@ -261,7 +261,7 @@ public class AddInstanceDialog extends AppDialog {
             this.getDialog().dispose();
         });
         rightButtonsPanel.add(cancelButton);
-        buttonsPanel.setBorder(new EmptyBorder(6, 10, 10, 10));
+        buttonsPanel.setBorder(new EmptyBorder(6, 10, 10, 0));
         root.add(buttonsPanel, BorderLayout.SOUTH);
 
         root.add(centerPanel, BorderLayout.CENTER);
