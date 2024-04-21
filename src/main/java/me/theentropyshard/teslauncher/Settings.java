@@ -34,7 +34,7 @@ public class Settings {
     public boolean darkTheme = false;
     public String lastDir = System.getProperty("user.dir");
     public boolean useDownloadDialog = true;
-    public String lastInstanceGroup;
+    public String lastInstanceGroup = "<default>";
     public boolean dialogRelativeToParent = true;
 
     public Settings() {
