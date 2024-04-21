@@ -69,7 +69,7 @@ public class SettingsView extends View {
         }
 
         {
-            JPanel uiSettings = new JPanel(new GridLayout(0, 1));
+            JPanel uiSettings = new JPanel(new GridLayout(2, 2));
             uiSettings.setBorder(new TitledBorder("UI"));
 
             JComboBox<String> options = new JComboBox<>(new String[]{"Dialog", "Circle"});
@@ -98,6 +98,33 @@ public class SettingsView extends View {
 
             uiSettings.add(label);
             uiSettings.add(options);
+
+            JLabel dialogPosition = new JLabel("Dialog position: ");
+
+            JComboBox<String> position = new JComboBox<>(new String[]{"Relative to parent", "Always centered"});
+            if (TESLauncher.getInstance().getSettings().dialogRelativeToParent) {
+                options.setSelectedIndex(0);
+            } else {
+                options.setSelectedIndex(1);
+            }
+
+            position.addItemListener(e -> {
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    switch (e.getItem().toString()) {
+                        case "Relative to parent":
+                            TESLauncher.getInstance().getSettings().dialogRelativeToParent = true;
+                            break;
+                        case "Always centered":
+                            TESLauncher.getInstance().getSettings().dialogRelativeToParent = false;
+                            break;
+                        default:
+                            throw new RuntimeException("Unreachable");
+                    }
+                }
+            });
+
+            uiSettings.add(dialogPosition);
+            uiSettings.add(position);
 
             gbc.gridy++;
             gbc.weighty = 1;

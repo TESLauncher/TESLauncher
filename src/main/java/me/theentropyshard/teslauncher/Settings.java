@@ -35,6 +35,7 @@ public class Settings {
     public String lastDir = System.getProperty("user.dir");
     public boolean useDownloadDialog = true;
     public String lastInstanceGroup;
+    public boolean dialogRelativeToParent = true;
 
     public Settings() {
 

@@ -18,6 +18,7 @@
 
 package me.theentropyshard.teslauncher.gui.dialogs;
 
+import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.utils.SwingUtils;
 
 import javax.swing.*;
@@ -32,7 +33,11 @@ public abstract class AppDialog {
     }
 
     public void center(int screen) {
-        SwingUtils.centerWindow(this.dialog, screen);
+        if (TESLauncher.getInstance().getSettings().dialogRelativeToParent) {
+            this.dialog.setLocationRelativeTo(TESLauncher.frame);
+        } else {
+            SwingUtils.centerWindow(this.dialog, screen);
+        }
     }
 
     public void setVisible(boolean visible) {
