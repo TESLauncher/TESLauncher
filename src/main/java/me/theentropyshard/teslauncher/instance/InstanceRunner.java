@@ -30,6 +30,7 @@ import me.theentropyshard.teslauncher.minecraft.auth.microsoft.AuthException;
 import me.theentropyshard.teslauncher.swing.MessageBox;
 import me.theentropyshard.teslauncher.utils.FileUtils;
 import me.theentropyshard.teslauncher.utils.OperatingSystem;
+import me.theentropyshard.teslauncher.utils.ProcessReader;
 import me.theentropyshard.teslauncher.utils.TimeUtils;
 import me.theentropyshard.teslauncher.utils.json.Json;
 import net.lingala.zip4j.ZipFile;
@@ -433,25 +434,19 @@ public class InstanceRunner extends Thread {
 
         Process process = processBuilder.start();
 
-        InputStream inputStream = process.getInputStream();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
-        String line;
-        while ((line = reader.readLine()) != null) {
-            if (line.contains("Could not reserve enough space for object heap") ||
-                    line.contains("There is insufficient memory for the Java Runtime Environment to continue")) {
-                MessageBox.showErrorMessage(TESLauncher.frame,
-                        "Java Runtime Environment could not allocate enough memory"
-                );
-            }
-
-            LOG.info(line);
-        }
+        new ProcessReader(process).read(this::readProcessOutput);
 
         try {
             return process.waitFor();
         } catch (InterruptedException e) {
             throw new IOException("Unable to wait for process to end");
         }
+    }
+
+    private void readProcessOutput(String line) {
+        MinecraftError.checkForError(line);
+
+        LOG.info(line);
     }
 
     private String getJavaExecutable(String componentName, Path runtimesDir) {
