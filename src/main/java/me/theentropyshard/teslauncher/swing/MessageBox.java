@@ -36,6 +36,10 @@ public final class MessageBox {
         ) == JOptionPane.YES_OPTION;
     }
 
+    public static String showInputMessage(Component parent, String title, String message) {
+        return JOptionPane.showInputDialog(parent, message, title, JOptionPane.QUESTION_MESSAGE);
+    }
+
     private MessageBox() {
         throw new UnsupportedOperationException();
     }
