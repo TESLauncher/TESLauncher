@@ -19,11 +19,8 @@
 package me.theentropyshard.teslauncher;
 
 public final class AppVersion {
-    private static final String VERSION = AppVersion.class.getPackage().getImplementationVersion();
-    private static final String FALLBACK_VERSION = "0.0.0";
-
     public static String getVersion() {
-        return AppVersion.VERSION == null ? AppVersion.FALLBACK_VERSION : AppVersion.VERSION;
+        return BuildConfig.APP_VERSION;
     }
 
     private AppVersion() {
