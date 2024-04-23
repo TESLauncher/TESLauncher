@@ -77,6 +77,8 @@ public class TESLauncher {
         this.args = args;
         this.workDir = workDir;
 
+        Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler());
+
         TESLauncher.setInstance(this);
 
         Path minecraftDir = this.workDir.resolve("minecraft");
