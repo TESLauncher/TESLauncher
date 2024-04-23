@@ -174,6 +174,31 @@ public class InstanceItem extends JPanel implements MinecraftDownloadListener {
         this.arcColor = UIManager.getColor("AccountItem.borderColor");
     }
 
+    public void instanceChanged(Instance instance) {
+        this.textLabel.setText(instance.getName());
+    }
+
+    @Override
+    public void onStageChanged(String stage) {
+
+    }
+
+    @Override
+    public void onProgress(long totalSize, long downloadedBytes) {
+        SwingUtilities.invokeLater(() -> {
+            this.setPercentComplete((double) downloadedBytes / (double) totalSize);
+            this.repaint();
+        });
+    }
+
+    @Override
+    public void onFinish() {
+        SwingUtilities.invokeLater(() -> {
+            this.setPercentComplete(0.0D);
+            this.repaint();
+        });
+    }
+
     @Override
     public Dimension getPreferredSize() {
         return InstanceItem.PREFERRED_SIZE;
@@ -205,26 +230,5 @@ public class InstanceItem extends JPanel implements MinecraftDownloadListener {
 
     public void setPercentComplete(double percentComplete) {
         this.percentComplete = percentComplete;
-    }
-
-    @Override
-    public void onStageChanged(String stage) {
-
-    }
-
-    @Override
-    public void onProgress(long totalSize, long downloadedBytes) {
-        SwingUtilities.invokeLater(() -> {
-            this.setPercentComplete((double) downloadedBytes / (double) totalSize);
-            this.repaint();
-        });
-    }
-
-    @Override
-    public void onFinish() {
-        SwingUtilities.invokeLater(() -> {
-            this.setPercentComplete(0.0D);
-            this.repaint();
-        });
     }
 }

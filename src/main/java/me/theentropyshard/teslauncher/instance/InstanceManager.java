@@ -27,6 +27,7 @@ import org.apache.logging.log4j.Logger;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -110,19 +111,19 @@ public class InstanceManager {
         return path;
     }
 
-    private Path getInstanceWorkDir(Instance instance) {
-        String cleanName = FileUtils.sanitizeFileName(instance.getName());
+    private Path getInstanceWorkDir(String suggestedName, String minecraftVersion) {
+        String cleanName = FileUtils.sanitizeFileName(suggestedName);
 
         if (cleanName.isEmpty()) {
-            cleanName = "instance" + instance.getMinecraftVersion();
+            cleanName = "instance" + minecraftVersion;
         }
 
         Path freeName;
 
         try {
             freeName = this.findFreeName(cleanName);
-        } catch (Exception e) {
-            LOG.warn("Unable to find free name for instance");
+        } catch (StackOverflowError | Exception e) {
+            LOG.warn("Unable to find free name for instance", e);
 
             freeName = this.workDir.resolve(StringUtils.getRandomString(10));
         }
@@ -139,7 +140,7 @@ public class InstanceManager {
         }
 
         Instance instance = new Instance(name, groupName, minecraftVersion);
-        instance.setWorkDir(this.getInstanceWorkDir(instance));
+        instance.setWorkDir(this.getInstanceWorkDir(name, minecraftVersion));
 
         this.cacheInstance(instance);
 
@@ -160,6 +161,28 @@ public class InstanceManager {
         FileUtils.delete(instance.getWorkDir());
 
         this.uncacheInstance(instance);
+    }
+
+    public boolean renameInstance(Instance instance, String newName) throws IOException {
+        this.uncacheInstance(instance);
+
+        Path newInstanceDir = this.getInstanceWorkDir(newName, instance.getMinecraftVersion());
+
+        Files.move(instance.getWorkDir(), newInstanceDir, StandardCopyOption.REPLACE_EXISTING);
+
+        instance.setWorkDir(newInstanceDir);
+
+        boolean invalidName = !newInstanceDir.endsWith(newName);
+
+        if (invalidName) {
+            instance.setName(newInstanceDir.getFileName().toString());
+        } else {
+            instance.setName(newName);
+        }
+
+        this.cacheInstance(instance);
+
+        return invalidName;
     }
 
     public boolean instanceExists(String name) {

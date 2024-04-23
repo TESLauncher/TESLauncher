@@ -170,13 +170,37 @@ public class PlayView extends View {
                     new InstanceRunner(AccountsManager.getCurrentAccount(), item).start();
                 }
             } else if (mouseButton == MouseEvent.BUTTON3) { // right mouse button
+                Instance instance = item.getAssociatedInstance();
+
                 JPopupMenu popupMenu = new JPopupMenu();
 
                 JMenuItem editMenuItem = new JMenuItem("Edit");
                 editMenuItem.addActionListener(edit -> {
-                    new InstanceSettingsDialog(item.getAssociatedInstance());
+                    new InstanceSettingsDialog(instance);
                 });
                 popupMenu.add(editMenuItem);
+
+                JMenuItem renameItem = new JMenuItem("Rename");
+                renameItem.addActionListener(rename -> {
+                    String newName = MessageBox.showInputMessage(TESLauncher.frame, "Rename instance", "Enter new name");
+
+                    if (newName == null || newName.isEmpty()) {
+                        return;
+                    }
+
+                    InstanceManager manager = TESLauncher.getInstance().getInstanceManager();
+                    try {
+                        if (manager.renameInstance(instance, newName)) {
+                            MessageBox.showWarningMessage(TESLauncher.frame, "An invalid name was supplied! Valid name was created.");
+                        }
+                        item.instanceChanged(instance);
+                    } catch (IOException ex) {
+                        LOG.error("Could not rename instance {} ({}) to {}", instance.getName(), instance.getWorkDir(), newName);
+                    }
+                });
+                popupMenu.add(renameItem);
+
+                popupMenu.addSeparator();
 
                 JMenuItem deleteMenuItem = new JMenuItem("Delete");
                 deleteMenuItem.addActionListener(delete -> {
@@ -188,13 +212,13 @@ public class PlayView extends View {
 
                 JMenuItem openInstanceFolder = new JMenuItem("Open instance folder");
                 openInstanceFolder.addActionListener(open -> {
-                    OperatingSystem.open(item.getAssociatedInstance().getWorkDir());
+                    OperatingSystem.open(instance.getWorkDir());
                 });
                 popupMenu.add(openInstanceFolder);
 
                 JMenuItem openMinecraftFolder = new JMenuItem("Open Minecraft folder");
                 openMinecraftFolder.addActionListener(open -> {
-                    OperatingSystem.open(item.getAssociatedInstance().getMinecraftDir());
+                    OperatingSystem.open(instance.getMinecraftDir());
                 });
                 popupMenu.add(openMinecraftFolder);
 
