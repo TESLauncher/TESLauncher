@@ -37,7 +37,7 @@ public final class MessageBox {
     }
 
     public static String showInputMessage(Component parent, String title, String message) {
-        return JOptionPane.showInputDialog(parent, message, title, JOptionPane.QUESTION_MESSAGE);
+        return JOptionPane.showInputDialog(parent, message, title, JOptionPane.PLAIN_MESSAGE);
     }
 
     private MessageBox() {
