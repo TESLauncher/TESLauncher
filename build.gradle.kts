@@ -33,6 +33,7 @@ tasks.shadowJar {
 
     manifest {
         attributes["Main-Class"] = application.mainClass
+        attributes["Implementation-Version"] = project.version.toString()
     }
 }
 
