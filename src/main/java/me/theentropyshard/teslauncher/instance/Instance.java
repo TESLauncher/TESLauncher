@@ -39,6 +39,7 @@ public class Instance {
     private String groupName;
     private String minecraftVersion;
     private String javaPath;
+    private String iconPath = "/assets/icons/grass_icon.png";
     private int minecraftWindowWidth;
     private int minecraftWindowHeight;
     private String customWindowString;
@@ -120,6 +121,14 @@ public class Instance {
 
     public void setJavaPath(String javaPath) {
         this.javaPath = javaPath;
+    }
+
+    public String getIconPath() {
+        return this.iconPath;
+    }
+
+    public void setIconPath(String iconPath) {
+        this.iconPath = iconPath;
     }
 
     public int getMinecraftWindowWidth() {

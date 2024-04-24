@@ -20,11 +20,12 @@ package me.theentropyshard.teslauncher.gui.view.playview;
 
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.accounts.AccountsManager;
-import me.theentropyshard.teslauncher.gui.view.View;
 import me.theentropyshard.teslauncher.gui.components.AddInstanceItem;
 import me.theentropyshard.teslauncher.gui.components.InstanceItem;
+import me.theentropyshard.teslauncher.gui.dialogs.SelectIconDialog;
 import me.theentropyshard.teslauncher.gui.dialogs.addinstance.AddInstanceDialog;
 import me.theentropyshard.teslauncher.gui.dialogs.instancesettings.InstanceSettingsDialog;
+import me.theentropyshard.teslauncher.gui.view.View;
 import me.theentropyshard.teslauncher.instance.Instance;
 import me.theentropyshard.teslauncher.instance.InstanceManager;
 import me.theentropyshard.teslauncher.instance.InstanceRunner;
@@ -127,7 +128,7 @@ public class PlayView extends View {
                     List<Instance> instances = this.get();
 
                     for (Instance instance : instances) {
-                        Icon icon = SwingUtils.getIcon("/assets/grass_icon.png");
+                        Icon icon = SwingUtils.getIcon(instance.getIconPath());
                         InstanceItem item = new InstanceItem(icon, instance.getName());
                         PlayView.this.addInstanceItem(item, instance.getGroupName());
                     }
@@ -179,6 +180,12 @@ public class PlayView extends View {
                     new InstanceSettingsDialog(instance);
                 });
                 popupMenu.add(editMenuItem);
+
+                JMenuItem iconMenuItem = new JMenuItem("Icon");
+                iconMenuItem.addActionListener(edit -> {
+                    new SelectIconDialog(item, instance);
+                });
+                popupMenu.add(iconMenuItem);
 
                 JMenuItem renameItem = new JMenuItem("Rename");
                 renameItem.addActionListener(rename -> {
