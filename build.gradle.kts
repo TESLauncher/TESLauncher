@@ -49,7 +49,7 @@ buildConfig {
 application.mainClass = "me.theentropyshard.teslauncher.Main"
 
 group = "me.theentropyshard"
-version = "0.11.0"
+version = "0.12.0"
 description = "TESLauncher"
 
 java.sourceCompatibility = JavaVersion.VERSION_1_8
