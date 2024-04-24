@@ -30,8 +30,8 @@ import java.util.List;
 
 public class Instance {
     private static final String INSTANCE_FILE_NAME = "instance.json";
-    private static final String MINECRAFT_DIR = OperatingSystem.isMacOS() ? "minecraft" : ".minecraft";
-    private static final String JARMODS_DIR = "jarmods";
+    private static final String MINECRAFT_DIR_NAME = OperatingSystem.isMacOS() ? "minecraft" : ".minecraft";
+    private static final String JARMODS_DIR_NAME = "jarmods";
 
     private transient Path workDir;
 
@@ -79,11 +79,11 @@ public class Instance {
     }
 
     public Path getMinecraftDir() {
-        return this.workDir.resolve(Instance.MINECRAFT_DIR);
+        return this.workDir.resolve(Instance.MINECRAFT_DIR_NAME);
     }
 
     public Path getJarModsDir() {
-        return this.workDir.resolve(Instance.JARMODS_DIR);
+        return this.workDir.resolve(Instance.JARMODS_DIR_NAME);
     }
 
     public List<JarMod> getJarMods() {

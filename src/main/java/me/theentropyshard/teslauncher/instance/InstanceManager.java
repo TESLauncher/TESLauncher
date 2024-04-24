@@ -148,7 +148,7 @@ public class InstanceManager {
         FileUtils.createDirectoryIfNotExists(instance.getMinecraftDir());
         FileUtils.createDirectoryIfNotExists(instance.getJarModsDir());
 
-        FileUtils.writeUtf8(instance.getWorkDir().resolve("instance.json"), Json.write(instance));
+        instance.save();
     }
 
     public void removeInstance(String name) throws IOException {
