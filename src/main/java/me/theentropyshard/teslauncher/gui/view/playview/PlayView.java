@@ -105,7 +105,15 @@ public class PlayView extends View {
         this.instanceInfoLabel = new JLabel();
         this.instanceInfoLabel.setVisible(false);
 
-        root.add(this.instanceInfoLabel, BorderLayout.SOUTH);
+        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        bottomPanel.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, UIManager.getColor("Component.borderColor")));
+        JButton openFolderButton = new JButton("Open launcher folder");
+        openFolderButton.addActionListener(e -> {
+            OperatingSystem.open(TESLauncher.getInstance().getWorkDir());
+        });
+        bottomPanel.add(openFolderButton);
+
+        root.add(bottomPanel, BorderLayout.SOUTH);
 
         new SwingWorker<List<Instance>, Void>() {
             @Override
