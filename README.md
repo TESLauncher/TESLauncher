@@ -7,15 +7,11 @@ Yet another launcher for Minecraft
 ![images/Screenshot.png](images/Screenshot.png)
 
 ### Quick start:
-First, make sure you have [Maven](https://maven.apache.org/) installed. To check it, run
-```shell
-mvn -v
-```
-If your Maven home and OS information is displayed, it means you have installed Maven correctly. Then simply run these commands:
+You will need at least <strong>JDK 8</strong> to build and run this project.
 ```shell
 git clone https://github.com/TESLauncher/TESLauncher
 cd TESLauncher
-mvn clean package
+gradlew shadowJar
 ```
 If "BUILD SUCCESS" is displayed, use the following command to run the launcher:
 ```shell
