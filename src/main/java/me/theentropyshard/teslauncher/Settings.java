@@ -47,9 +47,7 @@ public class Settings {
 
     public static Settings load(Path file) {
         try {
-            String content = FileUtils.readUtf8(file);
-
-            return Json.parse(content, Settings.class);
+            return Json.parse(FileUtils.readUtf8(file), Settings.class);
         } catch (IOException e) {
             LOG.error("Could not load settings from {}, using defaults", file, e);
         }
@@ -59,8 +57,7 @@ public class Settings {
 
     public void save(Path file) {
         try {
-            String content = Json.write(this);
-            FileUtils.writeUtf8(file, content);
+            FileUtils.writeUtf8(file, Json.write(this));
         } catch (IOException e) {
             LOG.error("Could not save settings to {}", file);
         }
