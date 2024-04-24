@@ -103,9 +103,9 @@ public class SettingsView extends View {
 
             JComboBox<String> position = new JComboBox<>(new String[]{"Relative to parent", "Always centered"});
             if (TESLauncher.getInstance().getSettings().dialogRelativeToParent) {
-                options.setSelectedIndex(0);
+                position.setSelectedIndex(0);
             } else {
-                options.setSelectedIndex(1);
+                position.setSelectedIndex(1);
             }
 
             position.addItemListener(e -> {
