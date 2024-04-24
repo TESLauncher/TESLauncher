@@ -91,14 +91,7 @@ public class TESLauncher {
         this.createDirectories();
 
         this.settingsFile = this.workDir.resolve("settings.json");
-
-        Settings settings = new Settings();
-        try {
-            settings = settings.load(this.settingsFile);
-        } catch (IOException e) {
-            LOG.error("Unable to load settings, using defaults", e);
-        }
-        this.settings = settings;
+        this.settings = Settings.load(this.settingsFile);
 
         this.httpClient = new OkHttpClient.Builder()
                 .addNetworkInterceptor(new UserAgentInterceptor(TESLauncher.USER_AGENT))
@@ -173,11 +166,7 @@ public class TESLauncher {
 
         this.settings.lastInstanceGroup = String.valueOf(this.gui.getPlayView().getModel().getSelectedItem());
 
-        try {
-            this.settings.save(this.settingsFile);
-        } catch (IOException e) {
-            LOG.error("Exception while saving settings", e);
-        }
+        this.settings.save(this.settingsFile);
 
         System.exit(0);
     }
