@@ -18,21 +18,12 @@
 
 package me.theentropyshard.teslauncher;
 
-import me.theentropyshard.teslauncher.cli.Args;
-import org.apache.logging.log4j.LogManager;
+import me.theentropyshard.teslauncher.utils.SystemProperty;
 
-public class Main {
-    public static void main(String[] rawArgs) {
-        Args args = Args.parse(rawArgs);
+public final class LauncherProperties {
+    public static final SystemProperty LOGS_DIR = new SystemProperty("teslauncher.logsDir");
 
-        LauncherProperties.LOGS_DIR.install(args.getWorkDir().resolve("logs"));
-
-        try {
-            new TESLauncher(args, args.getWorkDir());
-        } catch (Throwable t) {
-            LogManager.getLogger(Main.class).error("Unable to start the launcher", t);
-
-            System.exit(1);
-        }
+    private LauncherProperties() {
+        throw new UnsupportedOperationException();
     }
 }
