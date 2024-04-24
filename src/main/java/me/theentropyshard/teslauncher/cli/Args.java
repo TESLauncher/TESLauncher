@@ -21,6 +21,7 @@ package me.theentropyshard.teslauncher.cli;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 
+import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -29,6 +30,9 @@ import java.util.List;
 public class Args {
     @Parameter(names = {"--workDir"})
     private String workDirPath;
+
+    @Parameter(names = {"--useJarLocation"})
+    private boolean useJarLocation;
 
     private final List<String> unknownOptions;
 
@@ -61,9 +65,17 @@ public class Args {
     }
 
     public Path getWorkDir() {
-        return (this.workDirPath == null || this.workDirPath.isEmpty() ?
-                Paths.get(System.getProperty("user.dir")) :
-                Paths.get(this.workDirPath)
-        ).normalize().toAbsolutePath();
+        Path workDir;
+
+        if (this.useJarLocation) {
+            workDir = Paths.get(URI.create(Args.class.getProtectionDomain().getCodeSource().getLocation().toString()))
+                    .getParent();
+        } else {
+            workDir = this.workDirPath == null || this.workDirPath.isEmpty() ?
+                    Paths.get(System.getProperty("user.dir")) :
+                    Paths.get(this.workDirPath);
+        }
+
+        return workDir.normalize().toAbsolutePath();
     }
 }
