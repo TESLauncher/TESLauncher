@@ -46,6 +46,10 @@ public class Settings {
     }
 
     public static Settings load(Path file) {
+        if (!Files.exists(file)) {
+            return new Settings();
+        }
+
         try {
             return Json.parse(FileUtils.readUtf8(file), Settings.class);
         } catch (IOException e) {
