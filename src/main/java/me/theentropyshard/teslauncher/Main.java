@@ -18,40 +18,21 @@
 
 package me.theentropyshard.teslauncher;
 
-import com.beust.jcommander.JCommander;
+import me.theentropyshard.teslauncher.cli.Args;
 import org.apache.logging.log4j.LogManager;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 public class Main {
-    public static void main(String[] args) {
-        Args theArgs = Main.parseArgs(args);
-        Path workDir = Main.resolveWorkDir(theArgs);
+    public static void main(String[] rawArgs) {
+        Args args = Args.parse(rawArgs);
 
-        System.setProperty("teslauncher.logsDir", workDir.resolve("logs").toString());
+        System.setProperty("teslauncher.logsDir", args.getWorkDir().resolve("logs").toString());
 
         try {
-            new TESLauncher(theArgs, workDir);
+            new TESLauncher(args, args.getWorkDir());
         } catch (Throwable t) {
             LogManager.getLogger(Main.class).error("Unable to start the launcher", t);
+
             System.exit(1);
         }
-    }
-
-    private static Args parseArgs(String[] rawArgs) {
-        Args args = new Args();
-        JCommander.newBuilder().addObject(args).build().parse(rawArgs);
-
-        return args;
-    }
-
-    private static Path resolveWorkDir(Args args) {
-        String workDirPath = args.getWorkDirPath();
-
-        return (workDirPath == null || workDirPath.isEmpty() ?
-                Paths.get(System.getProperty("user.dir")) :
-                Paths.get(workDirPath)
-        ).normalize().toAbsolutePath();
     }
 }

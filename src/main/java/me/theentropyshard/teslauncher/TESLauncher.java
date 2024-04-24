@@ -19,6 +19,7 @@
 package me.theentropyshard.teslauncher;
 
 import me.theentropyshard.teslauncher.accounts.AccountsManager;
+import me.theentropyshard.teslauncher.cli.Args;
 import me.theentropyshard.teslauncher.gui.Gui;
 import me.theentropyshard.teslauncher.instance.InstanceManager;
 import me.theentropyshard.teslauncher.network.UserAgentInterceptor;
@@ -78,6 +79,10 @@ public class TESLauncher {
         this.workDir = workDir;
 
         Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler());
+
+        if (args.hasUnknownOptions()) {
+            LOG.warn("Unknown options: {}", args.getUnknownOptions());
+        }
 
         TESLauncher.setInstance(this);
 
