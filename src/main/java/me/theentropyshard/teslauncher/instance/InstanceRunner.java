@@ -18,6 +18,7 @@
 
 package me.theentropyshard.teslauncher.instance;
 
+import me.theentropyshard.teslauncher.BuildConfig;
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.accounts.Account;
 import me.theentropyshard.teslauncher.accounts.MicrosoftAccount;
@@ -249,8 +250,8 @@ public class InstanceRunner extends Thread {
 
         // JVM
         argVars.put("natives_directory", tmpNativesDir.toAbsolutePath().toString());
-        argVars.put("launcher_name", TESLauncher.NAME);
-        argVars.put("launcher_version", TESLauncher.VERSION);
+        argVars.put("launcher_name", BuildConfig.APP_NAME);
+        argVars.put("launcher_version", BuildConfig.APP_VERSION);
         argVars.put("classpath", String.join(File.pathSeparator, classpath));
 
         Version.AssetIndex vAssetIndex = version.getAssetIndex();

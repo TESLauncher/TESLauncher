@@ -18,6 +18,7 @@
 
 package me.theentropyshard.teslauncher.gui.view;
 
+import me.theentropyshard.teslauncher.BuildConfig;
 import me.theentropyshard.teslauncher.TESLauncher;
 
 import javax.swing.*;
@@ -32,7 +33,7 @@ public class AboutView extends View {
         JPanel root = this.getRoot();
         root.setLayout(new GridBagLayout());
 
-        this.addLine(root, gbc, String.format("TESLauncher %s - simple Minecraft launcher", TESLauncher.VERSION));
+        this.addLine(root, gbc, String.format("TESLauncher %s - simple Minecraft launcher", BuildConfig.APP_VERSION));
         this.addLine(root, gbc, "by TheEntropyShard");
         this.addLine(root, gbc, "More at https://github.com/TESLauncher");
     }

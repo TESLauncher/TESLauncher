@@ -41,9 +41,7 @@ import java.util.concurrent.TimeUnit;
 public class TESLauncher {
     private static final Logger LOG = LogManager.getLogger(TESLauncher.class);
 
-    public static final String NAME = "TESLauncher";
-    public static final String VERSION = AppVersion.getVersion();
-    public static final String USER_AGENT = TESLauncher.NAME + "/" + TESLauncher.VERSION;
+    public static final String USER_AGENT = BuildConfig.APP_NAME + "/" + BuildConfig.APP_VERSION;
 
     public static final int WIDTH = 960;
     public static final int HEIGHT = 540;
@@ -122,7 +120,7 @@ public class TESLauncher {
 
         this.taskPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
-        this.gui = new Gui(this.settings.darkTheme);
+        this.gui = new Gui(BuildConfig.APP_NAME, this.settings.darkTheme);
         this.gui.getFrame().addWindowListener(new WindowClosingListener(e -> TESLauncher.this.shutdown()));
 
         this.gui.showGui();

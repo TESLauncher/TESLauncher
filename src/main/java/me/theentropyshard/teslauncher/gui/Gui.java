@@ -45,7 +45,7 @@ public class Gui {
     private boolean darkTheme;
     private boolean initialized;
 
-    public Gui(boolean darkTheme) {
+    public Gui(String title, boolean darkTheme) {
         this.darkTheme = darkTheme;
 
         this.switchTheme();
@@ -56,7 +56,7 @@ public class Gui {
         this.viewSelector = new JTabbedPane(JTabbedPane.LEFT);
         this.viewSelector.setPreferredSize(new Dimension(TESLauncher.WIDTH, TESLauncher.HEIGHT));
 
-        TESLauncher.frame = this.frame = new JFrame(TESLauncher.NAME);
+        TESLauncher.frame = this.frame = new JFrame(title);
         this.frame.add(this.viewSelector, BorderLayout.CENTER);
         this.frame.pack();
         SwingUtils.centerWindow(this.frame, 0);

@@ -42,6 +42,7 @@ buildConfig {
     className("BuildConfig")
     useJavaOutput()
 
+    buildConfigField("APP_NAME", provider { project.name })
     buildConfigField("APP_VERSION", provider { project.version.toString() })
 }
 
