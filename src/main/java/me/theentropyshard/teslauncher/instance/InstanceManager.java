@@ -185,21 +185,6 @@ public class InstanceManager {
         return invalidName;
     }
 
-    public boolean instanceExists(String name) {
-        Instance instance = this.getInstanceByName(name);
-        if (instance == null) {
-            return false;
-        }
-
-        if (Files.exists(instance.getWorkDir())) {
-            return true;
-        } else {
-            this.uncacheInstance(instance);
-
-            return false;
-        }
-    }
-
     public Instance getInstanceByName(String name) {
         return this.instancesByName.get(name);
     }
