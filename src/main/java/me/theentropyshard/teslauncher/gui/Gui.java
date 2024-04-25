@@ -29,6 +29,7 @@ import me.theentropyshard.teslauncher.gui.view.accountsview.AccountsView;
 import me.theentropyshard.teslauncher.gui.view.accountsview.AddAccountItem;
 import me.theentropyshard.teslauncher.gui.view.playview.InstancesPanel;
 import me.theentropyshard.teslauncher.gui.view.playview.PlayView;
+import me.theentropyshard.teslauncher.utils.OperatingSystem;
 import me.theentropyshard.teslauncher.utils.SwingUtils;
 
 import javax.swing.*;
@@ -54,10 +55,20 @@ public class Gui {
         JFrame.setDefaultLookAndFeelDecorated(true);
 
         this.viewSelector = new JTabbedPane(JTabbedPane.LEFT);
-        this.viewSelector.setPreferredSize(new Dimension(TESLauncher.WIDTH, TESLauncher.HEIGHT));
 
         TESLauncher.frame = this.frame = new JFrame(title);
         this.frame.add(this.viewSelector, BorderLayout.CENTER);
+
+        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        bottomPanel.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, UIManager.getColor("Component.borderColor")));
+        JButton openFolderButton = new JButton("Open launcher folder");
+        openFolderButton.addActionListener(e -> {
+            OperatingSystem.open(TESLauncher.getInstance().getWorkDir());
+        });
+        bottomPanel.add(openFolderButton);
+        this.frame.add(bottomPanel, BorderLayout.SOUTH);
+
+        this.frame.getContentPane().setPreferredSize(new Dimension(TESLauncher.WIDTH, TESLauncher.HEIGHT));
         this.frame.pack();
         SwingUtils.centerWindow(this.frame, 0);
     }
