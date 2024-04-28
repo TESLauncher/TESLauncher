@@ -20,20 +20,20 @@ package me.theentropyshard.teslauncher.gui.view.playview;
 
 import me.theentropyshard.teslauncher.accounts.Account;
 import me.theentropyshard.teslauncher.accounts.AccountsManager;
-import me.theentropyshard.teslauncher.gui.view.View;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class PlayViewHeader extends View {
+public class PlayViewHeader extends JPanel {
     private final JComboBox<String> instanceGroups;
     private final JLabel account;
 
     public static PlayViewHeader instance;
 
     public PlayViewHeader() {
+        super(new BorderLayout());
+
         PlayViewHeader.instance = this;
-        JPanel root = this.getRoot();
 
         JPanel leftSide = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
@@ -52,8 +52,8 @@ public class PlayViewHeader extends View {
         this.setCurrentAccount(AccountsManager.getCurrentAccount());
         rightSide.add(this.account);
 
-        root.add(leftSide, BorderLayout.WEST);
-        root.add(rightSide, BorderLayout.EAST);
+        this.add(leftSide, BorderLayout.WEST);
+        this.add(rightSide, BorderLayout.EAST);
     }
 
     public void setCurrentAccount(Account account) {

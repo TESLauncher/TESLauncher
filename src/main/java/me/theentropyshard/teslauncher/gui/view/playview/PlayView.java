@@ -25,7 +25,6 @@ import me.theentropyshard.teslauncher.gui.components.InstanceItem;
 import me.theentropyshard.teslauncher.gui.dialogs.SelectIconDialog;
 import me.theentropyshard.teslauncher.gui.dialogs.addinstance.AddInstanceDialog;
 import me.theentropyshard.teslauncher.gui.dialogs.instancesettings.InstanceSettingsDialog;
-import me.theentropyshard.teslauncher.gui.view.View;
 import me.theentropyshard.teslauncher.instance.Instance;
 import me.theentropyshard.teslauncher.instance.InstanceManager;
 import me.theentropyshard.teslauncher.instance.InstanceRunner;
@@ -72,7 +71,7 @@ public class PlayView extends JPanel {
         this.instancesPanelView = new JPanel(this.cardLayout);
 
         this.header = new PlayViewHeader();
-        this.add(this.header.getRoot(), BorderLayout.NORTH);
+        this.add(this.header, BorderLayout.NORTH);
 
         AddInstanceItem defaultItem = new AddInstanceItem();
         defaultItem.addMouseListener(new MouseClickListener(e -> {
