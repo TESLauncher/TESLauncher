@@ -25,6 +25,7 @@ import org.apache.logging.log4j.Logger;
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Path;
 
 public enum OperatingSystem {
@@ -69,6 +70,26 @@ public enum OperatingSystem {
                 }
             } else {
                 LOG.warn("Unable to open '{}' using java.awt.Desktop: action 'OPEN' not supported", path);
+            }
+        } else {
+            LOG.warn("java.awt.Desktop not supported. OS: {}", OperatingSystem.getCurrent());
+        }
+    }
+
+    public static void browse(String uri) {
+        if (Desktop.isDesktopSupported()) {
+            Desktop desktop = Desktop.getDesktop();
+
+            if (desktop.isSupported(Desktop.Action.BROWSE)) {
+                try {
+                    desktop.browse(URI.create(uri));
+                } catch (IllegalArgumentException e) {
+                    LOG.warn("URI cannot be converted to URL: {}", uri);
+                } catch (IOException e) {
+                    LOG.warn("Unable to browse '{}' using java.awt.Desktop", uri, e);
+                }
+            } else {
+                LOG.warn("Unable to browse '{}' using java.awt.Desktop: action 'BROWSE' not supported", uri);
             }
         } else {
             LOG.warn("java.awt.Desktop not supported. OS: {}", OperatingSystem.getCurrent());

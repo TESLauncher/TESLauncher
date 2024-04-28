@@ -170,16 +170,12 @@ public class MicrosoftAccountCreationView extends JPanel {
 
             if (!this.isSelectedBox()) {
                 if (!Desktop.isDesktopSupported()) {
-                    MessageBox.showErrorMessage(TESLauncher.frame, "java.awt.Desktop is not supported");
+                    MessageBox.showErrorMessage(TESLauncher.frame, "java.awt.Desktop is not supported, try opening the browser yourself");
+
                     return;
                 }
 
-                Desktop desktop = Desktop.getDesktop();
-                try {
-                    desktop.browse(new URI(verificationUri));
-                } catch (IOException | URISyntaxException ex) {
-                    throw new RuntimeException(ex);
-                }
+                OperatingSystem.browse(verificationUri);
             } else {
                 new OpenBrowserDialog(userCode, verificationUri);
             }
