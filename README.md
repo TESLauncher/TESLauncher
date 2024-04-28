@@ -4,6 +4,7 @@
 > This project is unfinished. Do not have any expectations.
 
 Yet another launcher for Minecraft 
+
 ![images/Screenshot.png](images/Screenshot.png)
 
 ### Quick start:
