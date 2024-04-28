@@ -27,10 +27,9 @@ import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 
-public class SettingsView extends View {
+public class SettingsView extends JPanel {
     public SettingsView() {
-        JPanel root = this.getRoot();
-        root.setLayout(new GridBagLayout());
+        this.setLayout(new GridBagLayout());
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.weightx = 2;
@@ -65,7 +64,7 @@ public class SettingsView extends View {
 
 
             gbc.gridy++;
-            root.add(themeSettings, gbc);
+            this.add(themeSettings, gbc);
         }
 
         {
@@ -128,7 +127,7 @@ public class SettingsView extends View {
 
             gbc.gridy++;
             gbc.weighty = 1;
-            root.add(uiSettings, gbc);
+            this.add(uiSettings, gbc);
         }
     }
 }
