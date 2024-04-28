@@ -49,7 +49,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-public class PlayView extends View {
+public class PlayView extends JPanel {
     private static final Logger LOG = LogManager.getLogger(PlayView.class);
 
     public static final String DEFAULT_GROUP_NAME = "<default>";
@@ -65,14 +65,14 @@ public class PlayView extends View {
     private InstancesPanel currentPanel;
 
     public PlayView() {
-        JPanel root = this.getRoot();
+        super(new BorderLayout());
 
         this.groups = new HashMap<>();
         this.cardLayout = new CardLayout();
         this.instancesPanelView = new JPanel(this.cardLayout);
 
         this.header = new PlayViewHeader();
-        root.add(this.header.getRoot(), BorderLayout.NORTH);
+        this.add(this.header.getRoot(), BorderLayout.NORTH);
 
         AddInstanceItem defaultItem = new AddInstanceItem();
         defaultItem.addMouseListener(new MouseClickListener(e -> {
@@ -81,7 +81,7 @@ public class PlayView extends View {
         this.defaultInstancesPanel = new InstancesPanel(defaultItem);
         this.currentPanel = this.defaultInstancesPanel;
         this.groups.put(PlayView.DEFAULT_GROUP_NAME, this.defaultInstancesPanel);
-        root.add(this.instancesPanelView, BorderLayout.CENTER);
+        this.add(this.instancesPanelView, BorderLayout.CENTER);
 
         this.groups.forEach((name, panel) -> {
             this.instancesPanelView.add(panel.getRoot(), name);
@@ -105,7 +105,7 @@ public class PlayView extends View {
         this.instanceInfoLabel = new JLabel();
         this.instanceInfoLabel.setVisible(false);
 
-        root.add(this.instanceInfoLabel, BorderLayout.SOUTH);
+        this.add(this.instanceInfoLabel, BorderLayout.SOUTH);
 
         new SwingWorker<List<Instance>, Void>() {
             @Override

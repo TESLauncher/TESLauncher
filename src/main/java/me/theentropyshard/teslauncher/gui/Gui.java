@@ -151,7 +151,7 @@ public class Gui {
             this.playView = new PlayView();
             this.accountsView = new AccountsView();
 
-            this.viewSelector.addTab("Play", this.playView.getRoot());
+            this.viewSelector.addTab("Play", this.playView);
             this.viewSelector.addTab("Accounts", this.accountsView.getRoot());
             this.viewSelector.addTab("Settings", new SettingsView());
             this.viewSelector.addTab("About", new AboutView());
