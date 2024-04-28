@@ -24,18 +24,17 @@ import me.theentropyshard.teslauncher.TESLauncher;
 import javax.swing.*;
 import java.awt.*;
 
-public class AboutView extends View {
+public class AboutView extends JPanel {
     public AboutView() {
+        this.setLayout(new GridBagLayout());
+
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.anchor = GridBagConstraints.CENTER;
         gbc.fill = GridBagConstraints.VERTICAL;
 
-        JPanel root = this.getRoot();
-        root.setLayout(new GridBagLayout());
-
-        this.addLine(root, gbc, String.format("TESLauncher %s - simple Minecraft launcher", BuildConfig.APP_VERSION));
-        this.addLine(root, gbc, "by TheEntropyShard");
-        this.addLine(root, gbc, "More at https://github.com/TESLauncher");
+        this.addLine(this, gbc, String.format("TESLauncher %s - simple Minecraft launcher", BuildConfig.APP_VERSION));
+        this.addLine(this, gbc, "by TheEntropyShard");
+        this.addLine(this, gbc, "More at https://github.com/TESLauncher");
     }
 
     private void addLine(JPanel panel, GridBagConstraints gbc, String text) {
