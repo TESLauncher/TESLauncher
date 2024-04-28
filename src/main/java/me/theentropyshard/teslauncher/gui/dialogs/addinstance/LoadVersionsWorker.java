@@ -22,7 +22,7 @@ import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.minecraft.MinecraftDownloader;
 import me.theentropyshard.teslauncher.minecraft.VersionManifest;
 import me.theentropyshard.teslauncher.minecraft.VersionType;
-import me.theentropyshard.teslauncher.utils.SwingUtils;
+import me.theentropyshard.teslauncher.gui.utils.SwingUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

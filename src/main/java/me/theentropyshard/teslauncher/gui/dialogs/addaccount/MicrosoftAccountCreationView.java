@@ -28,7 +28,7 @@ import me.theentropyshard.teslauncher.minecraft.auth.microsoft.AuthListener;
 import me.theentropyshard.teslauncher.minecraft.auth.microsoft.MicrosoftAuthenticator;
 import me.theentropyshard.teslauncher.minecraft.auth.microsoft.MinecraftProfile;
 import me.theentropyshard.teslauncher.minecraft.auth.microsoft.MinecraftSkin;
-import me.theentropyshard.teslauncher.swing.MessageBox;
+import me.theentropyshard.teslauncher.gui.utils.MessageBox;
 import me.theentropyshard.teslauncher.utils.OperatingSystem;
 import me.theentropyshard.teslauncher.utils.SkinUtils;
 import okhttp3.OkHttpClient;

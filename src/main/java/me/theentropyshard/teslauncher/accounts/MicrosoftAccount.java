@@ -26,7 +26,6 @@ import me.theentropyshard.teslauncher.minecraft.auth.microsoft.AuthException;
 import me.theentropyshard.teslauncher.minecraft.auth.microsoft.AuthListener;
 import me.theentropyshard.teslauncher.minecraft.auth.microsoft.MicrosoftAuthenticator;
 import me.theentropyshard.teslauncher.minecraft.auth.microsoft.MinecraftProfile;
-import me.theentropyshard.teslauncher.utils.SwingUtils;
 import me.theentropyshard.teslauncher.utils.UndashedUUID;
 
 import javax.swing.*;

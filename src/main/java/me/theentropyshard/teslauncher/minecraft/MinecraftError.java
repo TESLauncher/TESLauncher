@@ -19,7 +19,7 @@
 package me.theentropyshard.teslauncher.minecraft;
 
 import me.theentropyshard.teslauncher.TESLauncher;
-import me.theentropyshard.teslauncher.swing.MessageBox;
+import me.theentropyshard.teslauncher.gui.utils.MessageBox;
 
 public class MinecraftError {
     public static void checkForError(String line) {

@@ -25,7 +25,7 @@ import me.theentropyshard.teslauncher.accounts.AccountsManager;
 import me.theentropyshard.teslauncher.accounts.OfflineAccount;
 import me.theentropyshard.teslauncher.gui.view.accountsview.AccountItem;
 import me.theentropyshard.teslauncher.gui.view.accountsview.AccountsView;
-import me.theentropyshard.teslauncher.swing.MessageBox;
+import me.theentropyshard.teslauncher.gui.utils.MessageBox;
 
 import javax.swing.*;
 import java.awt.*;

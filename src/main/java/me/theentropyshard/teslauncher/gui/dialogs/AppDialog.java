@@ -19,7 +19,7 @@
 package me.theentropyshard.teslauncher.gui.dialogs;
 
 import me.theentropyshard.teslauncher.TESLauncher;
-import me.theentropyshard.teslauncher.utils.SwingUtils;
+import me.theentropyshard.teslauncher.gui.utils.SwingUtils;
 
 import javax.swing.*;
 import java.awt.*;

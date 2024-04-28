@@ -23,7 +23,7 @@ import me.theentropyshard.teslauncher.cli.Args;
 import me.theentropyshard.teslauncher.gui.Gui;
 import me.theentropyshard.teslauncher.instance.InstanceManager;
 import me.theentropyshard.teslauncher.network.UserAgentInterceptor;
-import me.theentropyshard.teslauncher.swing.WindowClosingListener;
+import me.theentropyshard.teslauncher.gui.utils.WindowClosingListener;
 import me.theentropyshard.teslauncher.utils.FileUtils;
 import okhttp3.OkHttpClient;
 import okhttp3.Protocol;

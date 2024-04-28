@@ -21,8 +21,8 @@ package me.theentropyshard.teslauncher.gui.view.accountsview;
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.accounts.Account;
 import me.theentropyshard.teslauncher.gui.view.playview.PlayViewHeader;
-import me.theentropyshard.teslauncher.swing.MessageBox;
-import me.theentropyshard.teslauncher.utils.SwingUtils;
+import me.theentropyshard.teslauncher.gui.utils.MessageBox;
+import me.theentropyshard.teslauncher.gui.utils.SwingUtils;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;

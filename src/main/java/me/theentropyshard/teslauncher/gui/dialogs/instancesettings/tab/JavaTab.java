@@ -20,7 +20,7 @@ package me.theentropyshard.teslauncher.gui.dialogs.instancesettings.tab;
 
 import com.formdev.flatlaf.FlatClientProperties;
 import me.theentropyshard.teslauncher.instance.Instance;
-import me.theentropyshard.teslauncher.swing.MessageBox;
+import me.theentropyshard.teslauncher.gui.utils.MessageBox;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;

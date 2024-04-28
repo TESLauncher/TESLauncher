@@ -16,35 +16,24 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.swing;
+package me.theentropyshard.teslauncher.gui.utils;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-public class MouseEnterExitListener extends MouseAdapter {
-    private final EnteredListener enteredListener;
-    private final ExitedListener exitedListener;
+public class MouseClickListener extends MouseAdapter {
+    private final Listener listener;
 
-    public MouseEnterExitListener(EnteredListener enteredListener, ExitedListener exitedListener) {
-        this.enteredListener = enteredListener;
-        this.exitedListener = exitedListener;
+    public MouseClickListener(Listener listener) {
+        this.listener = listener;
     }
 
     @Override
-    public void mouseEntered(MouseEvent e) {
-        this.enteredListener.onMouseEntered(e);
+    public void mouseClicked(MouseEvent e) {
+        this.listener.onMouseClicked(e);
     }
 
-    @Override
-    public void mouseExited(MouseEvent e) {
-        this.exitedListener.onMouseExited(e);
-    }
-
-    public interface EnteredListener {
-        void onMouseEntered(MouseEvent e);
-    }
-
-    public interface ExitedListener {
-        void onMouseExited(MouseEvent e);
+    public interface Listener {
+        void onMouseClicked(MouseEvent e);
     }
 }

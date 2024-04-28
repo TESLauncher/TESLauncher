@@ -22,7 +22,7 @@ import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.gui.components.InstanceItem;
 import me.theentropyshard.teslauncher.gui.layouts.WrapLayout;
 import me.theentropyshard.teslauncher.instance.Instance;
-import me.theentropyshard.teslauncher.utils.SwingUtils;
+import me.theentropyshard.teslauncher.gui.utils.SwingUtils;
 
 import javax.swing.*;
 import java.awt.*;

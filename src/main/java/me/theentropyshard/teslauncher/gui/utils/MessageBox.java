@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.swing;
+package me.theentropyshard.teslauncher.gui.utils;
 
 import javax.swing.*;
 import java.awt.*;

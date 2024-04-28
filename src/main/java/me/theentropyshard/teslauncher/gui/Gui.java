@@ -30,7 +30,7 @@ import me.theentropyshard.teslauncher.gui.view.accountsview.AddAccountItem;
 import me.theentropyshard.teslauncher.gui.view.playview.InstancesPanel;
 import me.theentropyshard.teslauncher.gui.view.playview.PlayView;
 import me.theentropyshard.teslauncher.utils.OperatingSystem;
-import me.theentropyshard.teslauncher.utils.SwingUtils;
+import me.theentropyshard.teslauncher.gui.utils.SwingUtils;
 
 import javax.swing.*;
 import javax.swing.plaf.ColorUIResource;

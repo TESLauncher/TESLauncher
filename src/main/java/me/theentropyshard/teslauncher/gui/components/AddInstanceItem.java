@@ -18,7 +18,7 @@
 
 package me.theentropyshard.teslauncher.gui.components;
 
-import me.theentropyshard.teslauncher.utils.SwingUtils;
+import me.theentropyshard.teslauncher.gui.utils.SwingUtils;
 
 import java.awt.*;
 

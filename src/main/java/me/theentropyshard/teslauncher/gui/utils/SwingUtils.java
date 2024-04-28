@@ -16,11 +16,10 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.utils;
+package me.theentropyshard.teslauncher.gui.utils;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.awt.event.ActionListener;

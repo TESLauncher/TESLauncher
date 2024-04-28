@@ -24,8 +24,8 @@ import me.theentropyshard.teslauncher.gui.dialogs.AppDialog;
 import me.theentropyshard.teslauncher.gui.view.playview.PlayView;
 import me.theentropyshard.teslauncher.instance.InstanceAlreadyExistsException;
 import me.theentropyshard.teslauncher.instance.InstanceManager;
-import me.theentropyshard.teslauncher.swing.MessageBox;
-import me.theentropyshard.teslauncher.utils.SwingUtils;
+import me.theentropyshard.teslauncher.gui.utils.MessageBox;
+import me.theentropyshard.teslauncher.gui.utils.SwingUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

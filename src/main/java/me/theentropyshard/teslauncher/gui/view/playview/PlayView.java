@@ -28,11 +28,11 @@ import me.theentropyshard.teslauncher.gui.dialogs.instancesettings.InstanceSetti
 import me.theentropyshard.teslauncher.instance.Instance;
 import me.theentropyshard.teslauncher.instance.InstanceManager;
 import me.theentropyshard.teslauncher.instance.InstanceRunner;
-import me.theentropyshard.teslauncher.swing.MessageBox;
-import me.theentropyshard.teslauncher.swing.MouseClickListener;
-import me.theentropyshard.teslauncher.swing.MouseEnterExitListener;
+import me.theentropyshard.teslauncher.gui.utils.MessageBox;
+import me.theentropyshard.teslauncher.gui.utils.MouseClickListener;
+import me.theentropyshard.teslauncher.gui.utils.MouseEnterExitListener;
 import me.theentropyshard.teslauncher.utils.OperatingSystem;
-import me.theentropyshard.teslauncher.utils.SwingUtils;
+import me.theentropyshard.teslauncher.gui.utils.SwingUtils;
 import me.theentropyshard.teslauncher.utils.TimeUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
