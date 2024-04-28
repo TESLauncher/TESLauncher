@@ -83,7 +83,7 @@ public class PlayView extends JPanel {
         this.add(this.instancesPanelView, BorderLayout.CENTER);
 
         this.groups.forEach((name, panel) -> {
-            this.instancesPanelView.add(panel.getRoot(), name);
+            this.instancesPanelView.add(panel, name);
         });
 
         JComboBox<String> instanceGroups = this.header.getInstanceGroups();
@@ -157,7 +157,7 @@ public class PlayView extends JPanel {
             panel = new InstancesPanel(addInstanceItem);
             this.groups.put(groupName, panel);
             this.model.addElement(groupName);
-            this.instancesPanelView.add(panel.getRoot(), groupName);
+            this.instancesPanelView.add(panel, groupName);
         }
         panel.addInstanceItem(item);
 

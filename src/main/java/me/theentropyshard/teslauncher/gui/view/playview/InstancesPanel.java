@@ -18,7 +18,6 @@
 
 package me.theentropyshard.teslauncher.gui.view.playview;
 
-import me.theentropyshard.teslauncher.gui.view.View;
 import me.theentropyshard.teslauncher.gui.components.AddInstanceItem;
 import me.theentropyshard.teslauncher.gui.components.InstanceItem;
 import me.theentropyshard.teslauncher.gui.layouts.WrapLayout;
@@ -26,13 +25,13 @@ import me.theentropyshard.teslauncher.gui.layouts.WrapLayout;
 import javax.swing.*;
 import java.awt.*;
 
-public class InstancesPanel extends View {
+public class InstancesPanel extends JPanel {
     private final AddInstanceItem addInstanceItem;
     private final JPanel instancesPanel;
     private final JScrollPane scrollPane;
 
     public InstancesPanel(AddInstanceItem addInstanceItem) {
-        JPanel root = this.getRoot();
+        super(new BorderLayout());
 
         this.addInstanceItem = addInstanceItem;
         this.instancesPanel = new JPanel(new WrapLayout(WrapLayout.LEFT, 8, 8));
@@ -49,7 +48,7 @@ public class InstancesPanel extends View {
         this.scrollPane.setBorder(null);
         this.scrollPane.getVerticalScrollBar().setUnitIncrement(8);
 
-        root.add(this.scrollPane, BorderLayout.CENTER);
+        this.add(this.scrollPane, BorderLayout.CENTER);
     }
 
     public void addInstanceItem(InstanceItem item) {
