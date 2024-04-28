@@ -21,7 +21,6 @@ package me.theentropyshard.teslauncher.gui.view.accountsview;
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.accounts.Account;
 import me.theentropyshard.teslauncher.accounts.AccountsManager;
-import me.theentropyshard.teslauncher.gui.view.View;
 import me.theentropyshard.teslauncher.gui.dialogs.addaccount.AddAccountDialog;
 import me.theentropyshard.teslauncher.gui.view.playview.PlayViewHeader;
 
@@ -31,7 +30,7 @@ import java.awt.*;
 import java.io.IOException;
 import java.util.List;
 
-public class AccountsView extends View {
+public class AccountsView extends JPanel {
     private final JPanel panel;
     private final JScrollPane scrollPane;
     private final AccountItemGroup group;
@@ -39,7 +38,7 @@ public class AccountsView extends View {
     private final AddAccountItem addAccountItem;
 
     public AccountsView() {
-        JPanel root = this.getRoot();
+        super(new BorderLayout());
 
         this.group = new AccountItemGroup();
 
@@ -50,7 +49,7 @@ public class AccountsView extends View {
 
         this.scrollPane = new JScrollPane(borderPanel);
         this.scrollPane.setBorder(null);
-        root.add(this.scrollPane, BorderLayout.CENTER);
+        this.add(this.scrollPane, BorderLayout.CENTER);
 
         this.addAccountItem = new AddAccountItem();
         this.addAccountItem.addMouseClickListener(e -> {
