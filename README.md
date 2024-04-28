@@ -28,3 +28,9 @@ Example:
 ```shell
 java -jar build/libs/TESLauncher-0.12.1.jar --workDir C:\Users\User\Documents\TESLauncher
 ```
+Alternatively, you can use `--useJarLocation` argument, which will make the launcher use the folder for its files where the jar file is located. <br>
+In that case the `--workDir` argument is ignored. Example:
+```shell
+java -jar build/libs/TESLauncher-0.12.1.jar --useJarLocation
+```
+This way the launcher files will be created in build/libs.
