@@ -19,7 +19,7 @@
 package me.theentropyshard.teslauncher.gui.view.playview;
 
 import me.theentropyshard.teslauncher.accounts.Account;
-import me.theentropyshard.teslauncher.accounts.AccountsManager;
+import me.theentropyshard.teslauncher.accounts.AccountManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -49,7 +49,7 @@ public class PlayViewHeader extends JPanel {
         rightSide.add(accountsLabel);
 
         this.account = new JLabel();
-        this.setCurrentAccount(AccountsManager.getCurrentAccount());
+        this.setCurrentAccount(AccountManager.getCurrentAccount());
         rightSide.add(this.account);
 
         this.add(leftSide, BorderLayout.WEST);

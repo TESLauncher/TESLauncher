@@ -19,7 +19,7 @@
 package me.theentropyshard.teslauncher.gui.view.playview;
 
 import me.theentropyshard.teslauncher.TESLauncher;
-import me.theentropyshard.teslauncher.accounts.AccountsManager;
+import me.theentropyshard.teslauncher.accounts.AccountManager;
 import me.theentropyshard.teslauncher.gui.components.AddInstanceItem;
 import me.theentropyshard.teslauncher.gui.components.InstanceItem;
 import me.theentropyshard.teslauncher.gui.dialogs.SelectIconDialog;
@@ -164,10 +164,10 @@ public class PlayView extends JPanel {
         item.addMouseListener(new MouseClickListener(e -> {
             int mouseButton = e.getButton();
             if (mouseButton == MouseEvent.BUTTON1) { // left mouse button
-                if (AccountsManager.getCurrentAccount() == null) {
+                if (AccountManager.getCurrentAccount() == null) {
                     MessageBox.showErrorMessage(TESLauncher.frame, "No account selected");
                 } else {
-                    new InstanceRunner(AccountsManager.getCurrentAccount(), item).start();
+                    new InstanceRunner(AccountManager.getCurrentAccount(), item).start();
                 }
             } else if (mouseButton == MouseEvent.BUTTON3) { // right mouse button
                 Instance instance = item.getAssociatedInstance();

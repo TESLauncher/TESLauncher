@@ -20,7 +20,7 @@ package me.theentropyshard.teslauncher.gui.view.accountsview;
 
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.accounts.Account;
-import me.theentropyshard.teslauncher.accounts.AccountsManager;
+import me.theentropyshard.teslauncher.accounts.AccountManager;
 import me.theentropyshard.teslauncher.gui.dialogs.addaccount.AddAccountDialog;
 import me.theentropyshard.teslauncher.gui.view.playview.PlayViewHeader;
 
@@ -57,8 +57,8 @@ public class AccountsView extends JPanel {
         });
         this.panel.add(this.addAccountItem);
 
-        AccountsManager accountsManager = TESLauncher.getInstance().getAccountsManager();
-        List<Account> accounts = accountsManager.getAccounts();
+        AccountManager accountManager = TESLauncher.getInstance().getAccountsManager();
+        List<Account> accounts = accountManager.getAccounts();
         for (Account account : accounts) {
             if (account.getHeadIcon() == null) {
                 account.setHeadIcon(Account.DEFAULT_HEAD);
@@ -97,10 +97,10 @@ public class AccountsView extends JPanel {
         AccountItem accountItem = (AccountItem) item;
 
         accountItem.addMouseClickListener(e -> {
-            AccountsManager accountsManager = TESLauncher.getInstance().getAccountsManager();
-            accountsManager.selectAccount(accountItem.getAccount());
+            AccountManager accountManager = TESLauncher.getInstance().getAccountsManager();
+            accountManager.selectAccount(accountItem.getAccount());
             try {
-                accountsManager.save();
+                accountManager.save();
             } catch (IOException ex) {
                 ex.printStackTrace();
             }

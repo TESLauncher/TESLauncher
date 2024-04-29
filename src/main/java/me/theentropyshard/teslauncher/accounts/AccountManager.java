@@ -32,11 +32,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class AccountsManager {
+public class AccountManager {
     private final Path accountsFile;
     private final Map<String, Account> accounts;
 
-    public AccountsManager(Path workDir) {
+    public AccountManager(Path workDir) {
         this.accountsFile = workDir.resolve("accounts.json");
 
         try {

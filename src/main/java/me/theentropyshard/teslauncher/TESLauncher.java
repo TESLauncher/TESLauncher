@@ -18,7 +18,7 @@
 
 package me.theentropyshard.teslauncher;
 
-import me.theentropyshard.teslauncher.accounts.AccountsManager;
+import me.theentropyshard.teslauncher.accounts.AccountManager;
 import me.theentropyshard.teslauncher.cli.Args;
 import me.theentropyshard.teslauncher.gui.Gui;
 import me.theentropyshard.teslauncher.instance.InstanceManager;
@@ -61,7 +61,7 @@ public class TESLauncher {
 
     private final OkHttpClient httpClient;
 
-    private final AccountsManager accountsManager;
+    private final AccountManager accountManager;
     private final InstanceManager instanceManager;
 
     private final ExecutorService taskPool;
@@ -104,9 +104,9 @@ public class TESLauncher {
                 .protocols(Collections.singletonList(Protocol.HTTP_1_1))
                 .build();
 
-        this.accountsManager = new AccountsManager(this.workDir);
+        this.accountManager = new AccountManager(this.workDir);
         try {
-            this.accountsManager.loadAccounts();
+            this.accountManager.loadAccounts();
         } catch (IOException e) {
             LOG.error("Unable to load accounts", e);
         }
@@ -154,7 +154,7 @@ public class TESLauncher {
         this.taskPool.shutdown();
 
         try {
-            this.accountsManager.save();
+            this.accountManager.save();
         } catch (IOException e) {
             LOG.error("Exception while saving accounts", e);
         }
@@ -224,8 +224,8 @@ public class TESLauncher {
         return this.log4jConfigsDir;
     }
 
-    public AccountsManager getAccountsManager() {
-        return this.accountsManager;
+    public AccountManager getAccountsManager() {
+        return this.accountManager;
     }
 
     public InstanceManager getInstanceManager() {

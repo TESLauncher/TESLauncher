@@ -21,7 +21,7 @@ package me.theentropyshard.teslauncher.gui.dialogs.addaccount;
 import com.formdev.flatlaf.FlatClientProperties;
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.accounts.Account;
-import me.theentropyshard.teslauncher.accounts.AccountsManager;
+import me.theentropyshard.teslauncher.accounts.AccountManager;
 import me.theentropyshard.teslauncher.accounts.OfflineAccount;
 import me.theentropyshard.teslauncher.gui.view.accountsview.AccountItem;
 import me.theentropyshard.teslauncher.gui.view.accountsview.AccountsView;
@@ -49,17 +49,17 @@ public class OfflineAccountCreationView extends JPanel {
                 return;
             }
 
-            AccountsManager accountsManager = TESLauncher.getInstance().getAccountsManager();
+            AccountManager accountManager = TESLauncher.getInstance().getAccountsManager();
 
             Account account = new OfflineAccount(text);
-            if (!accountsManager.canCreateAccount(account.getUsername())) {
+            if (!accountManager.canCreateAccount(account.getUsername())) {
                 MessageBox.showErrorMessage(TESLauncher.frame, "Account with username '" + account.getUsername() + "' already exists");
 
                 return;
             }
 
             account.setHeadIcon(Account.DEFAULT_HEAD);
-            accountsManager.saveAccount(account);
+            accountManager.saveAccount(account);
             accountsView.addAccountItem(new AccountItem(account));
 
             dialog.getDialog().dispose();
