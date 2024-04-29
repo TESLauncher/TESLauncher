@@ -28,6 +28,8 @@ import java.util.Arrays;
 import java.util.Collections;
 
 public class MicrosoftAuthenticator {
+    private static final String CLIENT_ID = "394fd08d-cb75-4f21-9807-ae14babcb4c0";
+
     private final OkHttpClient httpClient;
     private String refreshToken;
     private final boolean refresh;
@@ -44,7 +46,7 @@ public class MicrosoftAuthenticator {
     // DO NOT USE MY APPLICATION (CLIENT) ID!!! YOU MUST CREATE YOUR OWN APPLICATION!!!
 
     public MinecraftProfile authenticate() throws IOException {
-        DeviceCodeResponse deviceCodeResponse = this.getDeviceCode("consumers", "394fd08d-cb75-4f21-9807-ae14babcb4c0", "XboxLive.signin offline_access");
+        DeviceCodeResponse deviceCodeResponse = this.getDeviceCode("consumers", MicrosoftAuthenticator.CLIENT_ID, "XboxLive.signin offline_access");
         this.listener.onUserCodeReceived(deviceCodeResponse.userCode, deviceCodeResponse.verificationUri);
         System.out.println("Code: " + deviceCodeResponse.userCode);
         System.out.println("Url: " + deviceCodeResponse.verificationUri);
@@ -109,7 +111,7 @@ public class MicrosoftAuthenticator {
                     ),
                     Arrays.asList(
                             "refresh_token",
-                            "394fd08d-cb75-4f21-9807-ae14babcb4c0",
+                            MicrosoftAuthenticator.CLIENT_ID,
                             token
                     )
             );
@@ -122,7 +124,7 @@ public class MicrosoftAuthenticator {
                     ),
                     Arrays.asList(
                             "urn:ietf:params:oauth:grant-type:device_code",
-                            "394fd08d-cb75-4f21-9807-ae14babcb4c0",
+                            MicrosoftAuthenticator.CLIENT_ID,
                             token
                     )
             );
