@@ -291,7 +291,7 @@ public class MinecraftDownloader {
                 qualifier = "arm32";
             }
         } else {
-            qualifier = OperatingSystem.getArch();
+            qualifier = OperatingSystem.getBits();
         }
 
         return qualifier;
