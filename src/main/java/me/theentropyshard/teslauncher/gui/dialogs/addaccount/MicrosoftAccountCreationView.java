@@ -21,13 +21,15 @@ package me.theentropyshard.teslauncher.gui.dialogs.addaccount;
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.accounts.Account;
 import me.theentropyshard.teslauncher.accounts.MicrosoftAccount;
+import me.theentropyshard.teslauncher.gui.dialogs.OpenBrowserDialog;
+import me.theentropyshard.teslauncher.gui.utils.MessageBox;
 import me.theentropyshard.teslauncher.gui.view.accountsview.AccountItem;
 import me.theentropyshard.teslauncher.gui.view.accountsview.AccountsView;
-import me.theentropyshard.teslauncher.gui.dialogs.OpenBrowserDialog;
 import me.theentropyshard.teslauncher.minecraft.auth.microsoft.*;
-import me.theentropyshard.teslauncher.gui.utils.MessageBox;
+import me.theentropyshard.teslauncher.utils.ListUtils;
 import me.theentropyshard.teslauncher.utils.OperatingSystem;
 import me.theentropyshard.teslauncher.utils.SkinUtils;
+import me.theentropyshard.teslauncher.utils.UndashedUUID;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -41,8 +43,6 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;
 import java.util.Base64;
@@ -118,9 +118,7 @@ public class MicrosoftAccountCreationView extends JPanel {
 
                         MicrosoftAccount microsoftAccount = new MicrosoftAccount();
                         microsoftAccount.setAccessToken(profile.accessToken);
-                        microsoftAccount.setUuid(UUID.fromString(profile.id.replaceFirst(
-                                "(\\p{XDigit}{8})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}+)", "$1-$2-$3-$4-$5"
-                        )));
+                        microsoftAccount.setUuid(UndashedUUID.fromString(profile.id));
                         microsoftAccount.setUsername(profile.name);
                         microsoftAccount.setRefreshToken(authenticator.getRefreshToken());
                         microsoftAccount.setLoggedInAt(OffsetDateTime.now());
@@ -183,6 +181,7 @@ public class MicrosoftAccountCreationView extends JPanel {
             if (!this.isSelectedBox()) {
                 if (!Desktop.isDesktopSupported()) {
                     MessageBox.showErrorMessage(TESLauncher.frame, "java.awt.Desktop is not supported, try opening the browser yourself");
+                    LOG.warn("java.awt.Desktop is not supported, try opening the browser yourself");
 
                     return;
                 }
@@ -227,13 +226,7 @@ public class MicrosoftAccountCreationView extends JPanel {
     }
 
     public static String getBase64SkinHead(MinecraftProfile profile) throws IOException {
-        MinecraftSkin skin = null;
-
-        for (MinecraftSkin needle : profile.skins) {
-            if ("ACTIVE".equalsIgnoreCase(needle.state)) {
-                skin = needle;
-            }
-        }
+        MinecraftSkin skin = ListUtils.search(profile.skins, s -> "ACTIVE".equalsIgnoreCase(s.state));
 
         if (skin == null) {
             return Account.DEFAULT_HEAD;
