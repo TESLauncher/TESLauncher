@@ -24,16 +24,15 @@ import me.theentropyshard.teslauncher.accounts.MicrosoftAccount;
 import me.theentropyshard.teslauncher.gui.view.accountsview.AccountItem;
 import me.theentropyshard.teslauncher.gui.view.accountsview.AccountsView;
 import me.theentropyshard.teslauncher.gui.dialogs.OpenBrowserDialog;
-import me.theentropyshard.teslauncher.minecraft.auth.microsoft.AuthListener;
-import me.theentropyshard.teslauncher.minecraft.auth.microsoft.MicrosoftAuthenticator;
-import me.theentropyshard.teslauncher.minecraft.auth.microsoft.MinecraftProfile;
-import me.theentropyshard.teslauncher.minecraft.auth.microsoft.MinecraftSkin;
+import me.theentropyshard.teslauncher.minecraft.auth.microsoft.*;
 import me.theentropyshard.teslauncher.gui.utils.MessageBox;
 import me.theentropyshard.teslauncher.utils.OperatingSystem;
 import me.theentropyshard.teslauncher.utils.SkinUtils;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -52,6 +51,8 @@ import java.util.UUID;
 
 //TODO: this is still big shit. fix it
 public class MicrosoftAccountCreationView extends JPanel {
+    private static final Logger LOG = LogManager.getLogger(MicrosoftAccountCreationView.class);
+
     private final CardLayout layout;
     private final AddAccountDialog dialog;
 
@@ -103,7 +104,18 @@ public class MicrosoftAccountCreationView extends JPanel {
                                 secondView, null, false
                         );
 
-                        MinecraftProfile profile = authenticator.authenticate();
+                        MinecraftProfile profile = null;
+                        try {
+                            profile = authenticator.authenticate();
+                        } catch (AuthException e) {
+                            LOG.error("Could not authenticate", e);
+                            MessageBox.showErrorMessage(TESLauncher.frame, e.getMessage());
+                        }
+
+                        if (profile == null) {
+                            return null;
+                        }
+
                         MicrosoftAccount microsoftAccount = new MicrosoftAccount();
                         microsoftAccount.setAccessToken(profile.accessToken);
                         microsoftAccount.setUuid(UUID.fromString(profile.id.replaceFirst(

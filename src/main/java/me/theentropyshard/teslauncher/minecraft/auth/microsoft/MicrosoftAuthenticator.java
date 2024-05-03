@@ -45,7 +45,7 @@ public class MicrosoftAuthenticator {
 
     // DO NOT USE MY APPLICATION (CLIENT) ID!!! YOU MUST CREATE YOUR OWN APPLICATION!!!
 
-    public MinecraftProfile authenticate() throws IOException {
+    public MinecraftProfile authenticate() throws IOException, AuthException {
         DeviceCodeResponse deviceCodeResponse = this.getDeviceCode("consumers", MicrosoftAuthenticator.CLIENT_ID, "XboxLive.signin offline_access");
         this.listener.onUserCodeReceived(deviceCodeResponse.userCode, deviceCodeResponse.verificationUri);
 
@@ -65,8 +65,7 @@ public class MicrosoftAuthenticator {
         this.expiresIn = minecraftAuthResponse.expiresIn;
 
         if (!this.checkGameOwnership(minecraftAuthResponse)) {
-            System.err.println("Account does not own Minecraft");
-            return null;
+            throw new AuthException("Account does not own Minecraft");
         }
 
         return this.getProfile(minecraftAuthResponse);
@@ -93,7 +92,7 @@ public class MicrosoftAuthenticator {
         }
     }
 
-    private OAuthCodeResponse getMicrosoftOAuthCode(DeviceCodeResponse deviceCodeResponse) throws IOException {
+    private OAuthCodeResponse getMicrosoftOAuthCode(DeviceCodeResponse deviceCodeResponse) throws IOException, AuthException {
         String url = "https://login.microsoftonline.com/consumers/oauth2/v2.0/token";
 
         String token = this.refresh ? this.refreshToken : deviceCodeResponse.deviceCode;
@@ -143,13 +142,11 @@ public class MicrosoftAuthenticator {
                             }
                             break;
                         case "authorization_declined":
-                            return null;
+                            throw new AuthException("Authorization declined");
                         case "bad_verification_code":
-                            System.out.println("Wrong verification/refresh code: " + token);
-                            return null;
+                            throw new AuthException("Wrong verification/refresh code: " + token);
                         case "expired_token":
-                            System.out.println("Device code expired");
-                            return null;
+                            throw new AuthException("Device code expired");
                     }
                 } else {
                     return Json.parse(jsonObject, OAuthCodeResponse.class);
@@ -179,7 +176,7 @@ public class MicrosoftAuthenticator {
         }
     }
 
-    private XSTSAuthResponse obtainXSTSToken(XboxLiveAuthResponse authResponse) throws IOException {
+    private XSTSAuthResponse obtainXSTSToken(XboxLiveAuthResponse authResponse) throws IOException, AuthException {
         String url = "https://xsts.auth.xboxlive.com/xsts/authorize";
 
         XSTSTokenRequest tokenRequest = new XSTSTokenRequest();
@@ -199,9 +196,8 @@ public class MicrosoftAuthenticator {
                 JsonObject jsonObject = Json.parse(json, JsonObject.class);
                 String xErr = jsonObject.get("XErr").getAsString();
                 String errorMsg = MicrosoftAuthenticator.getXSTSErrorMessage(xErr);
-                System.out.println("Error obtaining XSTS token: " + errorMsg + " (" + xErr + ")");
 
-                return null;
+                throw new AuthException("Error obtaining XSTS token: " + errorMsg + " (" + xErr + ")");
             } else {
                 return Json.parse(json, XSTSAuthResponse.class);
             }
