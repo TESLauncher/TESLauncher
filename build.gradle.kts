@@ -1,29 +1,46 @@
+group = "me.theentropyshard"
+version = "0.12.2"
+description = "TESLauncher"
+
+repositories {
+    mavenCentral()
+    gradlePluginPortal()
+}
+
 plugins {
-    id("java-library")
+    id("java")
     id("application")
     id("com.github.johnrengelman.shadow") version "8.1.1"
     id("com.github.gmazzo.buildconfig") version "5.3.5"
-}
-
-repositories {
-    mavenLocal()
-    mavenCentral()
+    id("edu.sc.seis.launch4j") version "3.0.5"
 }
 
 dependencies {
-    api(libs.com.formdev.flatlaf)
-    api(libs.com.google.code.gson.gson)
-    api(libs.net.lingala.zip4j.zip4j)
-    api(libs.org.apache.commons.commons.text)
-    api(libs.com.beust.jcommander)
-    api(libs.com.squareup.okhttp3.okhttp)
-    api(libs.net.java.dev.jna.jna)
-    api(libs.net.java.dev.jna.jna.platform)
-    api(libs.org.apache.logging.log4j.log4j.api)
-    api(libs.org.apache.logging.log4j.log4j.core)
+    implementation(libs.com.formdev.flatlaf)
+    implementation(libs.com.google.code.gson.gson)
+    implementation(libs.net.lingala.zip4j.zip4j)
+    implementation(libs.org.apache.commons.commons.text)
+    implementation(libs.com.beust.jcommander)
+    implementation(libs.com.squareup.okhttp3.okhttp)
+    implementation(libs.net.java.dev.jna.jna)
+    implementation(libs.net.java.dev.jna.jna.platform)
+    implementation(libs.org.apache.logging.log4j.log4j.api)
+    implementation(libs.org.apache.logging.log4j.log4j.core)
 
     testImplementation(libs.org.junit.jupiter.junit.jupiter.api)
     testImplementation(libs.org.junit.jupiter.junit.jupiter.engine)
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+application {
+    mainClass = "me.theentropyshard.teslauncher.Main"
+    applicationDefaultJvmArgs = listOf(
+        "-Djna.nosys=true"
+    )
 }
 
 tasks.shadowJar {
@@ -46,14 +63,20 @@ buildConfig {
     buildConfigField("APP_VERSION", provider { project.version.toString() })
 }
 
-application.mainClass = "me.theentropyshard.teslauncher.Main"
-
-group = "me.theentropyshard"
-version = "0.12.2"
-description = "TESLauncher"
-
-java.sourceCompatibility = JavaVersion.VERSION_1_8
-java.targetCompatibility = JavaVersion.VERSION_1_8
+launch4j {
+    mainClassName = application.mainClass
+    outfile = "${project.name}-${project.version}.exe"
+    copyConfigurable = emptyArray<Any>()
+    setJarTask(project.tasks.shadowJar.get())
+    jreMinVersion = "${project.java.targetCompatibility}"
+    version = "${project.version}"
+    textVersion = "${project.version}"
+    copyright = "2023-2024 ${project.name}"
+    companyName = project.name
+    jvmOptions = listOf(
+        "-Djna.nosys=true"
+    )
+}
 
 tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
