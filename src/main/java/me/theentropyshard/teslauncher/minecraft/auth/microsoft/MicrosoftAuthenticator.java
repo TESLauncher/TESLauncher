@@ -48,8 +48,6 @@ public class MicrosoftAuthenticator {
     public MinecraftProfile authenticate() throws IOException {
         DeviceCodeResponse deviceCodeResponse = this.getDeviceCode("consumers", MicrosoftAuthenticator.CLIENT_ID, "XboxLive.signin offline_access");
         this.listener.onUserCodeReceived(deviceCodeResponse.userCode, deviceCodeResponse.verificationUri);
-        System.out.println("Code: " + deviceCodeResponse.userCode);
-        System.out.println("Url: " + deviceCodeResponse.verificationUri);
 
         OAuthCodeResponse microsoftOAuthCode;
         if (this.refresh) {
