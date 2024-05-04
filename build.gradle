@@ -1,0 +1,198 @@
+import java.time.LocalDate
+import java.time.ZoneId
+
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {
+            url = 'https://jitpack.io'
+            content {
+                includeGroup 'com.github.ATLauncher.gradle-macappbundle'
+            }
+        }
+    }
+
+    dependencies {
+        classpath 'com.github.ATLauncher.gradle-macappbundle:edu.sc.seis.macAppBundle.gradle.plugin:d22f8cdb94'
+    }
+}
+
+plugins {
+    id 'java'
+    id 'application'
+    id 'de.undercouch.download' version '5.4.0'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
+    id 'com.github.gmazzo.buildconfig' version '5.3.5'
+    id 'edu.sc.seis.launch4j' version '3.0.5'
+    id 'edu.sc.seis.macAppBundle' version '2.3.0'
+}
+
+group = 'me.theentropyshard'
+version = '0.12.2'
+description = 'TESLauncher'
+
+def theMainClass = 'me.theentropyshard.teslauncher.Main'
+def theVersion = project.version.toString()
+def theName = project.name
+def theBuildDir = layout.buildDirectory.asFile.get().absolutePath
+
+repositories {
+    mavenCentral()
+    gradlePluginPortal()
+}
+
+ext {
+    flatlaf = '3.4.1'
+    gson = '2.10.1'
+    zip4j = '2.11.5'
+    text = '1.10.0'
+    jcommander = '1.82'
+    okhttp = '4.12.0'
+    jna = '5.14.0'
+    log4j = '2.20.0'
+    junit = '5.7.2'
+}
+
+dependencies {
+    implementation "com.formdev:flatlaf:$flatlaf"
+    implementation "com.google.code.gson:gson:$gson"
+    implementation "net.lingala.zip4j:zip4j:$zip4j"
+    implementation "org.apache.commons:commons-text:$text"
+    implementation "com.beust:jcommander:$jcommander"
+    implementation "com.squareup.okhttp3:okhttp:$okhttp"
+    implementation "net.java.dev.jna:jna:$jna"
+    implementation "net.java.dev.jna:jna-platform:$jna"
+    implementation "org.apache.logging.log4j:log4j-api:$log4j"
+    implementation "org.apache.logging.log4j:log4j-core:$log4j"
+
+    testImplementation "org.junit.jupiter:junit-jupiter-api:$junit"
+    testImplementation "org.junit.jupiter:junit-jupiter-engine:$junit"
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+application {
+    mainClass = theMainClass
+    applicationDefaultJvmArgs = [
+            '-Djna.nosys=true'
+    ]
+}
+
+jar {
+    manifest {
+        attributes(
+                'Main-Class': theMainClass,
+                'Implementation-Title': theName,
+                'Implementation-Version': theVersion,
+                'Implementation-Vendor': theName
+        )
+    }
+}
+
+shadowJar {
+    archiveClassifier = ''
+    archiveBaseName = theName
+    archiveVersion = theVersion
+}
+
+buildConfig {
+    packageName('me.theentropyshard.teslauncher')
+    className('BuildConfig')
+    useJavaOutput()
+
+    buildConfigField(String, 'APP_NAME', theName)
+    buildConfigField(String, 'APP_VERSION', theVersion)
+}
+
+launch4j {
+    outfile = "$theName-${theVersion}.exe"
+    jreMinVersion = "${project.java.targetCompatibility.toString()}"
+    mainClassName = theMainClass
+    // icon = "${projectDir}/src/main/resources/assets/image/icon.ico"
+    version = theVersion
+    textVersion = theVersion
+    copyright = "2023-${LocalDate.now(ZoneId.of("UTC")).getYear()} $theName"
+    companyName = theName
+    bundledJrePath = "jre/;%JAVA_HOME%;%PATH%"
+    jvmOptions = [
+            "-Djna.nosys=true"
+    ]
+}
+
+macAppBundle {
+    mainClassName = theMainClass
+    appName = theName
+    appStyle = 'universalJavaApplicationStub'
+    runtimeConfigurationName = 'shadow'
+    jarTask = 'shadowJar'
+    // icon = 'src/main/resources/assets/image/icon.icns'
+    javaProperties.put('user.dir', '$APP_ROOT/Contents/Java')
+    javaProperties.put('apple.laf.useScreenMenuBar', 'true')
+    javaExtras.put("-Djna.nosys", "true")
+    bundleExtras.put("JVMVersion", project.java.targetCompatibility.toString() + "+")
+}
+
+artifacts {
+    archives shadowJar
+
+    def path = project.tasks.jar.archiveFile.get().getAsFile().getAbsolutePath()
+    archives file(path.replace('.jar', '.exe').replace('libs', 'launch4j'))
+    archives file(path.replace('.jar', '.zip').replace('libs', 'distributions'))
+}
+
+tasks.register('copyArtifacts', Copy) {
+    dependsOn build
+    from shadowJar
+
+    def path = project.tasks.jar.archiveFile.get().getAsFile().getAbsolutePath()
+    from file(path.replace('.jar', '.exe').replace('libs', 'launch4j'))
+    from file(path.replace('.jar', '.zip').replace('libs', 'distributions'))
+
+    into "${projectDir}/dist"
+}
+
+tasks.register('downloadNewerUniversalJavaApplicationStub', Download) {
+    description 'Downloads newer universalJavaApplicationStub'
+    src 'https://raw.githubusercontent.com/tofi86/universalJavaApplicationStub/404f5c1b008d6296065de7a93406b387c9f3dce1/src/universalJavaApplicationStub'
+    dest file("$theBuildDir/macApp/${theName}.app/Contents/MacOS/universalJavaApplicationStub")
+    overwrite true
+}
+
+tasks.register('createMacApp', Zip) {
+    dependsOn createApp, shadowJar, downloadNewerUniversalJavaApplicationStub
+
+    from("$theBuildDir/macApp") {
+        include "${theName}.app/**"
+        exclude "${theName}.app/Contents/MacOS"
+    }
+
+    from("$theBuildDir/macApp") {
+        include "${theName}.app/Contents/MacOS/**"
+        fileMode 0777
+    }
+
+    archiveFileName = "$theName-${theVersion}.zip"
+}
+
+clean.doFirst {
+    delete "${projectDir}/dist"
+}
+
+build.finalizedBy copyArtifacts
+shadowJar.dependsOn jar
+build.dependsOn createExe, createMacApp
+startScripts.dependsOn shadowJar
+createExe.dependsOn shadowJar
+createAppZip.dependsOn downloadNewerUniversalJavaApplicationStub
+createDmg.dependsOn downloadNewerUniversalJavaApplicationStub
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+tasks.withType(Javadoc).configureEach {
+    options.encoding = 'UTF-8'
+}
