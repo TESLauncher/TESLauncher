@@ -73,6 +73,7 @@ launch4j {
     textVersion = "${project.version}"
     copyright = "2023-2024 ${project.name}"
     companyName = project.name
+    fileDescription = "A simple Minecraft launcher"
     jvmOptions = listOf(
         "-Djna.nosys=true"
     )
