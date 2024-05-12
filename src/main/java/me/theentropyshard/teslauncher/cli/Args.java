@@ -43,15 +43,17 @@ public class Args {
     public static Args parse(String[] rawArgs) {
         Args args = new Args();
 
-        JCommander commander = JCommander.newBuilder()
-                .acceptUnknownOptions(true)
-                .programName("TESLauncher")
-                .addObject(args)
-                .build();
+        if (rawArgs.length > 0) {
+            JCommander commander = JCommander.newBuilder()
+                    .acceptUnknownOptions(true)
+                    .programName("TESLauncher")
+                    .addObject(args)
+                    .build();
 
-        commander.parse(rawArgs);
+            commander.parse(rawArgs);
 
-        args.getUnknownOptions().addAll(commander.getUnknownOptions());
+            args.getUnknownOptions().addAll(commander.getUnknownOptions());
+        }
 
         return args;
     }
