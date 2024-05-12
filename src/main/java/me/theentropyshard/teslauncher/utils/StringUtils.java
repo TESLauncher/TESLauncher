@@ -25,9 +25,7 @@ public final class StringUtils {
         StringBuilder builder = new StringBuilder();
 
         for (int i = 0; i < length; i++) {
-            builder.append(StringUtils.ALPHABET.charAt(
-                    (int) (Math.random() * StringUtils.ALPHABET.length())
-            ));
+            builder.append(StringUtils.ALPHABET.charAt((int) (Math.random() * StringUtils.ALPHABET.length())));
         }
 
         return builder.toString();
