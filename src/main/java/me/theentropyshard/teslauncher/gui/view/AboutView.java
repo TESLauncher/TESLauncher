@@ -20,11 +20,18 @@ package me.theentropyshard.teslauncher.gui.view;
 
 import me.theentropyshard.teslauncher.BuildConfig;
 import me.theentropyshard.teslauncher.TESLauncher;
+import me.theentropyshard.teslauncher.utils.OperatingSystem;
 
 import javax.swing.*;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
+import javax.swing.text.html.HTMLEditorKit;
 import java.awt.*;
+import java.net.URL;
 
 public class AboutView extends JPanel {
+    private static final String GITHUB_LINK = "https://github.com/TESLauncher/TESLauncher";
+
     public AboutView() {
         this.setLayout(new GridBagLayout());
 
@@ -34,7 +41,22 @@ public class AboutView extends JPanel {
 
         this.addLine(this, gbc, String.format("TESLauncher %s - simple Minecraft launcher", BuildConfig.APP_VERSION));
         this.addLine(this, gbc, "by TheEntropyShard");
-        this.addLine(this, gbc, "More at https://github.com/TESLauncher");
+
+        JTextPane textPane = new JTextPane();
+        textPane.setEditorKit(new HTMLEditorKit());
+        textPane.setContentType("text/html");
+        textPane.setEditable(false);
+        textPane.setText("<html> More at <a href=\"" + AboutView.GITHUB_LINK + "\">" + AboutView.GITHUB_LINK + "</a> </html>");
+        textPane.addHyperlinkListener(e -> {
+            if (e.getEventType() != HyperlinkEvent.EventType.ACTIVATED) {
+                return;
+            }
+
+            OperatingSystem.browse(AboutView.GITHUB_LINK);
+        });
+
+        gbc.gridy++;
+        this.add(textPane, gbc);
     }
 
     private void addLine(JPanel panel, GridBagConstraints gbc, String text) {
