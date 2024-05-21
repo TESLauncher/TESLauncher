@@ -15,12 +15,17 @@
             </Policies>
             <DefaultRolloverStrategy max="10"/>
         </RollingRandomAccessFile>
+
+        <GuiConsoleAppender name="GuiConsole">
+            <PatternLayout pattern="%d{HH:mm:ss} [%t] %level %c{1.1.1.*} - %msg%n" />
+        </GuiConsoleAppender>
     </Appenders>
     <Loggers>
         <!-- avoid duplicated logs with additivity=false -->
         <Logger name="me.theentropyshard.teslauncher" level="debug" additivity="false">
             <AppenderRef ref="ConsoleLogger"/>
             <AppenderRef ref="FileLogger"/>
+            <AppenderRef ref="GuiConsole"/>
         </Logger>
 
         <Root/>

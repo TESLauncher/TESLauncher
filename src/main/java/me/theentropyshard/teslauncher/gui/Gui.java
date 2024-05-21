@@ -35,6 +35,8 @@ import me.theentropyshard.teslauncher.gui.utils.SwingUtils;
 import javax.swing.*;
 import javax.swing.plaf.ColorUIResource;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 public class Gui {
     private final JTabbedPane viewSelector;
@@ -70,11 +72,24 @@ public class Gui {
         });
         bottomPanel.add(openFolderButton);
 
+        LauncherConsole console = new LauncherConsole();
+        LauncherConsole.instance = console;
+
         JButton consoleButton = new JButton(this.consoleOpen ? "Hide console" : "Show console");
         consoleButton.addActionListener(e -> {
             this.consoleOpen = !this.consoleOpen;
             consoleButton.setText(this.consoleOpen ? "Hide console" : "Show console");
+            console.setVisible(this.consoleOpen);
         });
+
+        console.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                Gui.this.consoleOpen = !Gui.this.consoleOpen;
+                consoleButton.setText(Gui.this.consoleOpen ? "Hide console" : "Show console");
+            }
+        });
+
         bottomPanel.add(consoleButton);
 
         this.frame.add(bottomPanel, BorderLayout.SOUTH);
