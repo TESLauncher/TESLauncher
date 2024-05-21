@@ -46,6 +46,8 @@ public class Gui {
     private boolean darkTheme;
     private boolean initialized;
 
+    private boolean consoleOpen;
+
     public Gui(String title, boolean darkTheme) {
         this.darkTheme = darkTheme;
 
@@ -61,11 +63,20 @@ public class Gui {
 
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         bottomPanel.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, UIManager.getColor("Component.borderColor")));
+
         JButton openFolderButton = new JButton("Open launcher folder");
         openFolderButton.addActionListener(e -> {
             OperatingSystem.open(TESLauncher.getInstance().getWorkDir());
         });
         bottomPanel.add(openFolderButton);
+
+        JButton consoleButton = new JButton(this.consoleOpen ? "Hide console" : "Show console");
+        consoleButton.addActionListener(e -> {
+            this.consoleOpen = !this.consoleOpen;
+            consoleButton.setText(this.consoleOpen ? "Hide console" : "Show console");
+        });
+        bottomPanel.add(consoleButton);
+
         this.frame.add(bottomPanel, BorderLayout.SOUTH);
 
         this.frame.getContentPane().setPreferredSize(new Dimension(TESLauncher.WIDTH, TESLauncher.HEIGHT));
