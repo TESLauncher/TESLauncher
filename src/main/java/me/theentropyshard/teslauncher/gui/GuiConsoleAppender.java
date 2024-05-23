@@ -64,9 +64,10 @@ public class GuiConsoleAppender extends AbstractAppender {
             return;
         }
 
+        String line = this.getLayout().toSerializable(event).toString();
+
         SwingUtilities.invokeLater(() -> {
-            LauncherConsole console = LauncherConsole.instance;
-            console.addLine(event.getMessage().getFormattedMessage());
+            LauncherConsole.instance.addLine(line);
         });
     }
 

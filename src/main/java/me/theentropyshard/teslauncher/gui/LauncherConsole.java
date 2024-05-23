@@ -60,7 +60,13 @@ public class LauncherConsole {
     public void addLine(String line) {
         Document document = this.textPane.getDocument();
         try {
-            document.insertString(document.getLength(), line + "\n", null);
+            int length = document.getLength();
+
+            if (!line.endsWith("\n")) {
+                line += "\n";
+            }
+
+            document.insertString(length, line, null);
         } catch (BadLocationException e) {
             e.printStackTrace();
         }
