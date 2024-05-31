@@ -93,7 +93,7 @@ public class JarModsTab extends SettingsTab {
             }.execute();
         });
 
-        this.deleteModButton = new JButton("Delete jar mode");
+        this.deleteModButton = new JButton("Delete jar mod");
 
         JTable jarModsTable = new JTable(this.jarModsTableModel);
         jarModsTable.addMouseListener(new MouseAdapter() {
