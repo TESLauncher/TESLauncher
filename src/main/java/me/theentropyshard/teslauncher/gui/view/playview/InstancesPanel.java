@@ -60,6 +60,21 @@ public class InstancesPanel extends JPanel {
         this.instancesPanel.add(item, count - 1);
     }
 
+    public void makeItemFirst(InstanceItem item) {
+        int count = this.instancesPanel.getComponentCount();
+
+        for (int i = 0; i < count; i++) {
+            Component component = this.instancesPanel.getComponent(i);
+            if (component.equals(item)) {
+                this.instancesPanel.remove(component);
+
+                break;
+            }
+        }
+
+        this.instancesPanel.add(item, 0);
+    }
+
     public AddInstanceItem getAddInstanceItem() {
         return this.addInstanceItem;
     }

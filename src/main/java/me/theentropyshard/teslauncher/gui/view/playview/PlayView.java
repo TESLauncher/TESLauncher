@@ -161,12 +161,16 @@ public class PlayView extends JPanel {
         }
         panel.addInstanceItem(item);
 
+        InstancesPanel finalPanel = panel;
+
         item.addMouseListener(new MouseClickListener(e -> {
             int mouseButton = e.getButton();
             if (mouseButton == MouseEvent.BUTTON1) { // left mouse button
                 if (AccountManager.getCurrentAccount() == null) {
                     MessageBox.showErrorMessage(TESLauncher.frame, "No account selected");
                 } else {
+                    finalPanel.makeItemFirst(item);
+
                     new InstanceRunner(AccountManager.getCurrentAccount(), item).start();
                 }
             } else if (mouseButton == MouseEvent.BUTTON3) { // right mouse button
