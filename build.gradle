@@ -64,7 +64,6 @@ dependencies {
     implementation "net.java.dev.jna:jna-platform:$jna"
     implementation "org.apache.logging.log4j:log4j-api:$log4j"
     implementation "org.apache.logging.log4j:log4j-core:$log4j"
-    annotationProcessor "org.apache.logging.log4j:log4j-core:$log4j"
 
     testImplementation "org.junit.jupiter:junit-jupiter-api:$junit"
     testImplementation "org.junit.jupiter:junit-jupiter-engine:$junit"
