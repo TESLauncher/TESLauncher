@@ -243,6 +243,9 @@ public class InstanceRunner extends Thread {
 
         List<String> arguments = new ArrayList<>();
 
+        arguments.add("-Dfile.encoding=utf-8");
+        arguments.add("-Dconsole.encoding=utf-8");
+
         List<String> classpath = this.resolveClasspath(version, librariesDir, clientsDir);
 
         Map<String, Object> argVars = new HashMap<>();
