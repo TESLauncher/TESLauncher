@@ -107,9 +107,11 @@ public class Gui {
 
             UIManager.put("ProgressBar.selectionBackground", Color.WHITE);
             UIManager.put("ProgressBar.selectionForeground", Color.WHITE);
-            UIManager.put("ProgressBar.foreground", new ColorUIResource(64, 75, 93));
+            ColorUIResource accentColor = new ColorUIResource(Color.decode("#4B6EAF"));
+            UIManager.put("ProgressBar.foreground", accentColor);
+            UIManager.put("ProgressBar.background", new ColorUIResource(64, 75, 93));
 
-            UIManager.put("AccountItem.borderColor", new ColorUIResource(Color.decode("#4B6EAF")));
+            UIManager.put("AccountItem.borderColor", accentColor);
 
             FlatDarculaLaf.setup();
         } else {
@@ -118,10 +120,12 @@ public class Gui {
             UIManager.put("InstanceItem.pressedColor", new ColorUIResource(216, 224, 240));
 
             UIManager.put("ProgressBar.selectionBackground", Color.BLACK);
-            UIManager.put("ProgressBar.selectionForeground", Color.BLACK);
-            UIManager.put("ProgressBar.foreground", new ColorUIResource(222, 230, 237));
+            UIManager.put("ProgressBar.selectionForeground", Color.WHITE);
+            ColorUIResource accentColor = new ColorUIResource(Color.decode("#2675BF"));
+            UIManager.put("ProgressBar.foreground", accentColor);
+            UIManager.put("ProgressBar.background", new ColorUIResource(222, 230, 237));
 
-            UIManager.put("AccountItem.borderColor", new ColorUIResource(Color.decode("#2675BF")));
+            UIManager.put("AccountItem.borderColor", accentColor);
 
             FlatIntelliJLaf.setup();
         }
