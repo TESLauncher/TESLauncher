@@ -41,6 +41,7 @@ import java.awt.event.WindowEvent;
 public class Gui {
     private final JTabbedPane viewSelector;
     private final JFrame frame;
+    private final JPanel bottomPanel;
 
     private PlayView playView;
     private AccountsView accountsView;
@@ -63,14 +64,14 @@ public class Gui {
         TESLauncher.frame = this.frame = new JFrame(title);
         this.frame.add(this.viewSelector, BorderLayout.CENTER);
 
-        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 3, 5));
-        bottomPanel.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, UIManager.getColor("Component.borderColor")));
+        this.bottomPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 3, 5));
+        this.bottomPanel.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, UIManager.getColor("Component.borderColor")));
 
         JButton openFolderButton = new JButton("Open launcher folder");
         openFolderButton.addActionListener(e -> {
             OperatingSystem.open(TESLauncher.getInstance().getWorkDir());
         });
-        bottomPanel.add(openFolderButton);
+        this.bottomPanel.add(openFolderButton);
 
         LauncherConsole console = new LauncherConsole();
         LauncherConsole.instance = console;
@@ -90,9 +91,9 @@ public class Gui {
             }
         });
 
-        bottomPanel.add(consoleButton);
+        this.bottomPanel.add(consoleButton);
 
-        this.frame.add(bottomPanel, BorderLayout.SOUTH);
+        this.frame.add(this.bottomPanel, BorderLayout.SOUTH);
 
         this.frame.getContentPane().setPreferredSize(new Dimension(TESLauncher.WIDTH, TESLauncher.HEIGHT));
         this.frame.pack();
@@ -133,6 +134,8 @@ public class Gui {
         if (!this.initialized) {
             return;
         }
+
+        this.bottomPanel.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, UIManager.getColor("Component.borderColor")));
 
         InstancesPanel defaultInstancesPanel = this.playView.getDefaultInstancesPanel();
 
