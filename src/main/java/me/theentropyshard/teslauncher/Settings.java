@@ -40,6 +40,7 @@ public class Settings {
     public boolean useDownloadDialog = true;
     public String lastInstanceGroup = "<default>";
     public boolean dialogRelativeToParent = true;
+    public boolean writePrettyJson = false;
 
     public Settings() {
 

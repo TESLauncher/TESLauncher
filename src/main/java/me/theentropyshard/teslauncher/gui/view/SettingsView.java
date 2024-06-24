@@ -126,8 +126,23 @@ public class SettingsView extends JPanel {
             uiSettings.add(position);
 
             gbc.gridy++;
-            gbc.weighty = 1;
             this.add(uiSettings, gbc);
+        }
+
+        {
+            JPanel otherSettings = new JPanel(new GridLayout(1, 1));
+            otherSettings.setBorder(new TitledBorder("Other"));
+
+            JCheckBox prettyJson = new JCheckBox("Write pretty JSON files (useful for development/debugging)");
+            prettyJson.addActionListener(e -> {
+                TESLauncher.getInstance().getSettings().writePrettyJson = prettyJson.isSelected();
+            });
+            prettyJson.setSelected(TESLauncher.getInstance().getSettings().writePrettyJson);
+            otherSettings.add(prettyJson);
+
+            gbc.gridy++;
+            gbc.weighty = 1;
+            this.add(otherSettings, gbc);
         }
     }
 }

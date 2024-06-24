@@ -21,6 +21,7 @@ package me.theentropyshard.teslauncher.utils.json;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
+import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.accounts.Account;
 import me.theentropyshard.teslauncher.accounts.AccountDeserializer;
 import me.theentropyshard.teslauncher.minecraft.DownloadType;
@@ -75,6 +76,10 @@ public final class Json {
     }
 
     public static String write(Object o) {
+        if (TESLauncher.getInstance().getSettings().writePrettyJson) {
+            return Json.writePretty(o);
+        }
+
         return Json.GSON.toJson(o);
     }
 
