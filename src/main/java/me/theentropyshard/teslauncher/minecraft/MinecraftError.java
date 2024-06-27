@@ -23,7 +23,7 @@ import me.theentropyshard.teslauncher.gui.utils.MessageBox;
 
 public class MinecraftError {
     public static void checkForError(String line) {
-        if (line.contains("Could not reserve enough space for object heap") ||
+        if (line.contains("Could not reserve enough space for") ||
                 line.contains("There is insufficient memory for the Java Runtime Environment to continue")) {
 
             MinecraftError.handleInsufficientMemoryError();
