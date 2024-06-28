@@ -49,6 +49,7 @@ public class Instance {
     private long lastPlaytime;
     private long totalPlaytime;
     private final List<JarMod> jarMods;
+    private volatile boolean running;
 
     public Instance() {
         this(null, null, null);
@@ -69,6 +70,14 @@ public class Instance {
     public void updatePlaytime(long seconds) {
         this.lastPlaytime = seconds;
         this.totalPlaytime += seconds;
+    }
+
+    public boolean isRunning() {
+        return this.running;
+    }
+
+    public void setRunning(boolean running) {
+        this.running = running;
     }
 
     public Path getWorkDir() {

@@ -68,6 +68,18 @@ public class InstanceRunner extends Thread {
     }
 
     @Override
+    public synchronized void start() {
+        if (this.instance.isRunning()) {
+            return;
+        }
+
+        this.instance.setRunning(true);
+        this.item.setEnabled(false);
+
+        super.start();
+    }
+
+    @Override
     public void run() {
         boolean useDialog = TESLauncher.getInstance().getSettings().useDownloadDialog;
 
@@ -75,6 +87,8 @@ public class InstanceRunner extends Thread {
             try {
                 this.account.authenticate();
             } catch (AuthException e) {
+                this.instance.setRunning(false);
+                this.item.setEnabled(true);
                 LOG.error("Could not authenticate", e);
                 MessageBox.showErrorMessage(TESLauncher.frame, e.getMessage());
             }
@@ -141,6 +155,8 @@ public class InstanceRunner extends Thread {
         } catch (Exception e) {
             LOG.error("Exception occurred while trying to start Minecraft " + this.instance.getMinecraftVersion(), e);
         } finally {
+            this.instance.setRunning(false);
+            this.item.setEnabled(true);
             this.removeTempClient();
         }
     }

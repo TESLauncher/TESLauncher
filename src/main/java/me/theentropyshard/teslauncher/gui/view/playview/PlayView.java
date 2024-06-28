@@ -263,7 +263,13 @@ public class PlayView extends JPanel {
                         }
                     }
 
-                    this.instanceInfoLabel.setText(instance.getName() + timeString);
+                    timeString = instance.getName() + timeString;
+
+                    if (instance.isRunning()) {
+                        timeString = "[Running] " + timeString;
+                    }
+
+                    this.instanceInfoLabel.setText(timeString);
                 },
 
                 exit -> {

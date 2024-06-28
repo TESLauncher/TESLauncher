@@ -47,6 +47,8 @@ public class InstanceItem extends JPanel implements MinecraftDownloadListener {
     private boolean mouseOver;
     private boolean mousePressed;
 
+    private boolean mouseEnabled;
+
     private double percentComplete;
 
     public InstanceItem(Icon icon, String text) {
@@ -65,6 +67,8 @@ public class InstanceItem extends JPanel implements MinecraftDownloadListener {
         this.setPressedColor(UIManager.getColor("InstanceItem.pressedColor"));
         this.arcColor = UIManager.getColor("AccountItem.borderColor");
 
+        this.mouseEnabled = true;
+
         this.setOpaque(false);
         this.setToolTipText(text);
         this.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -72,28 +76,62 @@ public class InstanceItem extends JPanel implements MinecraftDownloadListener {
         this.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
+                if (!InstanceItem.this.mouseEnabled) {
+                    return;
+                }
+
                 InstanceItem.this.mouseOver = true;
                 InstanceItem.this.repaint();
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
+                if (!InstanceItem.this.mouseEnabled) {
+                    return;
+                }
+
                 InstanceItem.this.mouseOver = false;
                 InstanceItem.this.repaint();
             }
 
             @Override
             public void mousePressed(MouseEvent e) {
+                if (!InstanceItem.this.mouseEnabled) {
+                    return;
+                }
+
                 InstanceItem.this.mousePressed = true;
                 InstanceItem.this.repaint();
             }
 
             @Override
             public void mouseReleased(MouseEvent e) {
+                if (!InstanceItem.this.mouseEnabled) {
+                    return;
+                }
+
                 InstanceItem.this.mousePressed = false;
                 InstanceItem.this.repaint();
             }
         });
+    }
+
+    @Override
+    public void setEnabled(boolean enabled) {
+        if (SwingUtilities.isEventDispatchThread()) {
+            this.mouseEnabled = enabled;
+
+            if (!enabled) {
+                this.mouseOver = false;
+                this.mousePressed = false;
+                this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+            } else {
+                this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            }
+
+        } else {
+            SwingUtilities.invokeLater(() -> this.setEnabled(enabled));
+        }
     }
 
     public Instance getAssociatedInstance() {
