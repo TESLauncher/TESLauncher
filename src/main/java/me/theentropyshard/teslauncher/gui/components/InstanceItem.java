@@ -52,7 +52,7 @@ public class InstanceItem extends JPanel implements MinecraftDownloadListener {
     private double percentComplete;
 
     public InstanceItem(Icon icon, String text) {
-        super(new BorderLayout(), true);
+        super(new BorderLayout());
 
         this.iconLabel = new JLabel(icon);
         this.iconLabel.setHorizontalAlignment(JLabel.CENTER);
