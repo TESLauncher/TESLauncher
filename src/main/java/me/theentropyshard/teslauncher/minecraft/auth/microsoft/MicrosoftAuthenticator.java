@@ -198,6 +198,9 @@ public class MicrosoftAuthenticator {
                 String errorMsg = MicrosoftAuthenticator.getXSTSErrorMessage(xErr);
 
                 throw new AuthException("Error obtaining XSTS token: " + errorMsg + " (" + xErr + ")");
+            } else if (request.code() != 200) {
+                String response = json.isEmpty() ? "<empty>" : json;
+                throw new IOException("Error getting data. Code: " + request.code() + ", Response: " + response);
             } else {
                 return Json.parse(json, XSTSAuthResponse.class);
             }

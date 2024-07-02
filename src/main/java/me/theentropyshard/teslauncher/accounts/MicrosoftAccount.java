@@ -20,6 +20,7 @@ package me.theentropyshard.teslauncher.accounts;
 
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.gui.dialogs.MinecraftDownloadDialog;
+import me.theentropyshard.teslauncher.gui.utils.MessageBox;
 import me.theentropyshard.teslauncher.gui.view.accountsview.AccountItem;
 import me.theentropyshard.teslauncher.gui.dialogs.addaccount.MicrosoftAccountCreationView;
 import me.theentropyshard.teslauncher.minecraft.auth.microsoft.AuthException;
@@ -88,7 +89,15 @@ public class MicrosoftAccount extends Account {
                     authListener, this.refreshToken, true
             );
 
-            MinecraftProfile profile = authenticator.authenticate();
+            MinecraftProfile profile;
+            try {
+                profile = authenticator.authenticate();
+            } catch (IOException e) {
+                MessageBox.showErrorMessage(TESLauncher.frame, e.getMessage());
+                SwingUtilities.invokeLater(() -> dialog.getDialog().dispose());
+                return;
+            }
+
             this.setAccessToken(profile.accessToken);
             this.setUuid(UndashedUUID.fromString(profile.id));
 
