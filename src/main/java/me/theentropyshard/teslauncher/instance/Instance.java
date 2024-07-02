@@ -49,7 +49,7 @@ public class Instance {
     private long lastPlaytime;
     private long totalPlaytime;
     private final List<JarMod> jarMods;
-    private volatile boolean running;
+    private transient volatile boolean running;
 
     public Instance() {
         this(null, null, null);
