@@ -318,7 +318,7 @@ public class MinecraftDownloader {
         List<Library> nativeLibraries = new ArrayList<>();
 
         for (Library library : version.getLibraries()) {
-            if (!RuleMatcher.applyOnThisPlatform(library)) {
+            if (!library.applyOnThisPlatform()) {
                 continue;
             }
 

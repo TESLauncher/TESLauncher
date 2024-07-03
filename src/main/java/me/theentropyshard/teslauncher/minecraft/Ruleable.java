@@ -18,10 +18,38 @@
 
 package me.theentropyshard.teslauncher.minecraft;
 
+import me.theentropyshard.teslauncher.minecraft.rule.OperatingSystemFilter;
 import me.theentropyshard.teslauncher.minecraft.rule.Rule;
+import me.theentropyshard.teslauncher.utils.OperatingSystem;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 public interface Ruleable {
     List<Rule> getRules();
+
+    default boolean applyOnThisPlatform() {
+        List<Rule> rules = this.getRules();
+
+        Rule.Action lastAction = Rule.Action.DISALLOW;
+        if (rules == null || rules.isEmpty()) {
+            lastAction = Rule.Action.ALLOW;
+        } else {
+            for (Rule rule : rules) {
+                OperatingSystemFilter os = rule.getOperatingSystem();
+                if (os == null) {
+                    lastAction = rule.getAction();
+                } else {
+                    boolean versionMatches = os.getVersion() != null &&
+                            Pattern.compile(os.getVersion()).matcher(OperatingSystem.getVersion()).matches();
+                    if (MinecraftDownloader.getMcName().equals(os.getName()) ||
+                            versionMatches || OperatingSystem.getArch().equals(os.getArch())) {
+                        lastAction = rule.getAction();
+                    }
+                }
+            }
+        }
+
+        return lastAction == Rule.Action.ALLOW;
+    }
 }

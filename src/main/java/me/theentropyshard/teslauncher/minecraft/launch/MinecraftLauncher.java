@@ -77,7 +77,7 @@ public class MinecraftLauncher {
                 continue;
             }
 
-            if (RuleMatcher.applyOnThisPlatform(library)) {
+            if (library.applyOnThisPlatform()) {
                 this.classpath.add(librariesDir.resolve(artifact.getPath()).toAbsolutePath().toString());
             }
         }
@@ -164,7 +164,7 @@ public class MinecraftLauncher {
 
         if (newFormat) {
             for (Argument argument : version.getArguments().get(ArgumentType.JVM)) {
-                if (RuleMatcher.applyOnThisPlatform(argument)) {
+                if (argument.applyOnThisPlatform()) {
                     for (String value : argument.getValue()) {
                         arguments.add(substitutor.replace(value));
                     }
@@ -197,7 +197,7 @@ public class MinecraftLauncher {
 
         if (newFormat) {
             for (Argument argument : version.getArguments().get(ArgumentType.GAME)) {
-                if (RuleMatcher.applyOnThisPlatform(argument)) {
+                if (argument.applyOnThisPlatform()) {
                     for (String value : argument.getValue()) {
                         arguments.add(substitutor.replace(value));
                     }
