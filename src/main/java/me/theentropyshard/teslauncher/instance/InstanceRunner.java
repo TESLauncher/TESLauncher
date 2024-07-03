@@ -52,7 +52,7 @@ public class InstanceRunner extends Thread {
     private final Instance instance;
     private final InstanceItem item;
 
-    private Path clientCopyTmp;
+    private Path tempClientCopy;
 
     public InstanceRunner(Account account, InstanceItem item) {
         this.account = account;
@@ -137,7 +137,7 @@ public class InstanceRunner extends Thread {
         } finally {
             this.instance.setRunning(false);
             this.item.setEnabled(true);
-            this.removeTempClient();
+            this.deleteTempClient();
         }
     }
 
@@ -170,15 +170,15 @@ public class InstanceRunner extends Thread {
         downloader.downloadMinecraft(minecraftVersion);
     }
 
-    private void removeTempClient() {
-        if (this.clientCopyTmp == null || !Files.exists(this.clientCopyTmp)) {
+    private void deleteTempClient() {
+        if (this.tempClientCopy == null || !Files.exists(this.tempClientCopy)) {
             return;
         }
 
         try {
-            FileUtils.delete(this.clientCopyTmp);
+            FileUtils.delete(this.tempClientCopy);
         } catch (IOException e) {
-            LOG.warn("Unable to delete temporary copy of the client '{}'", this.clientCopyTmp, e);
+            LOG.warn("Unable to delete temporary copy of the client '{}'", this.tempClientCopy, e);
         }
     }
 
@@ -191,9 +191,8 @@ public class InstanceRunner extends Thread {
             classpath.add(originalClientPath.toString());
         } else {
             try {
-                Path copyOfClient = Files.copy(originalClientPath, this.instance.getWorkDir()
+                this.tempClientCopy = Files.copy(originalClientPath, this.instance.getWorkDir()
                         .resolve(originalClientPath.getFileName().toString() + System.currentTimeMillis() + ".jar"));
-                this.clientCopyTmp = copyOfClient;
 
                 List<File> zipFilesToMerge = new ArrayList<>();
 
@@ -205,7 +204,7 @@ public class InstanceRunner extends Thread {
                     zipFilesToMerge.add(Paths.get(jarMod.getFullPath()).toFile());
                 }
 
-                try (ZipFile copyZip = new ZipFile(copyOfClient.toFile())) {
+                try (ZipFile copyZip = new ZipFile(this.tempClientCopy.toFile())) {
                     copyZip.removeFile("META-INF/MANIFEST.MF");
                     copyZip.removeFile("META-INF/MOJANG_C.DSA");
                     copyZip.removeFile("META-INF/MOJANG_C.SF");
@@ -235,7 +234,7 @@ public class InstanceRunner extends Thread {
                     }
                 }
 
-                classpath.add(copyOfClient.toString());
+                classpath.add(this.tempClientCopy.toString());
             } catch (IOException e) {
                 LOG.warn("Cannot apply jar mods", e);
             }
