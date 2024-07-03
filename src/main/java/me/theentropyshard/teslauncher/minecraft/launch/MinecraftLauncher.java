@@ -97,13 +97,13 @@ public class MinecraftLauncher {
 
         this.resolveClasspath(version, librariesDir);
 
-        Map<String, Object> argVars = new HashMap<>();
+        Map<String, Object> argumentMap = new HashMap<>();
 
         // JVM
-        argVars.put("natives_directory", tmpNativesDir.toAbsolutePath().toString());
-        argVars.put("launcher_name", BuildConfig.APP_NAME);
-        argVars.put("launcher_version", BuildConfig.APP_VERSION);
-        argVars.put("classpath", String.join(File.pathSeparator, this.classpath));
+        argumentMap.put("natives_directory", tmpNativesDir.toAbsolutePath().toString());
+        argumentMap.put("launcher_name", BuildConfig.APP_NAME);
+        argumentMap.put("launcher_version", BuildConfig.APP_VERSION);
+        argumentMap.put("classpath", String.join(File.pathSeparator, this.classpath));
 
         Version.AssetIndex vAssetIndex = version.getAssetIndex();
         AssetIndex assetIndex = Json.parse(
@@ -115,49 +115,49 @@ public class MinecraftLauncher {
 
         // Game
         if (newFormat) {
-            argVars.put("client", "-");
-            argVars.put("auth_xuid", "-");
-            argVars.put("auth_player_name", account.getUsername());
-            argVars.put("version_name", version.getId());
-            argVars.put("game_directory", minecraftDir.toAbsolutePath().toString());
-            argVars.put("assets_root", assetsDir.toAbsolutePath().toString());
-            argVars.put("assets_index_name", version.getAssets());
-            argVars.put("auth_uuid", account.getUuid().toString());
-            argVars.put("auth_access_token", account.getAccessToken());
-            argVars.put("user_type", "msa");
-            argVars.put("version_type", version.getType().getJsonName());
+            argumentMap.put("client", "-");
+            argumentMap.put("auth_xuid", "-");
+            argumentMap.put("auth_player_name", account.getUsername());
+            argumentMap.put("version_name", version.getId());
+            argumentMap.put("game_directory", minecraftDir.toAbsolutePath().toString());
+            argumentMap.put("assets_root", assetsDir.toAbsolutePath().toString());
+            argumentMap.put("assets_index_name", version.getAssets());
+            argumentMap.put("auth_uuid", account.getUuid().toString());
+            argumentMap.put("auth_access_token", account.getAccessToken());
+            argumentMap.put("user_type", "msa");
+            argumentMap.put("version_type", version.getType().getJsonName());
         } else {
-            argVars.put("auth_uuid", account.getUuid().toString());
-            argVars.put("auth_access_token", account.getAccessToken());
-            argVars.put("auth_session", "-");
-            argVars.put("user_properties", "-");
-            argVars.put("game_directory", minecraftDir.toAbsolutePath().toString());
-            argVars.put("version_type", version.getType().getJsonName());
-            argVars.put("user_type", "msa");
-            argVars.put("assets_index_name", version.getAssets());
-            argVars.put("version_name", version.getId());
-            argVars.put("auth_player_name", account.getUsername());
-            argVars.put("uuid", account.getUuid().toString());
-            argVars.put("accessToken", account.getAccessToken());
+            argumentMap.put("auth_uuid", account.getUuid().toString());
+            argumentMap.put("auth_access_token", account.getAccessToken());
+            argumentMap.put("auth_session", "-");
+            argumentMap.put("user_properties", "-");
+            argumentMap.put("game_directory", minecraftDir.toAbsolutePath().toString());
+            argumentMap.put("version_type", version.getType().getJsonName());
+            argumentMap.put("user_type", "msa");
+            argumentMap.put("assets_index_name", version.getAssets());
+            argumentMap.put("version_name", version.getId());
+            argumentMap.put("auth_player_name", account.getUsername());
+            argumentMap.put("uuid", account.getUuid().toString());
+            argumentMap.put("accessToken", account.getAccessToken());
             if (assetIndex.isMapToResources()) {
-                argVars.put("assets_root", minecraftDir.resolve("resources"));
-                argVars.put("game_assets", minecraftDir.resolve("resources"));
+                argumentMap.put("assets_root", minecraftDir.resolve("resources"));
+                argumentMap.put("game_assets", minecraftDir.resolve("resources"));
             } else if (assetIndex.isVirtual()) {
                 Path virtualAssets = assetsDir.resolve("virtual").resolve(vAssetIndex.getId()).toAbsolutePath();
-                argVars.put("assets_root", virtualAssets.toString());
-                argVars.put("game_assets", virtualAssets.toString());
+                argumentMap.put("assets_root", virtualAssets.toString());
+                argumentMap.put("game_assets", virtualAssets.toString());
             } else {
-                argVars.put("assets_root", assetsDir.toString());
-                argVars.put("game_assets", assetsDir.toString());
+                argumentMap.put("assets_root", assetsDir.toString());
+                argumentMap.put("game_assets", assetsDir.toString());
             }
         }
 
-        argVars.put("user_properties", "{}");
+        argumentMap.put("user_properties", "{}");
 
-        argVars.put("resolution_width", "960");
-        argVars.put("resolution_height", "540");
+        argumentMap.put("resolution_width", "960");
+        argumentMap.put("resolution_height", "540");
 
-        StringSubstitutor substitutor = new StringSubstitutor(argVars);
+        StringSubstitutor substitutor = new StringSubstitutor(argumentMap);
 
         arguments.add("-Xms" + minMemoryMegabytes + "m");
         arguments.add("-Xmx" + maxMemoryMegabytes + "m");
