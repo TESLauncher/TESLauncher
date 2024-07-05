@@ -21,7 +21,7 @@ package me.theentropyshard.teslauncher.gui.components;
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.instance.Instance;
 import me.theentropyshard.teslauncher.instance.InstanceManager;
-import me.theentropyshard.teslauncher.minecraft.MinecraftDownloadListener;
+import me.theentropyshard.teslauncher.minecraft.download.MinecraftDownloadListener;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;

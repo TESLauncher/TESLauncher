@@ -16,23 +16,12 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.gui.dialogs.addinstance;
+package me.theentropyshard.teslauncher.minecraft.auth.microsoft.data;
 
-import me.theentropyshard.teslauncher.minecraft.data.VersionType;
+public class MinecraftAuthRequest {
+    public String identityToken;
 
-import javax.swing.*;
-
-public class VersionTypeRowFilter extends RowFilter<McVersionsTableModel, Integer> {
-    private final JCheckBox checkBox;
-    private final VersionType versionType;
-
-    public VersionTypeRowFilter(JCheckBox checkBox, VersionType versionType) {
-        this.checkBox = checkBox;
-        this.versionType = versionType;
-    }
-
-    @Override
-    public boolean include(Entry<? extends McVersionsTableModel, ? extends Integer> entry) {
-        return this.checkBox.isSelected() && entry.getValue(2) == this.versionType;
+    public MinecraftAuthRequest(String identityToken) {
+        this.identityToken = identityToken;
     }
 }

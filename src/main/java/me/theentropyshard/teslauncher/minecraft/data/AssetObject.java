@@ -16,23 +16,25 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.gui.dialogs.addinstance;
+package me.theentropyshard.teslauncher.minecraft.data;
 
-import me.theentropyshard.teslauncher.minecraft.data.VersionType;
+public class AssetObject {
+    private long size;
+    private String hash;
 
-import javax.swing.*;
+    public AssetObject() {
 
-public class VersionTypeRowFilter extends RowFilter<McVersionsTableModel, Integer> {
-    private final JCheckBox checkBox;
-    private final VersionType versionType;
-
-    public VersionTypeRowFilter(JCheckBox checkBox, VersionType versionType) {
-        this.checkBox = checkBox;
-        this.versionType = versionType;
     }
 
-    @Override
-    public boolean include(Entry<? extends McVersionsTableModel, ? extends Integer> entry) {
-        return this.checkBox.isSelected() && entry.getValue(2) == this.versionType;
+    public long getSize() {
+        return this.size;
+    }
+
+    public String getHash() {
+        return this.hash;
+    }
+
+    public String getPrefix() {
+        return this.getHash().substring(0, 2);
     }
 }

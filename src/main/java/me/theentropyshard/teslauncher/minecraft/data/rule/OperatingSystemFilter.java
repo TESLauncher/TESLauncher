@@ -16,23 +16,35 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.gui.dialogs.addinstance;
+package me.theentropyshard.teslauncher.minecraft.data.rule;
 
-import me.theentropyshard.teslauncher.minecraft.data.VersionType;
+public class OperatingSystemFilter {
+    private String name;
+    private String version;
+    private String arch;
 
-import javax.swing.*;
+    public OperatingSystemFilter() {
 
-public class VersionTypeRowFilter extends RowFilter<McVersionsTableModel, Integer> {
-    private final JCheckBox checkBox;
-    private final VersionType versionType;
+    }
 
-    public VersionTypeRowFilter(JCheckBox checkBox, VersionType versionType) {
-        this.checkBox = checkBox;
-        this.versionType = versionType;
+    public String getName() {
+        return this.name;
+    }
+
+    public String getVersion() {
+        return this.version;
+    }
+
+    public String getArch() {
+        return this.arch;
     }
 
     @Override
-    public boolean include(Entry<? extends McVersionsTableModel, ? extends Integer> entry) {
-        return this.checkBox.isSelected() && entry.getValue(2) == this.versionType;
+    public String toString() {
+        return "OperatingSystemFilter{" +
+                "name='" + this.name + '\'' +
+                ", version='" + this.version + '\'' +
+                ", arch='" + this.arch + '\'' +
+                '}';
     }
 }

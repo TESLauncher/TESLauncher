@@ -16,23 +16,26 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.gui.dialogs.addinstance;
+package me.theentropyshard.teslauncher.minecraft.auth.microsoft.data;
 
-import me.theentropyshard.teslauncher.minecraft.data.VersionType;
+import com.google.gson.annotations.SerializedName;
 
-import javax.swing.*;
+public class XboxAuthProperties {
+    @SerializedName("AuthMethod")
+    public String authMethod;
 
-public class VersionTypeRowFilter extends RowFilter<McVersionsTableModel, Integer> {
-    private final JCheckBox checkBox;
-    private final VersionType versionType;
+    @SerializedName("SiteName")
+    public String siteName;
 
-    public VersionTypeRowFilter(JCheckBox checkBox, VersionType versionType) {
-        this.checkBox = checkBox;
-        this.versionType = versionType;
-    }
+    @SerializedName("RpsTicket")
+    public String rpsTicket;
 
     @Override
-    public boolean include(Entry<? extends McVersionsTableModel, ? extends Integer> entry) {
-        return this.checkBox.isSelected() && entry.getValue(2) == this.versionType;
+    public String toString() {
+        return "XboxAuthProperties{" +
+                "authMethod='" + this.authMethod + '\'' +
+                ", siteName='" + this.siteName + '\'' +
+                ", rpsTicket='" + this.rpsTicket + '\'' +
+                '}';
     }
 }

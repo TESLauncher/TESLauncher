@@ -26,6 +26,9 @@ import me.theentropyshard.teslauncher.gui.utils.MessageBox;
 import me.theentropyshard.teslauncher.gui.view.accountsview.AccountItem;
 import me.theentropyshard.teslauncher.gui.view.accountsview.AccountsView;
 import me.theentropyshard.teslauncher.minecraft.auth.microsoft.*;
+import me.theentropyshard.teslauncher.minecraft.auth.microsoft.MicrosoftAuthenticator;
+import me.theentropyshard.teslauncher.minecraft.auth.microsoft.data.MinecraftProfile;
+import me.theentropyshard.teslauncher.minecraft.auth.microsoft.data.MinecraftSkin;
 import me.theentropyshard.teslauncher.utils.ListUtils;
 import me.theentropyshard.teslauncher.utils.OperatingSystem;
 import me.theentropyshard.teslauncher.utils.SkinUtils;
@@ -47,7 +50,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;
 import java.util.Base64;
 import java.util.Objects;
-import java.util.UUID;
 
 //TODO: this is still big shit. fix it
 public class MicrosoftAccountCreationView extends JPanel {

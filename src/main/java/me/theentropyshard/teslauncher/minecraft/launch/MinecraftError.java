@@ -16,23 +16,21 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.gui.dialogs.addinstance;
+package me.theentropyshard.teslauncher.minecraft.launch;
 
-import me.theentropyshard.teslauncher.minecraft.data.VersionType;
+import me.theentropyshard.teslauncher.TESLauncher;
+import me.theentropyshard.teslauncher.gui.utils.MessageBox;
 
-import javax.swing.*;
+public class MinecraftError {
+    public static void checkForError(String line) {
+        if (line.contains("Could not reserve enough space for") ||
+                line.contains("There is insufficient memory for the Java Runtime Environment to continue")) {
 
-public class VersionTypeRowFilter extends RowFilter<McVersionsTableModel, Integer> {
-    private final JCheckBox checkBox;
-    private final VersionType versionType;
-
-    public VersionTypeRowFilter(JCheckBox checkBox, VersionType versionType) {
-        this.checkBox = checkBox;
-        this.versionType = versionType;
+            MinecraftError.handleInsufficientMemoryError();
+        }
     }
 
-    @Override
-    public boolean include(Entry<? extends McVersionsTableModel, ? extends Integer> entry) {
-        return this.checkBox.isSelected() && entry.getValue(2) == this.versionType;
+    private static void handleInsufficientMemoryError() {
+        MessageBox.showErrorMessage(TESLauncher.frame, "Java Runtime Environment could not allocate enough memory");
     }
 }

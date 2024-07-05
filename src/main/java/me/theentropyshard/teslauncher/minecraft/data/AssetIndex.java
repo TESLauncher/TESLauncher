@@ -16,23 +16,31 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.gui.dialogs.addinstance;
+package me.theentropyshard.teslauncher.minecraft.data;
 
-import me.theentropyshard.teslauncher.minecraft.data.VersionType;
+import com.google.gson.annotations.SerializedName;
 
-import javax.swing.*;
+import java.util.Map;
 
-public class VersionTypeRowFilter extends RowFilter<McVersionsTableModel, Integer> {
-    private final JCheckBox checkBox;
-    private final VersionType versionType;
+public class AssetIndex {
+    @SerializedName("map_to_resources")
+    private boolean mapToResources;
+    private boolean virtual;
+    private Map<String, AssetObject> objects;
 
-    public VersionTypeRowFilter(JCheckBox checkBox, VersionType versionType) {
-        this.checkBox = checkBox;
-        this.versionType = versionType;
+    public AssetIndex() {
+
     }
 
-    @Override
-    public boolean include(Entry<? extends McVersionsTableModel, ? extends Integer> entry) {
-        return this.checkBox.isSelected() && entry.getValue(2) == this.versionType;
+    public boolean isMapToResources() {
+        return this.mapToResources;
+    }
+
+    public boolean isVirtual() {
+        return this.virtual;
+    }
+
+    public Map<String, AssetObject> getObjects() {
+        return this.objects;
     }
 }

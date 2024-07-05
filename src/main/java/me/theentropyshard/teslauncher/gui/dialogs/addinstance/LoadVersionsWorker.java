@@ -19,9 +19,9 @@
 package me.theentropyshard.teslauncher.gui.dialogs.addinstance;
 
 import me.theentropyshard.teslauncher.TESLauncher;
-import me.theentropyshard.teslauncher.minecraft.MinecraftDownloader;
-import me.theentropyshard.teslauncher.minecraft.VersionManifest;
-import me.theentropyshard.teslauncher.minecraft.VersionType;
+import me.theentropyshard.teslauncher.minecraft.download.MinecraftDownloader;
+import me.theentropyshard.teslauncher.minecraft.data.VersionManifest;
+import me.theentropyshard.teslauncher.minecraft.data.VersionType;
 import me.theentropyshard.teslauncher.gui.utils.SwingUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

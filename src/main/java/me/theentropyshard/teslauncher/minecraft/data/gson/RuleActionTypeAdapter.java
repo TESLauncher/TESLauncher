@@ -16,23 +16,23 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.gui.dialogs.addinstance;
+package me.theentropyshard.teslauncher.minecraft.data.gson;
 
-import me.theentropyshard.teslauncher.minecraft.data.VersionType;
+import com.google.gson.TypeAdapter;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
+import me.theentropyshard.teslauncher.minecraft.data.rule.Rule;
 
-import javax.swing.*;
+import java.io.IOException;
 
-public class VersionTypeRowFilter extends RowFilter<McVersionsTableModel, Integer> {
-    private final JCheckBox checkBox;
-    private final VersionType versionType;
-
-    public VersionTypeRowFilter(JCheckBox checkBox, VersionType versionType) {
-        this.checkBox = checkBox;
-        this.versionType = versionType;
+public class RuleActionTypeAdapter extends TypeAdapter<Rule.Action> {
+    @Override
+    public void write(JsonWriter writer, Rule.Action action) throws IOException {
+        writer.value(action.getJsonName());
     }
 
     @Override
-    public boolean include(Entry<? extends McVersionsTableModel, ? extends Integer> entry) {
-        return this.checkBox.isSelected() && entry.getValue(2) == this.versionType;
+    public Rule.Action read(JsonReader reader) throws IOException {
+        return Rule.Action.getByName(reader.nextString());
     }
 }

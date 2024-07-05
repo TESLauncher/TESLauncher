@@ -20,7 +20,7 @@ package me.theentropyshard.teslauncher.gui.dialogs;
 
 import com.formdev.flatlaf.FlatClientProperties;
 import me.theentropyshard.teslauncher.TESLauncher;
-import me.theentropyshard.teslauncher.minecraft.MinecraftDownloadListener;
+import me.theentropyshard.teslauncher.minecraft.download.MinecraftDownloadListener;
 import me.theentropyshard.teslauncher.utils.MathUtils;
 
 import javax.swing.*;
