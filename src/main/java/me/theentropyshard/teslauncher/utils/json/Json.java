@@ -29,7 +29,6 @@ import me.theentropyshard.teslauncher.minecraft.data.Version;
 import me.theentropyshard.teslauncher.minecraft.data.VersionType;
 import me.theentropyshard.teslauncher.minecraft.data.argument.ArgumentType;
 import me.theentropyshard.teslauncher.minecraft.data.gson.*;
-import me.theentropyshard.teslauncher.minecraft.gson.*;
 import me.theentropyshard.teslauncher.minecraft.data.rule.Rule;
 import me.theentropyshard.teslauncher.utils.json.type.InstantTypeAdapter;
 import me.theentropyshard.teslauncher.utils.json.type.LocalDateTimeTypeAdapter;
