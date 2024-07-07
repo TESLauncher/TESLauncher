@@ -34,8 +34,6 @@ public class UserAgentInterceptor implements Interceptor {
     @NotNull
     @Override
     public Response intercept(Chain chain) throws IOException {
-        return chain.proceed(chain.request().newBuilder()
-                .header("User-Agent", this.userAgent)
-                .build());
+        return chain.proceed(chain.request().newBuilder().header("User-Agent", this.userAgent).build());
     }
 }
