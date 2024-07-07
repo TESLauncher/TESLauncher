@@ -19,6 +19,7 @@
 package me.theentropyshard.teslauncher.accounts;
 
 import com.google.gson.reflect.TypeToken;
+import me.theentropyshard.teslauncher.Settings;
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.utils.FileUtils;
 import me.theentropyshard.teslauncher.utils.json.Json;
@@ -96,7 +97,8 @@ public class AccountManager {
     }
 
     public void save() throws IOException {
-        String json = Json.write(this.accounts);
+        Settings settings = TESLauncher.getInstance().getSettings();
+        String json = settings.writePrettyJson ? Json.writePretty(this.accounts) : Json.write(this.accounts);
         Files.write(this.accountsFile, json.getBytes(StandardCharsets.UTF_8));
     }
 

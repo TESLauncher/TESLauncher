@@ -76,10 +76,6 @@ public final class Json {
     }
 
     public static String write(Object o) {
-        if (TESLauncher.getInstance().getSettings().writePrettyJson) {
-            return Json.writePretty(o);
-        }
-
         return Json.GSON.toJson(o);
     }
 

@@ -18,6 +18,8 @@
 
 package me.theentropyshard.teslauncher.instance;
 
+import me.theentropyshard.teslauncher.Settings;
+import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.utils.FileUtils;
 import me.theentropyshard.teslauncher.utils.OperatingSystem;
 import me.theentropyshard.teslauncher.utils.json.Json;
@@ -64,7 +66,9 @@ public class Instance {
     }
 
     public void save() throws IOException {
-        FileUtils.writeUtf8(this.getWorkDir().resolve(Instance.INSTANCE_FILE_NAME), Json.write(this));
+        Settings settings = TESLauncher.getInstance().getSettings();
+        String content = settings.writePrettyJson ? Json.writePretty(this) : Json.write(this);
+        FileUtils.writeUtf8(this.getWorkDir().resolve(Instance.INSTANCE_FILE_NAME), content);
     }
 
     public void updatePlaytime(long seconds) {

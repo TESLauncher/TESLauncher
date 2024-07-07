@@ -62,7 +62,7 @@ public class Settings {
 
     public void save(Path file) {
         try {
-            FileUtils.writeUtf8(file, Json.write(this));
+            FileUtils.writeUtf8(file, this.writePrettyJson ? Json.writePretty(this) : Json.write(this));
         } catch (IOException e) {
             LOG.error("Could not save settings to {}", file);
         }
