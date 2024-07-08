@@ -19,7 +19,7 @@
 package me.theentropyshard.teslauncher.gui.view.playview;
 
 import me.theentropyshard.teslauncher.TESLauncher;
-import me.theentropyshard.teslauncher.accounts.AccountManager;
+import me.theentropyshard.teslauncher.minecraft.accounts.AccountManager;
 import me.theentropyshard.teslauncher.gui.components.AddInstanceItem;
 import me.theentropyshard.teslauncher.gui.components.InstanceItem;
 import me.theentropyshard.teslauncher.gui.dialogs.SelectIconDialog;

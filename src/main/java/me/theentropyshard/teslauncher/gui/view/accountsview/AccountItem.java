@@ -19,7 +19,7 @@
 package me.theentropyshard.teslauncher.gui.view.accountsview;
 
 import me.theentropyshard.teslauncher.TESLauncher;
-import me.theentropyshard.teslauncher.accounts.Account;
+import me.theentropyshard.teslauncher.minecraft.accounts.Account;
 import me.theentropyshard.teslauncher.gui.view.playview.PlayViewHeader;
 import me.theentropyshard.teslauncher.gui.utils.MessageBox;
 import me.theentropyshard.teslauncher.gui.utils.SwingUtils;

@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.accounts;
+package me.theentropyshard.teslauncher.minecraft.accounts;
 
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.gui.dialogs.MinecraftDownloadDialog;

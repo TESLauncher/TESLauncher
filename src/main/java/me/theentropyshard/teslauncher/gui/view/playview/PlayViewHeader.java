@@ -18,8 +18,8 @@
 
 package me.theentropyshard.teslauncher.gui.view.playview;
 
-import me.theentropyshard.teslauncher.accounts.Account;
-import me.theentropyshard.teslauncher.accounts.AccountManager;
+import me.theentropyshard.teslauncher.minecraft.accounts.Account;
+import me.theentropyshard.teslauncher.minecraft.accounts.AccountManager;
 
 import javax.swing.*;
 import java.awt.*;

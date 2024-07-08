@@ -19,8 +19,8 @@
 package me.theentropyshard.teslauncher.gui.view.accountsview;
 
 import me.theentropyshard.teslauncher.TESLauncher;
-import me.theentropyshard.teslauncher.accounts.Account;
-import me.theentropyshard.teslauncher.accounts.AccountManager;
+import me.theentropyshard.teslauncher.minecraft.accounts.Account;
+import me.theentropyshard.teslauncher.minecraft.accounts.AccountManager;
 import me.theentropyshard.teslauncher.gui.dialogs.addaccount.AddAccountDialog;
 import me.theentropyshard.teslauncher.gui.view.playview.PlayViewHeader;
 

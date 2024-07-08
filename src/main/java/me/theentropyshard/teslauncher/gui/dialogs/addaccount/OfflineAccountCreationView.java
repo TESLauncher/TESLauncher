@@ -20,9 +20,9 @@ package me.theentropyshard.teslauncher.gui.dialogs.addaccount;
 
 import com.formdev.flatlaf.FlatClientProperties;
 import me.theentropyshard.teslauncher.TESLauncher;
-import me.theentropyshard.teslauncher.accounts.Account;
-import me.theentropyshard.teslauncher.accounts.AccountManager;
-import me.theentropyshard.teslauncher.accounts.OfflineAccount;
+import me.theentropyshard.teslauncher.minecraft.accounts.Account;
+import me.theentropyshard.teslauncher.minecraft.accounts.AccountManager;
+import me.theentropyshard.teslauncher.minecraft.accounts.OfflineAccount;
 import me.theentropyshard.teslauncher.gui.view.accountsview.AccountItem;
 import me.theentropyshard.teslauncher.gui.view.accountsview.AccountsView;
 import me.theentropyshard.teslauncher.gui.utils.MessageBox;

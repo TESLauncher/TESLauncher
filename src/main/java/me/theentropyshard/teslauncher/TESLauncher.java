@@ -18,8 +18,7 @@
 
 package me.theentropyshard.teslauncher;
 
-import me.theentropyshard.teslauncher.accounts.AccountManager;
-import me.theentropyshard.teslauncher.cli.Args;
+import me.theentropyshard.teslauncher.minecraft.accounts.AccountManager;
 import me.theentropyshard.teslauncher.gui.Gui;
 import me.theentropyshard.teslauncher.instance.InstanceManager;
 import me.theentropyshard.teslauncher.network.UserAgentInterceptor;
