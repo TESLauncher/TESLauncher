@@ -103,7 +103,7 @@ public class TESLauncher {
                 .protocols(Collections.singletonList(Protocol.HTTP_1_1))
                 .build();
 
-        this.accountManager = new AccountManager(this.workDir);
+        this.accountManager = new AccountManager(minecraftDir);
         try {
             this.accountManager.loadAccounts();
         } catch (IOException e) {
