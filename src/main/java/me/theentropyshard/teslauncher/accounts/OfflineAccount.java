@@ -19,6 +19,7 @@
 package me.theentropyshard.teslauncher.accounts;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 public class OfflineAccount extends Account {
@@ -28,7 +29,7 @@ public class OfflineAccount extends Account {
 
     @Override
     public void authenticate() throws IOException {
-        this.setUuid(UUID.randomUUID());
+        this.setUuid(UUID.nameUUIDFromBytes(("OfflineAccount:" + this.getUsername()).getBytes(StandardCharsets.UTF_8)));
         this.setAccessToken("-");
     }
 }
