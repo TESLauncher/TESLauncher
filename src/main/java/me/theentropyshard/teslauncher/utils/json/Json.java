@@ -40,6 +40,7 @@ import java.time.OffsetDateTime;
 
 public final class Json {
     private static final Gson GSON = new GsonBuilder()
+            .serializeNulls()
             .disableHtmlEscaping()
             .disableJdkUnsafe()
             //
