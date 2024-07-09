@@ -70,7 +70,7 @@ public class MinecraftLauncher {
                 optimizedArgs);
         List<String> command = this.buildRunCommand(version, arguments, this.runtimesDir);
 
-        return this.runGameProcess(command, runDir);
+        return this.runGameProcess(command, runDir, account);
     }
 
     private void resolveClasspath(Version version, Path librariesDir) {
@@ -315,7 +315,7 @@ public class MinecraftLauncher {
         return command;
     }
 
-    private int runGameProcess(List<String> command, Path runDir) throws IOException {
+    private int runGameProcess(List<String> command, Path runDir, Account account) throws IOException {
         ProcessBuilder processBuilder = new ProcessBuilder(command);
         processBuilder.environment().put("APPDATA", runDir.toString());
         processBuilder.directory(runDir.toFile());
@@ -323,7 +323,9 @@ public class MinecraftLauncher {
 
         Process process = processBuilder.start();
 
-        new ProcessReader(process).read(this::readProcessOutput);
+        new ProcessReader(process).read(line -> {
+            this.readProcessOutput(line, account);
+        });
 
         try {
             return process.waitFor();
@@ -332,7 +334,11 @@ public class MinecraftLauncher {
         }
     }
 
-    private void readProcessOutput(String line) {
+    private void readProcessOutput(String line, Account account) {
+        line = line.replace(account.getAccessToken(), "**ACCESSTOKEN**");
+        line = line.replace(account.getUsername(), "**USERNAME**");
+        line = line.replace(account.getUuid().toString(), "**UUID**");
+
         MinecraftError.checkForError(line);
 
         LOG.info(line);
