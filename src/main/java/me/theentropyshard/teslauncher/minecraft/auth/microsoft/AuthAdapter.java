@@ -16,20 +16,35 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.minecraft.accounts;
+package me.theentropyshard.teslauncher.minecraft.auth.microsoft;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.UUID;
+public class AuthAdapter implements AuthListener {
+    public AuthAdapter() {
 
-public class OfflineAccount extends Account {
-    public OfflineAccount(String username) {
-        this.setUsername(username);
     }
 
     @Override
-    public void authenticate() throws IOException {
-        this.setUuid(UUID.nameUUIDFromBytes(("OfflineAccount:" + this.getUsername()).getBytes(StandardCharsets.UTF_8)));
-        this.setAccessToken("-");
+    public void onUserCodeReceived(String userCode, String verificationUri) {
+
+    }
+
+    @Override
+    public void onMinecraftAuth() {
+
+    }
+
+    @Override
+    public void onCheckGameOwnership() {
+
+    }
+
+    @Override
+    public void onGettingSkin() {
+
+    }
+
+    @Override
+    public void onFinish() {
+
     }
 }

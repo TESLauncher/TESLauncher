@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.minecraft.accounts;
+package me.theentropyshard.teslauncher.minecraft.account;
 
 import me.theentropyshard.teslauncher.minecraft.auth.microsoft.AuthException;
 
@@ -34,14 +34,17 @@ public abstract class Account {
     private String username;
     private UUID uuid;
     private String accessToken;
-
-    // Stored in base64
     private String headIcon;
-
-    private boolean selected;
 
     public Account() {
 
+    }
+
+    public Account(String username, UUID uuid, String accessToken, String headIcon) {
+        this.username = username;
+        this.uuid = uuid;
+        this.accessToken = accessToken;
+        this.headIcon = headIcon;
     }
 
     public abstract void authenticate() throws IOException, AuthException;
@@ -76,19 +79,5 @@ public abstract class Account {
 
     public void setHeadIcon(String headIcon) {
         this.headIcon = headIcon;
-    }
-
-    public boolean isSelected() {
-        return this.selected;
-    }
-
-    public void setSelected(boolean selected) {
-        this.selected = selected;
-    }
-
-    @Override
-    public String toString() {
-        return this.getClass().getSimpleName() + "{username=" +
-                this.username + ", selected=" + this.selected + "}";
     }
 }

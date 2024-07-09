@@ -44,7 +44,7 @@ public class AddAccountDialog extends AppDialog {
         viewSelector.addTab("Microsoft", this.microsoftView);
 
         root.add(viewSelector, BorderLayout.CENTER);
-        //root.setPreferredSize(new Dimension(800, 600));
+        //root.setPreferredSize(new Dimension(450, 270));
 
         this.setResizable(false);
         this.setContent(root);

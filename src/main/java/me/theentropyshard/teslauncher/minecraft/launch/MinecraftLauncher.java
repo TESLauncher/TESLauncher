@@ -20,8 +20,8 @@ package me.theentropyshard.teslauncher.minecraft.launch;
 
 import me.theentropyshard.teslauncher.BuildConfig;
 import me.theentropyshard.teslauncher.TESLauncher;
-import me.theentropyshard.teslauncher.minecraft.accounts.Account;
-import me.theentropyshard.teslauncher.minecraft.accounts.MicrosoftAccount;
+import me.theentropyshard.teslauncher.minecraft.account.Account;
+import me.theentropyshard.teslauncher.minecraft.account.microsoft.MicrosoftAccount;
 import me.theentropyshard.teslauncher.minecraft.data.argument.Argument;
 import me.theentropyshard.teslauncher.minecraft.data.argument.ArgumentType;
 import me.theentropyshard.teslauncher.minecraft.data.AssetIndex;

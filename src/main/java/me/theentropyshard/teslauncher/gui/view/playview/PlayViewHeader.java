@@ -18,8 +18,8 @@
 
 package me.theentropyshard.teslauncher.gui.view.playview;
 
-import me.theentropyshard.teslauncher.minecraft.accounts.Account;
-import me.theentropyshard.teslauncher.minecraft.accounts.AccountManager;
+import me.theentropyshard.teslauncher.TESLauncher;
+import me.theentropyshard.teslauncher.minecraft.account.Account;
 
 import javax.swing.*;
 import java.awt.*;
@@ -49,7 +49,7 @@ public class PlayViewHeader extends JPanel {
         rightSide.add(accountsLabel);
 
         this.account = new JLabel();
-        this.setCurrentAccount(AccountManager.getCurrentAccount());
+        this.setCurrentAccount(TESLauncher.getInstance().getAccountManager().getCurrentAccount());
         rightSide.add(this.account);
 
         this.add(leftSide, BorderLayout.WEST);

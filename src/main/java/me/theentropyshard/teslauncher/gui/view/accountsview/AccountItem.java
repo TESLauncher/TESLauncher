@@ -19,10 +19,11 @@
 package me.theentropyshard.teslauncher.gui.view.accountsview;
 
 import me.theentropyshard.teslauncher.TESLauncher;
-import me.theentropyshard.teslauncher.minecraft.accounts.Account;
+import me.theentropyshard.teslauncher.minecraft.account.Account;
 import me.theentropyshard.teslauncher.gui.view.playview.PlayViewHeader;
 import me.theentropyshard.teslauncher.gui.utils.MessageBox;
 import me.theentropyshard.teslauncher.gui.utils.SwingUtils;
+import me.theentropyshard.teslauncher.minecraft.account.AccountManager;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -137,8 +138,11 @@ public class AccountItem extends JPanel {
                         return;
                     }
 
+                    AccountManager accountManager = TESLauncher.getInstance().getAccountManager();
+                    boolean wasSelected = account == accountManager.getCurrentAccount();
+
                     try {
-                        TESLauncher.getInstance().getAccountsManager().removeAccount(account);
+                        accountManager.removeAccount(account);
                     } catch (IOException ex) {
                         ex.printStackTrace();
 
@@ -152,7 +156,7 @@ public class AccountItem extends JPanel {
 
                     TESLauncher.getInstance().getGui().getAccountsView().removeAccountItem(AccountItem.this);
 
-                    if (account.isSelected()) {
+                    if (wasSelected) {
                         PlayViewHeader header = TESLauncher.getInstance().getGui().getPlayView().getHeader();
                         header.setCurrentAccount(null);
                     }

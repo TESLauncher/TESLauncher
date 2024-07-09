@@ -16,26 +16,22 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.minecraft.accounts;
+package me.theentropyshard.teslauncher.minecraft.account;
 
-import com.google.gson.reflect.TypeToken;
 import me.theentropyshard.teslauncher.Settings;
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.utils.FileUtils;
 import me.theentropyshard.teslauncher.utils.json.Json;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 public class AccountManager {
     private final Path accountsFile;
-    private final Map<String, Account> accounts;
+
+    private AccountStorage accountStorage;
 
     public AccountManager(Path workDir) {
         this.accountsFile = workDir.resolve("accounts.json");
@@ -45,30 +41,27 @@ public class AccountManager {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-        this.accounts = new LinkedHashMap<>();
     }
 
-    public static Account getCurrentAccount() {
-        Map<String, Account> accountsMap = TESLauncher.getInstance().getAccountsManager().getAccountsMap();
-        for (Map.Entry<String, Account> entry : accountsMap.entrySet()) {
-            Account account = entry.getValue();
-            if (account.isSelected()) {
-                return account;
-            }
-        }
-
-        return null;
+    public Account getCurrentAccount() {
+        return this.accountStorage.getSelectedAccount();
     }
 
     public boolean canCreateAccount(String username) {
-        return !this.accounts.containsKey(username);
+        return !this.accountStorage.accountExists(username);
     }
 
-    public void loadAccounts() throws IOException {
-        Map<String, Account> accounts = Json.parse(FileUtils.readUtf8(this.accountsFile), new TypeToken<Map<String, Account>>() {}.getType());
-        if (accounts != null) {
-            this.accounts.putAll(accounts);
+    public void load() throws IOException {
+        if (Files.size(this.accountsFile) == 0L) {
+            this.accountStorage = new AccountStorage();
+
+            return;
+        }
+
+        this.accountStorage = Json.parse(FileUtils.readUtf8(this.accountsFile), AccountStorage.class);
+
+        if (this.accountStorage == null) {
+            throw new IOException("Could not load account storage from '" + this.accountsFile + "'");
         }
     }
 
@@ -77,7 +70,7 @@ public class AccountManager {
             return false;
         }
 
-        this.accounts.put(account.getUsername(), account);
+        this.accountStorage.addAccount(account);
 
         try {
             this.save();
@@ -89,30 +82,26 @@ public class AccountManager {
     }
 
     public void selectAccount(Account account) {
-        for (Map.Entry<String, Account> entry : this.accounts.entrySet()) {
-            entry.getValue().setSelected(false);
-        }
-
-        account.setSelected(true);
+        this.accountStorage.setSelected(account.getUsername());
     }
 
     public void save() throws IOException {
         Settings settings = TESLauncher.getInstance().getSettings();
-        String json = settings.writePrettyJson ? Json.writePretty(this.accounts) : Json.write(this.accounts);
-        Files.write(this.accountsFile, json.getBytes(StandardCharsets.UTF_8));
+        String json = settings.writePrettyJson ? Json.writePretty(this.accountStorage) : Json.write(this.accountStorage);
+        FileUtils.writeUtf8(this.accountsFile, json);
     }
 
     public List<Account> getAccounts() {
-        return new ArrayList<>(this.accounts.values());
-    }
-
-    public Map<String, Account> getAccountsMap() {
-        return this.accounts;
+        return this.accountStorage.getAccountList();
     }
 
     public void removeAccount(Account account) throws IOException {
-        this.accounts.remove(account.getUsername());
+        this.accountStorage.removeAccount(account);
 
         this.save();
+    }
+
+    public AccountStorage getAccountStorage() {
+        return this.accountStorage;
     }
 }

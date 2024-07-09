@@ -19,13 +19,14 @@
 package me.theentropyshard.teslauncher.gui.dialogs.addaccount;
 
 import me.theentropyshard.teslauncher.TESLauncher;
-import me.theentropyshard.teslauncher.minecraft.accounts.Account;
-import me.theentropyshard.teslauncher.minecraft.accounts.MicrosoftAccount;
 import me.theentropyshard.teslauncher.gui.dialogs.OpenBrowserDialog;
 import me.theentropyshard.teslauncher.gui.utils.MessageBox;
 import me.theentropyshard.teslauncher.gui.view.accountsview.AccountItem;
 import me.theentropyshard.teslauncher.gui.view.accountsview.AccountsView;
-import me.theentropyshard.teslauncher.minecraft.auth.microsoft.*;
+import me.theentropyshard.teslauncher.minecraft.account.Account;
+import me.theentropyshard.teslauncher.minecraft.account.microsoft.MicrosoftAccount;
+import me.theentropyshard.teslauncher.minecraft.auth.microsoft.AuthException;
+import me.theentropyshard.teslauncher.minecraft.auth.microsoft.AuthListener;
 import me.theentropyshard.teslauncher.minecraft.auth.microsoft.MicrosoftAuthenticator;
 import me.theentropyshard.teslauncher.minecraft.auth.microsoft.data.MinecraftProfile;
 import me.theentropyshard.teslauncher.minecraft.auth.microsoft.data.MinecraftSkin;
@@ -115,6 +116,8 @@ public class MicrosoftAccountCreationView extends JPanel {
                         }
 
                         if (profile == null) {
+                            LOG.error("Profile is null");
+
                             return null;
                         }
 
@@ -134,7 +137,7 @@ public class MicrosoftAccountCreationView extends JPanel {
 
                         secondView.onFinish();
 
-                        TESLauncher.getInstance().getAccountsManager().saveAccount(microsoftAccount);
+                        TESLauncher.getInstance().getAccountManager().saveAccount(microsoftAccount);
 
                         TESLauncher.getInstance().getGui().getAccountsView().addAccountItem(
                                 new AccountItem(microsoftAccount)
@@ -196,26 +199,34 @@ public class MicrosoftAccountCreationView extends JPanel {
 
         @Override
         public void onMinecraftAuth() {
-            String text = this.textPane.getText();
-            this.textPane.setText(text + "\n\n" + "Authenticating with Minecraft...");
+            SwingUtilities.invokeLater(() -> {
+                String text = this.textPane.getText();
+                this.textPane.setText(text + "\n" + "Authenticating with Minecraft...");
+            });
         }
 
         @Override
         public void onCheckGameOwnership() {
-            String text = this.textPane.getText();
-            this.textPane.setText(text + "\n\n" + "Checking game ownership...");
+            SwingUtilities.invokeLater(() -> {
+                String text = this.textPane.getText();
+                this.textPane.setText(text + "\n" + "Checking game ownership...");
+            });
         }
 
         @Override
         public void onGettingSkin() {
-            String text = this.textPane.getText();
-            this.textPane.setText(text + "\n\n" + "Getting skin...");
+            SwingUtilities.invokeLater(() -> {
+                String text = this.textPane.getText();
+                this.textPane.setText(text + "\n" + "Getting skin...");
+            });
         }
 
         @Override
         public void onFinish() {
-            String text = this.textPane.getText();
-            this.textPane.setText(text + "\n\n" + "Finished");
+            SwingUtilities.invokeLater(() -> {
+                String text = this.textPane.getText();
+                this.textPane.setText(text + "\n" + "Finished");
+            });
         }
 
         public boolean isSelectedBox() {

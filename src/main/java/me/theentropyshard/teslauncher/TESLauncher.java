@@ -18,7 +18,7 @@
 
 package me.theentropyshard.teslauncher;
 
-import me.theentropyshard.teslauncher.minecraft.accounts.AccountManager;
+import me.theentropyshard.teslauncher.minecraft.account.AccountManager;
 import me.theentropyshard.teslauncher.gui.Gui;
 import me.theentropyshard.teslauncher.instance.InstanceManager;
 import me.theentropyshard.teslauncher.network.UserAgentInterceptor;
@@ -105,7 +105,7 @@ public class TESLauncher {
 
         this.accountManager = new AccountManager(minecraftDir);
         try {
-            this.accountManager.loadAccounts();
+            this.accountManager.load();
         } catch (IOException e) {
             LOG.error("Unable to load accounts", e);
         }
@@ -223,7 +223,7 @@ public class TESLauncher {
         return this.log4jConfigsDir;
     }
 
-    public AccountManager getAccountsManager() {
+    public AccountManager getAccountManager() {
         return this.accountManager;
     }
 

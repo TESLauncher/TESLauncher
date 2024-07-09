@@ -19,7 +19,7 @@
 package me.theentropyshard.teslauncher.instance;
 
 import me.theentropyshard.teslauncher.TESLauncher;
-import me.theentropyshard.teslauncher.minecraft.accounts.Account;
+import me.theentropyshard.teslauncher.minecraft.account.Account;
 import me.theentropyshard.teslauncher.gui.components.InstanceItem;
 import me.theentropyshard.teslauncher.gui.dialogs.MinecraftDownloadDialog;
 import me.theentropyshard.teslauncher.gui.utils.MessageBox;

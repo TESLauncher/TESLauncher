@@ -21,8 +21,10 @@ package me.theentropyshard.teslauncher.utils.json;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
-import me.theentropyshard.teslauncher.minecraft.accounts.Account;
-import me.theentropyshard.teslauncher.minecraft.accounts.AccountDeserializer;
+import me.theentropyshard.teslauncher.minecraft.account.Account;
+import me.theentropyshard.teslauncher.minecraft.account.AccountStorage;
+import me.theentropyshard.teslauncher.minecraft.account.gson.AccountDeserializer;
+import me.theentropyshard.teslauncher.minecraft.account.gson.AccountStorageDeserializer;
 import me.theentropyshard.teslauncher.minecraft.data.DownloadType;
 import me.theentropyshard.teslauncher.minecraft.data.Version;
 import me.theentropyshard.teslauncher.minecraft.data.VersionType;
@@ -49,6 +51,7 @@ public final class Json {
             .registerTypeAdapter(OffsetDateTime.class, new OffsetDateTimeTypeAdapter())
             //
             .registerTypeAdapter(Account.class, new AccountDeserializer())
+            .registerTypeAdapter(AccountStorage.class, new AccountStorageDeserializer())
             .registerTypeAdapter(Version.class, new VersionDeserializer())
             .registerTypeAdapter(VersionType.class, new VersionTypeTypeAdapter())
             .registerTypeAdapter(Rule.Action.class, new RuleActionTypeAdapter())

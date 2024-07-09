@@ -19,8 +19,8 @@
 package me.theentropyshard.teslauncher.gui.view.accountsview;
 
 import me.theentropyshard.teslauncher.TESLauncher;
-import me.theentropyshard.teslauncher.minecraft.accounts.Account;
-import me.theentropyshard.teslauncher.minecraft.accounts.AccountManager;
+import me.theentropyshard.teslauncher.minecraft.account.Account;
+import me.theentropyshard.teslauncher.minecraft.account.AccountManager;
 import me.theentropyshard.teslauncher.gui.dialogs.addaccount.AddAccountDialog;
 import me.theentropyshard.teslauncher.gui.view.playview.PlayViewHeader;
 
@@ -57,7 +57,7 @@ public class AccountsView extends JPanel {
         });
         this.panel.add(this.addAccountItem);
 
-        AccountManager accountManager = TESLauncher.getInstance().getAccountsManager();
+        AccountManager accountManager = TESLauncher.getInstance().getAccountManager();
         List<Account> accounts = accountManager.getAccounts();
         for (Account account : accounts) {
             if (account.getHeadIcon() == null) {
@@ -65,7 +65,8 @@ public class AccountsView extends JPanel {
             }
             AccountItem item = new AccountItem(account);
             this.addAccountItem(item);
-            if (account.isSelected()) {
+
+            if (account == accountManager.getCurrentAccount()) {
                 this.group.makeItemSelected(item);
             }
         }
@@ -97,7 +98,7 @@ public class AccountsView extends JPanel {
         AccountItem accountItem = (AccountItem) item;
 
         accountItem.addMouseClickListener(e -> {
-            AccountManager accountManager = TESLauncher.getInstance().getAccountsManager();
+            AccountManager accountManager = TESLauncher.getInstance().getAccountManager();
             accountManager.selectAccount(accountItem.getAccount());
             try {
                 accountManager.save();

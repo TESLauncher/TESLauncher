@@ -16,12 +16,15 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.minecraft.accounts;
+package me.theentropyshard.teslauncher.minecraft.account.gson;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import me.theentropyshard.teslauncher.minecraft.account.Account;
+import me.theentropyshard.teslauncher.minecraft.account.OfflineAccount;
+import me.theentropyshard.teslauncher.minecraft.account.microsoft.MicrosoftAccount;
 import me.theentropyshard.teslauncher.utils.json.Json;
 
 import java.lang.reflect.Type;
@@ -35,26 +38,10 @@ public class AccountDeserializer implements JsonDeserializer<Account> {
     public Account deserialize(JsonElement element, Type type, JsonDeserializationContext ctx) {
         JsonObject root = element.getAsJsonObject();
 
-        boolean noHead = !root.has("headIcon");
-
-        if (!root.has("accessToken") || root.get("accessToken").getAsString().equals("-")) {
-            OfflineAccount offlineAccount = new OfflineAccount(root.get("username").getAsString());
-
-            if (noHead) {
-                offlineAccount.setHeadIcon(Account.DEFAULT_HEAD);
-            }
-
-            offlineAccount.setSelected(root.get("selected").getAsBoolean());
-
-            return offlineAccount;
+        if (root.has("microsoftAuthInfo")) {
+            return ctx.deserialize(root, MicrosoftAccount.class);
+        } else {
+            return ctx.deserialize(root, OfflineAccount.class);
         }
-
-        Account account = Json.parse(root, MicrosoftAccount.class);
-
-        if (noHead) {
-            account.setHeadIcon(Account.DEFAULT_HEAD);
-        }
-
-        return account;
     }
 }
