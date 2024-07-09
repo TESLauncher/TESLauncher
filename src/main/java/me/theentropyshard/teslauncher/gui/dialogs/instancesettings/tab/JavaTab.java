@@ -67,8 +67,21 @@ public class JavaTab extends SettingsTab {
         root.add(javaInstallation, gbc);
 
         gbc.gridy++;
-        gbc.weighty = 1;
         root.add(memorySettings, gbc);
+
+        JPanel otherSettings = new JPanel(new GridLayout(0, 1));
+        otherSettings.setBorder(BorderFactory.createTitledBorder("Other"));
+
+        JCheckBox useOptimizedArgs = new JCheckBox("Use optimized JVM arguments");
+        useOptimizedArgs.setSelected(instance.isUseOptimizedArgs());
+        useOptimizedArgs.addActionListener(e -> {
+            instance.setUseOptimizedArgs(useOptimizedArgs.isSelected());
+        });
+        otherSettings.add(useOptimizedArgs);
+
+        gbc.gridy++;
+        gbc.weighty = 1;
+        root.add(otherSettings, gbc);
 
         this.getDialog().addWindowListener(new WindowAdapter() {
             @Override

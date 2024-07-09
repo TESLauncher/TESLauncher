@@ -51,6 +51,7 @@ public class Instance {
     private long lastPlaytime;
     private long totalPlaytime;
     private final List<JarMod> jarMods;
+    private boolean useOptimizedArgs;
     private transient volatile boolean running;
 
     public Instance() {
@@ -206,5 +207,13 @@ public class Instance {
 
     public void setTotalPlaytime(long totalPlaytime) {
         this.totalPlaytime = totalPlaytime;
+    }
+
+    public boolean isUseOptimizedArgs() {
+        return this.useOptimizedArgs;
+    }
+
+    public void setUseOptimizedArgs(boolean useOptimizedArgs) {
+        this.useOptimizedArgs = useOptimizedArgs;
     }
 }

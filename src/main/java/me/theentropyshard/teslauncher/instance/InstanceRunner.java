@@ -118,7 +118,8 @@ public class InstanceRunner extends Thread {
             int exitCode = launcher.launch(classpath -> {
                         this.applyJarMods(version, classpath, versionsDir);
                     }, this.account, version, minecraftDir, minecraftDir,
-                    this.instance.getMinimumMemoryInMegabytes(), this.instance.getMaximumMemoryInMegabytes());
+                    this.instance.getMinimumMemoryInMegabytes(), this.instance.getMaximumMemoryInMegabytes(),
+                    this.instance.isUseOptimizedArgs());
 
             long end = System.currentTimeMillis();
 
