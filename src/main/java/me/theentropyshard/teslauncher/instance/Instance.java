@@ -51,7 +51,7 @@ public class Instance {
     private long lastPlaytime;
     private long totalPlaytime;
     private final List<JarMod> jarMods;
-    private boolean useOptimizedArgs;
+    private String jvmFlags;
     private transient volatile boolean running;
 
     public Instance() {
@@ -75,6 +75,14 @@ public class Instance {
     public void updatePlaytime(long seconds) {
         this.lastPlaytime = seconds;
         this.totalPlaytime += seconds;
+    }
+
+    public String getJvmFlags() {
+        return this.jvmFlags;
+    }
+
+    public void setJvmFlags(String jvmFlags) {
+        this.jvmFlags = jvmFlags;
     }
 
     public boolean isRunning() {
@@ -207,13 +215,5 @@ public class Instance {
 
     public void setTotalPlaytime(long totalPlaytime) {
         this.totalPlaytime = totalPlaytime;
-    }
-
-    public boolean isUseOptimizedArgs() {
-        return this.useOptimizedArgs;
-    }
-
-    public void setUseOptimizedArgs(boolean useOptimizedArgs) {
-        this.useOptimizedArgs = useOptimizedArgs;
     }
 }

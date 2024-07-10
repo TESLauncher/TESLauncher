@@ -43,6 +43,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class InstanceRunner extends Thread {
@@ -115,11 +116,16 @@ public class InstanceRunner extends Thread {
 
             long start = System.currentTimeMillis();
 
+            String jvmFlags = this.instance.getJvmFlags();
+            if (jvmFlags == null || jvmFlags.isEmpty()) {
+                jvmFlags = "";
+            }
+
             int exitCode = launcher.launch(classpath -> {
                         this.applyJarMods(version, classpath, versionsDir);
                     }, this.account, version, minecraftDir, minecraftDir,
                     this.instance.getMinimumMemoryInMegabytes(), this.instance.getMaximumMemoryInMegabytes(),
-                    this.instance.isUseOptimizedArgs());
+                    Arrays.asList(jvmFlags.split("\\s")));
 
             long end = System.currentTimeMillis();
 

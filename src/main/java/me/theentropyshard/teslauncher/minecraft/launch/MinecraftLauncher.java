@@ -62,12 +62,12 @@ public class MinecraftLauncher {
     }
 
     public int launch(Consumer<List<String>> beforeLaunch, Account account, Version version,
-                      Path runDir, Path minecraftDir, long minMem, long maxMem, boolean optimizedArgs) throws IOException {
+                      Path runDir, Path minecraftDir, long minMem, long maxMem, List<String> jvmFlags) throws IOException {
         this.classpath.clear();
 
         beforeLaunch.accept(this.classpath);
         List<String> arguments = this.getArguments(account, version, this.nativesDir, this.librariesDir, minecraftDir, minMem, maxMem,
-                optimizedArgs);
+                jvmFlags);
         List<String> command = this.buildRunCommand(version, arguments, this.runtimesDir);
 
         return this.runGameProcess(command, runDir, account);
@@ -86,61 +86,8 @@ public class MinecraftLauncher {
         }
     }
 
-    private void addCMSOptimizedArguments(List<String> args) {
-        args.add("-XX:+DisableExplicitGC");
-        args.add("-XX:+UseConcMarkSweepGC");
-        args.add("-XX:-UseAdaptiveSizePolicy");
-        args.add("-XX:+CMSParallelRemarkEnabled");
-        args.add("-XX:+CMSClassUnloadingEnabled");
-        args.add("-XX:+UseCMSInitiatingOccupancyOnly");
-        args.add("-XX:ConcGCThreads=" + Math.max(1, Runtime.getRuntime().availableProcessors()) / 2);
-    }
-
-    private void addG1OptimizedArguments(List<String> args) {
-        args.add("-XX:+UnlockExperimentalVMOptions");
-        args.add("-XX:+UseG1GC");
-        args.add("-XX:G1NewSizePercent=20");
-        args.add("-XX:G1ReservePercent=20");
-        args.add("-XX:MaxGCPauseMillis=50");
-        args.add("-XX:G1HeapRegionSize=32M");
-        args.add("-XX:+DisableExplicitGC");
-        args.add("-XX:+AlwaysPreTouch");
-        args.add("-XX:+ParallelRefProcEnabled");
-    }
-
-    private void addZGCOptimizedArguments(List<String> args) {
-        args.add("-XX:+UnlockExperimentalVMOptions");
-        args.add("-XX:+UseZGC");
-        args.add("-XX:-ZUncommit");
-        args.add("-XX:ZCollectionInterval=5");
-        args.add("-XX:ZAllocationSpikeTolerance=2.0");
-        args.add("-XX:+AlwaysPreTouch");
-        args.add("-XX:+ParallelRefProcEnabled");
-        args.add("-XX:+DisableExplicitGC");
-    }
-
-    private void addOptimizedArguments(List<String> args, int jreVersion, long ramSize) {
-        if (jreVersion == 0) {
-            jreVersion = 8;
-        }
-
-        if (jreVersion >= 15 && Runtime.getRuntime().availableProcessors() >= 8 && ramSize >= 8192) {
-            this.addZGCOptimizedArguments(args);
-
-            return;
-        }
-
-        if (jreVersion >= 11 || (jreVersion >= 8 && Runtime.getRuntime().availableProcessors() >= 4)) {
-            this.addG1OptimizedArguments(args);
-
-            return;
-        }
-
-        this.addCMSOptimizedArguments(args);
-    }
-
     private List<String> getArguments(Account account, Version version, Path tmpNativesDir, Path librariesDir, Path minecraftDir,
-                                      long minMemoryMegabytes, long maxMemoryMegabytes, boolean optimizedArgs
+                                      long minMemoryMegabytes, long maxMemoryMegabytes, List<String> jvmFlags
     ) throws IOException {
         TESLauncher launcher = TESLauncher.getInstance();
         FileUtils.createDirectoryIfNotExists(minecraftDir);
@@ -151,8 +98,8 @@ public class MinecraftLauncher {
         arguments.add("-Dfile.encoding=utf-8");
         arguments.add("-Dconsole.encoding=utf-8");
 
-        if (optimizedArgs) {
-            this.addOptimizedArguments(arguments, version.getJavaVersion().getMajorVersion(), maxMemoryMegabytes);
+        if (!jvmFlags.isEmpty()) {
+            arguments.addAll(jvmFlags);
         }
 
         this.resolveClasspath(version, librariesDir);

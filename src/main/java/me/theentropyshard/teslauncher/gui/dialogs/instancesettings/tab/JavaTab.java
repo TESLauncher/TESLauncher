@@ -70,14 +70,24 @@ public class JavaTab extends SettingsTab {
         root.add(memorySettings, gbc);
 
         JPanel otherSettings = new JPanel(new GridLayout(0, 1));
-        otherSettings.setBorder(BorderFactory.createTitledBorder("Other"));
+        otherSettings.setBorder(BorderFactory.createTitledBorder("JVM Arguments"));
 
-        JCheckBox useOptimizedArgs = new JCheckBox("Use optimized JVM arguments");
-        useOptimizedArgs.setSelected(instance.isUseOptimizedArgs());
-        useOptimizedArgs.addActionListener(e -> {
-            instance.setUseOptimizedArgs(useOptimizedArgs.isSelected());
-        });
-        otherSettings.add(useOptimizedArgs);
+        JTextArea flagsArea = new JTextArea();
+        flagsArea.setLineWrap(true);
+        flagsArea.setWrapStyleWord(true);
+        flagsArea.setPreferredSize(new Dimension(0, 250));
+        flagsArea.setMaximumSize(new Dimension(1000, 250));
+        String jvmFlags = instance.getJvmFlags();
+        if (jvmFlags != null && !jvmFlags.isEmpty()) {
+            flagsArea.setText(jvmFlags);
+        }
+
+        JScrollPane scrollPane = new JScrollPane(
+                flagsArea,
+                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER
+        );
+        otherSettings.add(scrollPane);
 
         gbc.gridy++;
         gbc.weighty = 1;
@@ -87,6 +97,8 @@ public class JavaTab extends SettingsTab {
             @Override
             public void windowClosing(WindowEvent e) {
                 instance.setJavaPath(javaPathTextField.getText());
+                instance.setJvmFlags(flagsArea.getText());
+
                 String minMemory = minMemoryField.getText();
                 if (minMemory.isEmpty()) {
                     minMemory = "512";
@@ -126,7 +138,6 @@ public class JavaTab extends SettingsTab {
                     return;
                 }
 
-                instance.setJavaPath(javaPathTextField.getText());
                 instance.setMinimumMemoryInMegabytes(minimumMemoryInMegabytes);
                 instance.setMaximumMemoryInMegabytes(maximumMemoryInMegabytes);
             }
