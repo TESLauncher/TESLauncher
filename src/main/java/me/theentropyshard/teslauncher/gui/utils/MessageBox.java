@@ -44,6 +44,10 @@ public final class MessageBox {
         return JOptionPane.showInputDialog(parent, message, title, JOptionPane.PLAIN_MESSAGE);
     }
 
+    public static String showInputMessage(Component parent, String title, String message, String initialValue) {
+        return (String) JOptionPane.showInputDialog(parent, message, title, JOptionPane.PLAIN_MESSAGE, null, null, initialValue);
+    }
+
     private MessageBox() {
         throw new UnsupportedOperationException();
     }

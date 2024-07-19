@@ -194,7 +194,7 @@ public class PlayView extends JPanel {
 
                 JMenuItem renameItem = new JMenuItem("Rename");
                 renameItem.addActionListener(rename -> {
-                    String newName = MessageBox.showInputMessage(TESLauncher.frame, "Rename instance", "Enter new name");
+                    String newName = MessageBox.showInputMessage(TESLauncher.frame, "Rename instance", "Enter new name", instance.getName());
 
                     if (newName == null || newName.isEmpty()) {
                         return;
