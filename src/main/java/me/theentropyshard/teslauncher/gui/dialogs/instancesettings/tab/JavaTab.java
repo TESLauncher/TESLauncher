@@ -19,18 +19,19 @@
 package me.theentropyshard.teslauncher.gui.dialogs.instancesettings.tab;
 
 import com.formdev.flatlaf.FlatClientProperties;
-import me.theentropyshard.teslauncher.instance.Instance;
 import me.theentropyshard.teslauncher.gui.utils.MessageBox;
+import me.theentropyshard.teslauncher.gui.utils.IntegerDocumentFilter;
+import me.theentropyshard.teslauncher.instance.Instance;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
+import javax.swing.text.PlainDocument;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
 
 public class JavaTab extends SettingsTab {
-
     private final JTextField javaPathTextField;
     private final JTextField minMemoryField;
     private final JTextField maxMemoryField;
@@ -60,9 +61,15 @@ public class JavaTab extends SettingsTab {
         this.minMemoryField = new JTextField();
         this.minMemoryField.setText(String.valueOf(instance.getMinimumMemoryInMegabytes()));
         this.minMemoryField.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "512");
+        ((PlainDocument) this.minMemoryField.getDocument()).setDocumentFilter(new IntegerDocumentFilter((s) -> {
+            MessageBox.showErrorMessage(JavaTab.this.getDialog(), "Not an integer: " + s);
+        }));
         this.maxMemoryField = new JTextField();
         this.maxMemoryField.setText(String.valueOf(instance.getMaximumMemoryInMegabytes()));
         this.maxMemoryField.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "2048");
+        ((PlainDocument) this.maxMemoryField.getDocument()).setDocumentFilter(new IntegerDocumentFilter((s) -> {
+            MessageBox.showErrorMessage(JavaTab.this.getDialog(), "Not an integer: " + s);
+        }));
         memorySettings.add(minMemoryLabel);
         memorySettings.add(this.minMemoryField);
         memorySettings.add(maxMemoryLabel);
@@ -90,8 +97,8 @@ public class JavaTab extends SettingsTab {
 
         JScrollPane scrollPane = new JScrollPane(
             this.flagsArea,
-                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER
+            JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+            JScrollPane.HORIZONTAL_SCROLLBAR_NEVER
         );
         otherSettings.add(scrollPane);
 
@@ -113,32 +120,18 @@ public class JavaTab extends SettingsTab {
                     maxMemory = "2048";
                 }
 
-                int minimumMemoryInMegabytes = 512;
-                try {
-                    minimumMemoryInMegabytes = Integer.parseInt(minMemory);
-                } catch (NumberFormatException ex) {
-                    MessageBox.showErrorMessage(JavaTab.this.getDialog(),
-                            "Too many megabytes! (" + ex.getMessage() + ")");
-                }
-
-                int maximumMemoryInMegabytes = 2048;
-                try {
-                    maximumMemoryInMegabytes = Integer.parseInt(maxMemory);
-                } catch (NumberFormatException ex) {
-                    MessageBox.showErrorMessage(JavaTab.this.getDialog(),
-                            "Too many megabytes! (" + ex.getMessage() + ")");
-                }
+                int minimumMemoryInMegabytes = Integer.parseInt(minMemory);
+                int maximumMemoryInMegabytes = Integer.parseInt(maxMemory);
 
                 if (minimumMemoryInMegabytes > maximumMemoryInMegabytes) {
                     MessageBox.showErrorMessage(JavaTab.this.getDialog(),
-                            "Minimum amount of RAM cannot be larger than maximum");
+                        "Minimum amount of RAM cannot be larger than maximum");
                     return;
                 }
 
                 if (minimumMemoryInMegabytes < 512) {
-                    MessageBox.showErrorMessage(
-                            JavaTab.this.getDialog(),
-                            "Minimum amount of RAM cannot be less than 512 MiB");
+                    MessageBox.showErrorMessage(JavaTab.this.getDialog(),
+                        "Minimum amount of RAM cannot be less than 512 MiB");
                     return;
                 }
 
