@@ -65,13 +65,9 @@ public class InstanceRunner extends Thread {
 
     @Override
     public synchronized void start() {
-        System.out.println("Dwadwad");
-
         if (this.instance.isRunning()) {
             return;
         }
-
-        System.out.println("dawdwa");
 
         this.instance.setRunning(true);
         this.item.setEnabled(false);
