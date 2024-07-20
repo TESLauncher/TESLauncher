@@ -30,6 +30,12 @@ import java.awt.event.WindowEvent;
 import java.io.IOException;
 
 public class JavaTab extends SettingsTab {
+
+    private final JTextField javaPathTextField;
+    private final JTextField minMemoryField;
+    private final JTextField maxMemoryField;
+    private final JTextArea flagsArea;
+
     public JavaTab(String name, Instance instance, JDialog dialog) {
         super(name, instance, dialog);
 
@@ -42,25 +48,25 @@ public class JavaTab extends SettingsTab {
         gbc.anchor = GridBagConstraints.NORTH;
 
         JPanel javaInstallation = new JPanel(new GridLayout(0, 1));
-        JTextField javaPathTextField = new JTextField();
-        javaPathTextField.setText(instance.getJavaPath());
-        javaPathTextField.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Path to java.exe");
-        javaInstallation.add(javaPathTextField);
+        this.javaPathTextField = new JTextField();
+        this.javaPathTextField.setText(instance.getJavaPath());
+        this.javaPathTextField.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Path to java.exe");
+        javaInstallation.add(this.javaPathTextField);
         javaInstallation.setBorder(new TitledBorder("Java Installation"));
 
         JPanel memorySettings = new JPanel(new GridLayout(2, 2));
         JLabel minMemoryLabel = new JLabel("Minimum memory (Megabytes):");
         JLabel maxMemoryLabel = new JLabel("Maximum memory (Megabytes):");
-        JTextField minMemoryField = new JTextField();
-        minMemoryField.setText(String.valueOf(instance.getMinimumMemoryInMegabytes()));
-        minMemoryField.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "512");
-        JTextField maxMemoryField = new JTextField();
-        maxMemoryField.setText(String.valueOf(instance.getMaximumMemoryInMegabytes()));
-        maxMemoryField.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "2048");
+        this.minMemoryField = new JTextField();
+        this.minMemoryField.setText(String.valueOf(instance.getMinimumMemoryInMegabytes()));
+        this.minMemoryField.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "512");
+        this.maxMemoryField = new JTextField();
+        this.maxMemoryField.setText(String.valueOf(instance.getMaximumMemoryInMegabytes()));
+        this.maxMemoryField.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "2048");
         memorySettings.add(minMemoryLabel);
-        memorySettings.add(minMemoryField);
+        memorySettings.add(this.minMemoryField);
         memorySettings.add(maxMemoryLabel);
-        memorySettings.add(maxMemoryField);
+        memorySettings.add(this.maxMemoryField);
         memorySettings.setBorder(new TitledBorder("Memory Settings"));
 
         gbc.gridy++;
@@ -72,18 +78,18 @@ public class JavaTab extends SettingsTab {
         JPanel otherSettings = new JPanel(new GridLayout(0, 1));
         otherSettings.setBorder(BorderFactory.createTitledBorder("JVM Arguments"));
 
-        JTextArea flagsArea = new JTextArea();
-        flagsArea.setLineWrap(true);
-        flagsArea.setWrapStyleWord(true);
-        flagsArea.setPreferredSize(new Dimension(0, 250));
-        flagsArea.setMaximumSize(new Dimension(1000, 250));
+        this.flagsArea = new JTextArea();
+        this.flagsArea.setLineWrap(true);
+        this.flagsArea.setWrapStyleWord(true);
+        this.flagsArea.setPreferredSize(new Dimension(0, 250));
+        this.flagsArea.setMaximumSize(new Dimension(1000, 250));
         String jvmFlags = instance.getJvmFlags();
         if (jvmFlags != null && !jvmFlags.isEmpty()) {
-            flagsArea.setText(jvmFlags);
+            this.flagsArea.setText(jvmFlags);
         }
 
         JScrollPane scrollPane = new JScrollPane(
-                flagsArea,
+            this.flagsArea,
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER
         );
@@ -93,18 +99,16 @@ public class JavaTab extends SettingsTab {
         gbc.weighty = 1;
         root.add(otherSettings, gbc);
 
+        this.getDialog().setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         this.getDialog().addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                instance.setJavaPath(javaPathTextField.getText());
-                instance.setJvmFlags(flagsArea.getText());
-
-                String minMemory = minMemoryField.getText();
+                String minMemory = JavaTab.this.minMemoryField.getText();
                 if (minMemory.isEmpty()) {
                     minMemory = "512";
                 }
 
-                String maxMemory = maxMemoryField.getText();
+                String maxMemory = JavaTab.this.maxMemoryField.getText();
                 if (maxMemory.isEmpty()) {
                     maxMemory = "2048";
                 }
@@ -138,14 +142,20 @@ public class JavaTab extends SettingsTab {
                     return;
                 }
 
-                instance.setMinimumMemoryInMegabytes(minimumMemoryInMegabytes);
-                instance.setMaximumMemoryInMegabytes(maximumMemoryInMegabytes);
+                JavaTab.this.getDialog().dispose();
             }
         });
     }
 
     @Override
     public void save() throws IOException {
+        Instance instance = this.getInstance();
 
+        instance.setJavaPath(this.javaPathTextField.getText());
+        instance.setJvmFlags(this.flagsArea.getText());
+        instance.setMinimumMemoryInMegabytes(Integer.parseInt(this.minMemoryField.getText()));
+        instance.setMaximumMemoryInMegabytes(Integer.parseInt(this.maxMemoryField.getText()));
+
+        instance.save();
     }
 }
