@@ -22,11 +22,11 @@ import me.theentropyshard.teslauncher.BuildConfig;
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.minecraft.account.Account;
 import me.theentropyshard.teslauncher.minecraft.account.microsoft.MicrosoftAccount;
-import me.theentropyshard.teslauncher.minecraft.data.argument.Argument;
-import me.theentropyshard.teslauncher.minecraft.data.argument.ArgumentType;
 import me.theentropyshard.teslauncher.minecraft.data.AssetIndex;
 import me.theentropyshard.teslauncher.minecraft.data.Library;
 import me.theentropyshard.teslauncher.minecraft.data.Version;
+import me.theentropyshard.teslauncher.minecraft.data.argument.Argument;
+import me.theentropyshard.teslauncher.minecraft.data.argument.ArgumentType;
 import me.theentropyshard.teslauncher.utils.FileUtils;
 import me.theentropyshard.teslauncher.utils.OperatingSystem;
 import me.theentropyshard.teslauncher.utils.ProcessReader;
@@ -67,7 +67,7 @@ public class MinecraftLauncher {
 
         beforeLaunch.accept(this.classpath);
         List<String> arguments = this.getArguments(account, version, this.nativesDir, this.librariesDir, minecraftDir, minMem, maxMem,
-                jvmFlags);
+            jvmFlags);
         List<String> command = this.buildRunCommand(version, arguments, this.runtimesDir);
 
         return this.runGameProcess(command, runDir, account);
@@ -114,8 +114,8 @@ public class MinecraftLauncher {
 
         Version.AssetIndex vAssetIndex = version.getAssetIndex();
         AssetIndex assetIndex = Json.parse(
-                FileUtils.readUtf8(assetsDir.resolve("indexes").resolve(vAssetIndex.getId() + ".json")),
-                AssetIndex.class
+            FileUtils.readUtf8(assetsDir.resolve("indexes").resolve(vAssetIndex.getId() + ".json")),
+            AssetIndex.class
         );
 
         boolean newFormat = version.getMinecraftArguments() == null;
@@ -233,6 +233,26 @@ public class MinecraftLauncher {
         return arguments;
     }
 
+    public static String getJavaPath(String minecraftVersion, Path runtimesDir) {
+        try {
+            String[] parts = minecraftVersion.split("\\.");
+            int minorVersion = Integer.parseInt(parts[1]);
+            int patch = Integer.parseInt(parts[2]);
+
+            if (minorVersion >= 21 || minorVersion == 20 && patch >= 5) {
+                return MinecraftLauncher.getJavaExecutable("java-runtime-delta", runtimesDir);
+            } else if (minorVersion >= 18) {
+                return MinecraftLauncher.getJavaExecutable("java-runtime-gamma", runtimesDir);
+            } else if (minorVersion == 17) {
+                return MinecraftLauncher.getJavaExecutable("java-runtime-alpha", runtimesDir);
+            } else {
+                return MinecraftLauncher.getJavaExecutable("jre-legacy", runtimesDir);
+            }
+        } catch (Exception ignored) {
+            return MinecraftLauncher.getJavaExecutable("jre-legacy", runtimesDir);
+        }
+    }
+
     private List<String> buildRunCommand(Version version, List<String> arguments, Path runtimesDir) {
         List<String> command = new ArrayList<>();
 
@@ -240,20 +260,9 @@ public class MinecraftLauncher {
 
         Version.JavaVersion javaVersion = version.getJavaVersion();
         if (javaVersion != null) {
-            javaExecutable = this.getJavaExecutable(javaVersion.getComponent(), runtimesDir);
+            javaExecutable = MinecraftLauncher.getJavaExecutable(javaVersion.getComponent(), runtimesDir);
         } else {
-            try {
-                String[] split = version.getId().split("\\.");
-                int minorVersion = Integer.parseInt(split[1]);
-
-                if (minorVersion >= 17) {
-                    javaExecutable = this.getJavaExecutable("java-runtime-gamma", runtimesDir);
-                } else {
-                    javaExecutable = this.getJavaExecutable("jre-legacy", runtimesDir);
-                }
-            } catch (Exception ignored) {
-                javaExecutable = this.getJavaExecutable("jre-legacy", runtimesDir);
-            }
+            javaExecutable = MinecraftLauncher.getJavaPath(version.getId(), runtimesDir);
         }
 
         command.add(javaExecutable);
@@ -291,7 +300,7 @@ public class MinecraftLauncher {
         LOG.info(line);
     }
 
-    private String getJavaExecutable(String componentName, Path runtimesDir) {
+    public static String getJavaExecutable(String componentName, Path runtimesDir) {
         Path componentDir = runtimesDir.resolve(componentName);
 
         if (OperatingSystem.isMacOS()) {
@@ -299,8 +308,8 @@ public class MinecraftLauncher {
         }
 
         return componentDir
-                .resolve("bin")
-                .resolve(OperatingSystem.getCurrent().getJavaExecutableName())
-                .toString();
+            .resolve("bin")
+            .resolve(OperatingSystem.getCurrent().getJavaExecutableName())
+            .toString();
     }
 }
