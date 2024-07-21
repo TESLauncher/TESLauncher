@@ -105,7 +105,11 @@ public class InstanceRunner extends Thread {
             Path clientJson = versionsDir.resolve(minecraftVersion).resolve(minecraftVersion + ".json");
             Version version = Json.parse(FileUtils.readUtf8(clientJson), Version.class);
 
-            MinecraftLauncher launcher = new MinecraftLauncher(librariesDir, runtimesDir, nativesDir);
+            String javaPath = this.instance.getJavaPath();
+            if (javaPath == null || javaPath.isEmpty()) {
+                javaPath = null;
+            }
+            MinecraftLauncher launcher = new MinecraftLauncher(librariesDir, runtimesDir, nativesDir, javaPath);
 
             this.instance.setLastTimePlayed(LocalDateTime.now());
             this.instance.save();

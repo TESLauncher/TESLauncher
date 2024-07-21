@@ -43,6 +43,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class MinecraftLauncher {
     private static final Logger LOG = LogManager.getLogger(MinecraftLauncher.class);
@@ -50,13 +51,15 @@ public class MinecraftLauncher {
     private final Path librariesDir;
     private final Path runtimesDir;
     private final Path nativesDir;
+    private final String overrideJavaExecutable;
 
     private final List<String> classpath;
 
-    public MinecraftLauncher(Path librariesDir, Path runtimesDir, Path nativesDir) {
+    public MinecraftLauncher(Path librariesDir, Path runtimesDir, Path nativesDir, String overrideJavaExecutable) {
         this.librariesDir = librariesDir;
         this.runtimesDir = runtimesDir;
         this.nativesDir = nativesDir;
+        this.overrideJavaExecutable = overrideJavaExecutable;
 
         this.classpath = new ArrayList<>();
     }
@@ -191,6 +194,8 @@ public class MinecraftLauncher {
             int patch = Integer.parseInt(split[2]);
 
             if (minorVersion == 16 && patch == 5 && !(account instanceof MicrosoftAccount)) {
+                LOG.info("Fooling Minecraft 1.16.5, so multiplayer works for offline account");
+
                 arguments.add("-Dminecraft.api.auth.host=https://nope.invalid");
                 arguments.add("-Dminecraft.api.account.host=https://nope.invalid");
                 arguments.add("-Dminecraft.api.session.host=https://nope.invalid");
@@ -200,7 +205,9 @@ public class MinecraftLauncher {
 
         }
 
-        arguments.add(version.getMainClass());
+        String mainClass = version.getMainClass();
+        LOG.info("Main class: {}", mainClass);
+        arguments.add(mainClass);
 
         if (newFormat) {
             for (Argument argument : version.getArguments().get(ArgumentType.GAME)) {
@@ -236,13 +243,27 @@ public class MinecraftLauncher {
     private List<String> buildRunCommand(Version version, List<String> arguments, Path runtimesDir) {
         List<String> command = new ArrayList<>();
 
-        command.add(MinecraftLauncher.getMojangJavaExecutable(version, runtimesDir));
+        if (this.overrideJavaExecutable == null) {
+            command.add(MinecraftLauncher.getMojangJavaExecutable(version, runtimesDir));
+        } else {
+            LOG.info("Using custom JRE: {}", this.overrideJavaExecutable);
+            command.add(this.overrideJavaExecutable);
+        }
         command.addAll(arguments);
 
         return command;
     }
 
     private int runGameProcess(List<String> command, Path runDir, Account account) throws IOException {
+        LOG.info("Working directory: {}", runDir);
+
+        List<String> censoredCommand = command.stream()
+            .map(s -> (account instanceof MicrosoftAccount) ? s.replace(account.getAccessToken(), "**ACCESSTOKEN**") : s)
+            .map(s -> s.replace(account.getUsername(), "**USERNAME**"))
+            .map(s -> s.replace(account.getUuid().toString(), "**UUID**"))
+            .collect(Collectors.toList());
+        LOG.info("Running: {}", censoredCommand);
+
         ProcessBuilder processBuilder = new ProcessBuilder(command);
         processBuilder.environment().put("APPDATA", runDir.toString());
         processBuilder.directory(runDir.toFile());
@@ -277,9 +298,15 @@ public class MinecraftLauncher {
         Version.JavaVersion javaVersion = version.getJavaVersion();
 
         if (javaVersion != null) {
-            return MinecraftLauncher.getJavaExecutable(javaVersion.getComponent(), runtimesDir);
+            String javaExecutable = MinecraftLauncher.getJavaExecutable(javaVersion.getComponent(), runtimesDir);
+            LOG.info("Using Mojang JRE {}: {}", javaVersion.getMajorVersion(), javaExecutable);
+
+            return javaExecutable;
         } else {
-            return MinecraftLauncher.getFallbackJavaPath(version.getId(), runtimesDir);
+            String fallbackJavaPath = MinecraftLauncher.getFallbackJavaPath(version.getId(), runtimesDir);
+            LOG.warn("Could not find Java version in version info. Using fallback JRE: {}", fallbackJavaPath);
+
+            return fallbackJavaPath;
         }
     }
 
