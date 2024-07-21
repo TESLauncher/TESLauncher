@@ -124,14 +124,16 @@ public class HttpDownload {
 
     public void downloadFile(Request request, boolean partiallyDownloaded, long size) throws IOException {
         try (Response response = this.httpClient.newCall(request).execute();
-             InputStream is = Objects.requireNonNull(response.body()).byteStream()) {
-            if (partiallyDownloaded && size >= 0) {
-                try (FileChannel fileChannel = FileChannel.open(this.saveAs, StandardOpenOption.APPEND);
-                     ReadableByteChannel src = Channels.newChannel(is)) {
+             ReadableByteChannel src = Channels.newChannel(Objects.requireNonNull(response.body()).byteStream())) {
+            if (partiallyDownloaded && size > 0) {
+                try (FileChannel fileChannel = FileChannel.open(this.saveAs, StandardOpenOption.APPEND)) {
                     fileChannel.transferFrom(src, size, Long.MAX_VALUE);
                 }
             } else {
-                Files.copy(is, this.saveAs, StandardCopyOption.REPLACE_EXISTING);
+                try (FileChannel fileChannel = FileChannel.open(this.saveAs,
+                    StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE)) {
+                    fileChannel.transferFrom(src, 0, Long.MAX_VALUE);
+                }
             }
         }
     }
