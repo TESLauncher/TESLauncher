@@ -262,7 +262,9 @@ public class MinecraftLauncher {
     }
 
     private void readProcessOutput(String line, Account account) {
-        line = line.replace(account.getAccessToken(), "**ACCESSTOKEN**");
+        if (account instanceof MicrosoftAccount) {
+            line = line.replace(account.getAccessToken(), "**ACCESSTOKEN**");
+        }
         line = line.replace(account.getUsername(), "**USERNAME**");
         line = line.replace(account.getUuid().toString(), "**UUID**");
 
