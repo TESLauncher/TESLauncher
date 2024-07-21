@@ -233,39 +233,10 @@ public class MinecraftLauncher {
         return arguments;
     }
 
-    public static String getJavaPath(String minecraftVersion, Path runtimesDir) {
-        try {
-            String[] parts = minecraftVersion.split("\\.");
-            int minorVersion = Integer.parseInt(parts[1]);
-            int patch = Integer.parseInt(parts[2]);
-
-            if (minorVersion >= 21 || minorVersion == 20 && patch >= 5) {
-                return MinecraftLauncher.getJavaExecutable("java-runtime-delta", runtimesDir);
-            } else if (minorVersion >= 18) {
-                return MinecraftLauncher.getJavaExecutable("java-runtime-gamma", runtimesDir);
-            } else if (minorVersion == 17) {
-                return MinecraftLauncher.getJavaExecutable("java-runtime-alpha", runtimesDir);
-            } else {
-                return MinecraftLauncher.getJavaExecutable("jre-legacy", runtimesDir);
-            }
-        } catch (Exception ignored) {
-            return MinecraftLauncher.getJavaExecutable("jre-legacy", runtimesDir);
-        }
-    }
-
     private List<String> buildRunCommand(Version version, List<String> arguments, Path runtimesDir) {
         List<String> command = new ArrayList<>();
 
-        String javaExecutable;
-
-        Version.JavaVersion javaVersion = version.getJavaVersion();
-        if (javaVersion != null) {
-            javaExecutable = MinecraftLauncher.getJavaExecutable(javaVersion.getComponent(), runtimesDir);
-        } else {
-            javaExecutable = MinecraftLauncher.getJavaPath(version.getId(), runtimesDir);
-        }
-
-        command.add(javaExecutable);
+        command.add(MinecraftLauncher.getMojangJavaExecutable(version, runtimesDir));
         command.addAll(arguments);
 
         return command;
@@ -298,6 +269,36 @@ public class MinecraftLauncher {
         MinecraftError.checkForError(line);
 
         LOG.info(line);
+    }
+
+    private static String getMojangJavaExecutable(Version version, Path runtimesDir) {
+        Version.JavaVersion javaVersion = version.getJavaVersion();
+
+        if (javaVersion != null) {
+            return MinecraftLauncher.getJavaExecutable(javaVersion.getComponent(), runtimesDir);
+        } else {
+            return MinecraftLauncher.getFallbackJavaPath(version.getId(), runtimesDir);
+        }
+    }
+
+    public static String getFallbackJavaPath(String minecraftVersion, Path runtimesDir) {
+        try {
+            String[] parts = minecraftVersion.split("\\.");
+            int minorVersion = Integer.parseInt(parts[1]);
+            int patch = Integer.parseInt(parts[2]);
+
+            if (minorVersion >= 21 || minorVersion == 20 && patch >= 5) {
+                return MinecraftLauncher.getJavaExecutable("java-runtime-delta", runtimesDir);
+            } else if (minorVersion >= 18) {
+                return MinecraftLauncher.getJavaExecutable("java-runtime-gamma", runtimesDir);
+            } else if (minorVersion == 17) {
+                return MinecraftLauncher.getJavaExecutable("java-runtime-alpha", runtimesDir);
+            } else {
+                return MinecraftLauncher.getJavaExecutable("jre-legacy", runtimesDir);
+            }
+        } catch (Exception ignored) {
+            return MinecraftLauncher.getJavaExecutable("jre-legacy", runtimesDir);
+        }
     }
 
     public static String getJavaExecutable(String componentName, Path runtimesDir) {
