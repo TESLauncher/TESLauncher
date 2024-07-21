@@ -19,14 +19,14 @@
 package me.theentropyshard.teslauncher.instance;
 
 import me.theentropyshard.teslauncher.TESLauncher;
-import me.theentropyshard.teslauncher.minecraft.account.Account;
 import me.theentropyshard.teslauncher.gui.components.InstanceItem;
 import me.theentropyshard.teslauncher.gui.dialogs.MinecraftDownloadDialog;
 import me.theentropyshard.teslauncher.gui.utils.MessageBox;
+import me.theentropyshard.teslauncher.minecraft.account.Account;
+import me.theentropyshard.teslauncher.minecraft.auth.microsoft.AuthException;
+import me.theentropyshard.teslauncher.minecraft.data.Version;
 import me.theentropyshard.teslauncher.minecraft.download.GuiMinecraftDownloader;
 import me.theentropyshard.teslauncher.minecraft.download.MinecraftDownloader;
-import me.theentropyshard.teslauncher.minecraft.data.Version;
-import me.theentropyshard.teslauncher.minecraft.auth.microsoft.AuthException;
 import me.theentropyshard.teslauncher.minecraft.launch.MinecraftLauncher;
 import me.theentropyshard.teslauncher.utils.FileUtils;
 import me.theentropyshard.teslauncher.utils.TimeUtils;
@@ -100,15 +100,16 @@ public class InstanceRunner extends Thread {
 
             Path minecraftDir = this.instance.getMinecraftDir();
 
-            this.checkMinecraftInstallation(useDialog, versionsDir, assetsDir, librariesDir, nativesDir, runtimesDir, minecraftDir, minecraftVersion);
-
-            Path clientJson = versionsDir.resolve(minecraftVersion).resolve(minecraftVersion + ".json");
-            Version version = Json.parse(FileUtils.readUtf8(clientJson), Version.class);
-
             String javaPath = this.instance.getJavaPath();
             if (javaPath == null || javaPath.isEmpty()) {
                 javaPath = null;
             }
+            this.checkMinecraftInstallation(useDialog, versionsDir, assetsDir, librariesDir, nativesDir, runtimesDir, minecraftDir,
+                minecraftVersion, javaPath == null);
+
+            Path clientJson = versionsDir.resolve(minecraftVersion).resolve(minecraftVersion + ".json");
+            Version version = Json.parse(FileUtils.readUtf8(clientJson), Version.class);
+
             MinecraftLauncher launcher = new MinecraftLauncher(librariesDir, runtimesDir, nativesDir, javaPath);
 
             this.instance.setLastTimePlayed(LocalDateTime.now());
@@ -122,10 +123,10 @@ public class InstanceRunner extends Thread {
             }
 
             int exitCode = launcher.launch(classpath -> {
-                        this.applyJarMods(version, classpath, versionsDir);
-                    }, this.account, version, minecraftDir, minecraftDir,
-                    this.instance.getMinimumMemoryInMegabytes(), this.instance.getMaximumMemoryInMegabytes(),
-                    Arrays.asList(jvmFlags.split("\\s")));
+                    this.applyJarMods(version, classpath, versionsDir);
+                }, this.account, version, minecraftDir, minecraftDir,
+                this.instance.getMinimumMemoryInMegabytes(), this.instance.getMaximumMemoryInMegabytes(),
+                Arrays.asList(jvmFlags.split("\\s")));
 
             long end = System.currentTimeMillis();
 
@@ -149,28 +150,31 @@ public class InstanceRunner extends Thread {
     }
 
     private void checkMinecraftInstallation(boolean useDialog, Path versionsDir, Path assetsDir, Path librariesDir,
-                                            Path nativesDir, Path runtimesDir, Path minecraftDir, String minecraftVersion) throws IOException {
+                                            Path nativesDir, Path runtimesDir, Path minecraftDir, String minecraftVersion,
+                                            boolean downloadJava) throws IOException {
 
         MinecraftDownloader downloader;
         if (useDialog) {
             downloader = new GuiMinecraftDownloader(
-                    versionsDir,
-                    assetsDir,
-                    librariesDir,
-                    nativesDir,
-                    runtimesDir,
-                    minecraftDir.resolve("resources"),
-                    new MinecraftDownloadDialog()
+                versionsDir,
+                assetsDir,
+                librariesDir,
+                nativesDir,
+                runtimesDir,
+                minecraftDir.resolve("resources"),
+                new MinecraftDownloadDialog(),
+                downloadJava
             );
         } else {
             downloader = new MinecraftDownloader(
-                    versionsDir,
-                    assetsDir,
-                    librariesDir,
-                    nativesDir,
-                    runtimesDir,
-                    minecraftDir.resolve("resources"),
-                    this.item
+                versionsDir,
+                assetsDir,
+                librariesDir,
+                nativesDir,
+                runtimesDir,
+                minecraftDir.resolve("resources"),
+                this.item,
+                downloadJava
             );
         }
 
@@ -199,7 +203,7 @@ public class InstanceRunner extends Thread {
         } else {
             try {
                 this.tempClientCopy = Files.copy(originalClientPath, this.instance.getWorkDir()
-                        .resolve(originalClientPath.getFileName().toString() + System.currentTimeMillis() + ".jar"));
+                    .resolve(originalClientPath.getFileName().toString() + System.currentTimeMillis() + ".jar"));
 
                 List<File> zipFilesToMerge = new ArrayList<>();
 

@@ -28,8 +28,8 @@ public class GuiMinecraftDownloader extends MinecraftDownloader {
     private final MinecraftDownloadDialog dialog;
 
     public GuiMinecraftDownloader(Path versionsDir, Path assetsDir, Path librariesDir, Path nativesDir, Path runtimesDir,
-                                  Path instanceResourcesDir, MinecraftDownloadDialog dialog) {
-        super(versionsDir, assetsDir, librariesDir, nativesDir, runtimesDir, instanceResourcesDir, dialog);
+                                  Path instanceResourcesDir, MinecraftDownloadDialog dialog, boolean downloadJava) {
+        super(versionsDir, assetsDir, librariesDir, nativesDir, runtimesDir, instanceResourcesDir, dialog, downloadJava);
         this.dialog = dialog;
     }
 

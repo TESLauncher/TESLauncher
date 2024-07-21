@@ -62,9 +62,11 @@ public class MinecraftDownloader {
     private final Path runtimesDir;
     private final Path instanceResourcesDir;
     private final MinecraftDownloadListener minecraftDownloadListener;
+    private final boolean downloadJava;
 
     public MinecraftDownloader(Path versionsDir, Path assetsDir, Path librariesDir, Path nativesDir, Path runtimesDir,
-                               Path instanceResourcesDir, MinecraftDownloadListener minecraftDownloadListener) {
+                               Path instanceResourcesDir, MinecraftDownloadListener minecraftDownloadListener,
+                               boolean downloadJava) {
         this.versionsDir = versionsDir;
         this.assetsDir = assetsDir;
         this.librariesDir = librariesDir;
@@ -72,6 +74,7 @@ public class MinecraftDownloader {
         this.runtimesDir = runtimesDir;
         this.instanceResourcesDir = instanceResourcesDir;
         this.minecraftDownloadListener = minecraftDownloadListener;
+        this.downloadJava = downloadJava;
     }
 
     public void downloadMinecraft(String versionId) throws IOException {
@@ -119,12 +122,16 @@ public class MinecraftDownloader {
             this.downloadAssets(version, assetsList);
             assetsList.downloadAll();
 
-            LOG.info("Downloading Java...");
-            this.minecraftDownloadListener.onProgress(0, 0);
-            this.minecraftDownloadListener.onStageChanged("Downloading Java");
-            DownloadList javaList = new DownloadList(this.minecraftDownloadListener::onProgress);
-            this.downloadJava(version, javaList);
-            javaList.downloadAll();
+            if (this.downloadJava) {
+                LOG.info("Downloading Java...");
+                this.minecraftDownloadListener.onProgress(0, 0);
+                this.minecraftDownloadListener.onStageChanged("Downloading Java");
+                DownloadList javaList = new DownloadList(this.minecraftDownloadListener::onProgress);
+                this.downloadJava(version, javaList);
+                javaList.downloadAll();
+            } else {
+                LOG.info("Not downloading Java");
+            }
 
             this.minecraftDownloadListener.onFinish();
         } else {
@@ -143,8 +150,12 @@ public class MinecraftDownloader {
             LOG.info("Downloading assets...");
             this.downloadAssets(version, list);
 
-            LOG.info("Downloading Java...");
-            this.downloadJava(version, list);
+            if (this.downloadJava) {
+                LOG.info("Downloading Java...");
+                this.downloadJava(version, list);
+            } else {
+                LOG.info("Not downloading Java");
+            }
 
             list.downloadAll();
 
@@ -250,18 +261,18 @@ public class MinecraftDownloader {
         }
 
         OkHttpClient httpClient = TESLauncher.getInstance().getHttpClient().newBuilder()
-                .addNetworkInterceptor(new ProgressNetworkInterceptor((contentLength, bytesRead, bytesThisTime, done) -> {
-                    this.minecraftDownloadListener.onProgress(contentLength, bytesRead);
-                }))
-                .build();
+            .addNetworkInterceptor(new ProgressNetworkInterceptor((contentLength, bytesRead, bytesThisTime, done) -> {
+                this.minecraftDownloadListener.onProgress(contentLength, bytesRead);
+            }))
+            .build();
 
         HttpDownload download = new HttpDownload.Builder()
-                .httpClient(httpClient)
-                .url(client.getUrl())
-                .expectedSize(client.getSize())
-                .sha1(client.getSha1())
-                .saveAs(jarFile)
-                .build();
+            .httpClient(httpClient)
+            .url(client.getUrl())
+            .expectedSize(client.getSize())
+            .sha1(client.getSha1())
+            .saveAs(jarFile)
+            .build();
 
         clientList.add(download);
 
@@ -340,12 +351,12 @@ public class MinecraftDownloader {
 
                 if (!Files.exists(jarFile) || Files.size(jarFile) != artifact.getSize()) {
                     HttpDownload download = new HttpDownload.Builder()
-                            .httpClient(TESLauncher.getInstance().getHttpClient())
-                            .url(artifact.getUrl())
-                            .sha1(artifact.getSha1())
-                            .expectedSize(artifact.getSize())
-                            .saveAs(jarFile)
-                            .build();
+                        .httpClient(TESLauncher.getInstance().getHttpClient())
+                        .url(artifact.getUrl())
+                        .sha1(artifact.getSha1())
+                        .expectedSize(artifact.getSize())
+                        .saveAs(jarFile)
+                        .build();
                     librariesList.add(download);
                 }
             }
@@ -357,12 +368,12 @@ public class MinecraftDownloader {
 
                 if (!Files.exists(filePath) || Files.size(filePath) != classifier.getSize()) {
                     HttpDownload download = new HttpDownload.Builder()
-                            .httpClient(TESLauncher.getInstance().getHttpClient())
-                            .url(classifier.getUrl())
-                            .sha1(classifier.getSha1())
-                            .expectedSize(classifier.getSize())
-                            .saveAs(filePath)
-                            .build();
+                        .httpClient(TESLauncher.getInstance().getHttpClient())
+                        .url(classifier.getUrl())
+                        .sha1(classifier.getSha1())
+                        .expectedSize(classifier.getSize())
+                        .saveAs(filePath)
+                        .build();
                     librariesList.add(download);
                 }
             }
@@ -392,10 +403,10 @@ public class MinecraftDownloader {
             AssetObject assetObject = entry.getValue();
 
             HttpDownload.Builder builder = new HttpDownload.Builder()
-                    .httpClient(TESLauncher.getInstance().getHttpClient())
-                    .url(ApiUrls.RESOURCES + assetObject.getPrefix() + "/" + assetObject.getHash())
-                    .expectedSize(assetObject.getSize())
-                    .sha1(assetObject.getHash());
+                .httpClient(TESLauncher.getInstance().getHttpClient())
+                .url(ApiUrls.RESOURCES + assetObject.getPrefix() + "/" + assetObject.getHash())
+                .expectedSize(assetObject.getSize())
+                .sha1(assetObject.getHash());
 
             Path saveAs;
             Path copyTo = null;
@@ -407,8 +418,8 @@ public class MinecraftDownloader {
 
                 if (!Files.exists(saveAs)) {
                     if (Files.exists(resourcesFile) &&
-                            Files.size(resourcesFile) == assetObject.getSize() &&
-                            HashUtils.sha1(resourcesFile).equals(assetObject.getHash())) {
+                        Files.size(resourcesFile) == assetObject.getSize() &&
+                        HashUtils.sha1(resourcesFile).equals(assetObject.getHash())) {
 
                         FileUtils.createDirectoryIfNotExists(saveAs.getParent());
                         Files.copy(resourcesFile, saveAs, StandardCopyOption.REPLACE_EXISTING);
@@ -550,13 +561,13 @@ public class MinecraftDownloader {
                         JreFile.Download raw = jreFile.downloads.get("raw");
 
                         HttpDownload download = new HttpDownload.Builder()
-                                .httpClient(TESLauncher.getInstance().getHttpClient())
-                                .url(raw.url)
-                                .expectedSize(raw.size)
-                                .sha1(raw.sha1)
-                                .executable(jreFile.executable)
-                                .saveAs(savePath)
-                                .build();
+                            .httpClient(TESLauncher.getInstance().getHttpClient())
+                            .url(raw.url)
+                            .expectedSize(raw.size)
+                            .sha1(raw.sha1)
+                            .executable(jreFile.executable)
+                            .saveAs(savePath)
+                            .build();
 
                         javaList.add(download);
                     }
@@ -613,8 +624,8 @@ public class MinecraftDownloader {
         }
 
         return componentDir
-                .resolve("bin")
-                .resolve(OperatingSystem.getCurrent().getJavaExecutableName())
-                .toString();
+            .resolve("bin")
+            .resolve(OperatingSystem.getCurrent().getJavaExecutableName())
+            .toString();
     }
 }
