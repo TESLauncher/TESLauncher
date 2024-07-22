@@ -18,12 +18,14 @@
 
 package me.theentropyshard.teslauncher.gui;
 
+import com.formdev.flatlaf.ui.FlatScrollPaneUI;
 import me.theentropyshard.teslauncher.BuildConfig;
 
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import java.awt.*;
+import java.awt.event.MouseWheelListener;
 import java.awt.event.WindowListener;
 
 public class LauncherConsole {
@@ -42,6 +44,16 @@ public class LauncherConsole {
         this.textPane.setEditable(false);
 
         JScrollPane scrollPane = new JScrollPane(this.textPane);
+        scrollPane.setUI(new FlatScrollPaneUI() {
+            @Override
+            protected MouseWheelListener createMouseWheelListener() {
+                if (this.isSmoothScrollingEnabled()) {
+                    return new SmoothScrollMouseWheelListener(this.scrollpane.getVerticalScrollBar());
+                } else {
+                    return super.createMouseWheelListener();
+                }
+            }
+        });
 
         this.frame = new JFrame(BuildConfig.APP_NAME + " console");
         this.frame.add(scrollPane, BorderLayout.CENTER);
