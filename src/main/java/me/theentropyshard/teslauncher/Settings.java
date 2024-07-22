@@ -41,6 +41,7 @@ public class Settings {
     public String lastInstanceGroup = "<default>";
     public boolean dialogRelativeToParent = true;
     public boolean writePrettyJson = false;
+    public boolean showAmountOfTime = false;
 
     public Settings() {
 

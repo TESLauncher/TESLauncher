@@ -68,7 +68,7 @@ public class SettingsView extends JPanel {
         }
 
         {
-            JPanel uiSettings = new JPanel(new GridLayout(2, 2));
+            JPanel uiSettings = new JPanel(new GridLayout(3, 3));
             uiSettings.setBorder(new TitledBorder("UI"));
 
             JComboBox<String> options = new JComboBox<>(new String[]{"Dialog", "Circle"});
@@ -124,6 +124,13 @@ public class SettingsView extends JPanel {
 
             uiSettings.add(dialogPosition);
             uiSettings.add(position);
+
+            JCheckBox showAmountOfTime = new JCheckBox("Show the amount of time that has passed since the release date");
+            showAmountOfTime.addActionListener(e -> {
+                TESLauncher.getInstance().getSettings().showAmountOfTime = showAmountOfTime.isSelected();
+            });
+            showAmountOfTime.setSelected(TESLauncher.getInstance().getSettings().showAmountOfTime);
+            uiSettings.add(showAmountOfTime);
 
             gbc.gridy++;
             this.add(uiSettings, gbc);

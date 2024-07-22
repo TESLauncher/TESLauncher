@@ -28,7 +28,10 @@ import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import javax.swing.table.TableRowSorter;
+import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.Temporal;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.concurrent.ExecutionException;
@@ -73,10 +76,16 @@ public class LoadVersionsWorker extends SwingWorker<VersionManifest, Void> {
             return;
         }
 
+        boolean showAmountOfTime = TESLauncher.getInstance().getSettings().showAmountOfTime;
+
         for (VersionManifest.Version version : versionManifest.getVersions()) {
+            OffsetDateTime releaseTime = version.getReleaseTime();
+            String releasedDate = this.formatter.format(releaseTime) + (showAmountOfTime ?
+                " (" + this.getAgoFromNow(releaseTime) + ")" : "");
+
             Object[] rowData = {
                     version.getId(),
-                    this.formatter.format(version.getReleaseTime()),
+                    releasedDate,
                     version.getType()
             };
 
@@ -112,6 +121,48 @@ public class LoadVersionsWorker extends SwingWorker<VersionManifest, Void> {
 
         this.dialog.getAddButton().setEnabled(true);
 
-        SwingUtils.setJTableColumnsWidth(this.table, 70, 15, 15);
+        if (showAmountOfTime) {
+            SwingUtils.setJTableColumnsWidth(this.table, 55, 30, 15);
+        } else {
+            SwingUtils.setJTableColumnsWidth(this.table, 70, 15, 15);
+        }
+    }
+
+    private String getAgoFromNow(Temporal temporal) {
+        OffsetDateTime now = OffsetDateTime.now();
+
+        long years = ChronoUnit.YEARS.between(temporal, now);
+        if (years == 0) {
+            long months = ChronoUnit.MONTHS.between(temporal, now);
+            if (months == 0) {
+                long weeks = ChronoUnit.WEEKS.between(temporal, now);
+                if (weeks == 0) {
+                    int days = (int) ChronoUnit.DAYS.between(temporal, now);
+                    switch (days) {
+                        case 0: return "today";
+                        case 1: return "yesterday";
+                        default: return days + " days ago";
+                    }
+                } else {
+                    if (weeks == 1) {
+                        return "1 week ago";
+                    } else {
+                        return weeks + " weeks ago";
+                    }
+                }
+            } else {
+                if (months == 1) {
+                    return "1 month ago";
+                } else {
+                    return months + " months ago";
+                }
+            }
+        } else {
+            if (years == 1) {
+                return "1 year ago";
+            } else {
+                return years + " years ago";
+            }
+        }
     }
 }

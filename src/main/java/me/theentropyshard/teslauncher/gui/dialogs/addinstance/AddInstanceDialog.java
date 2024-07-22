@@ -119,7 +119,6 @@ public class AddInstanceDialog extends AppDialog {
                 return c;
             }
         });
-        SwingUtils.setJTableColumnsWidth(versionsTable, 70, 15, 15);
         versionsTable.getTableHeader().setEnabled(false);
         versionsTable.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
