@@ -39,6 +39,7 @@ public class Settings {
     public boolean dialogRelativeToParent = true;
     public boolean writePrettyJson = false;
     public boolean showAmountOfTime = false;
+    public int whenMCLaunchesOption = 0;
 
     public Settings() {
 

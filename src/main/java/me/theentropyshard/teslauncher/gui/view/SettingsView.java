@@ -26,6 +26,7 @@ import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
 public class SettingsView extends JPanel {
     public SettingsView() {
@@ -137,7 +138,7 @@ public class SettingsView extends JPanel {
         }
 
         {
-            JPanel otherSettings = new JPanel(new GridLayout(1, 1));
+            JPanel otherSettings = new JPanel(new GridLayout(2, 2));
             otherSettings.setBorder(new TitledBorder("Other"));
 
             JCheckBox prettyJson = new JCheckBox("Write pretty JSON files (useful for development/debugging)");
@@ -146,6 +147,30 @@ public class SettingsView extends JPanel {
             });
             prettyJson.setSelected(TESLauncher.getInstance().getSettings().writePrettyJson);
             otherSettings.add(prettyJson);
+            otherSettings.add(Box.createHorizontalGlue());
+
+            JLabel whenMinecraftLaunchesLabel = new JLabel("When Minecraft launches: ");
+            otherSettings.add(whenMinecraftLaunchesLabel);
+            String[] options = {
+                "Do nothing",
+                "Hide launcher",
+                "Hide launcher and console",
+                "Exit launcher (Time spent on instance won't be counted)"
+            };
+            JComboBox<String> behavior = new JComboBox<>(options);
+            behavior.addItemListener(e -> {
+                if (e.getStateChange() != ItemEvent.SELECTED) {
+                    return;
+                }
+
+                TESLauncher.getInstance().getSettings().whenMCLaunchesOption = behavior.getSelectedIndex();
+            });
+            int index = TESLauncher.getInstance().getSettings().whenMCLaunchesOption;
+            if (index < 0 || index >= options.length) {
+                index = 0;
+            }
+            behavior.setSelectedIndex(index);
+            otherSettings.add(behavior);
 
             gbc.gridy++;
             gbc.weighty = 1;

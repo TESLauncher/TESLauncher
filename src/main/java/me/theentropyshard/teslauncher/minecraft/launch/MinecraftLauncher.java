@@ -64,7 +64,7 @@ public class MinecraftLauncher {
     }
 
     public int launch(Consumer<List<String>> beforeLaunch, Account account, Version version,
-                      Path runDir, Path minecraftDir, long minMem, long maxMem, List<String> jvmFlags) throws IOException {
+                      Path runDir, Path minecraftDir, long minMem, long maxMem, List<String> jvmFlags, boolean exitAfterLaunch) throws IOException {
         this.classpath.clear();
 
         beforeLaunch.accept(this.classpath);
@@ -72,7 +72,7 @@ public class MinecraftLauncher {
             jvmFlags);
         List<String> command = this.buildRunCommand(version, arguments, this.runtimesDir);
 
-        return this.runGameProcess(command, runDir, account);
+        return this.runGameProcess(command, runDir, account, exitAfterLaunch);
     }
 
     private void resolveClasspath(Version version, Path librariesDir) {
@@ -253,7 +253,7 @@ public class MinecraftLauncher {
         return command;
     }
 
-    private int runGameProcess(List<String> command, Path runDir, Account account) throws IOException {
+    private int runGameProcess(List<String> command, Path runDir, Account account, boolean exitAfterLaunch) throws IOException {
         Log.info("Working directory: " + runDir);
 
         List<String> censoredCommand = command.stream()
@@ -269,6 +269,10 @@ public class MinecraftLauncher {
         processBuilder.redirectErrorStream(true);
 
         Process process = processBuilder.start();
+
+        if (exitAfterLaunch) {
+            TESLauncher.getInstance().shutdown();
+        }
 
         new ProcessReader(process).read(line -> {
             this.readProcessOutput(line, account);

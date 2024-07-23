@@ -18,7 +18,9 @@
 
 package me.theentropyshard.teslauncher.instance;
 
+import me.theentropyshard.teslauncher.Settings;
 import me.theentropyshard.teslauncher.TESLauncher;
+import me.theentropyshard.teslauncher.gui.LauncherConsole;
 import me.theentropyshard.teslauncher.gui.components.InstanceItem;
 import me.theentropyshard.teslauncher.gui.dialogs.MinecraftDownloadDialog;
 import me.theentropyshard.teslauncher.gui.utils.MessageBox;
@@ -121,11 +123,33 @@ public class InstanceRunner extends Thread {
                 jvmFlags = "";
             }
 
+            int option = TESLauncher.getInstance().getSettings().whenMCLaunchesOption;
+
+            switch (option) {
+                case 1:
+                    TESLauncher.frame.setVisible(false);
+                    break;
+                case 2:
+                    TESLauncher.frame.setVisible(false);
+                    LauncherConsole.instance.setVisible(false);
+                    break;
+            }
+
             int exitCode = launcher.launch(classpath -> {
                     this.applyJarMods(version, classpath, versionsDir);
                 }, this.account, version, minecraftDir, minecraftDir,
                 this.instance.getMinimumMemoryInMegabytes(), this.instance.getMaximumMemoryInMegabytes(),
-                Arrays.asList(jvmFlags.split("\\s")));
+                Arrays.asList(jvmFlags.split("\\s")), option == 3);
+
+            switch (option) {
+                case 1:
+                    TESLauncher.frame.setVisible(true);
+                    break;
+                case 2:
+                    LauncherConsole.instance.setVisible(true);
+                    TESLauncher.frame.setVisible(true);
+                    break;
+            }
 
             long end = System.currentTimeMillis();
 
