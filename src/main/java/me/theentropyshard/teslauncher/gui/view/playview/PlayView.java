@@ -34,8 +34,7 @@ import me.theentropyshard.teslauncher.gui.utils.MouseEnterExitListener;
 import me.theentropyshard.teslauncher.utils.OperatingSystem;
 import me.theentropyshard.teslauncher.gui.utils.SwingUtils;
 import me.theentropyshard.teslauncher.utils.TimeUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import me.theentropyshard.teslauncher.logging.Log;
 
 import javax.swing.*;
 import java.awt.*;
@@ -49,7 +48,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 public class PlayView extends JPanel {
-    private static final Logger LOG = LogManager.getLogger(PlayView.class);
+    
 
     public static final String DEFAULT_GROUP_NAME = "<default>";
 
@@ -207,7 +206,8 @@ public class PlayView extends JPanel {
                         }
                         item.instanceChanged(instance);
                     } catch (IOException ex) {
-                        LOG.error("Could not rename instance {} ({}) to {}", instance.getName(), instance.getWorkDir(), newName);
+                        Log.error("Could not rename instance " + instance.getName() +
+                            " (" + instance.getWorkDir() + ") to " + newName);
                     }
                 });
                 popupMenu.add(renameItem);
@@ -295,7 +295,7 @@ public class PlayView extends JPanel {
             try {
                 instanceManager.removeInstance(instance.getName());
             } catch (IOException ex) {
-                LOG.error("Could not remove instance instance {}", instance.getWorkDir(), ex);
+                Log.stackTrace("Could not remove instance instance " + instance.getWorkDir(), ex);
 
                 return;
             }

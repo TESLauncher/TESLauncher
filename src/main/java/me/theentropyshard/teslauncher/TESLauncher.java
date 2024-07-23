@@ -26,8 +26,7 @@ import me.theentropyshard.teslauncher.gui.utils.WindowClosingListener;
 import me.theentropyshard.teslauncher.utils.FileUtils;
 import okhttp3.OkHttpClient;
 import okhttp3.Protocol;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import me.theentropyshard.teslauncher.logging.Log;
 
 import javax.swing.*;
 import java.io.IOException;
@@ -38,7 +37,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class TESLauncher {
-    private static final Logger LOG = LogManager.getLogger(TESLauncher.class);
+    
 
     public static final String USER_AGENT = BuildConfig.APP_NAME + "/" + BuildConfig.APP_VERSION;
 
@@ -78,7 +77,7 @@ public class TESLauncher {
         Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler());
 
         if (args.hasUnknownOptions()) {
-            LOG.warn("Unknown options: {}", args.getUnknownOptions());
+            Log.warn("Unknown options: " + args.getUnknownOptions());
         }
 
         TESLauncher.setInstance(this);
@@ -107,14 +106,14 @@ public class TESLauncher {
         try {
             this.accountManager.load();
         } catch (IOException e) {
-            LOG.error("Unable to load accounts", e);
+            Log.stackTrace("Unable to load accounts", e);
         }
 
         this.instanceManager = new InstanceManager(this.instancesDir);
         try {
             this.instanceManager.load();
         } catch (IOException e) {
-            LOG.error("Unable to load instances", e);
+            Log.stackTrace("Unable to load instances", e);
         }
 
         this.taskPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
@@ -135,7 +134,7 @@ public class TESLauncher {
             FileUtils.createDirectoryIfNotExists(this.versionsDir);
             FileUtils.createDirectoryIfNotExists(this.log4jConfigsDir);
         } catch (IOException e) {
-            LOG.error("Unable to create launcher directories", e);
+            Log.stackTrace("Unable to create launcher directories", e);
         }
     }
 
@@ -155,14 +154,14 @@ public class TESLauncher {
         try {
             this.accountManager.save();
         } catch (IOException e) {
-            LOG.error("Exception while saving accounts", e);
+            Log.stackTrace("Exception while saving accounts", e);
         }
 
         this.instanceManager.getInstances().forEach(instance -> {
             try {
                 instance.save();
             } catch (IOException e) {
-                LOG.error("Exception while saving instance '" + instance + "'", e);
+                Log.stackTrace("Exception while saving instance '" + instance + "'", e);
             }
         });
 

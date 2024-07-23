@@ -22,8 +22,7 @@ import com.formdev.flatlaf.ui.FlatScrollPaneUI;
 import me.theentropyshard.teslauncher.BuildConfig;
 
 import javax.swing.*;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
+import javax.swing.text.*;
 import java.awt.*;
 import java.awt.event.MouseWheelListener;
 import java.awt.event.WindowListener;
@@ -33,17 +32,32 @@ public class LauncherConsole {
     private static final int DEFAULT_Y = 80;
 
     private final JTextPane textPane;
+    private final SimpleAttributeSet attrs;
     private final JFrame frame;
 
     public static LauncherConsole instance;
 
     public LauncherConsole() {
-        this.textPane = new JTextPane();
+        this.textPane = new JTextPane() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+                super.paintComponent(g);
+            }
+        };
         this.textPane.setPreferredSize(new Dimension(480, 280));
         this.textPane.setFont(this.textPane.getFont().deriveFont(14.0f));
+        this.textPane.setEditorKit(new WrapEditorKit());
         this.textPane.setEditable(false);
 
-        JScrollPane scrollPane = new JScrollPane(this.textPane);
+        this.attrs = new SimpleAttributeSet();
+
+        JScrollPane scrollPane = new JScrollPane(
+            this.textPane,
+            JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+            JScrollPane.HORIZONTAL_SCROLLBAR_NEVER
+        );
         scrollPane.setUI(new FlatScrollPaneUI() {
             @Override
             protected MouseWheelListener createMouseWheelListener() {
@@ -61,6 +75,10 @@ public class LauncherConsole {
         this.frame.setLocation(LauncherConsole.DEFAULT_X, LauncherConsole.DEFAULT_Y);
     }
 
+    public JFrame getFrame() {
+        return this.frame;
+    }
+
     public void setVisible(boolean visibility) {
         this.frame.setVisible(visibility);
     }
@@ -69,18 +87,80 @@ public class LauncherConsole {
         this.frame.addWindowListener(listener);
     }
 
-    public void addLine(String line) {
+    public LauncherConsole setColor(Color c) {
+        StyleConstants.setForeground(this.attrs, c);
+
+        return this;
+    }
+
+    public LauncherConsole setBold(boolean bold) {
+        StyleConstants.setBold(this.attrs, bold);
+
+        return this;
+    }
+
+    public void write(String line) {
         Document document = this.textPane.getDocument();
+
         try {
-            int length = document.getLength();
-
-            if (!line.endsWith("\n")) {
-                line += "\n";
-            }
-
-            document.insertString(length, line, null);
+            document.insertString(document.getLength(), line, this.attrs);
         } catch (BadLocationException e) {
             e.printStackTrace();
+        }
+
+        this.textPane.setCaretPosition(document.getLength());
+    }
+
+    private static final class WrapEditorKit extends StyledEditorKit {
+        private final ViewFactory viewFactory;
+
+        public WrapEditorKit() {
+            this.viewFactory = new WrapColumnFactory();
+        }
+
+        @Override
+        public ViewFactory getViewFactory() {
+            return this.viewFactory;
+        }
+    }
+
+    private static final class WrapColumnFactory implements ViewFactory {
+        public View create(Element elem) {
+            String kind = elem.getName();
+
+            if (kind != null) {
+                switch (kind) {
+                    case AbstractDocument.ContentElementName:
+                        return new WrapLabelView(elem);
+                    case AbstractDocument.ParagraphElementName:
+                        return new ParagraphView(elem);
+                    case AbstractDocument.SectionElementName:
+                        return new BoxView(elem, View.Y_AXIS);
+                    case StyleConstants.ComponentElementName:
+                        return new ComponentView(elem);
+                    case StyleConstants.IconElementName:
+                        return new IconView(elem);
+                }
+            }
+
+            return new LabelView(elem);
+        }
+    }
+
+    private static final class WrapLabelView extends LabelView {
+        public WrapLabelView(Element element) {
+            super(element);
+        }
+
+        public float getMinimumSpan(int axis) {
+            switch (axis) {
+                case View.X_AXIS:
+                    return 0;
+                case View.Y_AXIS:
+                    return super.getMinimumSpan(axis);
+                default:
+                    throw new IllegalArgumentException("Invalid axis: " + axis);
+            }
         }
     }
 }

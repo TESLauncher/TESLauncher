@@ -16,23 +16,26 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher;
+package me.theentropyshard.teslauncher.logging;
 
-import me.theentropyshard.teslauncher.logging.Log;
+import javax.swing.*;
+import java.awt.*;
 
-public class Main {
-    public static void main(String[] rawArgs) {
-        Args args = Args.parse(rawArgs);
+public enum LogLevel {
+    INFO, WARN, ERROR, DEBUG;
 
-        LauncherProperties.LOGS_DIR.install(args.getWorkDir().resolve("logs"));
-        Log.start();
-
-        try {
-            new TESLauncher(args, args.getWorkDir());
-        } catch (Throwable t) {
-            Log.stackTrace("Unable to start the launcher", t);
-
-            System.exit(1);
+    public Color color() {
+        switch (this) {
+            case INFO:
+                return UIManager.getColor("LauncherConsole.infoColor");
+            case WARN:
+                return UIManager.getColor("LauncherConsole.warnColor");
+            case ERROR:
+                return UIManager.getColor("LauncherConsole.errorColor");
+            case DEBUG:
+                return UIManager.getColor("LauncherConsole.debugColor");
+            default:
+                throw new IllegalArgumentException("Unreachable");
         }
     }
 }

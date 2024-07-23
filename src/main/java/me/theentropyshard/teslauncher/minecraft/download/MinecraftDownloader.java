@@ -34,8 +34,7 @@ import me.theentropyshard.teslauncher.utils.json.Json;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.model.FileHeader;
 import okhttp3.OkHttpClient;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import me.theentropyshard.teslauncher.logging.Log;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -51,7 +50,7 @@ import java.util.List;
 import java.util.Map;
 
 public class MinecraftDownloader {
-    private static final Logger LOG = LogManager.getLogger(MinecraftDownloader.class);
+    
 
     private static final Duration MANIFEST_UPDATE_INTERVAL = Duration.ofHours(12);
 
@@ -80,7 +79,7 @@ public class MinecraftDownloader {
     public void downloadMinecraft(String versionId) throws IOException {
         FileUtils.createDirectoryIfNotExists(this.versionsDir.resolve(versionId));
 
-        LOG.info("Getting Manifest...");
+        Log.info("Getting Manifest...");
 
         VersionManifest manifest = MinecraftDownloader.getVersionManifest(this.versionsDir);
         if (manifest == null) {
@@ -89,33 +88,33 @@ public class MinecraftDownloader {
 
         VersionManifest.Version manifestVersion = ListUtils.search(manifest.getVersions(), v -> v.getId().equals(versionId));
         if (manifestVersion == null) {
-            LOG.warn("Unable to find Minecraft " + versionId);
+            Log.warn("Unable to find Minecraft " + versionId);
             return;
         }
 
-        LOG.info("Found Minecraft " + versionId);
+        Log.info("Found Minecraft " + versionId);
 
         if (TESLauncher.getInstance().getSettings().useDownloadDialog) {
-            LOG.info("Downloading client...");
+            Log.info("Downloading client...");
             this.minecraftDownloadListener.onProgress(0, 0);
             this.minecraftDownloadListener.onStageChanged("Downloading client");
             DownloadList clientList = new DownloadList(this.minecraftDownloadListener::onProgress);
             Version version = this.downloadClient(manifestVersion, clientList);
             clientList.downloadAll();
 
-            LOG.info("Downloading libraries...");
+            Log.info("Downloading libraries...");
             this.minecraftDownloadListener.onProgress(0, 0);
             this.minecraftDownloadListener.onStageChanged("Downloading libraries");
             DownloadList librariesList = new DownloadList(this.minecraftDownloadListener::onProgress);
             List<Library> nativeLibraries = this.downloadLibraries(version, librariesList);
             librariesList.downloadAll();
 
-            LOG.info("Extracting natives...");
+            Log.info("Extracting natives...");
             this.minecraftDownloadListener.onProgress(0, 0);
             this.minecraftDownloadListener.onStageChanged("Extracting natives");
             this.extractNatives(nativeLibraries);
 
-            LOG.info("Downloading assets...");
+            Log.info("Downloading assets...");
             this.minecraftDownloadListener.onProgress(0, 0);
             this.minecraftDownloadListener.onStageChanged("Downloading assets");
             DownloadList assetsList = new DownloadList(this.minecraftDownloadListener::onProgress);
@@ -123,14 +122,14 @@ public class MinecraftDownloader {
             assetsList.downloadAll();
 
             if (this.downloadJava) {
-                LOG.info("Downloading Java...");
+                Log.info("Downloading Java...");
                 this.minecraftDownloadListener.onProgress(0, 0);
                 this.minecraftDownloadListener.onStageChanged("Downloading Java");
                 DownloadList javaList = new DownloadList(this.minecraftDownloadListener::onProgress);
                 this.downloadJava(version, javaList);
                 javaList.downloadAll();
             } else {
-                LOG.info("Not downloading Java");
+                Log.info("Not downloading Java");
             }
 
             this.minecraftDownloadListener.onFinish();
@@ -138,23 +137,23 @@ public class MinecraftDownloader {
             this.minecraftDownloadListener.onProgress(0, 0);
             DownloadList list = new DownloadList(this.minecraftDownloadListener::onProgress);
 
-            LOG.info("Downloading client...");
+            Log.info("Downloading client...");
             Version version = this.downloadClient(manifestVersion, list);
 
-            LOG.info("Downloading libraries...");
+            Log.info("Downloading libraries...");
             List<Library> nativeLibraries = this.downloadLibraries(version, list);
 
-            LOG.info("Extracting natives...");
+            Log.info("Extracting natives...");
             this.extractNatives(nativeLibraries);
 
-            LOG.info("Downloading assets...");
+            Log.info("Downloading assets...");
             this.downloadAssets(version, list);
 
             if (this.downloadJava) {
-                LOG.info("Downloading Java...");
+                Log.info("Downloading Java...");
                 this.downloadJava(version, list);
             } else {
-                LOG.info("Not downloading Java");
+                Log.info("Not downloading Java");
             }
 
             list.downloadAll();
@@ -191,7 +190,7 @@ public class MinecraftDownloader {
                 try {
                     return MinecraftDownloader.fetchAndSaveVersionManifest(manifestFile);
                 } catch (IOException e) {
-                    LOG.error("Could not fetch and save version manifest to {}", manifestFile, e);
+                    Log.stackTrace("Could not fetch and save version manifest to " + manifestFile, e);
 
                     return manifest;
                 }
@@ -513,7 +512,7 @@ public class MinecraftDownloader {
                 try {
                     return MinecraftDownloader.fetchAndSaveAllRuntimes(runtimesFile);
                 } catch (IOException e) {
-                    LOG.error("Could not fetch and save all runtimes to {}", runtimesFile, e);
+                    Log.stackTrace("Could not fetch and save all runtimes to " + runtimesFile, e);
 
                     return jsonObject;
                 }

@@ -1,31 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="ERROR" packages="me.theentropyshard.teslauncher.gui">
+<Configuration status="ERROR">
     <Appenders>
-        <Console name="ConsoleLogger" target="SYSTEM_OUT">
-            <PatternLayout disableAnsi="false"
-                           pattern="%highlight{%d{HH:mm:ss} [%t] %level %c{1.1.1.*} - %msg%n}{INFO=default}" charset="UTF-8"/>
-        </Console>
-
         <RollingRandomAccessFile name="FileLogger" fileName="${sys:teslauncher.logsDir}/latest.log"
                                  filePattern="${sys:teslauncher.logsDir}/$${date:MM-yyyy}/app-%d{dd-MM-yyyy}-%i.log.gz">
-            <PatternLayout pattern="%d{HH:mm:ss} [%t] %level %logger - %msg%n" charset="UTF-8"/>
+            <PatternLayout pattern="%d{HH:mm:ss} [%t] %level - %msg%n" charset="UTF-8"/>
             <Policies>
                 <TimeBasedTriggeringPolicy/>
                 <SizeBasedTriggeringPolicy size="10 MB"/>
             </Policies>
             <DefaultRolloverStrategy max="10"/>
         </RollingRandomAccessFile>
-
-        <GuiConsoleAppender name="GuiConsole">
-            <PatternLayout pattern="%d{HH:mm:ss} [%t] %level %c{1.1.1.*} - %msg%n" charset="UTF-8"/>
-        </GuiConsoleAppender>
     </Appenders>
     <Loggers>
         <!-- avoid duplicated logs with additivity=false -->
         <Logger name="me.theentropyshard.teslauncher" level="debug" additivity="false">
-            <AppenderRef ref="ConsoleLogger"/>
             <AppenderRef ref="FileLogger"/>
-            <AppenderRef ref="GuiConsole"/>
         </Logger>
 
         <Root/>

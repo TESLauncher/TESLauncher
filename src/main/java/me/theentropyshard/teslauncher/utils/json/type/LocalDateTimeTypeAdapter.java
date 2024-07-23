@@ -21,15 +21,14 @@ package me.theentropyshard.teslauncher.utils.json.type;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import me.theentropyshard.teslauncher.logging.Log;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 
 public class LocalDateTimeTypeAdapter extends TypeAdapter<LocalDateTime> {
-    private static final Logger LOG = LogManager.getLogger(LocalDateTimeTypeAdapter.class);
+
 
     public LocalDateTimeTypeAdapter() {
 
@@ -47,7 +46,7 @@ public class LocalDateTimeTypeAdapter extends TypeAdapter<LocalDateTime> {
         try {
             return LocalDateTime.parse(text);
         } catch (DateTimeParseException e) {
-            LOG.warn("Cannot parse LocalDateTime '{}'", text);
+            Log.warn("Cannot parse LocalDateTime '" + text + "'");
         }
 
         return LocalDateTime.MIN;

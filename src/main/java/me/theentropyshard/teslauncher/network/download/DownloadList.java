@@ -21,8 +21,7 @@ package me.theentropyshard.teslauncher.network.download;
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.network.progress.ProgressNetworkInterceptor;
 import okhttp3.OkHttpClient;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import me.theentropyshard.teslauncher.logging.Log;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -34,7 +33,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class DownloadList {
-    private static final Logger LOG = LogManager.getLogger(DownloadList.class);
+    
 
     public static final int MAX_CONNECTIONS = 8;
 
@@ -99,7 +98,7 @@ public class DownloadList {
                 try {
                     download.execute();
                 } catch (IOException e) {
-                    LOG.error("Download failed", e);
+                    Log.stackTrace("Download failed", e);
                 }
             };
 

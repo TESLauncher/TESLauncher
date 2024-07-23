@@ -33,8 +33,7 @@ import me.theentropyshard.teslauncher.utils.TimeUtils;
 import me.theentropyshard.teslauncher.utils.json.Json;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.model.ZipParameters;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import me.theentropyshard.teslauncher.logging.Log;
 
 import java.io.File;
 import java.io.IOException;
@@ -47,7 +46,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class InstanceRunner extends Thread {
-    private static final Logger LOG = LogManager.getLogger(InstanceRunner.class);
+    
 
     private final Account account;
     private final Instance instance;
@@ -86,7 +85,7 @@ public class InstanceRunner extends Thread {
             } catch (AuthException e) {
                 this.instance.setRunning(false);
                 this.item.setEnabled(true);
-                LOG.error("Could not authenticate", e);
+                Log.stackTrace("Could not authenticate", e);
                 MessageBox.showErrorMessage(TESLauncher.frame, e.getMessage());
             }
 
@@ -130,18 +129,18 @@ public class InstanceRunner extends Thread {
 
             long end = System.currentTimeMillis();
 
-            LOG.info("Minecraft process finished with exit code " + exitCode);
+            Log.info("Minecraft process finished with exit code " + exitCode);
 
             long seconds = (end - start) / 1000;
             String timePlayed = TimeUtils.getHoursMinutesSeconds(seconds);
             if (!timePlayed.trim().isEmpty()) {
-                LOG.info("You played for " + timePlayed + "!");
+                Log.info("You played for " + timePlayed + "!");
             }
 
             this.instance.updatePlaytime(seconds);
             this.instance.save();
         } catch (Exception e) {
-            LOG.error("Exception occurred while trying to start Minecraft " + minecraftVersion, e);
+            Log.stackTrace("Exception occurred while trying to start Minecraft " + minecraftVersion, e);
         } finally {
             this.instance.setRunning(false);
             this.item.setEnabled(true);
@@ -189,7 +188,7 @@ public class InstanceRunner extends Thread {
         try {
             FileUtils.delete(this.tempClientCopy);
         } catch (IOException e) {
-            LOG.warn("Unable to delete temporary copy of the client '{}'", this.tempClientCopy, e);
+            Log.stackTrace("Unable to delete temporary copy of the client '" + this.tempClientCopy + "'", e);
         }
     }
 
@@ -247,7 +246,7 @@ public class InstanceRunner extends Thread {
 
                 classpath.add(this.tempClientCopy.toString());
             } catch (IOException e) {
-                LOG.warn("Cannot apply jar mods", e);
+                Log.stackTrace("Cannot apply jar mods", e);
             }
         }
     }

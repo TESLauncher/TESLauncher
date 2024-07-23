@@ -21,8 +21,7 @@ package me.theentropyshard.teslauncher.instance;
 import me.theentropyshard.teslauncher.utils.FileUtils;
 import me.theentropyshard.teslauncher.utils.StringUtils;
 import me.theentropyshard.teslauncher.utils.json.Json;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import me.theentropyshard.teslauncher.logging.Log;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -34,7 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 public class InstanceManager {
-    private static final Logger LOG = LogManager.getLogger(InstanceManager.class);
+    
 
     private final Path workDir;
     private final List<Instance> instances;
@@ -123,7 +122,7 @@ public class InstanceManager {
         try {
             freeName = this.findFreeName(cleanName);
         } catch (StackOverflowError | Exception e) {
-            LOG.warn("Unable to find free name for instance", e);
+            Log.warn("Unable to find free name for instance");
 
             freeName = this.workDir.resolve(StringUtils.getRandomString(10));
         }

@@ -26,8 +26,7 @@ import me.theentropyshard.teslauncher.instance.InstanceAlreadyExistsException;
 import me.theentropyshard.teslauncher.instance.InstanceManager;
 import me.theentropyshard.teslauncher.gui.utils.MessageBox;
 import me.theentropyshard.teslauncher.gui.utils.SwingUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import me.theentropyshard.teslauncher.logging.Log;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -40,7 +39,7 @@ import java.awt.event.KeyEvent;
 import java.io.IOException;
 
 public class AddInstanceDialog extends AppDialog {
-    private static final Logger LOG = LogManager.getLogger(AddInstanceDialog.class);
+    
 
     private final JTextField nameField;
     private final JTextField groupField;
@@ -248,9 +247,9 @@ public class AddInstanceDialog extends AppDialog {
                             ex.getMessage()
                     );
 
-                    LOG.warn(ex);
+                    Log.warn(ex.toString());
                 } catch (IOException ex) {
-                    LOG.error("Unable to create new instance", ex);
+                    Log.stackTrace("Unable to create new instance", ex);
                 }
             });
         });

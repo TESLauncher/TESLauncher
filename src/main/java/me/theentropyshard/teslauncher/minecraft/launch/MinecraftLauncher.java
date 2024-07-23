@@ -32,8 +32,7 @@ import me.theentropyshard.teslauncher.utils.OperatingSystem;
 import me.theentropyshard.teslauncher.utils.ProcessReader;
 import me.theentropyshard.teslauncher.utils.json.Json;
 import org.apache.commons.text.StringSubstitutor;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import me.theentropyshard.teslauncher.logging.Log;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,7 +45,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class MinecraftLauncher {
-    private static final Logger LOG = LogManager.getLogger(MinecraftLauncher.class);
+    
 
     private final Path librariesDir;
     private final Path runtimesDir;
@@ -194,7 +193,7 @@ public class MinecraftLauncher {
             int patch = Integer.parseInt(split[2]);
 
             if (minorVersion == 16 && patch == 5 && !(account instanceof MicrosoftAccount)) {
-                LOG.info("Fooling Minecraft 1.16.5, so multiplayer works for offline account");
+                Log.info("Fooling Minecraft 1.16.5, so multiplayer works for offline account");
 
                 arguments.add("-Dminecraft.api.auth.host=https://nope.invalid");
                 arguments.add("-Dminecraft.api.account.host=https://nope.invalid");
@@ -206,7 +205,7 @@ public class MinecraftLauncher {
         }
 
         String mainClass = version.getMainClass();
-        LOG.info("Main class: {}", mainClass);
+        Log.info("Main class: " + mainClass);
         arguments.add(mainClass);
 
         if (newFormat) {
@@ -246,7 +245,7 @@ public class MinecraftLauncher {
         if (this.overrideJavaExecutable == null) {
             command.add(MinecraftLauncher.getMojangJavaExecutable(version, runtimesDir));
         } else {
-            LOG.info("Using custom JRE: {}", this.overrideJavaExecutable);
+            Log.info("Using custom JRE: " + this.overrideJavaExecutable);
             command.add(this.overrideJavaExecutable);
         }
         command.addAll(arguments);
@@ -255,14 +254,14 @@ public class MinecraftLauncher {
     }
 
     private int runGameProcess(List<String> command, Path runDir, Account account) throws IOException {
-        LOG.info("Working directory: {}", runDir);
+        Log.info("Working directory: " + runDir);
 
         List<String> censoredCommand = command.stream()
             .map(s -> (account instanceof MicrosoftAccount) ? s.replace(account.getAccessToken(), "**ACCESSTOKEN**") : s)
             .map(s -> s.replace(account.getUsername(), "**USERNAME**"))
             .map(s -> s.replace(account.getUuid().toString(), "**UUID**"))
             .collect(Collectors.toList());
-        LOG.info("Running: {}", censoredCommand);
+        Log.info("Running: " + censoredCommand);
 
         ProcessBuilder processBuilder = new ProcessBuilder(command);
         processBuilder.environment().put("APPDATA", runDir.toString());
@@ -291,7 +290,7 @@ public class MinecraftLauncher {
 
         MinecraftError.checkForError(line);
 
-        LOG.info(line);
+        Log.minecraft(line);
     }
 
     private static String getMojangJavaExecutable(Version version, Path runtimesDir) {
@@ -299,12 +298,12 @@ public class MinecraftLauncher {
 
         if (javaVersion != null) {
             String javaExecutable = MinecraftLauncher.getJavaExecutable(javaVersion.getComponent(), runtimesDir);
-            LOG.info("Using Mojang JRE {}: {}", javaVersion.getMajorVersion(), javaExecutable);
+            Log.info("Using Mojang JRE " + javaVersion.getMajorVersion() + ": " + javaExecutable);
 
             return javaExecutable;
         } else {
             String fallbackJavaPath = MinecraftLauncher.getFallbackJavaPath(version.getId(), runtimesDir);
-            LOG.warn("Could not find Java version in version info. Using fallback JRE: {}", fallbackJavaPath);
+            Log.warn("Could not find Java version in version info. Using fallback JRE: " + fallbackJavaPath);
 
             return fallbackJavaPath;
         }

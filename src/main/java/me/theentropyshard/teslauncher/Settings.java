@@ -19,10 +19,9 @@
 package me.theentropyshard.teslauncher;
 
 
+import me.theentropyshard.teslauncher.logging.Log;
 import me.theentropyshard.teslauncher.utils.FileUtils;
 import me.theentropyshard.teslauncher.utils.json.Json;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -32,8 +31,6 @@ import java.nio.file.Path;
  * I don't usually like making fields public, but ok, those are settings
  */
 public class Settings {
-    private static final Logger LOG = LogManager.getLogger(Settings.class);
-
     public String language = "english";
     public boolean darkTheme = false;
     public String lastDir = System.getProperty("user.dir");
@@ -55,7 +52,7 @@ public class Settings {
         try {
             return Json.parse(FileUtils.readUtf8(file), Settings.class);
         } catch (IOException e) {
-            LOG.error("Could not load settings from {}, using defaults", file, e);
+            Log.stackTrace("Could not load settings from" + file + ", using defaults", e);
         }
 
         return new Settings();
@@ -65,7 +62,7 @@ public class Settings {
         try {
             FileUtils.writeUtf8(file, this.writePrettyJson ? Json.writePretty(this) : Json.write(this));
         } catch (IOException e) {
-            LOG.error("Could not save settings to {}", file);
+            Log.stackTrace("Could not save settings to " + file, e);
         }
     }
 }

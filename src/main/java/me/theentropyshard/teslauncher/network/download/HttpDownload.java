@@ -23,8 +23,7 @@ import me.theentropyshard.teslauncher.utils.HashUtils;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import me.theentropyshard.teslauncher.logging.Log;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,7 +38,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.Objects;
 
 public class HttpDownload {
-    private static final Logger LOG = LogManager.getLogger(HttpDownload.class);
+    
 
     private static final long EXPECTED_SIZE_NOT_SET = -1L;
 
@@ -81,16 +80,16 @@ public class HttpDownload {
                     if (hashMatches) {
                         return;
                     } else {
-                        LOG.debug("File '{}' exists, size matches, but SHA-1 does not match", this.saveAs);
+                        Log.debug("File '" + this.saveAs + "' exists, size matches, but SHA-1 does not match");
                     }
 
                     needsDownload = true;
                 }
             } else if (this.expectedSize != HttpDownload.EXPECTED_SIZE_NOT_SET) {
                 if (hashMatches) {
-                    LOG.debug("File '{}' exists, SHA-1 matches, but size does not match", this.saveAs);
+                    Log.debug("File '" + this.saveAs + "' exists, SHA-1 matches, but size does not match");
                 } else {
-                    LOG.debug("File '{}' exists, but size and SHA-1 do not match", this.saveAs);
+                    Log.debug("File '" + this.saveAs + "' exists, but size and SHA-1 do not match");
                 }
 
                 needsDownload = true;
@@ -165,7 +164,7 @@ public class HttpDownload {
             try {
                 return Files.size(this.saveAs);
             } catch (IOException e) {
-                LOG.error("Could not get file size of {}", this.saveAs, e);
+                Log.stackTrace("Could not get file size of " + this.saveAs, e);
             }
         }
 

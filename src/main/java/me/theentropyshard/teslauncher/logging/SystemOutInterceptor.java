@@ -16,23 +16,28 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher;
+package me.theentropyshard.teslauncher.logging;
 
-import me.theentropyshard.teslauncher.logging.Log;
+import java.io.OutputStream;
+import java.io.PrintStream;
 
-public class Main {
-    public static void main(String[] rawArgs) {
-        Args args = Args.parse(rawArgs);
+public class SystemOutInterceptor extends PrintStream {
+    private final LogLevel level;
 
-        LauncherProperties.LOGS_DIR.install(args.getWorkDir().resolve("logs"));
-        Log.start();
+    public SystemOutInterceptor(OutputStream out, LogLevel level) {
+        super(out, true);
 
-        try {
-            new TESLauncher(args, args.getWorkDir());
-        } catch (Throwable t) {
-            Log.stackTrace("Unable to start the launcher", t);
+        this.level = level;
+    }
 
-            System.exit(1);
+    @Override
+    public void print(String s) {
+        super.print(s);
+
+        if (this.level == LogLevel.ERROR) {
+            Log.error(s);
+        } else {
+            Log.debug(s);
         }
     }
 }

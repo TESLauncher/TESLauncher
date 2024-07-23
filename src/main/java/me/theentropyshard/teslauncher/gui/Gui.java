@@ -22,6 +22,7 @@ import com.formdev.flatlaf.FlatDarculaLaf;
 import com.formdev.flatlaf.FlatIntelliJLaf;
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.gui.components.InstanceItem;
+import me.theentropyshard.teslauncher.gui.utils.SwingUtils;
 import me.theentropyshard.teslauncher.gui.view.AboutView;
 import me.theentropyshard.teslauncher.gui.view.SettingsView;
 import me.theentropyshard.teslauncher.gui.view.accountsview.AccountItem;
@@ -30,7 +31,6 @@ import me.theentropyshard.teslauncher.gui.view.accountsview.AddAccountItem;
 import me.theentropyshard.teslauncher.gui.view.playview.InstancesPanel;
 import me.theentropyshard.teslauncher.gui.view.playview.PlayView;
 import me.theentropyshard.teslauncher.utils.OperatingSystem;
-import me.theentropyshard.teslauncher.gui.utils.SwingUtils;
 
 import javax.swing.*;
 import javax.swing.plaf.ColorUIResource;
@@ -114,6 +114,11 @@ public class Gui {
 
             UIManager.put("AccountItem.borderColor", accentColor);
 
+            UIManager.put("LauncherConsole.infoColor", new ColorUIResource(Color.WHITE));
+            UIManager.put("LauncherConsole.warnColor", new ColorUIResource(Color.YELLOW.darker()));
+            UIManager.put("LauncherConsole.errorColor", new ColorUIResource(Color.RED.darker()));
+            UIManager.put("LauncherConsole.debugColor", new ColorUIResource(Color.CYAN.darker()));
+
             FlatDarculaLaf.setup();
         } else {
             UIManager.put("InstanceItem.defaultColor", new ColorUIResource(222, 230, 237));
@@ -127,6 +132,11 @@ public class Gui {
             UIManager.put("ProgressBar.background", new ColorUIResource(222, 230, 237));
 
             UIManager.put("AccountItem.borderColor", accentColor);
+
+            UIManager.put("LauncherConsole.infoColor", new ColorUIResource(Color.BLACK));
+            UIManager.put("LauncherConsole.warnColor", new ColorUIResource(Color.YELLOW.darker()));
+            UIManager.put("LauncherConsole.errorColor", new ColorUIResource(Color.RED.darker()));
+            UIManager.put("LauncherConsole.debugColor", new ColorUIResource(Color.CYAN.darker()));
 
             FlatIntelliJLaf.setup();
         }
@@ -168,6 +178,12 @@ public class Gui {
 
         SwingUtilities.updateComponentTreeUI(this.frame);
         this.frame.pack();
+
+        if (LauncherConsole.instance != null) {
+            JFrame frame = LauncherConsole.instance.getFrame();
+            SwingUtilities.updateComponentTreeUI(frame);
+            frame.pack();
+        }
 
         InstancesPanel defaultInstancesPanel = this.playView.getDefaultInstancesPanel();
         defaultInstancesPanel.getScrollPane().setBorder(null);

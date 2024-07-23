@@ -23,8 +23,7 @@ import me.theentropyshard.teslauncher.minecraft.download.MinecraftDownloader;
 import me.theentropyshard.teslauncher.minecraft.data.VersionManifest;
 import me.theentropyshard.teslauncher.minecraft.data.VersionType;
 import me.theentropyshard.teslauncher.gui.utils.SwingUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import me.theentropyshard.teslauncher.logging.Log;
 
 import javax.swing.*;
 import javax.swing.table.TableRowSorter;
@@ -37,7 +36,7 @@ import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 
 public class LoadVersionsWorker extends SwingWorker<VersionManifest, Void> {
-    private static final Logger LOG = LogManager.getLogger(LoadVersionsWorker.class);
+    
 
     private final McVersionsTableModel model;
     private final AddInstanceDialog dialog;
@@ -71,7 +70,7 @@ public class LoadVersionsWorker extends SwingWorker<VersionManifest, Void> {
         try {
             versionManifest = this.get();
         } catch (InterruptedException | ExecutionException e) {
-            LOG.error("Unexpected error", e);
+            Log.stackTrace("Unexpected error", e);
 
             return;
         }

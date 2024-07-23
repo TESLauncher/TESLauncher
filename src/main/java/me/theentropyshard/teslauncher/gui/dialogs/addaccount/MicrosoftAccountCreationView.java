@@ -37,8 +37,7 @@ import me.theentropyshard.teslauncher.utils.UndashedUUID;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import me.theentropyshard.teslauncher.logging.Log;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -54,7 +53,7 @@ import java.util.Objects;
 
 //TODO: this is still big shit. fix it
 public class MicrosoftAccountCreationView extends JPanel {
-    private static final Logger LOG = LogManager.getLogger(MicrosoftAccountCreationView.class);
+    
 
     private final CardLayout layout;
     private final AddAccountDialog dialog;
@@ -111,12 +110,12 @@ public class MicrosoftAccountCreationView extends JPanel {
                         try {
                             profile = authenticator.authenticate();
                         } catch (AuthException e) {
-                            LOG.error("Could not authenticate", e);
+                            Log.stackTrace("Could not authenticate", e);
                             MessageBox.showErrorMessage(TESLauncher.frame, e.getMessage());
                         }
 
                         if (profile == null) {
-                            LOG.error("Profile is null");
+                            Log.error("Profile is null");
 
                             return null;
                         }
@@ -186,7 +185,7 @@ public class MicrosoftAccountCreationView extends JPanel {
             if (!this.isSelectedBox()) {
                 if (!Desktop.isDesktopSupported()) {
                     MessageBox.showErrorMessage(TESLauncher.frame, "java.awt.Desktop is not supported, try opening the browser yourself");
-                    LOG.warn("java.awt.Desktop is not supported, try opening the browser yourself");
+                    Log.warn("java.awt.Desktop is not supported, try opening the browser yourself");
 
                     return;
                 }

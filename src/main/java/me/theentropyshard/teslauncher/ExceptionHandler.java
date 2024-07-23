@@ -18,18 +18,15 @@
 
 package me.theentropyshard.teslauncher;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import me.theentropyshard.teslauncher.logging.Log;
 
 public class ExceptionHandler implements Thread.UncaughtExceptionHandler {
-    private static final Logger LOG = LogManager.getLogger(ExceptionHandler.class);
-
     public ExceptionHandler() {
 
     }
 
     @Override
     public void uncaughtException(Thread t, Throwable e) {
-        LOG.error("Uncaught exception in thread [{}]", t, e);
+        Log.stackTrace("Uncaught exception in thread [" + t + "]", e);
     }
 }
