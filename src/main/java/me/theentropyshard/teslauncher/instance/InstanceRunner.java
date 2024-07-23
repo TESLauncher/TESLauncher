@@ -125,6 +125,8 @@ public class InstanceRunner extends Thread {
 
             int option = TESLauncher.getInstance().getSettings().whenMCLaunchesOption;
 
+            boolean consoleWasOpen = LauncherConsole.instance.getFrame().isVisible();
+
             switch (option) {
                 case 1:
                     TESLauncher.frame.setVisible(false);
@@ -146,7 +148,9 @@ public class InstanceRunner extends Thread {
                     TESLauncher.frame.setVisible(true);
                     break;
                 case 2:
-                    LauncherConsole.instance.setVisible(true);
+                    if (consoleWasOpen) {
+                        LauncherConsole.instance.setVisible(true);
+                    }
                     TESLauncher.frame.setVisible(true);
                     break;
             }
