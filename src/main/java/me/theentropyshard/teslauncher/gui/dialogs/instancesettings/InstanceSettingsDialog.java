@@ -25,7 +25,7 @@ import me.theentropyshard.teslauncher.gui.dialogs.instancesettings.tab.JarModsTa
 import me.theentropyshard.teslauncher.gui.dialogs.instancesettings.tab.JavaTab;
 import me.theentropyshard.teslauncher.gui.dialogs.instancesettings.tab.SettingsTab;
 import me.theentropyshard.teslauncher.gui.view.playview.InstancesPanel;
-import me.theentropyshard.teslauncher.instance.Instance;
+import me.theentropyshard.teslauncher.instance.MinecraftInstance;
 
 import javax.swing.*;
 import java.awt.*;
@@ -42,7 +42,7 @@ public class InstanceSettingsDialog extends AppDialog {
     private final JTabbedPane tabbedPane;
     private final List<SettingsTab> tabs;
 
-    public InstanceSettingsDialog(Instance instance) {
+    public InstanceSettingsDialog(MinecraftInstance instance) {
         super(TESLauncher.frame, "Instance Settings - " + instance.getName());
 
         this.tabbedPane = new JTabbedPane(JTabbedPane.LEFT);
@@ -78,7 +78,7 @@ public class InstanceSettingsDialog extends AppDialog {
                 InstancesPanel instancesPanel = TESLauncher.getInstance().getGui().getPlayView().getCurrentInstancesPanel();
                 JPanel itemsPanel = instancesPanel.getInstancesPanel();
                 for (Component component : itemsPanel.getComponents()) {
-                    Instance associatedInstance = ((InstanceItem) component).getAssociatedInstance();
+                    MinecraftInstance associatedInstance = ((InstanceItem) component).getAssociatedInstance();
                     if (associatedInstance == instance) {
                         ((InstanceItem) component).getTextLabel().setText(instance.getName());
                         try {

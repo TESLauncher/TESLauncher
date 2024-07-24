@@ -20,7 +20,7 @@ package me.theentropyshard.teslauncher.gui.dialogs.instancesettings.tab;
 
 import me.theentropyshard.teslauncher.Settings;
 import me.theentropyshard.teslauncher.TESLauncher;
-import me.theentropyshard.teslauncher.instance.Instance;
+import me.theentropyshard.teslauncher.instance.MinecraftInstance;
 import me.theentropyshard.teslauncher.instance.JarMod;
 
 import javax.swing.*;
@@ -31,7 +31,6 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -39,7 +38,7 @@ public class JarModsTab extends SettingsTab {
     private final JarModsTableModel jarModsTableModel;
     private final JButton deleteModButton;
 
-    public JarModsTab(Instance instance, JDialog dialog) {
+    public JarModsTab(MinecraftInstance instance, JDialog dialog) {
         super("Jar Mods", instance, dialog);
 
         JPanel root = this.getRoot();

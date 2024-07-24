@@ -33,11 +33,9 @@ import java.util.List;
 import java.util.Map;
 
 public class InstanceManager {
-    
-
     private final Path workDir;
-    private final List<Instance> instances;
-    private final Map<String, Instance> instancesByName;
+    private final List<MinecraftInstance> instances;
+    private final Map<String, MinecraftInstance> instancesByName;
 
     public InstanceManager(Path workDir) {
         this.workDir = workDir;
@@ -58,7 +56,7 @@ public class InstanceManager {
                 continue;
             }
 
-            Instance instance = Json.parse(FileUtils.readUtf8(instanceFile), Instance.class);
+            MinecraftInstance instance = Json.parse(FileUtils.readUtf8(instanceFile), MinecraftInstance.class);
             instance.setWorkDir(path);
 
             this.cacheInstance(instance);
@@ -70,7 +68,7 @@ public class InstanceManager {
         this.load();
     }
 
-    private void cacheInstance(Instance instance) {
+    private void cacheInstance(MinecraftInstance instance) {
         if (this.instancesByName.containsKey(instance.getName())) {
             return;
         }
@@ -79,7 +77,7 @@ public class InstanceManager {
         this.instancesByName.put(instance.getName(), instance);
     }
 
-    private void uncacheInstance(Instance instance) {
+    private void uncacheInstance(MinecraftInstance instance) {
         if (!this.instancesByName.containsKey(instance.getName())) {
             return;
         }
@@ -138,7 +136,7 @@ public class InstanceManager {
             throw new InstanceAlreadyExistsException(name);
         }
 
-        Instance instance = new Instance(name, groupName, minecraftVersion);
+        MinecraftInstance instance = new MinecraftInstance(name, groupName, minecraftVersion);
         instance.setWorkDir(this.getInstanceWorkDir(name, minecraftVersion));
 
         this.cacheInstance(instance);
@@ -151,7 +149,7 @@ public class InstanceManager {
     }
 
     public void removeInstance(String name) throws IOException {
-        Instance instance = this.getInstanceByName(name);
+        MinecraftInstance instance = this.getInstanceByName(name);
 
         if (instance == null) {
             return;
@@ -162,7 +160,7 @@ public class InstanceManager {
         this.uncacheInstance(instance);
     }
 
-    public boolean renameInstance(Instance instance, String newName) throws IOException {
+    public boolean renameInstance(MinecraftInstance instance, String newName) throws IOException {
         this.uncacheInstance(instance);
 
         Path newInstanceDir = this.getInstanceWorkDir(newName, instance.getMinecraftVersion());
@@ -184,11 +182,11 @@ public class InstanceManager {
         return invalidName;
     }
 
-    public Instance getInstanceByName(String name) {
+    public MinecraftInstance getInstanceByName(String name) {
         return this.instancesByName.get(name);
     }
 
-    public List<Instance> getInstances() {
+    public List<MinecraftInstance> getInstances() {
         return this.instances;
     }
 }

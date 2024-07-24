@@ -18,7 +18,7 @@
 
 package me.theentropyshard.teslauncher.gui.dialogs.instancesettings.tab;
 
-import me.theentropyshard.teslauncher.instance.Instance;
+import me.theentropyshard.teslauncher.instance.MinecraftInstance;
 import me.theentropyshard.teslauncher.instance.JarMod;
 
 import javax.swing.table.AbstractTableModel;
@@ -31,7 +31,7 @@ public class JarModsTableModel extends AbstractTableModel {
 
     private final List<JarMod> jarMods;
 
-    public JarModsTableModel(Instance instance) {
+    public JarModsTableModel(MinecraftInstance instance) {
         if (instance.getJarMods() == null) {
             this.jarMods = new ArrayList<>();
         } else {

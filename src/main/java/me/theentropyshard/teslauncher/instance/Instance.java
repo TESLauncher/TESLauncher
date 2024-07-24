@@ -18,99 +18,23 @@
 
 package me.theentropyshard.teslauncher.instance;
 
-import me.theentropyshard.teslauncher.Settings;
-import me.theentropyshard.teslauncher.TESLauncher;
-import me.theentropyshard.teslauncher.utils.FileUtils;
-import me.theentropyshard.teslauncher.utils.OperatingSystem;
-import me.theentropyshard.teslauncher.utils.json.Json;
-
-import java.io.IOException;
-import java.nio.file.Path;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
-public class Instance {
-    private static final String INSTANCE_FILE_NAME = "instance.json";
-    private static final String MINECRAFT_DIR_NAME = OperatingSystem.isMacOS() ? "minecraft" : ".minecraft";
-    private static final String JARMODS_DIR_NAME = "jarmods";
-
-    private transient Path workDir;
-
+public abstract class Instance {
     private String name;
-    private String groupName;
-    private String minecraftVersion;
-    private String javaPath;
+    private String group;
     private String iconPath = "/assets/icons/grass_icon.png";
-    private int minecraftWindowWidth;
-    private int minecraftWindowHeight;
-    private String customWindowString;
-    private int minimumMemoryInMegabytes = 512;
-    private int maximumMemoryInMegabytes = 2048;
     private LocalDateTime lastTimePlayed = LocalDateTime.MIN;
     private long lastPlaytime;
     private long totalPlaytime;
-    private final List<JarMod> jarMods;
-    private String jvmFlags;
-    private transient volatile boolean running;
 
     public Instance() {
-        this(null, null, null);
-    }
 
-    public Instance(String name, String groupName, String minecraftVersion) {
-        this.name = name;
-        this.groupName = groupName;
-        this.minecraftVersion = minecraftVersion;
-
-        this.jarMods = new ArrayList<>();
-    }
-
-    public void save() throws IOException {
-        Settings settings = TESLauncher.getInstance().getSettings();
-        String content = settings.writePrettyJson ? Json.writePretty(this) : Json.write(this);
-        FileUtils.writeUtf8(this.getWorkDir().resolve(Instance.INSTANCE_FILE_NAME), content);
     }
 
     public void updatePlaytime(long seconds) {
         this.lastPlaytime = seconds;
         this.totalPlaytime += seconds;
-    }
-
-    public String getJvmFlags() {
-        return this.jvmFlags;
-    }
-
-    public void setJvmFlags(String jvmFlags) {
-        this.jvmFlags = jvmFlags;
-    }
-
-    public boolean isRunning() {
-        return this.running;
-    }
-
-    public void setRunning(boolean running) {
-        this.running = running;
-    }
-
-    public Path getWorkDir() {
-        return this.workDir;
-    }
-
-    public void setWorkDir(Path workDir) {
-        this.workDir = workDir;
-    }
-
-    public Path getMinecraftDir() {
-        return this.workDir.resolve(Instance.MINECRAFT_DIR_NAME);
-    }
-
-    public Path getJarModsDir() {
-        return this.workDir.resolve(Instance.JARMODS_DIR_NAME);
-    }
-
-    public List<JarMod> getJarMods() {
-        return this.jarMods;
     }
 
     public String getName() {
@@ -121,28 +45,12 @@ public class Instance {
         this.name = name;
     }
 
-    public String getGroupName() {
-        return this.groupName;
+    public String getGroup() {
+        return this.group;
     }
 
-    public void setGroupName(String groupName) {
-        this.groupName = groupName;
-    }
-
-    public String getMinecraftVersion() {
-        return this.minecraftVersion;
-    }
-
-    public void setMinecraftVersion(String minecraftVersion) {
-        this.minecraftVersion = minecraftVersion;
-    }
-
-    public String getJavaPath() {
-        return this.javaPath;
-    }
-
-    public void setJavaPath(String javaPath) {
-        this.javaPath = javaPath;
+    public void setGroup(String group) {
+        this.group = group;
     }
 
     public String getIconPath() {
@@ -151,46 +59,6 @@ public class Instance {
 
     public void setIconPath(String iconPath) {
         this.iconPath = iconPath;
-    }
-
-    public int getMinecraftWindowWidth() {
-        return this.minecraftWindowWidth;
-    }
-
-    public void setMinecraftWindowWidth(int minecraftWindowWidth) {
-        this.minecraftWindowWidth = minecraftWindowWidth;
-    }
-
-    public int getMinecraftWindowHeight() {
-        return this.minecraftWindowHeight;
-    }
-
-    public void setMinecraftWindowHeight(int minecraftWindowHeight) {
-        this.minecraftWindowHeight = minecraftWindowHeight;
-    }
-
-    public String getCustomWindowString() {
-        return this.customWindowString;
-    }
-
-    public void setCustomWindowString(String customWindowString) {
-        this.customWindowString = customWindowString;
-    }
-
-    public int getMinimumMemoryInMegabytes() {
-        return this.minimumMemoryInMegabytes;
-    }
-
-    public void setMinimumMemoryInMegabytes(int minimumMemoryInMegabytes) {
-        this.minimumMemoryInMegabytes = minimumMemoryInMegabytes;
-    }
-
-    public int getMaximumMemoryInMegabytes() {
-        return this.maximumMemoryInMegabytes;
-    }
-
-    public void setMaximumMemoryInMegabytes(int maximumMemoryInMegabytes) {
-        this.maximumMemoryInMegabytes = maximumMemoryInMegabytes;
     }
 
     public LocalDateTime getLastTimePlayed() {

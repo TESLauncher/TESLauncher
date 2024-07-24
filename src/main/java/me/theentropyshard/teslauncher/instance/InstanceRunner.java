@@ -18,7 +18,6 @@
 
 package me.theentropyshard.teslauncher.instance;
 
-import me.theentropyshard.teslauncher.Settings;
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.gui.LauncherConsole;
 import me.theentropyshard.teslauncher.gui.components.InstanceItem;
@@ -46,12 +45,13 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 public class InstanceRunner extends Thread {
     
 
     private final Account account;
-    private final Instance instance;
+    private final MinecraftInstance instance;
     private final InstanceItem item;
 
     private Path tempClientCopy;
@@ -118,11 +118,6 @@ public class InstanceRunner extends Thread {
 
             long start = System.currentTimeMillis();
 
-            String jvmFlags = this.instance.getJvmFlags();
-            if (jvmFlags == null || jvmFlags.isEmpty()) {
-                jvmFlags = "";
-            }
-
             int option = TESLauncher.getInstance().getSettings().whenMCLaunchesOption;
 
             boolean consoleWasOpen = LauncherConsole.instance.getFrame().isVisible();
@@ -140,8 +135,8 @@ public class InstanceRunner extends Thread {
             int exitCode = launcher.launch(classpath -> {
                     this.applyJarMods(version, classpath, versionsDir);
                 }, this.account, version, minecraftDir, minecraftDir,
-                this.instance.getMinimumMemoryInMegabytes(), this.instance.getMaximumMemoryInMegabytes(),
-                Arrays.asList(jvmFlags.split("\\s")), option == 3);
+                this.instance.getMinimumMemoryMegabytes(), this.instance.getMaximumMemoryMegabytes(),
+                this.instance.getCustomJvmFlags(), option == 3);
 
             switch (option) {
                 case 1:

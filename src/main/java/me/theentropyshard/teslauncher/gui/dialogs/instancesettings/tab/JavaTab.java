@@ -19,9 +19,9 @@
 package me.theentropyshard.teslauncher.gui.dialogs.instancesettings.tab;
 
 import com.formdev.flatlaf.FlatClientProperties;
-import me.theentropyshard.teslauncher.gui.utils.MessageBox;
 import me.theentropyshard.teslauncher.gui.utils.IntegerDocumentFilter;
-import me.theentropyshard.teslauncher.instance.Instance;
+import me.theentropyshard.teslauncher.gui.utils.MessageBox;
+import me.theentropyshard.teslauncher.instance.MinecraftInstance;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -30,6 +30,9 @@ import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 public class JavaTab extends SettingsTab {
     private final JTextField javaPathTextField;
@@ -37,7 +40,7 @@ public class JavaTab extends SettingsTab {
     private final JTextField maxMemoryField;
     private final JTextArea flagsArea;
 
-    public JavaTab(String name, Instance instance, JDialog dialog) {
+    public JavaTab(String name, MinecraftInstance instance, JDialog dialog) {
         super(name, instance, dialog);
 
         JPanel root = this.getRoot();
@@ -59,13 +62,21 @@ public class JavaTab extends SettingsTab {
         JLabel minMemoryLabel = new JLabel("Minimum memory (Megabytes):");
         JLabel maxMemoryLabel = new JLabel("Maximum memory (Megabytes):");
         this.minMemoryField = new JTextField();
-        this.minMemoryField.setText(String.valueOf(instance.getMinimumMemoryInMegabytes()));
+        int minimumMemoryMegabytes = instance.getMinimumMemoryMegabytes();
+        if (minimumMemoryMegabytes == 0) {
+            minimumMemoryMegabytes = 512;
+        }
+        this.minMemoryField.setText(String.valueOf(minimumMemoryMegabytes));
         this.minMemoryField.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "512");
         ((PlainDocument) this.minMemoryField.getDocument()).setDocumentFilter(new IntegerDocumentFilter((s) -> {
             MessageBox.showErrorMessage(JavaTab.this.getDialog(), "Not an integer: " + s);
         }));
         this.maxMemoryField = new JTextField();
-        this.maxMemoryField.setText(String.valueOf(instance.getMaximumMemoryInMegabytes()));
+        int maximumMemoryMegabytes = instance.getMaximumMemoryMegabytes();
+        if (maximumMemoryMegabytes == 0) {
+            maximumMemoryMegabytes = 2048;
+        }
+        this.maxMemoryField.setText(String.valueOf(maximumMemoryMegabytes));
         this.maxMemoryField.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "2048");
         ((PlainDocument) this.maxMemoryField.getDocument()).setDocumentFilter(new IntegerDocumentFilter((s) -> {
             MessageBox.showErrorMessage(JavaTab.this.getDialog(), "Not an integer: " + s);
@@ -90,9 +101,10 @@ public class JavaTab extends SettingsTab {
         this.flagsArea.setWrapStyleWord(true);
         this.flagsArea.setPreferredSize(new Dimension(0, 250));
         this.flagsArea.setMaximumSize(new Dimension(1000, 250));
-        String jvmFlags = instance.getJvmFlags();
-        if (jvmFlags != null && !jvmFlags.isEmpty()) {
-            this.flagsArea.setText(jvmFlags);
+
+        Set<String> customJvmFlags = instance.getCustomJvmFlags();
+        if (customJvmFlags != null && !customJvmFlags.isEmpty()) {
+            this.flagsArea.setText(String.join(" ", customJvmFlags));
         }
 
         JScrollPane scrollPane = new JScrollPane(
@@ -142,12 +154,12 @@ public class JavaTab extends SettingsTab {
 
     @Override
     public void save() throws IOException {
-        Instance instance = this.getInstance();
+        MinecraftInstance instance = this.getInstance();
 
         instance.setJavaPath(this.javaPathTextField.getText());
-        instance.setJvmFlags(this.flagsArea.getText());
-        instance.setMinimumMemoryInMegabytes(Integer.parseInt(this.minMemoryField.getText()));
-        instance.setMaximumMemoryInMegabytes(Integer.parseInt(this.maxMemoryField.getText()));
+        instance.setCustomJvmFlags(new LinkedHashSet<>(Arrays.asList(this.flagsArea.getText().split("\\s"))));
+        instance.setMinimumMemoryMegabytes(Integer.parseInt(this.minMemoryField.getText()));
+        instance.setMaximumMemoryMegabytes(Integer.parseInt(this.maxMemoryField.getText()));
 
         instance.save();
     }

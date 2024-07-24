@@ -25,7 +25,7 @@ import me.theentropyshard.teslauncher.gui.components.InstanceItem;
 import me.theentropyshard.teslauncher.gui.dialogs.SelectIconDialog;
 import me.theentropyshard.teslauncher.gui.dialogs.addinstance.AddInstanceDialog;
 import me.theentropyshard.teslauncher.gui.dialogs.instancesettings.InstanceSettingsDialog;
-import me.theentropyshard.teslauncher.instance.Instance;
+import me.theentropyshard.teslauncher.instance.MinecraftInstance;
 import me.theentropyshard.teslauncher.instance.InstanceManager;
 import me.theentropyshard.teslauncher.instance.InstanceRunner;
 import me.theentropyshard.teslauncher.gui.utils.MessageBox;
@@ -48,8 +48,6 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 public class PlayView extends JPanel {
-    
-
     public static final String DEFAULT_GROUP_NAME = "<default>";
 
     private final PlayViewHeader header;
@@ -105,12 +103,12 @@ public class PlayView extends JPanel {
 
         this.add(this.instanceInfoLabel, BorderLayout.SOUTH);
 
-        new SwingWorker<List<Instance>, Void>() {
+        new SwingWorker<List<MinecraftInstance>, Void>() {
             @Override
-            protected List<Instance> doInBackground() {
+            protected List<MinecraftInstance> doInBackground() {
                 InstanceManager instanceManager = TESLauncher.getInstance().getInstanceManager();
 
-                List<Instance> instances = instanceManager.getInstances();
+                List<MinecraftInstance> instances = instanceManager.getInstances();
                 instances.sort((instance1, instance2) -> {
                     LocalDateTime lastTimePlayed1 = instance1.getLastTimePlayed();
                     LocalDateTime lastTimePlayed2 = instance2.getLastTimePlayed();
@@ -123,12 +121,17 @@ public class PlayView extends JPanel {
             @Override
             protected void done() {
                 try {
-                    List<Instance> instances = this.get();
+                    List<MinecraftInstance> instances = this.get();
 
-                    for (Instance instance : instances) {
+                    for (MinecraftInstance instance : instances) {
                         Icon icon = SwingUtils.getIcon(instance.getIconPath());
                         InstanceItem item = new InstanceItem(icon, instance.getName());
-                        PlayView.this.addInstanceItem(item, instance.getGroupName());
+                        String group = instance.getGroup();
+                        if (group == null || group.isEmpty()) {
+                            instance.setGroup(PlayView.DEFAULT_GROUP_NAME);
+                            group = instance.getGroup();
+                        }
+                        PlayView.this.addInstanceItem(item, group);
                     }
 
                     String group = TESLauncher.getInstance().getSettings().lastInstanceGroup;
@@ -175,7 +178,7 @@ public class PlayView extends JPanel {
                     new InstanceRunner(accountManager.getCurrentAccount(), item).start();
                 }
             } else if (mouseButton == MouseEvent.BUTTON3) { // right mouse button
-                Instance instance = item.getAssociatedInstance();
+                MinecraftInstance instance = item.getAssociatedInstance();
 
                 JPopupMenu popupMenu = new JPopupMenu();
 
@@ -242,7 +245,7 @@ public class PlayView extends JPanel {
                 enter -> {
                     this.instanceInfoLabel.setVisible(true);
 
-                    Instance instance = item.getAssociatedInstance();
+                    MinecraftInstance instance = item.getAssociatedInstance();
 
                     if (instance == null) {
                         return;
@@ -282,7 +285,7 @@ public class PlayView extends JPanel {
     }
 
     public void deleteInstance(InstanceItem item) {
-        Instance instance = item.getAssociatedInstance();
+        MinecraftInstance instance = item.getAssociatedInstance();
 
         boolean ok = MessageBox.showConfirmMessage(
                 TESLauncher.frame,

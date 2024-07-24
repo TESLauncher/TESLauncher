@@ -20,6 +20,7 @@ package me.theentropyshard.teslauncher.minecraft.launch;
 
 import me.theentropyshard.teslauncher.BuildConfig;
 import me.theentropyshard.teslauncher.TESLauncher;
+import me.theentropyshard.teslauncher.logging.Log;
 import me.theentropyshard.teslauncher.minecraft.account.Account;
 import me.theentropyshard.teslauncher.minecraft.account.microsoft.MicrosoftAccount;
 import me.theentropyshard.teslauncher.minecraft.data.AssetIndex;
@@ -32,20 +33,16 @@ import me.theentropyshard.teslauncher.utils.OperatingSystem;
 import me.theentropyshard.teslauncher.utils.ProcessReader;
 import me.theentropyshard.teslauncher.utils.json.Json;
 import org.apache.commons.text.StringSubstitutor;
-import me.theentropyshard.teslauncher.logging.Log;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class MinecraftLauncher {
-    
+
 
     private final Path librariesDir;
     private final Path runtimesDir;
@@ -64,7 +61,7 @@ public class MinecraftLauncher {
     }
 
     public int launch(Consumer<List<String>> beforeLaunch, Account account, Version version,
-                      Path runDir, Path minecraftDir, long minMem, long maxMem, List<String> jvmFlags, boolean exitAfterLaunch) throws IOException {
+                      Path runDir, Path minecraftDir, long minMem, long maxMem, Set<String> jvmFlags, boolean exitAfterLaunch) throws IOException {
         this.classpath.clear();
 
         beforeLaunch.accept(this.classpath);
@@ -89,7 +86,7 @@ public class MinecraftLauncher {
     }
 
     private List<String> getArguments(Account account, Version version, Path tmpNativesDir, Path librariesDir, Path minecraftDir,
-                                      long minMemoryMegabytes, long maxMemoryMegabytes, List<String> jvmFlags
+                                      long minMemoryMegabytes, long maxMemoryMegabytes, Set<String> jvmFlags
     ) throws IOException {
         TESLauncher launcher = TESLauncher.getInstance();
         FileUtils.createDirectoryIfNotExists(minecraftDir);

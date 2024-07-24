@@ -19,7 +19,7 @@
 package me.theentropyshard.teslauncher.gui.components;
 
 import me.theentropyshard.teslauncher.TESLauncher;
-import me.theentropyshard.teslauncher.instance.Instance;
+import me.theentropyshard.teslauncher.instance.MinecraftInstance;
 import me.theentropyshard.teslauncher.instance.InstanceManager;
 import me.theentropyshard.teslauncher.minecraft.download.MinecraftDownloadListener;
 
@@ -134,7 +134,7 @@ public class InstanceItem extends JPanel implements MinecraftDownloadListener {
         }
     }
 
-    public Instance getAssociatedInstance() {
+    public MinecraftInstance getAssociatedInstance() {
         InstanceManager instanceManager = TESLauncher.getInstance().getInstanceManager();
         return instanceManager.getInstanceByName(this.getTextLabel().getText());
     }
@@ -212,7 +212,7 @@ public class InstanceItem extends JPanel implements MinecraftDownloadListener {
         this.arcColor = UIManager.getColor("AccountItem.borderColor");
     }
 
-    public void instanceChanged(Instance instance) {
+    public void instanceChanged(MinecraftInstance instance) {
         this.textLabel.setText(instance.getName());
     }
 

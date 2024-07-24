@@ -21,14 +21,14 @@ package me.theentropyshard.teslauncher.gui.dialogs;
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.gui.components.InstanceItem;
 import me.theentropyshard.teslauncher.gui.layouts.WrapLayout;
-import me.theentropyshard.teslauncher.instance.Instance;
+import me.theentropyshard.teslauncher.instance.MinecraftInstance;
 import me.theentropyshard.teslauncher.gui.utils.SwingUtils;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class SelectIconDialog extends AppDialog {
-    public SelectIconDialog(InstanceItem item, Instance instance) {
+    public SelectIconDialog(InstanceItem item, MinecraftInstance instance) {
         super(TESLauncher.frame, "Select an Icon - " + instance.getName());
 
         JPanel root = new JPanel(new WrapLayout(WrapLayout.LEFT, 8, 8));
