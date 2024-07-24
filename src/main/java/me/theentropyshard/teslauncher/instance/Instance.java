@@ -18,9 +18,19 @@
 
 package me.theentropyshard.teslauncher.instance;
 
+import me.theentropyshard.teslauncher.Settings;
+import me.theentropyshard.teslauncher.TESLauncher;
+import me.theentropyshard.teslauncher.utils.FileUtils;
+import me.theentropyshard.teslauncher.utils.json.Json;
+
+import java.io.IOException;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 
 public abstract class Instance {
+    private static final String FILE_NAME = "instance.json";
+
+    private transient Path workDir;
     private String name;
     private String group;
     private String iconPath = "/assets/icons/grass_icon.png";
@@ -32,9 +42,23 @@ public abstract class Instance {
 
     }
 
+    public void save() throws IOException {
+        Settings settings = TESLauncher.getInstance().getSettings();
+        String content = settings.writePrettyJson ? Json.writePretty(this) : Json.write(this);
+        FileUtils.writeUtf8(this.getWorkDir().resolve(Instance.FILE_NAME), content);
+    }
+
     public void updatePlaytime(long seconds) {
         this.lastPlaytime = seconds;
         this.totalPlaytime += seconds;
+    }
+
+    public Path getWorkDir() {
+        return this.workDir;
+    }
+
+    public void setWorkDir(Path workDir) {
+        this.workDir = workDir;
     }
 
     public String getName() {

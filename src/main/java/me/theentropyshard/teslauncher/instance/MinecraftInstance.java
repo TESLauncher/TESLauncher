@@ -18,23 +18,15 @@
 
 package me.theentropyshard.teslauncher.instance;
 
-import me.theentropyshard.teslauncher.Settings;
-import me.theentropyshard.teslauncher.TESLauncher;
-import me.theentropyshard.teslauncher.utils.FileUtils;
 import me.theentropyshard.teslauncher.utils.OperatingSystem;
-import me.theentropyshard.teslauncher.utils.json.Json;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MinecraftInstance extends JavaInstance {
-    private static final String INSTANCE_FILE_NAME = "instance.json";
     private static final String MINECRAFT_DIR_NAME = OperatingSystem.isMacOS() ? "minecraft" : ".minecraft";
     private static final String JARMODS_DIR_NAME = "jarmods";
-
-    private transient Path workDir;
 
     private String minecraftVersion;
     private int minecraftWindowWidth;
@@ -55,12 +47,6 @@ public class MinecraftInstance extends JavaInstance {
         this.jarMods = new ArrayList<>();
     }
 
-    public void save() throws IOException {
-        Settings settings = TESLauncher.getInstance().getSettings();
-        String content = settings.writePrettyJson ? Json.writePretty(this) : Json.write(this);
-        FileUtils.writeUtf8(this.getWorkDir().resolve(MinecraftInstance.INSTANCE_FILE_NAME), content);
-    }
-
     public boolean isRunning() {
         return this.running;
     }
@@ -69,20 +55,12 @@ public class MinecraftInstance extends JavaInstance {
         this.running = running;
     }
 
-    public Path getWorkDir() {
-        return this.workDir;
-    }
-
-    public void setWorkDir(Path workDir) {
-        this.workDir = workDir;
-    }
-
     public Path getMinecraftDir() {
-        return this.workDir.resolve(MinecraftInstance.MINECRAFT_DIR_NAME);
+        return this.getWorkDir().resolve(MinecraftInstance.MINECRAFT_DIR_NAME);
     }
 
     public Path getJarModsDir() {
-        return this.workDir.resolve(MinecraftInstance.JARMODS_DIR_NAME);
+        return this.getWorkDir().resolve(MinecraftInstance.JARMODS_DIR_NAME);
     }
 
     public List<JarMod> getJarMods() {
