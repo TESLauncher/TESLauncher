@@ -138,7 +138,7 @@ public class SettingsView extends JPanel {
         }
 
         {
-            JPanel otherSettings = new JPanel(new GridLayout(2, 2));
+            JPanel otherSettings = new JPanel(new GridLayout(3, 3));
             otherSettings.setBorder(new TitledBorder("Other"));
 
             JCheckBox prettyJson = new JCheckBox("Write pretty JSON files (useful for development/debugging)");
@@ -151,26 +151,43 @@ public class SettingsView extends JPanel {
 
             JLabel whenMinecraftLaunchesLabel = new JLabel("When Minecraft launches: ");
             otherSettings.add(whenMinecraftLaunchesLabel);
-            String[] options = {
+            String[] whenLaunchesOptions = {
                 "Do nothing",
                 "Hide launcher",
                 "Hide launcher and console",
                 "Exit launcher (Time spent on instance won't be counted)"
             };
-            JComboBox<String> behavior = new JComboBox<>(options);
-            behavior.addItemListener(e -> {
+            JComboBox<String> whenLaunchesBehavior = new JComboBox<>(whenLaunchesOptions);
+            whenLaunchesBehavior.addItemListener(e -> {
                 if (e.getStateChange() != ItemEvent.SELECTED) {
                     return;
                 }
 
-                TESLauncher.getInstance().getSettings().whenMCLaunchesOption = behavior.getSelectedIndex();
+                TESLauncher.getInstance().getSettings().whenMCLaunchesOption = whenLaunchesBehavior.getSelectedIndex();
             });
-            int index = TESLauncher.getInstance().getSettings().whenMCLaunchesOption;
-            if (index < 0 || index >= options.length) {
-                index = 0;
+            int whenLaunchesIndex = TESLauncher.getInstance().getSettings().whenMCLaunchesOption;
+            if (whenLaunchesIndex < 0 || whenLaunchesIndex >= whenLaunchesOptions.length) {
+                whenLaunchesIndex = 0;
             }
-            behavior.setSelectedIndex(index);
-            otherSettings.add(behavior);
+            whenLaunchesBehavior.setSelectedIndex(whenLaunchesIndex);
+            otherSettings.add(whenLaunchesBehavior);
+
+            JLabel whenMinecraftExits = new JLabel("When Minecraft exits: ");
+            otherSettings.add(whenMinecraftExits);
+            String[] whenExitsOptions = {
+                "Do nothing",
+                "Exit launcher if Minecraft exit code is 0 (ok)"
+            };
+            JComboBox<String> whenExitsBehavior = new JComboBox<>(whenExitsOptions);
+            whenExitsBehavior.addItemListener(e -> {
+                TESLauncher.getInstance().getSettings().whenMCExitsOption = whenExitsBehavior.getSelectedIndex();
+            });
+            int whenExitsIndex = TESLauncher.getInstance().getSettings().whenMCExitsOption;
+            if (whenExitsIndex < 0 || whenExitsIndex >= whenExitsOptions.length) {
+                whenExitsIndex = 0;
+            }
+            whenExitsBehavior.setSelectedIndex(whenExitsIndex);
+            otherSettings.add(whenExitsBehavior);
 
             gbc.gridy++;
             gbc.weighty = 1;

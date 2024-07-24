@@ -80,6 +80,7 @@ public class InstanceRunner extends Thread {
     public void run() {
         boolean useDialog = TESLauncher.getInstance().getSettings().useDownloadDialog;
 
+        int exitCode = 0;
         String minecraftVersion = this.instance.getMinecraftVersion();
         try {
             try {
@@ -132,22 +133,26 @@ public class InstanceRunner extends Thread {
                     break;
             }
 
-            int exitCode = launcher.launch(classpath -> {
+            exitCode = launcher.launch(classpath -> {
                     this.applyJarMods(version, classpath, versionsDir);
                 }, this.account, version, minecraftDir, minecraftDir,
                 this.instance.getMinimumMemoryMegabytes(), this.instance.getMaximumMemoryMegabytes(),
                 this.instance.getCustomJvmFlags(), option == 3);
 
-            switch (option) {
-                case 1:
-                    TESLauncher.frame.setVisible(true);
-                    break;
-                case 2:
-                    if (consoleWasOpen) {
-                        LauncherConsole.instance.setVisible(true);
-                    }
-                    TESLauncher.frame.setVisible(true);
-                    break;
+            int exitsOption = TESLauncher.getInstance().getSettings().whenMCExitsOption;
+
+            if (exitsOption == 0) {
+                switch (option) {
+                    case 1:
+                        TESLauncher.frame.setVisible(true);
+                        break;
+                    case 2:
+                        if (consoleWasOpen) {
+                            LauncherConsole.instance.setVisible(true);
+                        }
+                        TESLauncher.frame.setVisible(true);
+                        break;
+                }
             }
 
             long end = System.currentTimeMillis();
@@ -162,6 +167,10 @@ public class InstanceRunner extends Thread {
 
             this.instance.updatePlaytime(seconds);
             this.instance.save();
+
+            if (exitCode == 0 && exitsOption == 1) {
+                TESLauncher.getInstance().shutdown();
+            }
         } catch (Exception e) {
             Log.stackTrace("Exception occurred while trying to start Minecraft " + minecraftVersion, e);
         } finally {

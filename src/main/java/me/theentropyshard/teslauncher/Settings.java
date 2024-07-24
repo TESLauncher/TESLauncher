@@ -40,6 +40,7 @@ public class Settings {
     public boolean writePrettyJson = false;
     public boolean showAmountOfTime = false;
     public int whenMCLaunchesOption = 0;
+    public int whenMCExitsOption = 0;
 
     public Settings() {
 
