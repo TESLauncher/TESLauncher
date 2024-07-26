@@ -18,11 +18,18 @@
 
 package me.theentropyshard.teslauncher.instance;
 
+import me.theentropyshard.teslauncher.utils.FileUtils;
+import me.theentropyshard.teslauncher.utils.ListUtils;
 import me.theentropyshard.teslauncher.utils.OperatingSystem;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class MinecraftInstance extends JavaInstance {
     private static final String MINECRAFT_DIR_NAME = OperatingSystem.isMacOS() ? "minecraft" : ".minecraft";
@@ -45,6 +52,32 @@ public class MinecraftInstance extends JavaInstance {
         this.minecraftVersion = minecraftVersion;
 
         this.jarMods = new ArrayList<>();
+    }
+
+    public JarMod addJarMod(Path file) throws IOException {
+        UUID uuid = UUID.randomUUID();
+
+        Path fullPath = Files.copy(file, this.getJarModsDir().resolve(uuid + ".jar"), StandardCopyOption.REPLACE_EXISTING);
+
+        JarMod jarMod = new JarMod(
+            true, fullPath.toString(), uuid, file.getFileName().toString()
+        );
+
+        this.jarMods.add(jarMod);
+
+        return jarMod;
+    }
+
+    public void removeJarMod(String id) throws IOException {
+        JarMod jarMod = ListUtils.search(this.jarMods, mod -> mod.getUuid().toString().equals(id));
+
+        if (jarMod == null) {
+            return;
+        }
+
+        this.jarMods.remove(jarMod);
+
+        FileUtils.delete(Paths.get(jarMod.getFullPath()));
     }
 
     public boolean isRunning() {

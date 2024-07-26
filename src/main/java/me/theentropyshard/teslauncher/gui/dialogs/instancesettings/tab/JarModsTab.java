@@ -20,8 +20,9 @@ package me.theentropyshard.teslauncher.gui.dialogs.instancesettings.tab;
 
 import me.theentropyshard.teslauncher.Settings;
 import me.theentropyshard.teslauncher.TESLauncher;
-import me.theentropyshard.teslauncher.instance.MinecraftInstance;
 import me.theentropyshard.teslauncher.instance.JarMod;
+import me.theentropyshard.teslauncher.instance.MinecraftInstance;
+import me.theentropyshard.teslauncher.logging.Log;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -33,6 +34,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
 public class JarModsTab extends SettingsTab {
     private final JarModsTableModel jarModsTableModel;
@@ -50,9 +52,9 @@ public class JarModsTab extends SettingsTab {
         this.jarModsTableModel = new JarModsTableModel(instance);
 
         addJarMod.addActionListener(e -> {
-            new SwingWorker<Void, Void>() {
+            new SwingWorker<JarMod, Void>() {
                 @Override
-                protected Void doInBackground() throws Exception {
+                protected JarMod doInBackground() throws Exception {
                     UIManager.put("FileChooser.readOnly", Boolean.TRUE);
                     JFileChooser fileChooser = new JFileChooser();
                     fileChooser.setFileFilter(new FileNameExtensionFilter("Archives (*.zip, *.jar)", "zip", "jar"));
@@ -71,23 +73,30 @@ public class JarModsTab extends SettingsTab {
 
                         settings.lastDir = fileChooser.getCurrentDirectory().getAbsolutePath();
 
-                        List<JarMod> jarMods = instance.getJarMods();
+                        JarMod jarMod;
+                        try {
+                            jarMod = instance.addJarMod(selectedFile.toPath());
+                        } catch (IOException ex) {
+                            Log.error(ex);
+                            return null;
+                        }
 
-                        Path jarModPath = selectedFile.toPath().toAbsolutePath().normalize();
-
-                        JarMod jarMod = new JarMod(
-                                true,
-                                jarModPath.toString(),
-                                UUID.randomUUID(),
-                                jarModPath.getFileName().toString()
-                        );
-                        jarMods.add(jarMod);
-
-                        JarModsTab.this.jarModsTableModel.add(jarMod);
+                        return jarMod;
                     }
 
                     UIManager.put("FileChooser.readOnly", Boolean.FALSE);
                     return null;
+                }
+
+                @Override
+                protected void done() {
+                    JarMod jarMod = null;
+                    try {
+                        jarMod = this.get();
+                    } catch (InterruptedException | ExecutionException ex) {
+                        Log.error(ex);
+                    }
+                    JarModsTab.this.jarModsTableModel.add(jarMod);
                 }
             }.execute();
         });
@@ -118,10 +127,25 @@ public class JarModsTab extends SettingsTab {
             if (selectedRow == -1) {
                 return;
             }
-
             JarMod jarMod = this.jarModsTableModel.jarModAt(selectedRow);
-            this.jarModsTableModel.removeRow(selectedRow);
-            instance.getJarMods().remove(jarMod);
+
+            new SwingWorker<Void, Void>() {
+                @Override
+                protected Void doInBackground() throws Exception {
+                    try {
+                        instance.removeJarMod(jarMod.getUuid().toString());
+                    } catch (IOException e) {
+                        Log.error(e);
+                    }
+
+                    return null;
+                }
+
+                @Override
+                protected void done() {
+                    JarModsTab.this.jarModsTableModel.removeRow(selectedRow);
+                }
+            }.execute();
         });
 
         root.add(this.deleteModButton, BorderLayout.SOUTH);
