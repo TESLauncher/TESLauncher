@@ -32,13 +32,18 @@ public final class Log {
     private static final Pattern LOG4J_LEVEL_REGEX = Pattern.compile("<log4j:Event.*?level=\"(.*?)\".*?>");
     private static final Pattern LOG4J_MESSAGE_REGEX = Pattern.compile("<log4j:Message><!\\[CDATA\\[(.*?)]]></log4j:Message>");
 
+    private static final boolean WRAP_ERR = true;
+
     public static void start() {
         new LogRunnable(Log.EVENT_QUEUE).start();
 
-        //System.setOut(new SystemOutInterceptor(System.out, LogLevel.DEBUG));
-        System.setErr(new SystemOutInterceptor(System.err, LogLevel.ERROR));
+        System.setOut(new SystemOutInterceptor(System.out, LogLevel.DEBUG));
 
-        //Log.info("Initialized logging");
+        if (Log.WRAP_ERR) {
+            System.setErr(new SystemOutInterceptor(System.err, LogLevel.ERROR));
+        }
+
+        Log.info("Initialized logging");
     }
 
     public static void info(String message) {
@@ -63,11 +68,13 @@ public final class Log {
     }
 
     public static void error(Throwable t) {
-        t.printStackTrace();
-
-        CharArrayWriter writer = new CharArrayWriter();
-        t.printStackTrace(new PrintWriter(writer));
-        Log.error(writer.toString());
+        if (Log.WRAP_ERR) {
+            t.printStackTrace();
+        } else {
+            CharArrayWriter writer = new CharArrayWriter();
+            t.printStackTrace(new PrintWriter(writer));
+            Log.error(writer.toString());
+        }
     }
 
     public static void minecraftLog4j(String string) {
