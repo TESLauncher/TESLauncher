@@ -110,7 +110,7 @@ public class MicrosoftAccountCreationView extends JPanel {
                         try {
                             profile = authenticator.authenticate();
                         } catch (AuthException e) {
-                            Log.stackTrace("Could not authenticate", e);
+                            Log.error("Could not authenticate", e);
                             MessageBox.showErrorMessage(TESLauncher.frame, e.getMessage());
                         }
 

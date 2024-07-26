@@ -30,7 +30,7 @@ public class Main {
         try {
             new TESLauncher(args, args.getWorkDir());
         } catch (Throwable t) {
-            Log.stackTrace("Unable to start the launcher", t);
+            Log.error("Unable to start the launcher", t);
 
             System.exit(1);
         }

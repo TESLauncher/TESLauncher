@@ -57,12 +57,12 @@ public final class Log {
         Log.EVENT_QUEUE.offer(new LogEvent(LogLevel.DEBUG, message));
     }
 
-    public static void stackTrace(String message, Throwable t) {
+    public static void error(String message, Throwable t) {
         Log.error(message);
-        Log.stackTrace(t);
+        Log.error(t);
     }
 
-    public static void stackTrace(Throwable t) {
+    public static void error(Throwable t) {
         t.printStackTrace();
 
         CharArrayWriter writer = new CharArrayWriter();

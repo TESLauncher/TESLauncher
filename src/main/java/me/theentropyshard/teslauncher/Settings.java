@@ -54,7 +54,7 @@ public class Settings {
         try {
             return Json.parse(FileUtils.readUtf8(file), Settings.class);
         } catch (IOException e) {
-            Log.stackTrace("Could not load settings from" + file + ", using defaults", e);
+            Log.error("Could not load settings from" + file + ", using defaults", e);
         }
 
         return new Settings();
@@ -64,7 +64,7 @@ public class Settings {
         try {
             FileUtils.writeUtf8(file, this.writePrettyJson ? Json.writePretty(this) : Json.write(this));
         } catch (IOException e) {
-            Log.stackTrace("Could not save settings to " + file, e);
+            Log.error("Could not save settings to " + file, e);
         }
     }
 }

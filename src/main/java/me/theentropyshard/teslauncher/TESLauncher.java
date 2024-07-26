@@ -106,14 +106,14 @@ public class TESLauncher {
         try {
             this.accountManager.load();
         } catch (IOException e) {
-            Log.stackTrace("Unable to load accounts", e);
+            Log.error("Unable to load accounts", e);
         }
 
         this.instanceManager = new InstanceManager(this.instancesDir);
         try {
             this.instanceManager.load();
         } catch (IOException e) {
-            Log.stackTrace("Unable to load instances", e);
+            Log.error("Unable to load instances", e);
         }
 
         this.taskPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
@@ -134,7 +134,7 @@ public class TESLauncher {
             FileUtils.createDirectoryIfNotExists(this.versionsDir);
             FileUtils.createDirectoryIfNotExists(this.log4jConfigsDir);
         } catch (IOException e) {
-            Log.stackTrace("Unable to create launcher directories", e);
+            Log.error("Unable to create launcher directories", e);
         }
     }
 
@@ -154,14 +154,14 @@ public class TESLauncher {
         try {
             this.accountManager.save();
         } catch (IOException e) {
-            Log.stackTrace("Exception while saving accounts", e);
+            Log.error("Exception while saving accounts", e);
         }
 
         this.instanceManager.getInstances().forEach(instance -> {
             try {
                 instance.save();
             } catch (IOException e) {
-                Log.stackTrace("Exception while saving instance '" + instance + "'", e);
+                Log.error("Exception while saving instance '" + instance + "'", e);
             }
         });
 

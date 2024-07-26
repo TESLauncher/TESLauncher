@@ -43,9 +43,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
 public class InstanceRunner extends Thread {
     
@@ -88,7 +86,7 @@ public class InstanceRunner extends Thread {
             } catch (AuthException e) {
                 this.instance.setRunning(false);
                 this.item.setEnabled(true);
-                Log.stackTrace("Could not authenticate", e);
+                Log.error("Could not authenticate", e);
                 MessageBox.showErrorMessage(TESLauncher.frame, e.getMessage());
             }
 
@@ -172,7 +170,7 @@ public class InstanceRunner extends Thread {
                 TESLauncher.getInstance().shutdown();
             }
         } catch (Exception e) {
-            Log.stackTrace("Exception occurred while trying to start Minecraft " + minecraftVersion, e);
+            Log.error("Exception occurred while trying to start Minecraft " + minecraftVersion, e);
         } finally {
             this.instance.setRunning(false);
             this.item.setEnabled(true);
@@ -220,7 +218,7 @@ public class InstanceRunner extends Thread {
         try {
             FileUtils.delete(this.tempClientCopy);
         } catch (IOException e) {
-            Log.stackTrace("Unable to delete temporary copy of the client '" + this.tempClientCopy + "'", e);
+            Log.error("Unable to delete temporary copy of the client '" + this.tempClientCopy + "'", e);
         }
     }
 
@@ -278,7 +276,7 @@ public class InstanceRunner extends Thread {
 
                 classpath.add(this.tempClientCopy.toString());
             } catch (IOException e) {
-                Log.stackTrace("Cannot apply jar mods", e);
+                Log.error("Cannot apply jar mods", e);
             }
         }
     }

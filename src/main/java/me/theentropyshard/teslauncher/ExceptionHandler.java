@@ -27,6 +27,6 @@ public class ExceptionHandler implements Thread.UncaughtExceptionHandler {
 
     @Override
     public void uncaughtException(Thread t, Throwable e) {
-        Log.stackTrace("Uncaught exception in thread [" + t + "]", e);
+        Log.error("Uncaught exception in thread [" + t + "]", e);
     }
 }

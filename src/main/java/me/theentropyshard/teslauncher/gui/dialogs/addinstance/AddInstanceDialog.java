@@ -249,7 +249,7 @@ public class AddInstanceDialog extends AppDialog {
 
                     Log.warn(ex.toString());
                 } catch (IOException ex) {
-                    Log.stackTrace("Unable to create new instance", ex);
+                    Log.error("Unable to create new instance", ex);
                 }
             });
         });

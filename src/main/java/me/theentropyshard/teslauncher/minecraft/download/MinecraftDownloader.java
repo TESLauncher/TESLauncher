@@ -190,7 +190,7 @@ public class MinecraftDownloader {
                 try {
                     return MinecraftDownloader.fetchAndSaveVersionManifest(manifestFile);
                 } catch (IOException e) {
-                    Log.stackTrace("Could not fetch and save version manifest to " + manifestFile, e);
+                    Log.error("Could not fetch and save version manifest to " + manifestFile, e);
 
                     return manifest;
                 }
@@ -512,7 +512,7 @@ public class MinecraftDownloader {
                 try {
                     return MinecraftDownloader.fetchAndSaveAllRuntimes(runtimesFile);
                 } catch (IOException e) {
-                    Log.stackTrace("Could not fetch and save all runtimes to " + runtimesFile, e);
+                    Log.error("Could not fetch and save all runtimes to " + runtimesFile, e);
 
                     return jsonObject;
                 }

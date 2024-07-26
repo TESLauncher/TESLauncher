@@ -70,7 +70,7 @@ public class LoadVersionsWorker extends SwingWorker<VersionManifest, Void> {
         try {
             versionManifest = this.get();
         } catch (InterruptedException | ExecutionException e) {
-            Log.stackTrace("Unexpected error", e);
+            Log.error("Unexpected error", e);
 
             return;
         }

@@ -298,7 +298,7 @@ public class PlayView extends JPanel {
             try {
                 instanceManager.removeInstance(instance.getName());
             } catch (IOException ex) {
-                Log.stackTrace("Could not remove instance instance " + instance.getWorkDir(), ex);
+                Log.error("Could not remove instance instance " + instance.getWorkDir(), ex);
 
                 return;
             }

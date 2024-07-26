@@ -98,7 +98,7 @@ public class DownloadList {
                 try {
                     download.execute();
                 } catch (IOException e) {
-                    Log.stackTrace("Download failed", e);
+                    Log.error("Download failed", e);
                 }
             };
 

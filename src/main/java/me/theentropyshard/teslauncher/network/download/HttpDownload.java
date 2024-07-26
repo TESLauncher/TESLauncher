@@ -27,7 +27,6 @@ import me.theentropyshard.teslauncher.logging.Log;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
@@ -164,7 +163,7 @@ public class HttpDownload {
             try {
                 return Files.size(this.saveAs);
             } catch (IOException e) {
-                Log.stackTrace("Could not get file size of " + this.saveAs, e);
+                Log.error("Could not get file size of " + this.saveAs, e);
             }
         }
 
