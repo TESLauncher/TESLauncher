@@ -21,7 +21,7 @@ package me.theentropyshard.teslauncher.gui.dialogs.instancesettings.tab;
 import com.formdev.flatlaf.FlatClientProperties;
 import me.theentropyshard.teslauncher.gui.utils.IntegerDocumentFilter;
 import me.theentropyshard.teslauncher.gui.utils.MessageBox;
-import me.theentropyshard.teslauncher.instance.MinecraftInstance;
+import me.theentropyshard.teslauncher.minecraft.MinecraftInstance;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;

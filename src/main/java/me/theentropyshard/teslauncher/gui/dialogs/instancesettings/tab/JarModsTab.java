@@ -21,7 +21,7 @@ package me.theentropyshard.teslauncher.gui.dialogs.instancesettings.tab;
 import me.theentropyshard.teslauncher.Settings;
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.instance.JarMod;
-import me.theentropyshard.teslauncher.instance.MinecraftInstance;
+import me.theentropyshard.teslauncher.minecraft.MinecraftInstance;
 import me.theentropyshard.teslauncher.logging.Log;
 
 import javax.swing.*;
@@ -31,9 +31,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 public class JarModsTab extends SettingsTab {

@@ -25,7 +25,7 @@ import me.theentropyshard.teslauncher.gui.components.InstanceItem;
 import me.theentropyshard.teslauncher.gui.dialogs.SelectIconDialog;
 import me.theentropyshard.teslauncher.gui.dialogs.addinstance.AddInstanceDialog;
 import me.theentropyshard.teslauncher.gui.dialogs.instancesettings.InstanceSettingsDialog;
-import me.theentropyshard.teslauncher.instance.MinecraftInstance;
+import me.theentropyshard.teslauncher.minecraft.MinecraftInstance;
 import me.theentropyshard.teslauncher.instance.InstanceManager;
 import me.theentropyshard.teslauncher.instance.InstanceRunner;
 import me.theentropyshard.teslauncher.gui.utils.MessageBox;

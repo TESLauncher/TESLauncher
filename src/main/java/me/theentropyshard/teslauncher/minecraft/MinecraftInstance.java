@@ -16,8 +16,10 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.instance;
+package me.theentropyshard.teslauncher.minecraft;
 
+import me.theentropyshard.teslauncher.instance.JarMod;
+import me.theentropyshard.teslauncher.instance.JavaInstance;
 import me.theentropyshard.teslauncher.utils.FileUtils;
 import me.theentropyshard.teslauncher.utils.ListUtils;
 import me.theentropyshard.teslauncher.utils.OperatingSystem;

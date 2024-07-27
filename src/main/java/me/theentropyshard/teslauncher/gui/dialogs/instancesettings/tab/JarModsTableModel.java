@@ -18,7 +18,7 @@
 
 package me.theentropyshard.teslauncher.gui.dialogs.instancesettings.tab;
 
-import me.theentropyshard.teslauncher.instance.MinecraftInstance;
+import me.theentropyshard.teslauncher.minecraft.MinecraftInstance;
 import me.theentropyshard.teslauncher.instance.JarMod;
 
 import javax.swing.table.AbstractTableModel;

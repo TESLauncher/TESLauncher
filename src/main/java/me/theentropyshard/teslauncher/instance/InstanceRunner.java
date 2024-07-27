@@ -23,6 +23,7 @@ import me.theentropyshard.teslauncher.gui.LauncherConsole;
 import me.theentropyshard.teslauncher.gui.components.InstanceItem;
 import me.theentropyshard.teslauncher.gui.dialogs.MinecraftDownloadDialog;
 import me.theentropyshard.teslauncher.gui.utils.MessageBox;
+import me.theentropyshard.teslauncher.minecraft.MinecraftInstance;
 import me.theentropyshard.teslauncher.minecraft.account.Account;
 import me.theentropyshard.teslauncher.minecraft.auth.microsoft.AuthException;
 import me.theentropyshard.teslauncher.minecraft.data.Version;
