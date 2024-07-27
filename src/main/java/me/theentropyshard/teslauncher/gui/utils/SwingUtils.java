@@ -61,12 +61,7 @@ public final class SwingUtils {
     }
 
     public static Icon loadIconFromBase64(String base64) {
-        if (base64 == null) {
-            return null;
-        }
-
-        byte[] decoded = Base64.getMimeDecoder().decode(base64);
-        return new ImageIcon(decoded);
+        return new ImageIcon(SwingUtils.loadImageFromBase64(base64));
     }
 
     public static BufferedImage getImage(String path) {
