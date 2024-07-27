@@ -20,6 +20,7 @@ package me.theentropyshard.teslauncher.minecraft.download;
 
 import com.google.gson.JsonObject;
 import me.theentropyshard.teslauncher.TESLauncher;
+import me.theentropyshard.teslauncher.logging.Log;
 import me.theentropyshard.teslauncher.minecraft.ApiUrls;
 import me.theentropyshard.teslauncher.minecraft.data.*;
 import me.theentropyshard.teslauncher.network.HttpRequest;
@@ -34,7 +35,6 @@ import me.theentropyshard.teslauncher.utils.json.Json;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.model.FileHeader;
 import okhttp3.OkHttpClient;
-import me.theentropyshard.teslauncher.logging.Log;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -50,8 +50,6 @@ import java.util.List;
 import java.util.Map;
 
 public class MinecraftDownloader {
-    
-
     private static final Duration MANIFEST_UPDATE_INTERVAL = Duration.ofHours(12);
 
     private final Path versionsDir;
