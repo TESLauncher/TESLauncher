@@ -24,6 +24,7 @@ import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Base64;
@@ -43,6 +44,20 @@ public final class SwingUtils {
         SwingUtils.ICON_CACHE.put(path, icon);
 
         return icon;
+    }
+
+    public static BufferedImage loadImageFromBase64(String base64) {
+        if (base64 == null) {
+            return null;
+        }
+
+        byte[] decoded = Base64.getMimeDecoder().decode(base64);
+
+        try {
+            return ImageIO.read(new ByteArrayInputStream(decoded));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static Icon loadIconFromBase64(String base64) {
