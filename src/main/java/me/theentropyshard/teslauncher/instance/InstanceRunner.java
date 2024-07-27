@@ -79,7 +79,7 @@ public class InstanceRunner extends Thread {
     public void run() {
         boolean useDialog = TESLauncher.getInstance().getSettings().useDownloadDialog;
 
-        int exitCode = 0;
+        int exitCode;
         String minecraftVersion = this.instance.getMinecraftVersion();
         try {
             try {
