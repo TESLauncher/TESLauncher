@@ -197,7 +197,7 @@ public class InstanceRunner extends Thread {
                 nativesDir,
                 runtimesDir,
                 minecraftDir.resolve("resources"),
-                new MinecraftDownloadDialog(),
+                new MinecraftDownloadDialog(this.instance.getMinecraftVersion()),
                 downloadJava
             );
         } else {
