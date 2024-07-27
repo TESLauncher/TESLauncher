@@ -19,10 +19,13 @@
 package me.theentropyshard.teslauncher.gui.view.playview;
 
 import me.theentropyshard.teslauncher.TESLauncher;
+import me.theentropyshard.teslauncher.gui.utils.SwingUtils;
 import me.theentropyshard.teslauncher.minecraft.account.Account;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 
 public class PlayViewHeader extends JPanel {
     private final JComboBox<String> instanceGroups;
@@ -58,6 +61,8 @@ public class PlayViewHeader extends JPanel {
 
     public void setCurrentAccount(Account account) {
         if (account != null) {
+            BufferedImage image = SwingUtils.loadImageFromBase64(account.getHeadIcon());
+            this.account.setIcon(new ImageIcon(image.getScaledInstance(16, 16, BufferedImage.SCALE_FAST)));
             this.account.setText(account.getUsername());
         } else {
             this.account.setText("No account selected");
