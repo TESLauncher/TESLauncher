@@ -30,6 +30,14 @@ import java.util.Collections;
 
 public class MicrosoftAuthenticator {
     private static final String CLIENT_ID = "394fd08d-cb75-4f21-9807-ae14babcb4c0";
+    private static final String XBOX_LIVE_SCOPES = "XboxLive.signin offline_access";
+    private static final String DEVICE_CODE_URL = "https://login.microsoftonline.com/%s/oauth2/v2.0/devicecode";
+    private static final String OAUTH_URL = "https://login.microsoftonline.com/consumers/oauth2/v2.0/token";
+    private static final String XBOX_LIVE_AUTH_URL = "https://user.auth.xboxlive.com/user/authenticate";
+    private static final String XSTS_AUTH_URL = "https://xsts.auth.xboxlive.com/xsts/authorize";
+    private static final String MINECRAFT_AUTH_URL = "https://api.minecraftservices.com/authentication/login_with_xbox";
+    private static final String OWNERSHIP_CHECK_URL = "https://api.minecraftservices.com/entitlements/mcstore";
+    private static final String MINECRAFT_PROFILE_URL = "https://api.minecraftservices.com/minecraft/profile";
 
     private final OkHttpClient httpClient;
     private String refreshToken;
@@ -47,7 +55,7 @@ public class MicrosoftAuthenticator {
     // DO NOT USE MY APPLICATION (CLIENT) ID!!! YOU MUST CREATE YOUR OWN APPLICATION!!!
 
     public MinecraftProfile authenticate() throws IOException, AuthException {
-        DeviceCodeResponse deviceCodeResponse = this.getDeviceCode("consumers", MicrosoftAuthenticator.CLIENT_ID, "XboxLive.signin offline_access");
+        DeviceCodeResponse deviceCodeResponse = this.getDeviceCode("consumers", MicrosoftAuthenticator.CLIENT_ID, MicrosoftAuthenticator.XBOX_LIVE_SCOPES);
         this.listener.onUserCodeReceived(deviceCodeResponse.userCode, deviceCodeResponse.verificationUri);
 
         OAuthCodeResponse microsoftOAuthCode;
@@ -73,7 +81,7 @@ public class MicrosoftAuthenticator {
     }
 
     private DeviceCodeResponse getDeviceCode(String tenant, String clientId, String scope) throws IOException {
-        String url = String.format("https://login.microsoftonline.com/%s/oauth2/v2.0/devicecode", tenant);
+        String url = String.format(MicrosoftAuthenticator.DEVICE_CODE_URL, tenant);
 
         RequestBody requestBody = new FormBody(
                 Arrays.asList(
@@ -94,7 +102,7 @@ public class MicrosoftAuthenticator {
     }
 
     private OAuthCodeResponse getMicrosoftOAuthCode(DeviceCodeResponse deviceCodeResponse) throws IOException, AuthException {
-        String url = "https://login.microsoftonline.com/consumers/oauth2/v2.0/token";
+        String url = MicrosoftAuthenticator.OAUTH_URL;
 
         String token = this.refresh ? this.refreshToken : deviceCodeResponse.deviceCode;
 
@@ -157,7 +165,7 @@ public class MicrosoftAuthenticator {
     }
 
     private XboxLiveAuthResponse authenticateWithXboxLive(OAuthCodeResponse oAuthCodeResponse) throws IOException {
-        String url = "https://user.auth.xboxlive.com/user/authenticate";
+        String url = MicrosoftAuthenticator.XBOX_LIVE_AUTH_URL;
 
         XboxLiveAuthRequest authRequest = new XboxLiveAuthRequest();
         XboxAuthProperties properties = new XboxAuthProperties();
@@ -178,7 +186,7 @@ public class MicrosoftAuthenticator {
     }
 
     private XSTSAuthResponse obtainXSTSToken(XboxLiveAuthResponse authResponse) throws IOException, AuthException {
-        String url = "https://xsts.auth.xboxlive.com/xsts/authorize";
+        String url = MicrosoftAuthenticator.XSTS_AUTH_URL;
 
         XSTSTokenRequest tokenRequest = new XSTSTokenRequest();
         XSTSProperties properties = new XSTSProperties();
@@ -211,7 +219,7 @@ public class MicrosoftAuthenticator {
     private MinecraftAuthResponse authenticateWithMinecraft(XSTSAuthResponse authResponse) throws IOException {
         this.listener.onMinecraftAuth();
 
-        String url = "https://api.minecraftservices.com/authentication/login_with_xbox";
+        String url = MicrosoftAuthenticator.MINECRAFT_AUTH_URL;
 
         String payload = String.format("{\"identityToken\": \"XBL3.0 x=%s;%s\"}", authResponse.displayClaims.xui.get(0).uhs, authResponse.token);
         RequestBody requestBody = RequestBody.create(payload, MediaType.parse("application/json"));
@@ -226,7 +234,7 @@ public class MicrosoftAuthenticator {
     private boolean checkGameOwnership(MinecraftAuthResponse mcResponse) throws IOException {
         this.listener.onCheckGameOwnership();
 
-        String url = "https://api.minecraftservices.com/entitlements/mcstore";
+        String url = MicrosoftAuthenticator.OWNERSHIP_CHECK_URL;
 
         try (HttpRequest request = new HttpRequest(this.httpClient)) {
             String json = request.asString(url, Headers.of("Authorization", "Bearer " + mcResponse.accessToken));
@@ -237,7 +245,7 @@ public class MicrosoftAuthenticator {
     }
 
     private MinecraftProfile getProfile(MinecraftAuthResponse mcResponse) throws IOException {
-        String url = "https://api.minecraftservices.com/minecraft/profile";
+        String url = MicrosoftAuthenticator.MINECRAFT_PROFILE_URL;
 
         try (HttpRequest request = new HttpRequest(this.httpClient)) {
             String json = request.asString(url, Headers.of("Authorization", "Bearer " + mcResponse.accessToken));
