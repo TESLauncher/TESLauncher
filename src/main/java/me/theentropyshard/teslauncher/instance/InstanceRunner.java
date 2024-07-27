@@ -121,8 +121,6 @@ public class InstanceRunner extends Thread {
             this.instance.setLastTimePlayed(LocalDateTime.now());
             this.instance.save();
 
-            long start = System.currentTimeMillis();
-
             int option = TESLauncher.getInstance().getSettings().whenMCLaunchesOption;
 
             boolean consoleWasOpen = LauncherConsole.instance.getFrame().isVisible();
@@ -137,11 +135,15 @@ public class InstanceRunner extends Thread {
                     break;
             }
 
+            long start = System.currentTimeMillis();
+
             exitCode = launcher.launch(classpath -> {
                     this.applyJarMods(version, classpath, versionsDir);
                 }, this.account, version, minecraftDir, minecraftDir,
                 this.instance.getMinimumMemoryMegabytes(), this.instance.getMaximumMemoryMegabytes(),
                 this.instance.getCustomJvmFlags(), option == 3);
+
+            long end = System.currentTimeMillis();
 
             int exitsOption = TESLauncher.getInstance().getSettings().whenMCExitsOption;
 
@@ -158,8 +160,6 @@ public class InstanceRunner extends Thread {
                         break;
                 }
             }
-
-            long end = System.currentTimeMillis();
 
             Log.info("Minecraft process finished with exit code " + exitCode);
 
