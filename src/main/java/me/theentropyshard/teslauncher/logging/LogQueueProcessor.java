@@ -23,12 +23,12 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.concurrent.BlockingQueue;
 
-public final class LogRunnable implements Runnable {
-    private static final Logger LOG = LogManager.getLogger(LogRunnable.class);
+public final class LogQueueProcessor implements Runnable {
+    private static final Logger LOG = LogManager.getLogger(LogQueueProcessor.class);
 
     private final BlockingQueue<LogEvent> queue;
 
-    public LogRunnable(BlockingQueue<LogEvent> queue) {
+    public LogQueueProcessor(BlockingQueue<LogEvent> queue) {
         this.queue = queue;
     }
 

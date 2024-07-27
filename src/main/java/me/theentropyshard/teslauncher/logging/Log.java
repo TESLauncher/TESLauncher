@@ -35,7 +35,7 @@ public final class Log {
     private static final boolean WRAP_ERR = true;
 
     public static void start() {
-        new LogRunnable(Log.EVENT_QUEUE).start();
+        new LogQueueProcessor(Log.EVENT_QUEUE).start();
 
         System.setOut(new SystemOutInterceptor(System.out, LogLevel.DEBUG));
 
