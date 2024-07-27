@@ -23,6 +23,7 @@ import me.theentropyshard.teslauncher.gui.dialogs.MinecraftDownloadDialog;
 import me.theentropyshard.teslauncher.gui.dialogs.addaccount.MicrosoftAccountCreationView;
 import me.theentropyshard.teslauncher.gui.utils.MessageBox;
 import me.theentropyshard.teslauncher.gui.view.accountsview.AccountItem;
+import me.theentropyshard.teslauncher.logging.Log;
 import me.theentropyshard.teslauncher.minecraft.account.Account;
 import me.theentropyshard.teslauncher.minecraft.auth.microsoft.AuthAdapter;
 import me.theentropyshard.teslauncher.minecraft.auth.microsoft.AuthException;
@@ -56,9 +57,12 @@ public class MicrosoftAccount extends Account {
         }
 
         if (this.stillValid()) {
+            Log.info("Account is valid, no need to authenticate");
+
             return;
         }
 
+        Log.info("Refreshing auth token...");
         this.refresh();
     }
 
@@ -101,6 +105,7 @@ public class MicrosoftAccount extends Account {
         this.setExpiresIn(authenticator.getExpiresIn());
 
         dialog.onStageChanged("Getting skin...");
+        Log.info("Getting skin...");
         this.setHeadIcon(MicrosoftAccountCreationView.getBase64SkinHead(profile));
 
         TESLauncher.getInstance().getAccountManager().save();

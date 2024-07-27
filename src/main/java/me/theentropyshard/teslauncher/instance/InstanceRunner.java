@@ -25,6 +25,7 @@ import me.theentropyshard.teslauncher.gui.dialogs.MinecraftDownloadDialog;
 import me.theentropyshard.teslauncher.gui.utils.MessageBox;
 import me.theentropyshard.teslauncher.minecraft.MinecraftInstance;
 import me.theentropyshard.teslauncher.minecraft.account.Account;
+import me.theentropyshard.teslauncher.minecraft.account.OfflineAccount;
 import me.theentropyshard.teslauncher.minecraft.auth.microsoft.AuthException;
 import me.theentropyshard.teslauncher.minecraft.data.Version;
 import me.theentropyshard.teslauncher.minecraft.download.GuiMinecraftDownloader;
@@ -82,6 +83,10 @@ public class InstanceRunner extends Thread {
         int exitCode;
         String minecraftVersion = this.instance.getMinecraftVersion();
         try {
+            if (!(this.account instanceof OfflineAccount)) {
+                Log.info("Authenticating...");
+            }
+
             try {
                 this.account.authenticate();
             } catch (AuthException e) {
