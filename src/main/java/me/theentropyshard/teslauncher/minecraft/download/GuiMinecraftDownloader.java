@@ -18,17 +18,17 @@
 
 package me.theentropyshard.teslauncher.minecraft.download;
 
-import me.theentropyshard.teslauncher.gui.dialogs.MinecraftDownloadDialog;
+import me.theentropyshard.teslauncher.gui.dialogs.ProgressDialog;
 
 import javax.swing.*;
 import java.io.IOException;
 import java.nio.file.Path;
 
 public class GuiMinecraftDownloader extends MinecraftDownloader {
-    private final MinecraftDownloadDialog dialog;
+    private final ProgressDialog dialog;
 
     public GuiMinecraftDownloader(Path versionsDir, Path assetsDir, Path librariesDir, Path nativesDir, Path runtimesDir,
-                                  Path instanceResourcesDir, MinecraftDownloadDialog dialog, boolean downloadJava) {
+                                  Path instanceResourcesDir, ProgressDialog dialog, boolean downloadJava) {
         super(versionsDir, assetsDir, librariesDir, nativesDir, runtimesDir, instanceResourcesDir, dialog, downloadJava);
         this.dialog = dialog;
     }

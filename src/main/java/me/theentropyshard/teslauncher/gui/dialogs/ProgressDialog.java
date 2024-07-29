@@ -26,16 +26,12 @@ import me.theentropyshard.teslauncher.utils.MathUtils;
 import javax.swing.*;
 import java.awt.*;
 
-public class MinecraftDownloadDialog extends AppDialog implements MinecraftDownloadListener {
+public class ProgressDialog extends AppDialog implements MinecraftDownloadListener {
     private final JLabel stageLabel;
     private final JProgressBar progressBar;
 
-    public MinecraftDownloadDialog() {
-        this(null);
-    }
-
-    public MinecraftDownloadDialog(String minecraftVersion) {
-        super(TESLauncher.frame, "Downloading Minecraft" + (minecraftVersion == null ? "" : " " + minecraftVersion));
+    public ProgressDialog(String title) {
+        super(TESLauncher.frame, title);
 
         JPanel root = new JPanel(new BorderLayout());
         root.setPreferredSize(new Dimension(450, 270));

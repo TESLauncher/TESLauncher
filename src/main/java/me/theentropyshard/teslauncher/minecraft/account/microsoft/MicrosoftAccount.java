@@ -19,7 +19,7 @@
 package me.theentropyshard.teslauncher.minecraft.account.microsoft;
 
 import me.theentropyshard.teslauncher.TESLauncher;
-import me.theentropyshard.teslauncher.gui.dialogs.MinecraftDownloadDialog;
+import me.theentropyshard.teslauncher.gui.dialogs.ProgressDialog;
 import me.theentropyshard.teslauncher.gui.dialogs.addaccount.MicrosoftAccountCreationView;
 import me.theentropyshard.teslauncher.gui.utils.MessageBox;
 import me.theentropyshard.teslauncher.gui.view.accountsview.AccountItem;
@@ -67,8 +67,7 @@ public class MicrosoftAccount extends Account {
     }
 
     private void refresh() throws IOException, AuthException {
-        MinecraftDownloadDialog dialog = new MinecraftDownloadDialog();
-        dialog.getDialog().setTitle("Authenticating...");
+        ProgressDialog dialog = new ProgressDialog("Authenticating...");
         dialog.onStageChanged("Refreshing auth token...");
 
         SwingUtilities.invokeLater(() -> dialog.setVisible(true));

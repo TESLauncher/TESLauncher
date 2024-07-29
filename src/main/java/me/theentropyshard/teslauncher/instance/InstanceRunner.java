@@ -21,7 +21,7 @@ package me.theentropyshard.teslauncher.instance;
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.gui.LauncherConsole;
 import me.theentropyshard.teslauncher.gui.components.InstanceItem;
-import me.theentropyshard.teslauncher.gui.dialogs.MinecraftDownloadDialog;
+import me.theentropyshard.teslauncher.gui.dialogs.ProgressDialog;
 import me.theentropyshard.teslauncher.gui.utils.MessageBox;
 import me.theentropyshard.teslauncher.minecraft.MinecraftInstance;
 import me.theentropyshard.teslauncher.minecraft.account.Account;
@@ -197,7 +197,7 @@ public class InstanceRunner extends Thread {
                 nativesDir,
                 runtimesDir,
                 minecraftDir.resolve("resources"),
-                new MinecraftDownloadDialog(this.instance.getMinecraftVersion()),
+                new ProgressDialog("Downloading Minecraft " + minecraftVersion),
                 downloadJava
             );
         } else {
