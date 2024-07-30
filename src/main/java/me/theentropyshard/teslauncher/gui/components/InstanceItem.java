@@ -214,6 +214,7 @@ public class InstanceItem extends JPanel implements MinecraftDownloadListener {
 
     public void instanceChanged(MinecraftInstance instance) {
         this.textLabel.setText(instance.getName());
+        this.setToolTipText(instance.getName());
     }
 
     @Override
