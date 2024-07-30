@@ -53,6 +53,9 @@ public class MinecraftInstance extends JavaInstance {
         this.setGroup(group);
         this.minecraftVersion = minecraftVersion;
 
+        this.setMinimumMemoryMegabytes(512);
+        this.setMaximumMemoryMegabytes(2048);
+
         this.jarMods = new ArrayList<>();
     }
 
