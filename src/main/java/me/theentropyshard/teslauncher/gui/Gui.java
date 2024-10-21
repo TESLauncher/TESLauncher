@@ -22,6 +22,7 @@ import com.formdev.flatlaf.FlatDarculaLaf;
 import com.formdev.flatlaf.FlatIntelliJLaf;
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.gui.components.InstanceItem;
+import me.theentropyshard.teslauncher.gui.console.LauncherConsole;
 import me.theentropyshard.teslauncher.gui.utils.SwingUtils;
 import me.theentropyshard.teslauncher.gui.view.AboutView;
 import me.theentropyshard.teslauncher.gui.view.SettingsView;

@@ -18,10 +18,9 @@
 
 package me.theentropyshard.teslauncher.logging;
 
-import me.theentropyshard.teslauncher.gui.LauncherConsole;
+import me.theentropyshard.teslauncher.gui.console.LauncherConsole;
 import org.apache.logging.log4j.Logger;
 
-import java.awt.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 

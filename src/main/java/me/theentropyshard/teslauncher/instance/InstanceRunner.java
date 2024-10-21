@@ -19,7 +19,7 @@
 package me.theentropyshard.teslauncher.instance;
 
 import me.theentropyshard.teslauncher.TESLauncher;
-import me.theentropyshard.teslauncher.gui.LauncherConsole;
+import me.theentropyshard.teslauncher.gui.console.LauncherConsole;
 import me.theentropyshard.teslauncher.gui.components.InstanceItem;
 import me.theentropyshard.teslauncher.gui.dialogs.ProgressDialog;
 import me.theentropyshard.teslauncher.gui.utils.MessageBox;

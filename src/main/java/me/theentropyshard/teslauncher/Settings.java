@@ -41,6 +41,7 @@ public class Settings {
     public boolean showAmountOfTime = false;
     public int whenMCLaunchesOption = 0;
     public int whenMCExitsOption = 0;
+    public boolean consoleScrollDown = true;
 
     public Settings() {
 
