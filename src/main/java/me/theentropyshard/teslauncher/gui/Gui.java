@@ -18,11 +18,12 @@
 
 package me.theentropyshard.teslauncher.gui;
 
-import com.formdev.flatlaf.FlatDarculaLaf;
-import com.formdev.flatlaf.FlatIntelliJLaf;
+import com.formdev.flatlaf.FlatLaf;
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.gui.components.InstanceItem;
 import me.theentropyshard.teslauncher.gui.console.LauncherConsole;
+import me.theentropyshard.teslauncher.gui.laf.DarkLauncherLaf;
+import me.theentropyshard.teslauncher.gui.laf.LightLauncherLaf;
 import me.theentropyshard.teslauncher.gui.utils.SwingUtils;
 import me.theentropyshard.teslauncher.gui.view.AboutView;
 import me.theentropyshard.teslauncher.gui.view.SettingsView;
@@ -34,7 +35,6 @@ import me.theentropyshard.teslauncher.gui.view.playview.PlayView;
 import me.theentropyshard.teslauncher.utils.OperatingSystem;
 
 import javax.swing.*;
-import javax.swing.plaf.ColorUIResource;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -55,10 +55,12 @@ public class Gui {
     public Gui(String title, boolean darkTheme) {
         this.darkTheme = darkTheme;
 
-        this.switchTheme();
-
         JDialog.setDefaultLookAndFeelDecorated(true);
         JFrame.setDefaultLookAndFeelDecorated(true);
+
+        FlatLaf.registerCustomDefaultsSource("themes");
+
+        this.switchTheme();
 
         this.viewSelector = new JTabbedPane(JTabbedPane.LEFT);
 
@@ -103,43 +105,9 @@ public class Gui {
 
     public void switchTheme() {
         if (this.isDarkTheme()) {
-            UIManager.put("InstanceItem.defaultColor", new ColorUIResource(64, 75, 93));
-            UIManager.put("InstanceItem.hoveredColor", new ColorUIResource(70, 80, 100));
-            UIManager.put("InstanceItem.pressedColor", new ColorUIResource(60, 70, 86));
-
-            UIManager.put("ProgressBar.selectionBackground", Color.WHITE);
-            UIManager.put("ProgressBar.selectionForeground", Color.WHITE);
-            ColorUIResource accentColor = new ColorUIResource(Color.decode("#4B6EAF"));
-            UIManager.put("ProgressBar.foreground", accentColor);
-            UIManager.put("ProgressBar.background", new ColorUIResource(64, 75, 93));
-
-            UIManager.put("AccountItem.borderColor", accentColor);
-
-            UIManager.put("LauncherConsole.infoColor", new ColorUIResource(Color.WHITE));
-            UIManager.put("LauncherConsole.warnColor", new ColorUIResource(Color.YELLOW.darker()));
-            UIManager.put("LauncherConsole.errorColor", new ColorUIResource(Color.RED.darker()));
-            UIManager.put("LauncherConsole.debugColor", new ColorUIResource(Color.CYAN.darker()));
-
-            FlatDarculaLaf.setup();
+            DarkLauncherLaf.setup();
         } else {
-            UIManager.put("InstanceItem.defaultColor", new ColorUIResource(222, 230, 237));
-            UIManager.put("InstanceItem.hoveredColor", new ColorUIResource(224, 234, 244));
-            UIManager.put("InstanceItem.pressedColor", new ColorUIResource(216, 224, 240));
-
-            UIManager.put("ProgressBar.selectionBackground", Color.BLACK);
-            UIManager.put("ProgressBar.selectionForeground", Color.WHITE);
-            ColorUIResource accentColor = new ColorUIResource(Color.decode("#2675BF"));
-            UIManager.put("ProgressBar.foreground", accentColor);
-            UIManager.put("ProgressBar.background", new ColorUIResource(222, 230, 237));
-
-            UIManager.put("AccountItem.borderColor", accentColor);
-
-            UIManager.put("LauncherConsole.infoColor", new ColorUIResource(Color.BLACK));
-            UIManager.put("LauncherConsole.warnColor", new ColorUIResource(Color.YELLOW.darker()));
-            UIManager.put("LauncherConsole.errorColor", new ColorUIResource(Color.RED.darker()));
-            UIManager.put("LauncherConsole.debugColor", new ColorUIResource(Color.CYAN.darker()));
-
-            FlatIntelliJLaf.setup();
+            LightLauncherLaf.setup();
         }
 
         if (!this.initialized) {

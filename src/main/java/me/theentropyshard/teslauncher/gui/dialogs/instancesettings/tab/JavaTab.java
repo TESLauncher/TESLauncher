@@ -19,6 +19,7 @@
 package me.theentropyshard.teslauncher.gui.dialogs.instancesettings.tab;
 
 import com.formdev.flatlaf.FlatClientProperties;
+import com.formdev.flatlaf.ui.FlatScrollPaneBorder;
 import me.theentropyshard.teslauncher.gui.utils.IntegerDocumentFilter;
 import me.theentropyshard.teslauncher.gui.utils.MessageBox;
 import me.theentropyshard.teslauncher.minecraft.MinecraftInstance;
@@ -112,6 +113,7 @@ public class JavaTab extends SettingsTab {
             JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
             JScrollPane.HORIZONTAL_SCROLLBAR_NEVER
         );
+        scrollPane.setBorder(new FlatScrollPaneBorder());
         otherSettings.add(scrollPane);
 
         gbc.gridy++;
