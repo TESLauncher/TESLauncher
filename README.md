@@ -16,7 +16,7 @@ $ ./gradlew build
 ```
 If "BUILD SUCCESS" is displayed, use the following command to run the launcher:
 ```shell
-java -jar dist/TESLauncher-0.13.0.jar
+$ java -jar dist/TESLauncher-0.13.0.jar
 ```
 
 ### Warning
