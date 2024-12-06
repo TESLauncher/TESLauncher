@@ -28,7 +28,7 @@ plugins {
 }
 
 group = 'me.theentropyshard'
-version = '0.13.0'
+version = '0.13.1'
 description = 'TESLauncher'
 
 def theMainClass = 'me.theentropyshard.teslauncher.Main'
