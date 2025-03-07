@@ -98,7 +98,13 @@ public class MinecraftLauncher {
         arguments.add("-Dconsole.encoding=utf-8");
 
         if (jvmFlags != null && !jvmFlags.isEmpty()) {
-            arguments.addAll(jvmFlags);
+            for (String flag : jvmFlags) {
+                if (flag.trim().isEmpty()) {
+                    continue;
+                }
+
+                arguments.add(flag);
+            }
         }
 
         this.resolveClasspath(version, librariesDir);
