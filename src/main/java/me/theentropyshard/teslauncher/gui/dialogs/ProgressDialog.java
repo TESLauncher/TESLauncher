@@ -62,8 +62,11 @@ public class ProgressDialog extends AppDialog implements MinecraftDownloadListen
         this.progressBar.setMinimum(0);
         this.progressBar.setMaximum((int) totalSize);
         this.progressBar.setValue((int) downloadedBytes);
-        this.progressBar.setString(MathUtils.round(downloadedBytes / 1024.0D / 1024.0D, 2) +
-                " MiB / " + MathUtils.round(totalSize / 1024.0D / 1024.0D, 2) + " MiB");
+
+        double downloaded = MathUtils.round(downloadedBytes / 1024.0D / 1024.0D, 2);
+        double total = MathUtils.round(totalSize / 1024.0D / 1024.0D, 2);
+
+        this.progressBar.setString(String.format("%.2f MiB / %.2f MiB", downloaded, total));
     }
 
     @Override
