@@ -19,8 +19,10 @@
 package me.theentropyshard.teslauncher.gui;
 
 import com.formdev.flatlaf.FlatLaf;
+import com.formdev.flatlaf.ui.FlatTabbedPaneUI;
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.gui.components.InstanceItem;
+import me.theentropyshard.teslauncher.gui.components.MyTabbedPane;
 import me.theentropyshard.teslauncher.gui.console.LauncherConsole;
 import me.theentropyshard.teslauncher.gui.laf.DarkLauncherLaf;
 import me.theentropyshard.teslauncher.gui.laf.LightLauncherLaf;
@@ -62,7 +64,7 @@ public class Gui {
 
         this.switchTheme();
 
-        this.viewSelector = new JTabbedPane(JTabbedPane.LEFT);
+        this.viewSelector = new MyTabbedPane(JTabbedPane.LEFT);
 
         TESLauncher.frame = this.frame = new JFrame(title);
         this.frame.add(this.viewSelector, BorderLayout.CENTER);

@@ -20,6 +20,7 @@ package me.theentropyshard.teslauncher.gui.dialogs.instancesettings;
 
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.gui.components.InstanceItem;
+import me.theentropyshard.teslauncher.gui.components.MyTabbedPane;
 import me.theentropyshard.teslauncher.gui.dialogs.AppDialog;
 import me.theentropyshard.teslauncher.gui.dialogs.instancesettings.tab.JarModsTab;
 import me.theentropyshard.teslauncher.gui.dialogs.instancesettings.tab.JavaTab;
@@ -45,7 +46,7 @@ public class InstanceSettingsDialog extends AppDialog {
     public InstanceSettingsDialog(MinecraftInstance instance) {
         super(TESLauncher.frame, "Instance Settings - " + instance.getName());
 
-        this.tabbedPane = new JTabbedPane(JTabbedPane.LEFT);
+        this.tabbedPane = new MyTabbedPane(JTabbedPane.LEFT);
         this.tabbedPane.setPreferredSize(new Dimension(900, 480));
 
         InputMap inputMap = this.tabbedPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);

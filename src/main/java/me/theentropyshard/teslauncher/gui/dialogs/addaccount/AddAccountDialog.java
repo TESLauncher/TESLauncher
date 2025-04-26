@@ -19,6 +19,7 @@
 package me.theentropyshard.teslauncher.gui.dialogs.addaccount;
 
 import me.theentropyshard.teslauncher.TESLauncher;
+import me.theentropyshard.teslauncher.gui.components.MyTabbedPane;
 import me.theentropyshard.teslauncher.gui.view.accountsview.AccountsView;
 import me.theentropyshard.teslauncher.gui.dialogs.AppDialog;
 
@@ -34,7 +35,7 @@ public class AddAccountDialog extends AppDialog {
 
         JPanel root = new JPanel(new BorderLayout());
 
-        JTabbedPane viewSelector = new JTabbedPane(JTabbedPane.TOP);
+        JTabbedPane viewSelector = new MyTabbedPane(JTabbedPane.TOP);
         viewSelector.putClientProperty("JTabbedPane.tabAreaAlignment", "fill");
 
         this.offlineView = new OfflineAccountCreationView(this, accountsView);
