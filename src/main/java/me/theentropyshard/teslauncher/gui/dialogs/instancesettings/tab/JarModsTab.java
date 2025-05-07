@@ -88,11 +88,17 @@ public class JarModsTab extends SettingsTab {
                 @Override
                 protected void done() {
                     JarMod jarMod = null;
+
                     try {
                         jarMod = this.get();
                     } catch (InterruptedException | ExecutionException ex) {
                         Log.error(ex);
                     }
+
+                    if (jarMod == null) {
+                        return;
+                    }
+
                     JarModsTab.this.jarModsTableModel.add(jarMod);
                 }
             }.execute();
