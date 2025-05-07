@@ -18,15 +18,15 @@
 
 package me.theentropyshard.teslauncher;
 
-import me.theentropyshard.teslauncher.minecraft.account.AccountManager;
 import me.theentropyshard.teslauncher.gui.Gui;
-import me.theentropyshard.teslauncher.instance.InstanceManager;
-import me.theentropyshard.teslauncher.network.UserAgentInterceptor;
 import me.theentropyshard.teslauncher.gui.utils.WindowClosingListener;
+import me.theentropyshard.teslauncher.instance.InstanceManager;
+import me.theentropyshard.teslauncher.logging.Log;
+import me.theentropyshard.teslauncher.minecraft.account.AccountManager;
+import me.theentropyshard.teslauncher.network.UserAgentInterceptor;
 import me.theentropyshard.teslauncher.utils.FileUtils;
 import okhttp3.OkHttpClient;
 import okhttp3.Protocol;
-import me.theentropyshard.teslauncher.logging.Log;
 
 import javax.swing.*;
 import java.io.IOException;
@@ -37,8 +37,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class TESLauncher {
-    
-
     public static final String USER_AGENT = BuildConfig.APP_NAME + "/" + BuildConfig.APP_VERSION;
 
     public static final int WIDTH = 960;
@@ -95,12 +93,12 @@ public class TESLauncher {
         this.settings = Settings.load(this.settingsFile);
 
         this.httpClient = new OkHttpClient.Builder()
-                .addNetworkInterceptor(new UserAgentInterceptor(TESLauncher.USER_AGENT))
-                .connectTimeout(30, TimeUnit.SECONDS)
-                .readTimeout(5, TimeUnit.MINUTES)
-                .writeTimeout(5, TimeUnit.MINUTES)
-                .protocols(Collections.singletonList(Protocol.HTTP_1_1))
-                .build();
+            .addNetworkInterceptor(new UserAgentInterceptor(TESLauncher.USER_AGENT))
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(5, TimeUnit.MINUTES)
+            .writeTimeout(5, TimeUnit.MINUTES)
+            .protocols(Collections.singletonList(Protocol.HTTP_1_1))
+            .build();
 
         this.accountManager = new AccountManager(minecraftDir);
         try {
