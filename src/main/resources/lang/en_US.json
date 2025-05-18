@@ -2,5 +2,407 @@
     "metaInfo": {
         "name": "English",
         "displayName": "English"
+    },
+    "messages": {
+        "gui": {
+            "error": "Error",
+            "errorParsingModGameMessage": "<html>There was an error parsing the following file: <b>$$FILE_PATH$$</b> from mod with namespace <b>$$MOD_NAMESPACE$$</b>. Please check your mods!</html>",
+            "errorTooMuchMemoryGiven": "The Java Virtual Machine could not allocate the amount of memory set for this instance (min: $$MIN_MEMORY$$ MB, max: $$MAX_MEMORY$$ MB). Either buy more RAM or decrease the amount of memory in instance settings.",
+            "gameOutOfMemory": "Game has ran out of memory. Increase the amount of memory in instance settings.",
+            "addAccountDialog": {
+                "offline": {
+                    "enterUsername": "Enter a username"
+                },
+                "microsoft": {
+
+                }
+            },
+            "accountDelete": {
+                "error": "Unable to remove account '$$ACCOUNT_NAME$$'"
+            },
+            "playView": {
+                "deleteInstanceConfirm": "Are you sure that you want to delete instance '$$INSTANCE_NAME$$'?",
+                "cannotDeleteInstance": "Could not delete $$INSTANCE_DIR$$",
+                "invalidInstanceName": "An invalid name was supplied! Valid name was created."
+            },
+            "addInstanceDialog": {
+                "instanceNameCannotBeEmpty": "Instance name cannot be empty!",
+                "groupNameCannotBeEmpty": "Group name cannot be empty!",
+                "minecraftNotSelected": "Minecraft version is not selected!",
+                "unableToCreateInstance": "Unable to create new instance"
+            },
+            "instanceSettingsDialog": {
+                "couldNotLoadVersions": "Could not get versions",
+                "ramMinCannotBeLargerMax": "Minimum amount of RAM cannot be larger than maximum",
+                "ramMinCannotBeLess512MB": "Minimum amount of RAM cannot be less than 512 MiB",
+                "deleteWorldSure": "Are you sure that you want to delete world '$$WORLD_NAME$$'?",
+                "couldNotDeleteWorld": "Could not delete world '$$WORLD_NAME$$' located at $$WORLD_DIR$$",
+                "couldNotUpdateMod": "Could not update $$MOD_LOADER$$ mod '$$MOD_ID$$'"
+            },
+            "mods": {
+                "modAddedName": "Mod with name '$$MOD_NAME$$' already added!",
+                "modAddedId": "Mod with id '$$MOD_ID$$' already added!",
+                "modInvalid": "$$MOD_PATH$$ is not a valid $$MOD_LOADER$$ mod!"
+            }
+        }
+    },
+    "gui": {
+        "instanceItem": {
+            "contextMenu": {
+                "edit": "Edit",
+                "changeGroup": "Change Group",
+                "icon": "Icon",
+                "rename": "Rename",
+                "delete": "Delete",
+                "openInstanceFolder": "Open instance folder",
+                "openMinecraftFolder": "Open Minecraft folder",
+                "killProcess": "Kill process"
+            }
+        },
+        "changeGroupDialog": {
+            "title": "Change group of $$INSTANCE_NAME$$",
+            "label": "Select an existing group or type a name for a new one. Press Enter when done."
+        },
+        "modUpdateDialog": {
+            "title": "Updating mods",
+            "downloading": "Downloading"
+        },
+        "instanceSettingsDialog": {
+            "title": "Instance Settings - $$INSTANCE_NAME$$",
+            "exportInstance": {
+                "exportButton": "Export",
+                "tesliFiles": "TESLauncher instance file (*.tesli)",
+                "title": "Instance export",
+                "success": "Instance exported successfully!",
+                "failure": "Could not export instance",
+                "wrongExtension": "Exported file must end with .tesli"
+            },
+            "mainTab": {
+                "name": "Main",
+                "minecraftVersion": {
+                    "borderName": "Minecraft version",
+                    "autoUpdateToLatest": "Automatically update to the latest version"
+                },
+                "quickPlay": {
+                    "borderName": "Quick Play",
+                    "disabled": "Disabled",
+                    "world": "World",
+                    "server": "Server",
+                    "serverPlaceholder": "Enter server address"
+                },
+                "windowSettings": {
+                    "borderName": "Window",
+                    "customTitle": {
+                        "label": "Custom title",
+                        "textFieldPlaceholder": "Type custom window title here"
+                    },
+                    "startup": {
+                        "fullscreen": "Fullscreen",
+                        "maximized": "Maximized",
+                        "customSize": {
+                            "radioButton": "Custom Size",
+                            "width": "Width",
+                            "height": "Height"
+                        }
+                    }
+                },
+                "environmentVariables": {
+                    "borderName": "<html>Environment variables. Separate with semicolon: <b>NAME1=VALUE1; NAME2=VALUE2</b></html>"
+                }
+            },
+            "javaTab": {
+                "name": "Java",
+                "javaInstallation": {
+                    "borderName": "Java Installation",
+                    "textFieldPlaceholder": "Path to $$JAVAW$$",
+                    "current": "$$CURRENT_INSTALLATION$$ (Current)",
+                    "browse": "Browse path..."
+                },
+                "memorySettings": {
+                    "borderName": "Memory Settings",
+                    "minimum": "Minimum memory (Megabytes)",
+                    "maximum": "Maximum memory (Megabytes)"
+                },
+                "jvmFlags": {
+                    "borderName": "JVM Flags",
+                    "options": {
+                        "customFlags": "Custom flags",
+                        "optimizedFlags1": "Optimized set of flags #1 (Client and Server, G1 GC)",
+                        "optimizedFlags2": "Optimized set of flags #2 (Client, G1 GC)"
+                    },
+                    "notice": "Add custom JVM flags here. Separate with spaces"
+                }
+            },
+            "modsTab": {
+                "name": "Mods",
+                "modLoader": {
+                    "borderName": "Mod loader",
+                    "options": {
+                        "vanilla": "Vanilla",
+                        "fabric": "Fabric"
+                    }
+                },
+                "loaderVersion": {
+                    "borderName": "Loader version"
+                },
+                "modpack": "Modpack",
+                "customModpack": "Custom",
+                "modsTable": {
+                    "borderName": "Mods",
+                    "vanilla": {
+
+                    },
+                    "fabric": {
+                        "modName": "Name",
+                        "modVersion": "Version",
+                        "modDescription": "Description",
+                        "modActive": "Active",
+                        "addModButton": "Add Fabric mod",
+                        "deleteModButton": "Delete Fabric mod"
+                    }
+                },
+                "openModsFolder": "Open mods folder",
+                "updateModsCheckbox": "Update mods before running",
+                "updateModsButton": "Update mods"
+            },
+            "jarModsTab": {
+                "name": "Jar Mods",
+                "modName": "Name",
+                "modActive": "Active",
+                "addModButton": "Add Jar mod",
+                "deleteModButton": "Delete Jar mod"
+            },
+            "worldsTab": {
+                "name": "Worlds",
+                "table": {
+                    "worldName": "Name",
+                    "worldSeed": "Seed",
+                    "lastPlayed": "Last played",
+                    "createdAt": "Created"
+                },
+                "contextMenu": {
+                    "copySeed": "Copy seed",
+                    "exportAsZip": "Export as ZIP",
+                    "delete": "Delete"
+                },
+                "exportWorld": {
+                    "title": "Export world",
+                    "success": "World $$WORLD_NAME$$ exported successfully",
+                    "failure": "Could not export world $$WORLD_NAME$$"
+                },
+                "deletingWorld": "Deleting world",
+                "openWorldsDirButton": "Open worlds folder"
+            },
+            "screenshotsTab": {
+                "name": "Screenshots",
+                "copyImage": "Copy Image",
+                "copyFile": "Copy File",
+                "delete": "Delete",
+                "rename": "Rename",
+                "renameMessage": "Enter new name for the file",
+                "openScreenshotsDirButton": "Open screenshots folder"
+            },
+            "gameLogTab": {
+                "name": "Game Log",
+                "search": "Search",
+                "find": "Find",
+                "upload": "Upload",
+                "copyFile": "Copy File",
+                "copyText": "Copy Text",
+                "clear": "Clear",
+                "title": "Upload",
+                "uploading": "Uploading log to McLogs",
+                "failed": "Failed to upload log",
+                "largeLog": "Log size exceeds the limit, log will be truncated",
+                "successTitle": "Log uploaded",
+                "successMessage": "Log uploaded successfully! Link: $$LINK$$ (Copied to clipboard)"
+            }
+        },
+        "addAccountDialog": {
+            "title": "Add account",
+            "offline": {
+                "tabName": "Offline",
+                "textFieldPlaceholder": "Enter desired username"
+            },
+            "microsoft": {
+                "tabName": "Microsoft"
+            },
+            "accountExists": "Account with name '$$ACCOUNT_NAME$$' already exists",
+            "addButton": "Add"
+        },
+        "console": {
+            "title": "TESLauncher Console",
+            "scrollDown": "Scroll down",
+            "copyButton": "Copy",
+            "clearButton": "Clear"
+        },
+        "general": {
+            "yes": "Yes",
+            "no": "No",
+            "ok": "OK",
+            "cancel": "Cancel",
+            "archives": "Archives",
+            "openLauncherFolder": "Open launcher folder",
+            "consoleButton": {
+                "show": "Show console",
+                "hide": "Hide console"
+            },
+            "statsLabel": {
+                "instances": "$$INSTANCES_COUNT$$ instances",
+                "totalPlayedFor": "played for $$TOTAL_PLAYTIME$$ in total",
+                "tipIfEmpty": "Create an instance by pressing the «+» button!"
+            },
+            "tab": {
+                "play": "Play",
+                "accounts": "Accounts",
+                "settings": "Settings",
+                "about": "About"
+            }
+        },
+        "playView": {
+            "instanceGroup": "Instance group",
+            "account": "Account",
+            "deleteInstanceTitle": "Delete instance",
+            "renameInstanceDialog": {
+                "title": "Rename instance",
+                "message": "Enter new name"
+            },
+            "lastPlayedFor": "Last played for",
+            "totalPlayedFor": "Total played for",
+            "running": "Running"
+        },
+        "accountsView": {
+            "addAccountButton": "Click to add account",
+            "deleteConfirmation": {
+                "title": "Account removal",
+                "message": "Are you sure you want to delete account '$$ACCOUNT_NAME$$'?"
+            }
+        },
+        "settingsView": {
+            "themeSettings": {
+                "borderName": "Theme",
+                "light": "Light",
+                "dark": "Dark"
+            },
+            "ui": {
+                "borderName": "UI",
+                "dialogPosition": {
+                    "label": "Dialog position",
+                    "options": {
+                        "relativeToParent": "Relative to parent",
+                        "alwaysCentered": "Always centered"
+                    }
+                },
+                "amountOfTime": "Show the amount of time that has passed since the release date",
+                "showConsoleAtStartup": "Show console at startup"
+            },
+            "storageSettings": {
+                "borderName": "Storage",
+                "versionsPathLabel": "Versions directory path",
+                "versionsPathFieldPlaceholder": "<launcher folder>/minecraft/versions",
+                "instancesPathLabel": "Instances directory path",
+                "instancesPathFieldPlaceholder": "<launcher folder>/minecraft/instances",
+                "modLoadersPathLabel": "Mod loaders directory path",
+                "modLoadersPathFieldPlaceholder": "<launcher folder>/minecraft/modloaders",
+                "tip": "Remember to press ENTER to save path. Changes will be applied after restart"
+            },
+            "other": {
+                "borderName": "Other",
+                "writePrettyJson": "Write pretty JSON files (useful for development/debugging)",
+                "onGameLaunch": {
+                    "label": "When Minecraft launches",
+                    "options": {
+                        "doNothing": "Do nothing",
+                        "hideLauncher": "Hide launcher",
+                        "hideLauncherAndConsole": "Hide launcher and console",
+                        "exitLauncher": "Exit launcher (Time spent on instance won't be counted)"
+                    }
+                },
+                "onGameExit": {
+                    "label": "When Minecraft exits",
+                    "options": {
+                        "doNothing": "Do nothing",
+                        "exitLauncher": "Exit launcher if Minecraft exit code is 0 (ok)"
+                    }
+                },
+                "checkForUpdatesAtStartup": "Check for updates at startup",
+                "checkUpdatesNowButton": "Check for updates",
+                "checkingForUpdates": "Checking...",
+                "noUpdatesAvailable": "You are using the latest version",
+                "language": "Language",
+                "disableFileIntegrityCheck": "Disable file integrity check"
+            }
+        },
+        "aboutView": {
+            "lines": {
+                "line1": "TESLauncher $$LAUNCHER_VERSION$$ - simple Minecraft launcher",
+                "line2": "by TheEntropyShard",
+                "line3": "More at $$LAUNCHER_URL$$"
+            }
+        },
+        "addInstanceDialog": {
+            "importInstance": {
+                "importButton": "Import",
+                "tesliFiles": "TESLauncher instance file (*.tesli)",
+                "title": "Instance import",
+                "success": "Instance imported successfully",
+                "failure": "Could not import instance",
+                "duplicate": "Instance with a folder $$INSTANCE_FOLDER$$ already exists",
+                "badFile": "Instance file is corrupted or has an invalid format",
+                "wrongExtension": "Imported file must end with .tesli"
+            },
+            "title": "Add New Instance",
+            "nameFieldLabel": "Name",
+            "groupFieldLabel": "Group",
+            "autoUpdateToLatest": "Automatically update to the latest version",
+            "filter": "Filter",
+            "refreshButton": "Refresh",
+            "addButton": "Add",
+            "cancelButton": "Cancel",
+            "table": {
+                "version": "Version",
+                "dateReleased": "Date released",
+                "versionType": "Type"
+            },
+            "latestVersion": "(Latest)",
+            "showOnlyInstalled": "Show only installed versions"
+        },
+        "updateDialog": {
+            "title": "Update",
+            "updateNowButton": "Update",
+            "updateLaterButton": "Later"
+        }
+    },
+    "general": {
+        "updated": "Updated",
+        "time": {
+            "dateFormat": "MM/dd/yyyy",
+            "ago": "ago",
+            "units": {
+                "second1": "second",
+                "seconds234": "seconds",
+                "seconds": "seconds",
+                "minute1": "minute",
+                "minutes234": "minutes",
+                "minutes": "minutes",
+                "hour1": "hour",
+                "hours234": "hours",
+                "hours": "hours",
+                "day1": "day",
+                "days234": "days",
+                "days": "days",
+                "today": "today",
+                "yesterday": "yesterday",
+                "week1": "week",
+                "weeks234": "weeks",
+                "weeks": "weeks",
+                "month1": "month",
+                "months234": "months",
+                "months": "months",
+                "year1": "year",
+                "years234": "years",
+                "years": "years"
+            }
+        }
     }
 }

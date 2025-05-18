@@ -2,5 +2,407 @@
     "metaInfo": {
         "name": "Russian",
         "displayName": "Русский"
+    },
+    "messages": {
+        "gui": {
+            "error": "Ошибка",
+            "errorParsingModGameMessage": "<html>Не удалось распарсить следующий файл: <b>$$FILE_PATH$$</b> из мода с пространством имён <b>$$MOD_NAMESPACE$$</b>. Проверьте ваши моды!</html>",
+            "errorTooMuchMemoryGiven": "Виртуальной машине Java не удалось выделить количество памяти, установленное для этого инстанса (мин: $$MIN_MEMORY$$ MB, макс: $$MAX_MEMORY$$ MB). Либо купите больше оперативной памяти, либо уменьшите количество памяти в настройках инстанса.",
+            "gameOutOfMemory": "У игры закончилась выделенная память. Увеличьте количество памяти для этого инстанса в настройках.",
+            "addAccountDialog": {
+                "offline": {
+                    "enterUsername": "Введите имя"
+                },
+                "microsoft": {
+                    
+                }
+            },
+            "accountDelete": {
+                "error": "Не удалось удалить аккаунт '$$ACCOUNT_NAME$$'"
+            },
+            "playView": {
+                "deleteInstanceConfirm": "Вы уверены, что хотите удалить инстанс '$$INSTANCE_NAME$$'?",
+                "cannotDeleteInstance": "Не удалось удалить $$INSTANCE_DIR$$",
+                "invalidInstanceName": "Было введено невалидное имя! Валидное имя было создано."
+            },
+            "addInstanceDialog": {
+                "instanceNameCannotBeEmpty": "Имя инстанса не может быть пустым!",
+                "groupNameCannotBeEmpty": "Имя группы не может быть пустым!",
+                "minecraftVersionNotSelected": "Версия Minecraft не выбрана!",
+                "unableToCreateInstance": "Не удалось добавить инстанс"
+            },
+            "instanceSettingsDialog": {
+                "couldNotLoadVersions": "Не удалось загрузить версии",
+                "ramMinCannotBeLargerMax": "Minimum amount of RAM cannot be larger than maximum",
+                "ramMinCannotBeLess512MB": "Minimum amount of RAM cannot be less than 512 MiB",
+                "deleteWorldSure": "Вы уверены, что хотите удалить мир '$$WORLD_NAME$$'?",
+                "couldNotDeleteWorld": "Не удалось удалить мир '$$WORLD_NAME$$' в $$WORLD_DIR$$",
+                "couldNotUpdateMod": "Не удалось обновить $$MOD_LOADER$$ мод '$$MOD_ID$$'"
+            },
+            "mods": {
+                "modAddedName": "Мод с названием '$$MOD_NAME$$' уже добавлен!",
+                "modAddedId": "Мод с id '$$MOD_ID$$' уже добавлен!",
+                "modInvalid": "$$MOD_PATH$$ это невалидный мод для $$MOD_LOADER$$!"
+            }
+        }
+    },
+    "gui": {
+        "instanceItem": {
+            "contextMenu": {
+                "edit": "Редактировать",
+                "changeGroup": "Изменить группу",
+                "icon": "Иконка",
+                "rename": "Переименовать",
+                "delete": "Удалить",
+                "openInstanceFolder": "Открыть папку инстанса",
+                "openMinecraftFolder": "Открыть папку Minecraft",
+                "killProcess": "Остановить процесс"
+            }
+        },
+        "changeGroupDialog": {
+            "title": "Изменить группу $$INSTANCE_NAME$$",
+            "label": "Выберите существующую группу или впишите имя новой, после нажмите Enter."
+        },
+        "modUpdateDialog": {
+            "title": "Обновление модов",
+            "downloading": "Скачивание"
+        },
+        "instanceSettingsDialog": {
+            "title": "Настройки инстанса - $$INSTANCE_NAME$$",
+            "exportInstance": {
+                "exportButton": "Экспорт",
+                "tesliFiles": "Файл инстанса TESLauncher (*.tesli)",
+                "title": "Экспорт инстанса",
+                "success": "Инстанс успешно экспортирован!",
+                "failure": "Не удалось экспортировать инстанс",
+                "wrongExtension": "Название экспортированного файла должно оканчиваться на .tesli"
+            },
+            "mainTab": {
+                "name": "Основное",
+                "minecraftVersion": {
+                    "borderName": "Версия Minecraft",
+                    "autoUpdateToLatest": "Автоматически обновлять до последней версии"
+                },
+                "quickPlay": {
+                    "borderName": "Быстрая игра",
+                    "disabled": "Отключено",
+                    "world": "Мир",
+                    "server": "Сервер",
+                    "serverPlaceholder": "Введите адрес сервера"
+                },
+                "windowSettings": {
+                    "borderName": "Окно",
+                    "customTitle": {
+                        "label": "Кастомное название",
+                        "textFieldPlaceholder": "Введите кастомное название окна Minecraft"
+                    },
+                    "startup": {
+                        "fullscreen": "Полный экран",
+                        "maximized": "Полный экран (оконный режим)",
+                        "customSize": {
+                            "radioButton": "Кастомный размер",
+                            "width": "Ширина",
+                            "height": "Высота"
+                        }
+                    }
+                },
+                "environmentVariables": {
+                    "borderName": "<html>Переменные среды. Разделяйте через точку с запятой: <b>NAME1=VALUE1; NAME2=VALUE2</b></html>"
+                }
+            },
+            "javaTab": {
+                "name": "Java",
+                "javaInstallation": {
+                    "borderName": "Установка Java",
+                    "textFieldPlaceholder": "Путь до $$JAVAW$$",
+                    "current": "$$CURRENT_INSTALLATION$$ (Текущая)",
+                    "browse": "Выбрать..."
+                },
+                "memorySettings": {
+                    "borderName": "Выделение памяти",
+                    "minimum": "Минимум (Мегабайты)",
+                    "maximum": "Максимум (Мегабайты)"
+                },
+                "jvmFlags": {
+                    "borderName": "Флаги JVM",
+                    "options": {
+                        "customFlags": "Кастомные флаги",
+                        "optimizedFlags1": "Набор оптимизированных флагов #1 (Клиент и Сервер, G1 GC)",
+                        "optimizedFlags2": "Набор оптимизированных флагов #2 (Клиент, G1 GC)"
+                    },
+                    "notice": "Добавьте кастомные флаги JVM сюда. Разделяйте пробелами"
+                }
+            },
+            "modsTab": {
+                "name": "Моды",
+                "modLoader": {
+                    "borderName": "Загрузчик модов",
+                    "options": {
+                        "vanilla": "Vanilla",
+                        "fabric": "Fabric"
+                    }
+                },
+                "loaderVersion": {
+                    "borderName": "Версия загрузчика"
+                },
+                "modpack": "Модпак",
+                "customModpack": "Кастомный",
+                "modsTable": {
+                    "borderName": "Моды",
+                    "vanilla": {
+
+                    },
+                    "fabric": {
+                        "modName": "Имя",
+                        "modVersion": "Версия",
+                        "modDescription": "Описание",
+                        "modActive": "Активен",
+                        "addModButton": "Добавить Fabric мод",
+                        "deleteModButton": "Удалить Fabric мод"
+                    }
+                },
+                "openModsFolder": "Открыть папку с модами",
+                "updateModsCheckbox": "Обновлять моды перед запуском",
+                "updateModsButton": "Обновить моды"
+            },
+            "jarModsTab": {
+                "name": "Jar-моды",
+                "modName": "Имя",
+                "modActive": "Активен",
+                "addModButton": "Добавить Jar-мод",
+                "deleteModButton": "Удалить Jar-мод"
+            },
+            "worldsTab": {
+                "name": "Миры",
+                "table": {
+                    "worldName": "Имя",
+                    "worldSeed": "Сид",
+                    "lastPlayed": "Последняя игра",
+                    "createdAt": "Создан"
+                },
+                "contextMenu": {
+                    "copySeed": "Копировать сид",
+                    "exportAsZip": "Экспортировать как ZIP",
+                    "delete": "Удалить"
+                },
+                "exportWorld": {
+                    "title": "Экспорт мира",
+                    "success": "Мир $$WORLD_NAME$$ был успешно экспортирован",
+                    "failure": "Не удалось экспортировать мир $$WORLD_NAME$$"
+                },
+                "deletingWorld": "Удаление мира",
+                "openWorldsDirButton": "Открыть папку с мирами"
+            },
+            "screenshotsTab": {
+                "name": "Скриншоты",
+                "copyImage": "Копировать изображение",
+                "copyFile": "Копировать файл",
+                "delete": "Удалить",
+                "rename": "Переименовать",
+                "renameMessage": "Введите новое имя файла",
+                "openScreenshotsDirButton": "Открыть папку со скриншотами"
+            },
+            "gameLogTab": {
+                "name": "Лог Игры",
+                "search": "Поиск",
+                "find": "Найти",
+                "upload": "Опубликовать",
+                "copyFile": "Копировать файл",
+                "copyText": "Копировать текст",
+                "clear": "Очистить",
+                "title": "Загрузка",
+                "uploading": "Загрузка лога на McLogs",
+                "failed": "Не удалось загрузить лог",
+                "largeLog": "Размер лога превышает лимит, лог будет обрезан",
+                "successTitle": "Лог загружен",
+                "successMessage": "Лог успешно загружен! Ссылка: $$LINK$$ (Скопировано в буфер обмена)"
+            }
+        },
+        "addAccountDialog": {
+            "title": "Добавить аккаунт",
+            "offline": {
+                "tabName": "Оффлайн",
+                "textFieldPlaceholder": "Введите желаемое имя"
+            },
+            "microsoft": {
+                "tabName": "Microsoft"
+            },
+            "accountExists": "Аккаунт с ником '$$ACCOUNT_NAME$$' уже добавлен",
+            "addButton": "Добавить"
+        },
+        "console": {
+            "title": "Консоль TESLauncher",
+            "scrollDown": "Проматывать вниз",
+            "copyButton": "Копировать",
+            "clearButton": "Очистить"
+        },
+        "general": {
+            "yes": "Да",
+            "no": "Нет",
+            "ok": "Ок",
+            "cancel": "Отмена",
+            "archives": "Архивы",
+            "openLauncherFolder": "Открыть папку лаунчера",
+            "consoleButton": {
+                "show": "Показать консоль",
+                "hide": "Скрыть консоль"
+            },
+            "statsLabel": {
+                "instances": "$$INSTANCES_COUNT$$ инстансов",
+                "totalPlayedFor": "в сумме в игре проведено $$TOTAL_PLAYTIME$$",
+                "tipIfEmpty": "Нажмите на «+», чтобы создать новый инстанс!"
+            },
+            "tab": {
+                "play": "Игра",
+                "accounts": "Аккаунты",
+                "settings": "Настройки",
+                "about": "О лаунчере"
+            }
+        },
+        "playView": {
+            "instanceGroup": "Группа инстансов",
+            "account": "Аккаунт",
+            "deleteInstanceTitle": "Удалить инстанс",
+            "renameInstanceDialog": {
+                "title": "Переименовать инстанс",
+                "message": "Введите новое имя"
+            },
+            "lastPlayedFor": "Последний раз",
+            "totalPlayedFor": "Всего",
+            "running": "Запущено"
+        },
+        "accountsView": {
+            "addAccountButton": "Нажмите, чтобы добавить аккаунт",
+            "deleteConfirmation": {
+                "title": "Удаление аккаунта",
+                "message": "Вы уверены, что хотите удалить аккаунт '$$ACCOUNT_NAME$$'?"
+            }
+        },
+        "settingsView": {
+            "themeSettings": {
+                "borderName": "Тема",
+                "light": "Светлая",
+                "dark": "Тёмная"
+            },
+            "ui": {
+                "borderName": "Интерфейс",
+                "dialogPosition": {
+                    "label": "Позиция диалогов",
+                    "options": {
+                        "relativeToParent": "Относительно родителя",
+                        "alwaysCentered": "Всегда в центре"
+                    }
+                },
+                "amountOfTime": "Показывать время, прошедшее с релиза версии",
+                "showConsoleAtStartup": "Открывать консоль при запуске"
+            },
+            "storageSettings": {
+                "borderName": "Хранилище",
+                "versionsPathLabel": "Путь к папке с версиями",
+                "versionsPathFieldPlaceholder": "<папка лаунчера>/minecraft/versions",
+                "instancesPathLabel": "Путь к папке с инстансами",
+                "instancesPathFieldPlaceholder": "<папка лаунчера>/minecraft/instances",
+                "modLoadersPathLabel": "Путь к папке с загрузчиками модов",
+                "modLoadersPathFieldPlaceholder": "<папка лаунчера>/minecraft/modloaders",
+                "tip": "Не забудьте нажать ENTER, чтобы сохранить путь. Изменения будут применены после перезапуска"
+            },
+            "other": {
+                "borderName": "Другое",
+                "writePrettyJson": "Красиво форматировать Json-файлы (полезно для дебага/разработки)",
+                "onGameLaunch": {
+                    "label": "Когда Minecraft запускается",
+                    "options": {
+                        "doNothing": "Ничего не делать",
+                        "hideLauncher": "Скрывать лаунчер",
+                        "hideLauncherAndConsole": "Скрывать лаунчер и консоль",
+                        "exitLauncher": "Закрывать лаунчер (время, проведённое на инстансе не будет учитываться)"
+                    }
+                },
+                "onGameExit": {
+                    "label": "Когда Minecraft закрывается",
+                    "options": {
+                        "doNothing": "Ничего не делать",
+                        "exitLauncher": "Закрывать лаунчер, если код выхода 0 (ок)"
+                    }
+                },
+                "checkForUpdatesAtStartup": "Проверять обновления при запуске",
+                "checkUpdatesNowButton": "Проверить обновления",
+                "checkingForUpdates": "Проверяем...",
+                "noUpdatesAvailable": "Вы используете новейшую версию",
+                "language": "Язык",
+                "disableFileIntegrityCheck": "Отключить проверку целостности файлов"
+            }
+        },
+        "aboutView": {
+            "lines": {
+                "line1": "TESLauncher $$LAUNCHER_VERSION$$ - простой лаунчер для Minecraft",
+                "line2": "сделано TheEntropyShard",
+                "line3": "Больше на $$LAUNCHER_URL$$"
+            }
+        },
+        "addInstanceDialog": {
+            "importInstance": {
+                "importButton": "Импорт",
+                "tesliFiles": "Файл инстанса TESLauncher (*.tesli)",
+                "title": "Импорт инстанса",
+                "success": "Инстанс успешно импортирован!",
+                "failure": "Не удалось импортировать инстанс",
+                "duplicate": "Инстанс с папкой $$INSTANCE_FOLDER$$ уже существует",
+                "badFile": "Файл инстанса поврежден или имеет неверный формат",
+                "wrongExtension": "Название импортированного файла должно оканчиваться на .tesli"
+            },
+            "title": "Добавить новый инстанс",
+            "nameFieldLabel": "Имя",
+            "groupFieldLabel": "Группа",
+            "autoUpdateToLatest": "Автоматически обновлять версию инстанса",
+            "filter": "Фильтр",
+            "refreshButton": "Перезагрузить",
+            "addButton": "Добавить",
+            "cancelButton": "Отмена",
+            "table": {
+                "version": "Версия",
+                "dateReleased": "Дата релиза",
+                "versionType": "Тип версии"
+            },
+            "latestVersion": "(Новейшая)",
+            "showOnlyInstalled": "Показывать только установленные версии"
+        },
+        "updateDialog": {
+            "title": "Обновление",
+            "updateNowButton": "Обновить",
+            "updateLaterButton": "Позже"
+        }
+    },
+    "general": {
+        "updated": "Обновлено",
+        "time": {
+            "dateFormat": "dd.MM.yyyy",
+            "ago": "назад",
+            "units": {
+                "second1": "секунду",
+                "seconds234": "секунды",
+                "seconds": "секунд",
+                "minute1": "минуту",
+                "minutes234": "минуты",
+                "minutes": "минут",
+                "hour1": "час",
+                "hours234": "часа",
+                "hours": "часов",
+                "day1": "день",
+                "days234": "дня",
+                "days": "дней",
+                "today": "сегодня",
+                "yesterday": "вчера",
+                "week1": "неделю",
+                "weeks234": "недели",
+                "weeks": "недель",
+                "month1": "месяц",
+                "months234": "месяца",
+                "months": "месяцев",
+                "year1": "год",
+                "years234": "года",
+                "years": "лет"
+            }
+        }
     }
 }
