@@ -21,6 +21,8 @@ package me.theentropyshard.teslauncher;
 import me.theentropyshard.teslauncher.gui.Gui;
 import me.theentropyshard.teslauncher.gui.utils.WindowClosingListener;
 import me.theentropyshard.teslauncher.instance.InstanceManager;
+import me.theentropyshard.teslauncher.language.Language;
+import me.theentropyshard.teslauncher.language.LanguageManager;
 import me.theentropyshard.teslauncher.logging.Log;
 import me.theentropyshard.teslauncher.minecraft.account.AccountManager;
 import me.theentropyshard.teslauncher.network.UserAgentInterceptor;
@@ -51,12 +53,14 @@ public class TESLauncher {
     private final Path instancesDir;
     private final Path versionsDir;
     private final Path log4jConfigsDir;
+    private final Path languagesDir;
 
     private final Path settingsFile;
     private final Settings settings;
 
     private final OkHttpClient httpClient;
 
+    private final LanguageManager languageManager;
     private final AccountManager accountManager;
     private final InstanceManager instanceManager;
 
@@ -87,6 +91,7 @@ public class TESLauncher {
         this.instancesDir = minecraftDir.resolve("instances");
         this.versionsDir = minecraftDir.resolve("versions");
         this.log4jConfigsDir = minecraftDir.resolve("log4j");
+        this.languagesDir = this.workDir.resolve("languages");
         this.createDirectories();
 
         this.settingsFile = this.workDir.resolve("settings.json");
@@ -99,6 +104,9 @@ public class TESLauncher {
             .writeTimeout(5, TimeUnit.MINUTES)
             .protocols(Collections.singletonList(Protocol.HTTP_1_1))
             .build();
+
+        this.languageManager = new LanguageManager(this.languagesDir);
+        this.languageManager.load();
 
         this.accountManager = new AccountManager(minecraftDir);
         try {
@@ -131,6 +139,7 @@ public class TESLauncher {
             FileUtils.createDirectoryIfNotExists(this.instancesDir);
             FileUtils.createDirectoryIfNotExists(this.versionsDir);
             FileUtils.createDirectoryIfNotExists(this.log4jConfigsDir);
+            FileUtils.createDirectoryIfNotExists(this.languagesDir);
         } catch (IOException e) {
             Log.error("Unable to create launcher directories", e);
         }
@@ -178,6 +187,10 @@ public class TESLauncher {
 
     private static void setInstance(TESLauncher instance) {
         TESLauncher.instance = instance;
+    }
+
+    public Language getLanguage() {
+        return this.languageManager.getLanguage(this.settings.language);
     }
 
     public OkHttpClient getHttpClient() {
