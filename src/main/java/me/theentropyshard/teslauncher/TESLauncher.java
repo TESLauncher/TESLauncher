@@ -23,6 +23,7 @@ import me.theentropyshard.teslauncher.gui.utils.WindowClosingListener;
 import me.theentropyshard.teslauncher.instance.InstanceManager;
 import me.theentropyshard.teslauncher.language.Language;
 import me.theentropyshard.teslauncher.language.LanguageManager;
+import me.theentropyshard.teslauncher.language.LanguageSection;
 import me.theentropyshard.teslauncher.logging.Log;
 import me.theentropyshard.teslauncher.minecraft.account.AccountManager;
 import me.theentropyshard.teslauncher.network.UserAgentInterceptor;
@@ -107,6 +108,12 @@ public class TESLauncher {
 
         this.languageManager = new LanguageManager(this.languagesDir);
         this.languageManager.load();
+
+        LanguageSection section = this.getLanguage().getSection("gui.general");
+        UIManager.put("OptionPane.yesButtonText", section.getString("yes"));
+        UIManager.put("OptionPane.noButtonText", section.getString("no"));
+        UIManager.put("OptionPane.okButtonText", section.getString("ok"));
+        UIManager.put("OptionPane.cancelButtonText", section.getString("cancel"));
 
         this.accountManager = new AccountManager(minecraftDir);
         try {
