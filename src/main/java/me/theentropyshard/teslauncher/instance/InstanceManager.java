@@ -38,6 +38,8 @@ public class InstanceManager {
     private final List<MinecraftInstance> instances;
     private final Map<String, MinecraftInstance> instancesByName;
 
+    private long totalPlaytime;
+
     public InstanceManager(Path workDir) {
         this.workDir = workDir;
         this.instances = new ArrayList<>();
@@ -52,16 +54,26 @@ public class InstanceManager {
                 continue;
             }
 
-            Path instanceFile = path.resolve("instance.json");
-            if (!Files.exists(instanceFile)) {
-                continue;
+            if (this.loadInstance(path) == null) {
+                Log.warn("Found instance directory without instance.json: " + path);
             }
-
-            MinecraftInstance instance = Json.parse(FileUtils.readUtf8(instanceFile), MinecraftInstance.class);
-            instance.setWorkDir(path);
-
-            this.cacheInstance(instance);
         }
+    }
+
+    public MinecraftInstance loadInstance(Path instanceDir) throws IOException {
+        Path instanceFile = instanceDir.resolve("instance.json");
+
+        if (!Files.exists(instanceFile)) {
+            return null;
+        }
+
+        MinecraftInstance instance = Json.parse(FileUtils.readUtf8(instanceFile), MinecraftInstance.class);
+        instance.setWorkDir(instanceDir);
+
+        this.cacheInstance(instance);
+        this.increaseTotalPlaytime(instance.getTotalPlaytime());
+
+        return instance;
     }
 
     public void reload() throws IOException {
@@ -129,7 +141,7 @@ public class InstanceManager {
         return freeName;
     }
 
-    public void createInstance(String name, String groupName, String minecraftVersion) throws
+    public Instance createInstance(String name, String group, String minecraftVersion, boolean autoUpdate) throws
             IOException,
             InstanceAlreadyExistsException {
 
@@ -137,8 +149,9 @@ public class InstanceManager {
             throw new InstanceAlreadyExistsException(name);
         }
 
-        MinecraftInstance instance = new MinecraftInstance(name, groupName, minecraftVersion);
+        MinecraftInstance instance = new MinecraftInstance(name, group, minecraftVersion);
         instance.setWorkDir(this.getInstanceWorkDir(name, minecraftVersion));
+        instance.setAutoUpdateToLatest(autoUpdate);
 
         this.cacheInstance(instance);
 
@@ -147,6 +160,8 @@ public class InstanceManager {
         FileUtils.createDirectoryIfNotExists(instance.getJarModsDir());
 
         instance.save();
+
+        return instance;
     }
 
     public void removeInstance(String name) throws IOException {
@@ -159,6 +174,7 @@ public class InstanceManager {
         FileUtils.delete(instance.getWorkDir());
 
         this.uncacheInstance(instance);
+        this.decreaseTotalPlaytime(instance.getTotalPlaytime());
     }
 
     public boolean renameInstance(MinecraftInstance instance, String newName) throws IOException {
@@ -181,6 +197,30 @@ public class InstanceManager {
         this.cacheInstance(instance);
 
         return invalidName;
+    }
+
+    public void increaseTotalPlaytime(long seconds) {
+        if (seconds < 0) {
+            return;
+        }
+
+        this.totalPlaytime += seconds;
+    }
+
+    public void decreaseTotalPlaytime(long seconds) {
+        if (seconds < 0) {
+            return;
+        }
+
+        this.totalPlaytime = Math.max(0, Math.min(this.totalPlaytime, this.totalPlaytime - seconds));
+    }
+
+    public long getTotalPlaytime() {
+        return this.totalPlaytime;
+    }
+
+    public int getInstancesCount() {
+        return this.instances.size();
     }
 
     public MinecraftInstance getInstanceByName(String name) {

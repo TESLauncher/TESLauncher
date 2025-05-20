@@ -309,6 +309,14 @@ public class PlayView extends JPanel {
         }
     }
 
+    public void playLastInstance() {
+
+    }
+
+    public void reloadLanguage() {
+
+    }
+
     public DefaultComboBoxModel<String> getModel() {
         return this.model;
     }

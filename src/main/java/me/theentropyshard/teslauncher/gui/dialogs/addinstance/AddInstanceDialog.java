@@ -240,7 +240,7 @@ public class AddInstanceDialog extends AppDialog {
                 InstanceManager instanceManager = TESLauncher.getInstance().getInstanceManager();
 
                 try {
-                    instanceManager.createInstance(instanceName, chosenGroupName, mcVersion);
+                    instanceManager.createInstance(instanceName, chosenGroupName, mcVersion, false);
                 } catch (InstanceAlreadyExistsException ex) {
                     MessageBox.showErrorMessage(
                             AddInstanceDialog.this.getDialog(),

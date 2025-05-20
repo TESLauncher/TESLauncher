@@ -44,15 +44,17 @@ public class LanguageManager {
             return this.languages.get("English");
         }
 
-        Language language = this.languages.get(name);
-
-        if (language == null) {
-            Log.warn("Could not find language '" + name + "'");
+        if (!this.isLanguageLoaded(name)) {
+            Log.warn("Could not find language '" + name + "', defaulting to English");
 
             return this.languages.get("English");
         }
 
-        return language;
+        return this.languages.get(name);
+    }
+
+    public boolean isLanguageLoaded(String name) {
+        return this.languages.containsKey(name);
     }
 
     public void load() {

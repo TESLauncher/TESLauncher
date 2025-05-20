@@ -41,6 +41,7 @@ public class MinecraftInstance extends JavaInstance {
     private int minecraftWindowWidth;
     private int minecraftWindowHeight;
     private String customWindowString;
+    private boolean autoUpdateToLatest;
     private final List<JarMod> jarMods;
     private transient volatile boolean running;
 
@@ -135,5 +136,13 @@ public class MinecraftInstance extends JavaInstance {
 
     public void setCustomWindowString(String customWindowString) {
         this.customWindowString = customWindowString;
+    }
+
+    public boolean isAutoUpdateToLatest() {
+        return this.autoUpdateToLatest;
+    }
+
+    public void setAutoUpdateToLatest(boolean autoUpdateToLatest) {
+        this.autoUpdateToLatest = autoUpdateToLatest;
     }
 }

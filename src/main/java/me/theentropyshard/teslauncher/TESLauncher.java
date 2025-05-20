@@ -197,7 +197,13 @@ public class TESLauncher {
     }
 
     public Language getLanguage() {
-        return this.languageManager.getLanguage(this.settings.language);
+        Language language = this.languageManager.getLanguage(this.settings.language);
+
+        if (!this.languageManager.isLanguageLoaded(this.settings.language)) {
+            this.settings.language = "English";
+        }
+
+        return language;
     }
 
     public OkHttpClient getHttpClient() {

@@ -27,23 +27,35 @@ import java.util.regex.Pattern;
 
 public final class Log {
     private static final BlockingQueue<LogEvent> EVENT_QUEUE = new ArrayBlockingQueue<>(128);
+    private static final boolean WRAP_ERR = true;
+
+    // https://github.com/MultiMC/Launcher/blob/bb04cb09a37e4396ba09068e7d8691ceb6e3cfdc/launcher/minecraft/MinecraftInstance.cpp#L773
+    private static final String JAVA_SYMBOL = "([a-zA-Z_$][a-zA-Z\\d_$]*\\.)+[a-zA-Z_$][a-zA-Z\\d_$]*";
+    private static final Pattern EXCEPTION_AT_PATTERN = Pattern.compile("\\s+at " + Log.JAVA_SYMBOL);
+    private static final Pattern CAUSED_BY_PATTERN = Pattern.compile("Caused by: " + Log.JAVA_SYMBOL);
+    private static final Pattern EXCEPTION_PATTERN = Pattern.compile("([a-zA-Z_$][a-zA-Z\\d_$]*\\.)+[a-zA-Z_$]?[a-zA-Z\\d_$]*(Exception|Error|Throwable)");
+    private static final Pattern MORE_PATTERN = Pattern.compile("\\.\\.\\. \\d+ more$");
 
     private static final Pattern LOG4J_THREAD_REGEX = Pattern.compile("<log4j:Event.*?thread=\"(.*?)\".*?>");
     private static final Pattern LOG4J_LEVEL_REGEX = Pattern.compile("<log4j:Event.*?level=\"(.*?)\".*?>");
     private static final Pattern LOG4J_MESSAGE_REGEX = Pattern.compile("<log4j:Message><!\\[CDATA\\[(.*?)]]></log4j:Message>");
 
-    private static final boolean WRAP_ERR = true;
+    private static boolean started;
 
     public static void start() {
+        if (Log.started) {
+            return;
+        }
+
         new LogQueueProcessor(Log.EVENT_QUEUE).start();
 
-        System.setOut(new SystemOutInterceptor(System.out, LogLevel.DEBUG));
+        // System.setOut(new SystemOutInterceptor(System.out, LogLevel.DEBUG));
 
         if (Log.WRAP_ERR) {
             System.setErr(new SystemOutInterceptor(System.err, LogLevel.ERROR));
         }
 
-        Log.info("Initialized logging");
+        Log.started = true;
     }
 
     public static void info(String message) {

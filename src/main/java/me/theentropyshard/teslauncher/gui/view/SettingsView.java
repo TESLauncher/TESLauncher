@@ -194,4 +194,8 @@ public class SettingsView extends JPanel {
             this.add(otherSettings, gbc);
         }
     }
+
+    public void reloadLanguage() {
+
+    }
 }

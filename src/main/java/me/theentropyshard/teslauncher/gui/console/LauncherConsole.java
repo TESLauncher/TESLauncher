@@ -157,4 +157,8 @@ public class LauncherConsole {
             this.scrollToBottom();
         });
     }
+
+    public void reloadLanguage() {
+
+    }
 }

@@ -18,6 +18,9 @@
 
 package me.theentropyshard.teslauncher.utils;
 
+import me.theentropyshard.teslauncher.TESLauncher;
+import me.theentropyshard.teslauncher.language.LanguageSection;
+
 public final class TimeUtils {
     public static String getHoursMinutesSeconds(long totalSeconds) {
         long hours = totalSeconds / 3600;
@@ -43,6 +46,65 @@ public final class TimeUtils {
                 time = time + seconds + " seconds";
             } else {
                 time = time + ", " + seconds + " seconds";
+            }
+        }
+
+        return time;
+    }
+
+    public static String getHoursMinutesSecondsLocalized(long totalSeconds) {
+        LanguageSection section = TESLauncher.getInstance().getLanguage().getSection("general.time.units");
+
+        long hours = totalSeconds / 3600;
+        long minutes = (totalSeconds % 3600) / 60;
+        long seconds = totalSeconds % 60;
+
+        String time = "";
+
+        if (hours != 0) {
+            time = hours + " ";
+            String timeUnit;
+            if (hours == 1) {
+                timeUnit = section.getString("hour1");
+            } else if (hours == 2 || hours == 3 || hours == 4) {
+                timeUnit = section.getString("hours234");
+            } else {
+                timeUnit = section.getString("hours");
+            }
+            time = time + timeUnit;
+        }
+
+        if (minutes != 0) {
+            String timeUnit;
+            if (minutes == 1) {
+                timeUnit = section.getString("minute1");
+            } else if (minutes == 2 || minutes == 3 || minutes == 4) {
+                timeUnit = section.getString("minutes234");
+            } else {
+                timeUnit = section.getString("minutes");
+            }
+
+            if (hours == 0) {
+                time = time + minutes + " " + timeUnit;
+            } else {
+                time = time + ", " + minutes + " " + timeUnit;
+            }
+        }
+
+        if (seconds != 0) {
+            String timeUnit;
+            if (seconds == 1) {
+                timeUnit = section.getString("second1");
+            } else if (seconds == 2 || seconds == 3 || seconds == 4) {
+                timeUnit = section.getString("seconds234");
+            } else {
+                timeUnit = section.getString("seconds");
+            }
+
+            if (minutes == 0 && hours == 0) {
+                time = time + seconds + " " + timeUnit;
+            } else {
+                time = time + ", " + seconds + " " + timeUnit;
             }
         }
 

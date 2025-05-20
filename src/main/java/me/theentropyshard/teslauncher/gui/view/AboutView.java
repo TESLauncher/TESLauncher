@@ -63,4 +63,8 @@ public class AboutView extends JPanel {
         gbc.gridy++;
         panel.add(new JLabel(text), gbc);
     }
+
+    public void reloadLanguage() {
+
+    }
 }

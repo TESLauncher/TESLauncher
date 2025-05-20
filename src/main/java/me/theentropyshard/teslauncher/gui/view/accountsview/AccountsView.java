@@ -130,6 +130,10 @@ public class AccountsView extends JPanel {
         this.panel.revalidate();
     }
 
+    public void reloadLanguage() {
+
+    }
+
     public JScrollPane getScrollPane() {
         return this.scrollPane;
     }

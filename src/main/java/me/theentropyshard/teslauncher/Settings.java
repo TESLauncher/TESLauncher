@@ -31,7 +31,7 @@ import java.nio.file.Path;
  * I don't usually like making fields public, but ok, those are settings
  */
 public class Settings {
-    public String language = "english";
+    public String language = "English";
     public boolean darkTheme = false;
     public String lastDir = System.getProperty("user.dir");
     public boolean useDownloadDialog = true;
@@ -42,6 +42,24 @@ public class Settings {
     public int whenMCLaunchesOption = 0;
     public int whenMCExitsOption = 0;
     public boolean consoleScrollDown = true;
+    public boolean dialogRelativeParent = true;
+    public boolean settingsDialogUpdateToLatest = false;
+    public boolean showConsoleAtStartup = true;
+    public boolean checkUpdatesStartup = true;
+    public boolean disableFileIntegrityCheck = false;
+    public boolean showOnlyInstalledVersions;
+    public boolean alphaSelected = false;
+    public boolean betaSelected = false;
+    public boolean snapshotSelected = false;
+    public boolean releaseSelected = true;
+    public boolean overrideVersionsPath;
+    public String versionsDirPath;
+    public boolean overrideAssetsPath;
+    public String assetsDirPath;
+    public boolean overrideInstancesPath;
+    public String instancesDirPath;
+    public boolean overrideModloadersPath;
+    public String modloadersDirPath;
 
     public Settings() {
 

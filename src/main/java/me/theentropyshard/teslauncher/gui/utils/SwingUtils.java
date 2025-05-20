@@ -22,11 +22,14 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -44,6 +47,30 @@ public final class SwingUtils {
         SwingUtils.ICON_CACHE.put(path, icon);
 
         return icon;
+    }
+
+    public static void startWorker(Runnable runnable) {
+        new SwingWorker<Void, Void>() {
+            @Override
+            protected Void doInBackground() {
+                runnable.run();
+
+                return null;
+            }
+        }.execute();
+    }
+
+    public static Action newAction(ActionListener actionListener) {
+        return new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                actionListener.actionPerformed(e);
+            }
+        };
+    }
+
+    public static BufferedImage loadImageFromFile(Path file) throws IOException {
+        return ImageIO.read(file.toFile());
     }
 
     public static BufferedImage loadImageFromBase64(String base64) {
@@ -92,6 +119,12 @@ public final class SwingUtils {
     public static void removeActionListeners(AbstractButton button) {
         for (ActionListener listener : button.getActionListeners()) {
             button.removeActionListener(listener);
+        }
+    }
+
+    public static void removeMouseListeners(Component component) {
+        for (MouseListener listener : component.getMouseListeners()) {
+            component.removeMouseListener(listener);
         }
     }
 
