@@ -20,9 +20,12 @@ package me.theentropyshard.teslauncher.utils;
 
 import com.sun.jna.Platform;
 import me.theentropyshard.teslauncher.logging.Log;
+import me.theentropyshard.teslauncher.utils.datatransfer.TransferableFile;
+import me.theentropyshard.teslauncher.utils.datatransfer.TransferableImage;
 
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
@@ -137,6 +140,14 @@ public enum OperatingSystem {
 
     public static void copyToClipboard(String text) {
         Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(text), null);
+    }
+
+    public static void copyToClipboard(Path file) {
+        Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new TransferableFile(file), null);
+    }
+
+    public static void copyToClipboard(BufferedImage image) {
+        Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new TransferableImage(image), null);
     }
 
     public static boolean is64Bit() {
