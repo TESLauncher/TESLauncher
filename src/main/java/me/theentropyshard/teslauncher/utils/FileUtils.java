@@ -19,15 +19,17 @@
 package me.theentropyshard.teslauncher.utils;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public final class FileUtils {
-    private static final FileVisitor<Path> DELETE_VISITOR = new SimpleFileVisitor<Path>() {
+    private static final FileVisitor<Path> DELETE_VISITOR = new SimpleFileVisitor<>() {
         @Override
         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
             Files.delete(file);
@@ -43,6 +45,57 @@ public final class FileUtils {
         }
     };
 
+    private static final class CountFileVisitor extends SimpleFileVisitor<Path> {
+        private int filesCount;
+
+        @Override
+        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+            this.filesCount++;
+
+            return FileVisitResult.CONTINUE;
+        }
+
+        public int getFilesCount() {
+            return this.filesCount;
+        }
+    }
+
+    public static void rename(Path path, String newName) throws IOException {
+        Path parentDir = path.getParent();
+        Path targetPath = parentDir.resolve(newName);
+
+        Files.move(path, targetPath, StandardCopyOption.REPLACE_EXISTING);
+    }
+
+    public static boolean isPathInvalid(String path) {
+        try {
+            Path file = Paths.get(path).toAbsolutePath();
+
+            if (Files.exists(file)) {
+                return false;
+            }
+
+            FileUtils.createFileIfNotExists(file);
+            FileUtils.delete(file);
+        } catch (InvalidPathException | IOException e) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public static int countFiles(Path dir) throws IOException {
+        if (!Files.isDirectory(dir)) {
+            throw new IOException(dir + " was expected to be a directory");
+        }
+
+        CountFileVisitor visitor = new CountFileVisitor();
+
+        Files.walkFileTree(dir, visitor);
+
+        return visitor.getFilesCount();
+    }
+
     public static String sanitizeFileName(String dirtyName) {
         return dirtyName.replaceAll("[^a-zA-Z0-9_.]", "");
     }
@@ -56,6 +109,16 @@ public final class FileUtils {
             Files.walkFileTree(path, FileUtils.DELETE_VISITOR);
         } else {
             Files.delete(path);
+        }
+    }
+
+    public static void copyDirectory(Path src, Path dest) throws IOException {
+        List<Path> walked = FileUtils.walk(src);
+
+        FileUtils.createDirectoryIfNotExists(dest);
+
+        for (Path path : walked) {
+            Files.copy(path, dest.resolve(src.relativize(path)), StandardCopyOption.REPLACE_EXISTING);
         }
     }
 
@@ -81,16 +144,24 @@ public final class FileUtils {
     }
 
     public static void writeUtf8(Path file, String s) throws IOException {
+        FileUtils.write(file, s, StandardCharsets.UTF_8);
+    }
+
+    public static void write(Path file, String s, Charset charset) throws IOException {
         if (FileUtils.existsButIsNotAFile(file)) {
             throw new IOException(file + " exists, but is not a file");
         }
 
         Files.createDirectories(file.getParent());
-        Files.write(file, s.getBytes(StandardCharsets.UTF_8));
+        Files.writeString(file, s, charset);
     }
 
     public static String readUtf8(Path file) throws IOException {
-        return new String(Files.readAllBytes(file), StandardCharsets.UTF_8);
+        return FileUtils.read(file, StandardCharsets.UTF_8);
+    }
+
+    public static String read(Path file, Charset charset) throws IOException {
+        return Files.readString(file, charset);
     }
 
     public static List<Path> list(Path dir) throws IOException {
