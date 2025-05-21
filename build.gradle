@@ -53,6 +53,7 @@ ext {
     text = '1.10.0'
     jcommander = '1.82'
     okhttp = '4.12.0'
+    retrofit = '2.11.0'
     jna = '5.14.0'
     log4j = '2.20.0'
     junit = '5.7.2'
@@ -68,6 +69,8 @@ dependencies {
     implementation "org.apache.commons:commons-text:$text"
     implementation "com.beust:jcommander:$jcommander"
     implementation "com.squareup.okhttp3:okhttp:$okhttp"
+    implementation "com.squareup.retrofit2:retrofit:$retrofit"
+    implementation "com.squareup.retrofit2:converter-gson:$retrofit"
     implementation "net.java.dev.jna:jna:$jna"
     implementation "net.java.dev.jna:jna-platform:$jna"
     implementation "com.github.rtyley:animated-gif-lib-for-java:$gifdecoder"
