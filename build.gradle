@@ -39,6 +39,10 @@ def theBuildDir = layout.buildDirectory.asFile.get().absolutePath
 repositories {
     mavenCentral()
     gradlePluginPortal()
+
+    maven {
+        url 'https://jitpack.io'
+    }
 }
 
 ext {
@@ -52,6 +56,7 @@ ext {
     jna = '5.14.0'
     log4j = '2.20.0'
     junit = '5.7.2'
+    gifdecoder = 'animated-gif-lib-1.7'
 }
 
 dependencies {
@@ -65,6 +70,7 @@ dependencies {
     implementation "com.squareup.okhttp3:okhttp:$okhttp"
     implementation "net.java.dev.jna:jna:$jna"
     implementation "net.java.dev.jna:jna-platform:$jna"
+    implementation "com.github.rtyley:animated-gif-lib-for-java:$gifdecoder"
     implementation "org.apache.logging.log4j:log4j-api:$log4j"
     implementation "org.apache.logging.log4j:log4j-core:$log4j"
 
