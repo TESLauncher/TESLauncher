@@ -20,9 +20,11 @@ package me.theentropyshard.teslauncher.instance;
 
 import me.theentropyshard.teslauncher.Settings;
 import me.theentropyshard.teslauncher.TESLauncher;
+import me.theentropyshard.teslauncher.logging.Log;
 import me.theentropyshard.teslauncher.utils.FileUtils;
 import me.theentropyshard.teslauncher.utils.json.Json;
 
+import javax.swing.*;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
@@ -33,7 +35,7 @@ public abstract class Instance {
     private transient Path workDir;
     private String name;
     private String group;
-    private String iconPath = "/assets/icons/grass_icon.png";
+    private String iconFileName = "/assets/icons/grass_icon.png";
     private LocalDateTime lastTimePlayed = LocalDateTime.MIN;
     private long lastPlaytime;
     private long totalPlaytime;
@@ -52,6 +54,25 @@ public abstract class Instance {
         this.lastPlaytime = seconds;
         this.totalPlaytime += seconds;
     }
+
+    public Icon getIcon() {
+        IconManager iconManager = TESLauncher.getInstance().getIconManager();
+
+        Icon icon;
+
+        try {
+            icon = iconManager.getIcon(this.iconFileName).getIcon();
+        } catch (Exception e) {
+            Log.warn("Could not load icon '" + this.iconFileName + "' for instance '" + this.name + "'");
+
+            String validIconPath = "grass_icon.png";
+            this.iconFileName = validIconPath;
+            icon = iconManager.getIcon(validIconPath).getIcon();
+        }
+
+        return icon;
+    }
+
 
     public Path getWorkDir() {
         return this.workDir;
@@ -77,12 +98,12 @@ public abstract class Instance {
         this.group = group;
     }
 
-    public String getIconPath() {
-        return this.iconPath;
+    public String getIconFileName() {
+        return this.iconFileName;
     }
 
-    public void setIconPath(String iconPath) {
-        this.iconPath = iconPath;
+    public void setIconFileName(String iconFileName) {
+        this.iconFileName = iconFileName;
     }
 
     public LocalDateTime getLastTimePlayed() {

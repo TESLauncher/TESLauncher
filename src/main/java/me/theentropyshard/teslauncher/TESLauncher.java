@@ -20,6 +20,7 @@ package me.theentropyshard.teslauncher;
 
 import me.theentropyshard.teslauncher.gui.Gui;
 import me.theentropyshard.teslauncher.gui.utils.WindowClosingListener;
+import me.theentropyshard.teslauncher.instance.IconManager;
 import me.theentropyshard.teslauncher.instance.InstanceManager;
 import me.theentropyshard.teslauncher.language.Language;
 import me.theentropyshard.teslauncher.language.LanguageManager;
@@ -64,6 +65,7 @@ public class TESLauncher {
     private final LanguageManager languageManager;
     private final AccountManager accountManager;
     private final InstanceManager instanceManager;
+    private final IconManager iconManager;
 
     private final ExecutorService taskPool;
 
@@ -127,6 +129,16 @@ public class TESLauncher {
             this.instanceManager.load();
         } catch (IOException e) {
             Log.error("Unable to load instances", e);
+        }
+
+        Path iconsDir = minecraftDir.resolve("icons");
+        this.iconManager = new IconManager(iconsDir);
+        try {
+            FileUtils.createDirectoryIfNotExists(iconsDir);
+            this.iconManager.loadIcons();
+            this.iconManager.saveBuiltinIcons();
+        } catch (IOException e) {
+            Log.error("Unable to load icons", e);
         }
 
         this.taskPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
@@ -194,6 +206,10 @@ public class TESLauncher {
 
     private static void setInstance(TESLauncher instance) {
         TESLauncher.instance = instance;
+    }
+
+    public IconManager getIconManager() {
+        return this.iconManager;
     }
 
     public Language getLanguage() {

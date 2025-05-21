@@ -38,7 +38,7 @@ public class SelectIconDialog extends AppDialog {
         String grassPath = "/assets/icons/grass_icon.png";
         JButton grassButton = new JButton(SwingUtils.getIcon(grassPath));
         grassButton.addActionListener(e -> {
-            instance.setIconPath(grassPath);
+            instance.setIconFileName(grassPath);
             item.getIconLabel().setIcon(SwingUtils.getIcon(grassPath));
 
             this.getDialog().dispose();
@@ -48,7 +48,7 @@ public class SelectIconDialog extends AppDialog {
         String craftingTablePath = "/assets/icons/crafting_table_icon.png";
         JButton craftingTableButton = new JButton(SwingUtils.getIcon(craftingTablePath));
         craftingTableButton.addActionListener(e -> {
-            instance.setIconPath(craftingTablePath);
+            instance.setIconFileName(craftingTablePath);
             item.getIconLabel().setIcon(SwingUtils.getIcon(craftingTablePath));
 
             this.getDialog().dispose();

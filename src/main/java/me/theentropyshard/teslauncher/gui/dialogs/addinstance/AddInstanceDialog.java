@@ -27,6 +27,7 @@ import me.theentropyshard.teslauncher.instance.InstanceManager;
 import me.theentropyshard.teslauncher.gui.utils.MessageBox;
 import me.theentropyshard.teslauncher.gui.utils.SwingUtils;
 import me.theentropyshard.teslauncher.logging.Log;
+import me.theentropyshard.teslauncher.minecraft.MinecraftInstance;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -37,9 +38,23 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
+import java.util.Set;
 
 public class AddInstanceDialog extends AppDialog {
-    
+    public static final String TITLE = "gui.addInstanceDialog.title";
+    public static final String NAME_LABEL = "gui.addInstanceDialog.nameFieldLabel";
+    public static final String GROUP_LABEL = "gui.addInstanceDialog.groupFieldLabel";
+    public static final String AUTO_UPDATE_TO_LATEST = "gui.addInstanceDialog.autoUpdateToLatest";
+    public static final String FILTER = "gui.addInstanceDialog.filter";
+    public static final String REFRESH_BUTTON = "gui.addInstanceDialog.refreshButton";
+    public static final String ADD_BUTTON = "gui.addInstanceDialog.addButton";
+    public static final String CANCEL_BUTTON = "gui.addInstanceDialog.cancelButton";
+    public static final String EMPTY_NAME_MESSAGE = "messages.gui.addInstanceDialog.instanceNameCannotBeEmpty";
+    public static final String GROUP_NAME_EMPTY_MESSAGE = "messages.gui.addInstanceDialog.groupNameCannotBeEmpty";
+    public static final String VERSION_NOT_SELECTED_MESSAGE = "messages.gui.addInstanceDialog.cosmicVersionNotSelected";
+    public static final String UNABLE_TO_CREATE_MESSAGE = "messages.gui.addInstanceDialog.unableToCreateInstance";
+    public static final String NO_CLIENT_MESSAGE = "messages.gui.addInstanceDialog.doesNotHaveClient";
+    public static final String SHOW_ONLY_INSTALLED = "gui.addInstanceDialog.showOnlyInstalled";
 
     private final JTextField nameField;
     private final JTextField groupField;
@@ -51,8 +66,8 @@ public class AddInstanceDialog extends AppDialog {
 
     private boolean nameEdited;
 
-    public AddInstanceDialog(PlayView playView, String groupName) {
-        super(TESLauncher.frame, "Add New Instance");
+    public AddInstanceDialog(PlayView playView, String groupName, Set<String> groups) {
+        super(TESLauncher.frame, TESLauncher.getInstance().getLanguage().getString(AddInstanceDialog.TITLE));
 
         JPanel root = new JPanel(new BorderLayout());
 
@@ -230,7 +245,6 @@ public class AddInstanceDialog extends AppDialog {
             }
 
             String chosenGroupName = this.groupField.getText();
-            playView.addInstanceItem(new InstanceItem(SwingUtils.getIcon("/assets/grass_icon.png"), instanceName), chosenGroupName);
             this.getDialog().dispose();
             TableModel model = versionsTable.getModel();
             int selectedRow = versionsTable.getSelectedRow();
@@ -239,8 +253,11 @@ public class AddInstanceDialog extends AppDialog {
             TESLauncher.getInstance().doTask(() -> {
                 InstanceManager instanceManager = TESLauncher.getInstance().getInstanceManager();
 
+                MinecraftInstance instance;
+
                 try {
-                    instanceManager.createInstance(instanceName, chosenGroupName, mcVersion, false);
+                    instance = (MinecraftInstance) instanceManager.createInstance(instanceName, chosenGroupName, mcVersion,
+                        TESLauncher.getInstance().getSettings().settingsDialogUpdateToLatest);
                 } catch (InstanceAlreadyExistsException ex) {
                     MessageBox.showErrorMessage(
                             AddInstanceDialog.this.getDialog(),
@@ -248,9 +265,23 @@ public class AddInstanceDialog extends AppDialog {
                     );
 
                     Log.warn(ex.toString());
+
+                    return;
                 } catch (IOException ex) {
                     Log.error("Unable to create new instance", ex);
+
+                    return;
                 }
+
+                SwingUtilities.invokeLater(() -> {
+                    playView.addInstanceItem(
+                        new InstanceItem(instance), chosenGroupName, false
+                    );
+
+                    TESLauncher.getInstance().getGui().updateStats();
+
+                    this.getDialog().dispose();
+                });
             });
         });
         rightButtonsPanel.add(this.addButton);

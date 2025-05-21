@@ -18,16 +18,14 @@
 
 package me.theentropyshard.teslauncher.gui.components;
 
-import me.theentropyshard.teslauncher.TESLauncher;
+import me.theentropyshard.teslauncher.gui.utils.MouseListenerBuilder;
 import me.theentropyshard.teslauncher.minecraft.MinecraftInstance;
-import me.theentropyshard.teslauncher.instance.InstanceManager;
 import me.theentropyshard.teslauncher.minecraft.download.MinecraftDownloadListener;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
@@ -35,6 +33,8 @@ import java.awt.geom.Ellipse2D;
 public class InstanceItem extends JPanel implements MinecraftDownloadListener {
     private static final int SIDE_SIZE = 100;
     private static final Dimension PREFERRED_SIZE = new Dimension(InstanceItem.SIDE_SIZE, InstanceItem.SIDE_SIZE);
+
+    private final MinecraftInstance instance;
 
     private final JLabel iconLabel;
     private final JLabel textLabel;
@@ -46,19 +46,20 @@ public class InstanceItem extends JPanel implements MinecraftDownloadListener {
 
     private boolean mouseOver;
     private boolean mousePressed;
-
     private boolean mouseEnabled;
 
     private double percentComplete;
 
-    public InstanceItem(Icon icon, String text) {
+    public InstanceItem(MinecraftInstance instance) {
         super(new BorderLayout());
 
-        this.iconLabel = new JLabel(icon);
+        this.instance = instance;
+
+        this.iconLabel = new JLabel(instance.getIcon());
         this.iconLabel.setHorizontalAlignment(JLabel.CENTER);
         this.add(this.iconLabel, BorderLayout.CENTER);
 
-        this.textLabel = new JLabel(text);
+        this.textLabel = new JLabel(instance.getName());
         this.textLabel.setHorizontalAlignment(JLabel.CENTER);
         this.add(this.textLabel, BorderLayout.SOUTH);
 
@@ -70,50 +71,46 @@ public class InstanceItem extends JPanel implements MinecraftDownloadListener {
         this.mouseEnabled = true;
 
         this.setOpaque(false);
-        this.setToolTipText(text);
+        this.setToolTipText(instance.getName());
         this.setBorder(new EmptyBorder(5, 5, 5, 5));
         this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        this.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                if (!InstanceItem.this.mouseEnabled) {
+
+        MouseListener listener = new MouseListenerBuilder()
+            .mouseEntered(e -> {
+                if (!this.mouseEnabled) {
                     return;
                 }
 
-                InstanceItem.this.mouseOver = true;
-                InstanceItem.this.repaint();
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-                if (!InstanceItem.this.mouseEnabled) {
+                this.mouseOver = true;
+                this.repaint();
+            })
+            .mouseExited(e -> {
+                if (!this.mouseEnabled) {
                     return;
                 }
 
-                InstanceItem.this.mouseOver = false;
-                InstanceItem.this.repaint();
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-                if (!InstanceItem.this.mouseEnabled) {
+                this.mouseOver = false;
+                this.repaint();
+            })
+            .mousePressed(e -> {
+                if (!this.mouseEnabled) {
                     return;
                 }
 
-                InstanceItem.this.mousePressed = true;
-                InstanceItem.this.repaint();
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                if (!InstanceItem.this.mouseEnabled) {
+                this.mousePressed = true;
+                this.repaint();
+            })
+            .mouseReleased(e -> {
+                if (!this.mouseEnabled) {
                     return;
                 }
 
-                InstanceItem.this.mousePressed = false;
-                InstanceItem.this.repaint();
-            }
-        });
+                this.mousePressed = false;
+                this.repaint();
+            })
+            .build();
+
+        this.addMouseListener(listener);
     }
 
     @Override
@@ -135,8 +132,7 @@ public class InstanceItem extends JPanel implements MinecraftDownloadListener {
     }
 
     public MinecraftInstance getAssociatedInstance() {
-        InstanceManager instanceManager = TESLauncher.getInstance().getInstanceManager();
-        return instanceManager.getInstanceByName(this.getTextLabel().getText());
+        return this.instance;
     }
 
     protected void paintBackground(Graphics g) {
@@ -161,21 +157,21 @@ public class InstanceItem extends JPanel implements MinecraftDownloadListener {
 
         int arcSize = 48;
         Shape arc = new Arc2D.Double(
-                (double) size.width / 2 - (double) arcSize / 2,
-                (double) size.height / 2 - (double) arcSize / 2 - 8,
-                arcSize,
-                arcSize,
-                90 - degree,
-                degree,
-                Arc2D.PIE
+            (double) size.width / 2 - (double) arcSize / 2,
+            (double) size.height / 2 - (double) arcSize / 2 - 8,
+            arcSize,
+            arcSize,
+            90 - degree,
+            degree,
+            Arc2D.PIE
         );
 
         int innerSize = 42;
         Shape inner = new Ellipse2D.Double(
-                (double) size.width / 2 - (double) innerSize / 2,
-                (double) size.height / 2 - (double) innerSize / 2 - 8,
-                innerSize,
-                innerSize
+            (double) size.width / 2 - (double) innerSize / 2,
+            (double) size.height / 2 - (double) innerSize / 2 - 8,
+            innerSize,
+            innerSize
         );
 
         Area area = new Area(arc);
@@ -198,11 +194,21 @@ public class InstanceItem extends JPanel implements MinecraftDownloadListener {
 
     @Override
     protected void paintComponent(Graphics g) {
-        this.paintBackground(g);
+        Graphics2D g2d = ((Graphics2D) g);
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        super.paintComponent(g);
+        this.paintBackground(g2d);
 
-        this.paintArc((Graphics2D) g);
+        super.paintComponent(g2d);
+
+        this.paintArc(g2d);
+    }
+
+    @Override
+    public void updateUI() {
+        super.updateUI();
+
+        this.updateColors();
     }
 
     public void updateColors() {

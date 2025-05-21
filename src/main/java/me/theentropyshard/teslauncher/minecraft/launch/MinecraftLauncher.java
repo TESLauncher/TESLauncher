@@ -60,7 +60,7 @@ public class MinecraftLauncher {
         this.classpath = new ArrayList<>();
     }
 
-    public int launch(Consumer<List<String>> beforeLaunch, Account account, Version version,
+    public Process launch(Consumer<List<String>> beforeLaunch, Account account, Version version,
                       Path runDir, Path minecraftDir, long minMem, long maxMem, Set<String> jvmFlags, boolean exitAfterLaunch) throws IOException {
         this.classpath.clear();
 
@@ -256,7 +256,7 @@ public class MinecraftLauncher {
         return command;
     }
 
-    private int runGameProcess(List<String> command, Path runDir, Account account, boolean exitAfterLaunch) throws IOException {
+    private Process runGameProcess(List<String> command, Path runDir, Account account, boolean exitAfterLaunch) throws IOException {
         Log.info("Working directory: " + runDir);
 
         List<String> censoredCommand = command.stream()
@@ -277,27 +277,7 @@ public class MinecraftLauncher {
             TESLauncher.getInstance().shutdown();
         }
 
-        new ProcessReader(process).read(line -> {
-            this.readProcessOutput(line, account);
-        });
-
-        try {
-            return process.waitFor();
-        } catch (InterruptedException e) {
-            throw new IOException("Unable to wait for process to end");
-        }
-    }
-
-    private void readProcessOutput(String line, Account account) {
-        if (account instanceof MicrosoftAccount) {
-            line = line.replace(account.getAccessToken(), "**ACCESSTOKEN**");
-        }
-        line = line.replace(account.getUsername(), "**USERNAME**");
-        line = line.replace(account.getUuid().toString(), "**UUID**");
-
-        MinecraftError.checkForError(line);
-
-        Log.minecraft(line);
+        return process;
     }
 
     private static String getMojangJavaExecutable(Version version, Path runtimesDir) {

@@ -21,8 +21,11 @@ package me.theentropyshard.teslauncher.instance;
 import me.theentropyshard.teslauncher.minecraft.MinecraftInstance;
 import me.theentropyshard.teslauncher.utils.FileUtils;
 import me.theentropyshard.teslauncher.utils.StringUtils;
+import me.theentropyshard.teslauncher.utils.ZipUtils;
 import me.theentropyshard.teslauncher.utils.json.Json;
 import me.theentropyshard.teslauncher.logging.Log;
+import net.lingala.zip4j.ZipFile;
+import net.lingala.zip4j.model.FileHeader;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -213,6 +216,72 @@ public class InstanceManager {
         }
 
         this.totalPlaytime = Math.max(0, Math.min(this.totalPlaytime, this.totalPlaytime - seconds));
+    }
+
+    public InstanceImportResult importInstance(Path file) throws IOException {
+        try (ZipFile zipFile = new ZipFile(file.toFile())) {
+            List<FileHeader> fileHeaders = zipFile.getFileHeaders();
+            if (fileHeaders.isEmpty()) {
+                return new InstanceImportResult(
+                    InstanceImportStatus.BAD_FILE,
+                    "empty zip"
+                );
+            }
+
+            String fileName = ZipUtils.findTopLevelDirectory(fileHeaders);
+            if (fileName == null) {
+                return new InstanceImportResult(
+                    InstanceImportStatus.BAD_FILE,
+                    "cannot find top level directory in zip"
+                );
+            }
+
+            if (Files.exists(this.workDir.resolve(fileName))) {
+                return new InstanceImportResult(
+                    InstanceImportStatus.INSTANCE_EXISTS,
+                    fileName
+                );
+            }
+
+            zipFile.extractAll(this.workDir.toString());
+
+            Path instanceDir = this.workDir.resolve(fileName);
+            MinecraftInstance instance = this.loadInstance(instanceDir);
+            if (instance == null) {
+                FileUtils.delete(instanceDir);
+
+                return new InstanceImportResult(
+                    InstanceImportStatus.BAD_FILE,
+                    "no instance.json in zip"
+                );
+            }
+
+            return new InstanceImportResult(InstanceImportStatus.SUCCESS, instance);
+        }
+    }
+
+    public static final class InstanceImportResult {
+        private final InstanceImportStatus status;
+        private final Object message;
+
+        public InstanceImportResult(InstanceImportStatus status, Object message) {
+            this.status = status;
+            this.message = message;
+        }
+
+        public InstanceImportStatus getStatus() {
+            return this.status;
+        }
+
+        public Object getMessage() {
+            return this.message;
+        }
+    }
+
+    public enum InstanceImportStatus {
+        SUCCESS,
+        BAD_FILE,
+        INSTANCE_EXISTS
     }
 
     public long getTotalPlaytime() {

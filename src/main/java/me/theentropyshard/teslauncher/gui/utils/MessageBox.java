@@ -22,29 +22,33 @@ import javax.swing.*;
 import java.awt.*;
 
 public final class MessageBox {
-    public static void showWarningMessage(Component parent, String message) {
+    public static void showPlainMessage(Component parent, String title, Object message) {
+        JOptionPane.showMessageDialog(parent, message, title, JOptionPane.PLAIN_MESSAGE);
+    }
+
+    public static void showWarningMessage(Component parent, Object message) {
         JOptionPane.showMessageDialog(parent, message, "Warning", JOptionPane.WARNING_MESSAGE);
     }
 
-    public static void showErrorMessage(Component parent, String message) {
+    public static void showErrorMessage(Component parent, Object message) {
         JOptionPane.showMessageDialog(parent, message, "Error", JOptionPane.ERROR_MESSAGE);
     }
 
-    public static boolean showConfirmMessage(Component parent, String title, String message) {
+    public static boolean showConfirmMessage(Component parent, String title, Object message) {
         return JOptionPane.showConfirmDialog(
-                parent,
-                message,
-                title,
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.QUESTION_MESSAGE
+            parent,
+            message,
+            title,
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.QUESTION_MESSAGE
         ) == JOptionPane.YES_OPTION;
     }
 
-    public static String showInputMessage(Component parent, String title, String message) {
+    public static String showInputMessage(Component parent, String title, Object message) {
         return JOptionPane.showInputDialog(parent, message, title, JOptionPane.PLAIN_MESSAGE);
     }
 
-    public static String showInputMessage(Component parent, String title, String message, String initialValue) {
+    public static String showInputMessage(Component parent, String title, Object message, String initialValue) {
         return (String) JOptionPane.showInputDialog(parent, message, title, JOptionPane.PLAIN_MESSAGE, null, null, initialValue);
     }
 

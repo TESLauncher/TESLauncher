@@ -19,7 +19,9 @@
 package me.theentropyshard.teslauncher.gui.view.playview;
 
 import me.theentropyshard.teslauncher.TESLauncher;
-import me.theentropyshard.teslauncher.minecraft.account.AccountManager;
+import me.theentropyshard.teslauncher.gui.dialogs.ChangeGroupDialog;
+import me.theentropyshard.teslauncher.gui.utils.*;
+import me.theentropyshard.teslauncher.language.Language;
 import me.theentropyshard.teslauncher.gui.components.AddInstanceItem;
 import me.theentropyshard.teslauncher.gui.components.InstanceItem;
 import me.theentropyshard.teslauncher.gui.dialogs.SelectIconDialog;
@@ -28,11 +30,8 @@ import me.theentropyshard.teslauncher.gui.dialogs.instancesettings.InstanceSetti
 import me.theentropyshard.teslauncher.minecraft.MinecraftInstance;
 import me.theentropyshard.teslauncher.instance.InstanceManager;
 import me.theentropyshard.teslauncher.instance.InstanceRunner;
-import me.theentropyshard.teslauncher.gui.utils.MessageBox;
-import me.theentropyshard.teslauncher.gui.utils.MouseClickListener;
-import me.theentropyshard.teslauncher.gui.utils.MouseEnterExitListener;
+import me.theentropyshard.teslauncher.minecraft.account.Account;
 import me.theentropyshard.teslauncher.utils.OperatingSystem;
-import me.theentropyshard.teslauncher.gui.utils.SwingUtils;
 import me.theentropyshard.teslauncher.utils.TimeUtils;
 import me.theentropyshard.teslauncher.logging.Log;
 
@@ -59,6 +58,9 @@ public class PlayView extends JPanel {
     private final JLabel instanceInfoLabel;
 
     private InstancesPanel currentPanel;
+    private InstanceRunner instanceRunner;
+    private InstanceItem lastItem;
+    private MinecraftInstance lastPlayedInstance;
 
     public PlayView() {
         super(new BorderLayout());
@@ -71,9 +73,8 @@ public class PlayView extends JPanel {
         this.add(this.header, BorderLayout.NORTH);
 
         AddInstanceItem defaultItem = new AddInstanceItem();
-        defaultItem.addMouseListener(new MouseClickListener(e -> {
-            new AddInstanceDialog(this, PlayView.DEFAULT_GROUP_NAME);
-        }));
+        defaultItem.onClick(e -> new AddInstanceDialog(this, PlayView.DEFAULT_GROUP_NAME, groups.keySet()));
+
         this.defaultInstancesPanel = new InstancesPanel(defaultItem);
         this.currentPanel = this.defaultInstancesPanel;
         this.groups.put(PlayView.DEFAULT_GROUP_NAME, this.defaultInstancesPanel);
@@ -103,9 +104,9 @@ public class PlayView extends JPanel {
 
         this.add(this.instanceInfoLabel, BorderLayout.SOUTH);
 
-        new SwingWorker<List<MinecraftInstance>, Void>() {
+        new Worker<List<MinecraftInstance>, Void>("loading instances") {
             @Override
-            protected List<MinecraftInstance> doInBackground() {
+            protected List<MinecraftInstance> work() throws Exception {
                 InstanceManager instanceManager = TESLauncher.getInstance().getInstanceManager();
 
                 List<MinecraftInstance> instances = instanceManager.getInstances();
@@ -123,15 +124,12 @@ public class PlayView extends JPanel {
                 try {
                     List<MinecraftInstance> instances = this.get();
 
+                    if (instances.size() > 0) {
+                        PlayView.this.lastPlayedInstance = instances.get(0);
+                    }
+
                     for (MinecraftInstance instance : instances) {
-                        Icon icon = SwingUtils.getIcon(instance.getIconPath());
-                        InstanceItem item = new InstanceItem(icon, instance.getName());
-                        String group = instance.getGroup();
-                        if (group == null || group.isEmpty()) {
-                            instance.setGroup(PlayView.DEFAULT_GROUP_NAME);
-                            group = instance.getGroup();
-                        }
-                        PlayView.this.addInstanceItem(item, group);
+                        PlayView.this.loadInstance(instance, false);
                     }
 
                     String group = TESLauncher.getInstance().getSettings().lastInstanceGroup;
@@ -145,79 +143,118 @@ public class PlayView extends JPanel {
         }.execute();
     }
 
-    public void addInstanceItem(InstanceItem item, String groupName) {
-        if (item instanceof AddInstanceItem) {
-            throw new IllegalArgumentException("Adding AddInstanceItem is not allowed");
+    public void loadInstance(MinecraftInstance instance, boolean sort) {
+        InstanceItem item = new InstanceItem(instance);
+        PlayView.this.addInstanceItem(item, instance.getGroup(), sort);
+    }
+
+    public void addInstanceItem(InstanceItem item, String groupName, boolean sort) {
+        if (item.getAssociatedInstance() == this.lastPlayedInstance) {
+            this.lastItem = item;
         }
 
         InstancesPanel panel = this.groups.get(groupName);
         if (panel == null) {
             AddInstanceItem addInstanceItem = new AddInstanceItem();
-            addInstanceItem.addMouseListener(new MouseClickListener(e -> {
-                new AddInstanceDialog(this, groupName);
-            }));
+            addInstanceItem.onClick(e -> new AddInstanceDialog(this, groupName, groups.keySet()));
+
             panel = new InstancesPanel(addInstanceItem);
             this.groups.put(groupName, panel);
             this.model.addElement(groupName);
             this.instancesPanelView.add(panel, groupName);
         }
-        panel.addInstanceItem(item);
+        panel.addInstanceItem(item, sort);
 
         InstancesPanel finalPanel = panel;
 
         item.addMouseListener(new MouseClickListener(e -> {
-            AccountManager accountManager = TESLauncher.getInstance().getAccountManager();
-
             int mouseButton = e.getButton();
             if (mouseButton == MouseEvent.BUTTON1) { // left mouse button
-                if (accountManager.getCurrentAccount() == null) {
-                    MessageBox.showErrorMessage(TESLauncher.frame, "No account selected");
-                } else {
-                    finalPanel.makeItemFirst(item);
+                finalPanel.makeItemFirst(item);
 
-                    new InstanceRunner(accountManager.getCurrentAccount(), item).start();
+                this.lastItem = item;
+                this.lastPlayedInstance = item.getAssociatedInstance();
+
+                Account currentAccount = TESLauncher.getInstance().getAccountManager().getCurrentAccount();
+
+                if (currentAccount == null) {
+                    return;
                 }
+
+                this.instanceRunner = new InstanceRunner(this.lastPlayedInstance, currentAccount, this.lastItem);
+                this.instanceRunner.start();
             } else if (mouseButton == MouseEvent.BUTTON3) { // right mouse button
+                Language language = TESLauncher.getInstance().getLanguage();
+
                 MinecraftInstance instance = item.getAssociatedInstance();
 
                 JPopupMenu popupMenu = new JPopupMenu();
 
-                JMenuItem editMenuItem = new JMenuItem("Edit");
+                JMenuItem editMenuItem = new JMenuItem(language.getString("gui.instanceItem.contextMenu.edit"), SvgIcon.get("edit"));
                 editMenuItem.addActionListener(edit -> {
                     new InstanceSettingsDialog(instance);
                 });
                 popupMenu.add(editMenuItem);
 
-                JMenuItem iconMenuItem = new JMenuItem("Icon");
+                JMenuItem changeGroupItem = new JMenuItem(language.getString("gui.instanceItem.contextMenu.changeGroup"));
+                changeGroupItem.addActionListener(changeGroup -> {
+                    String group = new ChangeGroupDialog(instance, this.groups.keySet()).getGroup();
+
+                    if (group == null || group.trim().isEmpty() || instance.getGroup().equals(group)) {
+                        return;
+                    }
+
+                    InstancesPanel instancesPanel = this.groups.get(group);
+
+                    if (instancesPanel == null) {
+                        AddInstanceItem addInstanceItem = new AddInstanceItem();
+                        addInstanceItem.onClick(ev -> new AddInstanceDialog(this, group, groups.keySet()));
+
+                        instancesPanel = new InstancesPanel(addInstanceItem);
+                        this.groups.put(group, instancesPanel);
+                        this.model.addElement(group);
+                        this.instancesPanelView.add(instancesPanel, group);
+                    }
+
+                    instance.setGroup(group);
+                    instancesPanel.addInstanceItem(item, true);
+                    this.currentPanel.removeInstanceItem(item);
+                });
+                popupMenu.add(changeGroupItem);
+
+                JMenuItem iconMenuItem = new JMenuItem(language.getString("gui.instanceItem.contextMenu.icon"));
                 iconMenuItem.addActionListener(edit -> {
                     new SelectIconDialog(item, instance);
                 });
                 popupMenu.add(iconMenuItem);
 
-                JMenuItem renameItem = new JMenuItem("Rename");
+                JMenuItem renameItem = new JMenuItem(language.getString("gui.instanceItem.contextMenu.rename"));
                 renameItem.addActionListener(rename -> {
-                    String newName = MessageBox.showInputMessage(TESLauncher.frame, "Rename instance", "Enter new name", instance.getName());
+                    String newName = MessageBox.showInputMessage(TESLauncher.frame,
+                        language.getString("gui.playView.renameInstanceDialog.title"),
+                        language.getString("gui.playView.renameInstanceDialog.message"),
+                        instance.getName());
 
-                    if (newName == null || newName.isEmpty()) {
+                    if (newName == null || newName.isEmpty() || instance.getName().equals(newName)) {
                         return;
                     }
 
                     InstanceManager manager = TESLauncher.getInstance().getInstanceManager();
                     try {
                         if (manager.renameInstance(instance, newName)) {
-                            MessageBox.showWarningMessage(TESLauncher.frame, "An invalid name was supplied! Valid name was created.");
+                            MessageBox.showWarningMessage(TESLauncher.frame,
+                                language.getString("messages.gui.playView.invalidInstanceName"));
                         }
                         item.instanceChanged(instance);
                     } catch (IOException ex) {
-                        Log.error("Could not rename instance " + instance.getName() +
-                            " (" + instance.getWorkDir() + ") to " + newName);
+                        Log.error("Could not rename instance " + instance.getName() + " (" + instance.getWorkDir() + ") to " + newName, ex);
                     }
                 });
                 popupMenu.add(renameItem);
 
                 popupMenu.addSeparator();
 
-                JMenuItem deleteMenuItem = new JMenuItem("Delete");
+                JMenuItem deleteMenuItem = new JMenuItem(language.getString("gui.instanceItem.contextMenu.delete"), SvgIcon.get("delete"));
                 deleteMenuItem.addActionListener(delete -> {
                     this.deleteInstance(item);
                 });
@@ -225,72 +262,102 @@ public class PlayView extends JPanel {
 
                 popupMenu.addSeparator();
 
-                JMenuItem openInstanceFolder = new JMenuItem("Open instance folder");
+                JMenuItem openInstanceFolder = new JMenuItem(language.getString("gui.instanceItem.contextMenu.openInstanceFolder"), SvgIcon.get("open"));
                 openInstanceFolder.addActionListener(open -> {
                     OperatingSystem.open(instance.getWorkDir());
                 });
                 popupMenu.add(openInstanceFolder);
 
-                JMenuItem openMinecraftFolder = new JMenuItem("Open Minecraft folder");
-                openMinecraftFolder.addActionListener(open -> {
+                JMenuItem openCosmicFolder = new JMenuItem(language.getString("gui.instanceItem.contextMenu.openCosmicFolder"), SvgIcon.get("open"));
+                openCosmicFolder.addActionListener(open -> {
                     OperatingSystem.open(instance.getMinecraftDir());
                 });
-                popupMenu.add(openMinecraftFolder);
+                popupMenu.add(openCosmicFolder);
+
+                popupMenu.addSeparator();
+
+                JMenuItem exitInstanceItem = new JMenuItem(language.getString("gui.instanceItem.contextMenu.killProcess"), SvgIcon.get("suspend"));
+                exitInstanceItem.setEnabled(item.getAssociatedInstance().isRunning());
+                exitInstanceItem.addActionListener(exit -> {
+                    this.instanceRunner.stopGame();
+                });
+                popupMenu.add(exitInstanceItem);
 
                 popupMenu.show(item, e.getX(), e.getY());
             }
         }));
 
         item.addMouseListener(new MouseEnterExitListener(
-                enter -> {
-                    this.instanceInfoLabel.setVisible(true);
+            enter -> {
+                this.instanceInfoLabel.setVisible(true);
 
-                    MinecraftInstance instance = item.getAssociatedInstance();
+                MinecraftInstance instance = item.getAssociatedInstance();
 
-                    if (instance == null) {
-                        return;
-                    }
-
-                    String lastPlayedTime = TimeUtils.getHoursMinutesSeconds(instance.getLastPlaytime());
-                    String totalPlayedTime = TimeUtils.getHoursMinutesSeconds(instance.getTotalPlaytime());
-
-                    String timeString = "";
-
-                    if (!lastPlayedTime.isEmpty()) {
-                        timeString = " - Last played for " + lastPlayedTime;
-                    }
-
-                    if (!totalPlayedTime.isEmpty()) {
-                        if (lastPlayedTime.isEmpty()) {
-                            timeString = " - Total played for " + totalPlayedTime;
-                        } else {
-                            timeString = timeString + ", Total played for " + totalPlayedTime;
-                        }
-                    }
-
-                    timeString = instance.getName() + timeString;
-
-                    if (instance.isRunning()) {
-                        timeString = "[Running] " + timeString;
-                    }
-
-                    this.instanceInfoLabel.setText(timeString);
-                },
-
-                exit -> {
-                    this.instanceInfoLabel.setVisible(false);
-                    this.instanceInfoLabel.setText("");
+                if (instance == null) {
+                    return;
                 }
+
+                Language language = TESLauncher.getInstance().getLanguage();
+                String lastPlayedForText = language.getString("gui.playView.lastPlayedFor");
+                String totalPlayedForText = language.getString("gui.playView.totalPlayedFor");
+                String runningText = language.getString("gui.playView.running");
+
+                String lastPlayedTime = TimeUtils.getHoursMinutesSecondsLocalized(instance.getLastPlaytime());
+                String totalPlayedTime = TimeUtils.getHoursMinutesSecondsLocalized(instance.getTotalPlaytime());
+
+                String timeString = "";
+
+                if (!lastPlayedTime.isEmpty()) {
+                    timeString = " - " + lastPlayedForText + " " + lastPlayedTime;
+                }
+
+                if (!totalPlayedTime.isEmpty()) {
+                    if (lastPlayedTime.isEmpty()) {
+                        timeString = " - " + totalPlayedForText + " " + totalPlayedTime;
+                    } else {
+                        timeString = timeString + ", " + totalPlayedForText + " " + totalPlayedTime;
+                    }
+                }
+
+                timeString = instance.getName() + timeString;
+
+                if (instance.isRunning()) {
+                    timeString = "[" + runningText + "] " + timeString;
+                }
+
+                this.instanceInfoLabel.setText(timeString);
+            },
+
+            exit -> {
+                this.instanceInfoLabel.setVisible(false);
+                this.instanceInfoLabel.setText("");
+            }
         ));
     }
 
+    public void playLastInstance() {
+        Account currentAccount = TESLauncher.getInstance().getAccountManager().getCurrentAccount();
+
+        if (currentAccount == null) {
+            return;
+        }
+
+        if (this.lastItem != null && this.lastPlayedInstance != null) {
+            this.instanceRunner = new InstanceRunner(this.lastPlayedInstance, currentAccount, this.lastItem);
+            this.instanceRunner.start();
+        }
+    }
+
     public void deleteInstance(InstanceItem item) {
+        Language language = TESLauncher.getInstance().getLanguage();
+
         MinecraftInstance instance = item.getAssociatedInstance();
 
         boolean ok = MessageBox.showConfirmMessage(
-                TESLauncher.frame,
-                "Delete instance",
-                "Are you sure you want to delete instance '" + instance.getName() + "'?"
+            TESLauncher.frame,
+            language.getString("gui.playView.deleteInstanceTitle"),
+            language.getString("messages.gui.playView.deleteInstanceConfirm")
+                .replace("$$INSTANCE_NAME$$", instance.getName())
         );
 
         if (ok) {
@@ -298,7 +365,8 @@ public class PlayView extends JPanel {
             try {
                 instanceManager.removeInstance(instance.getName());
             } catch (IOException ex) {
-                Log.error("Could not remove instance instance " + instance.getWorkDir(), ex);
+                Log.error(language.getString("messages.gui.playView.cannotDeleteInstance")
+                    .replace("$$INSTANCE_DIR$$", instance.getWorkDir().toString()), ex);
 
                 return;
             }
@@ -309,12 +377,12 @@ public class PlayView extends JPanel {
         }
     }
 
-    public void playLastInstance() {
-
+    public void reloadLanguage() {
+        this.header.reloadLanguage();
     }
 
-    public void reloadLanguage() {
-
+    public MinecraftInstance getLastPlayedInstance() {
+        return this.lastPlayedInstance;
     }
 
     public DefaultComboBoxModel<String> getModel() {

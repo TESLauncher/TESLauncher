@@ -72,4 +72,8 @@ public class PlayViewHeader extends JPanel {
     public JComboBox<String> getInstanceGroups() {
         return this.instanceGroups;
     }
+
+    public void reloadLanguage() {
+
+    }
 }

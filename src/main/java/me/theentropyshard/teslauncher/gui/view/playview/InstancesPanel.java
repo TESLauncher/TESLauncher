@@ -51,13 +51,42 @@ public class InstancesPanel extends JPanel {
         this.add(this.scrollPane, BorderLayout.CENTER);
     }
 
-    public void addInstanceItem(InstanceItem item) {
-        if (item instanceof AddInstanceItem) {
-            throw new IllegalArgumentException("Adding AddInstanceItem is not allowed");
-        }
+    public void addInstanceItem(InstanceItem item, boolean sort) {
+        if (sort) {
+            boolean added = false;
+            int index = 0;
 
+            for (Component component : this.instancesPanel.getComponents()) {
+                if (component.getClass() == AddInstanceItem.class) {
+                    continue;
+                }
+
+                InstanceItem cItem = (InstanceItem) component;
+                if (cItem.getAssociatedInstance().getLastTimePlayed().isBefore(item.getAssociatedInstance().getLastTimePlayed())) {
+                    this.instancesPanel.add(item, index);
+
+                    added = true;
+                    break;
+                }
+
+                index++;
+            }
+
+            if (!added) {
+                this.addInstanceItemToEnd(item);
+            }
+        } else {
+            this.addInstanceItemToEnd(item);
+        }
+    }
+
+    public void addInstanceItemToEnd(InstanceItem item) {
         int count = this.instancesPanel.getComponentCount();
         this.instancesPanel.add(item, count - 1);
+    }
+
+    public void removeInstanceItem(InstanceItem item) {
+        this.instancesPanel.remove(item);
     }
 
     public void makeItemFirst(InstanceItem item) {

@@ -19,24 +19,27 @@
 package me.theentropyshard.teslauncher.instance;
 
 import me.theentropyshard.teslauncher.TESLauncher;
-import me.theentropyshard.teslauncher.gui.console.LauncherConsole;
 import me.theentropyshard.teslauncher.gui.components.InstanceItem;
+import me.theentropyshard.teslauncher.gui.console.LauncherConsole;
 import me.theentropyshard.teslauncher.gui.dialogs.ProgressDialog;
 import me.theentropyshard.teslauncher.gui.utils.MessageBox;
+import me.theentropyshard.teslauncher.logging.Log;
 import me.theentropyshard.teslauncher.minecraft.MinecraftInstance;
 import me.theentropyshard.teslauncher.minecraft.account.Account;
 import me.theentropyshard.teslauncher.minecraft.account.OfflineAccount;
+import me.theentropyshard.teslauncher.minecraft.account.microsoft.MicrosoftAccount;
 import me.theentropyshard.teslauncher.minecraft.auth.microsoft.AuthException;
 import me.theentropyshard.teslauncher.minecraft.data.Version;
 import me.theentropyshard.teslauncher.minecraft.download.GuiMinecraftDownloader;
 import me.theentropyshard.teslauncher.minecraft.download.MinecraftDownloader;
+import me.theentropyshard.teslauncher.minecraft.launch.MinecraftError;
 import me.theentropyshard.teslauncher.minecraft.launch.MinecraftLauncher;
 import me.theentropyshard.teslauncher.utils.FileUtils;
+import me.theentropyshard.teslauncher.utils.ProcessReader;
 import me.theentropyshard.teslauncher.utils.TimeUtils;
 import me.theentropyshard.teslauncher.utils.json.Json;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.model.ZipParameters;
-import me.theentropyshard.teslauncher.logging.Log;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,9 +49,11 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.function.Consumer;
 
 public class InstanceRunner extends Thread {
-    
+
 
     private final Account account;
     private final MinecraftInstance instance;
@@ -56,9 +61,11 @@ public class InstanceRunner extends Thread {
 
     private Path tempClientCopy;
 
-    public InstanceRunner(Account account, InstanceItem item) {
+    private Process process;
+
+    public InstanceRunner(MinecraftInstance instance, Account account, InstanceItem item) {
         this.account = account;
-        this.instance = item.getAssociatedInstance();
+        this.instance = instance;
         this.item = item;
 
         this.setName("Instance '" + this.instance.getName() + "'");
@@ -74,6 +81,16 @@ public class InstanceRunner extends Thread {
         this.item.setEnabled(false);
 
         super.start();
+    }
+
+    public void stopGame() {
+        if (this.process == null || !this.process.isAlive()) {
+            return;
+        }
+
+        this.process.destroy();
+
+        Log.info("Destroyed Minecraft process for instance " + this.instance.getName());
     }
 
     @Override
@@ -137,11 +154,14 @@ public class InstanceRunner extends Thread {
 
             long start = System.currentTimeMillis();
 
-            exitCode = launcher.launch(classpath -> {
+            exitCode = this.startProcess(
+                launcher,
+                classpath -> {
                     this.applyJarMods(version, classpath, versionsDir);
                 }, this.account, version, minecraftDir, minecraftDir,
                 this.instance.getMinimumMemoryMegabytes(), this.instance.getMaximumMemoryMegabytes(),
-                this.instance.getCustomJvmFlags(), option == 3);
+                this.instance.getCustomJvmFlags(), option == 3
+            );
 
             long end = System.currentTimeMillis();
 
@@ -182,6 +202,36 @@ public class InstanceRunner extends Thread {
             this.item.setEnabled(true);
             this.deleteTempClient();
         }
+    }
+
+    private int startProcess(
+        MinecraftLauncher launcher,
+        Consumer<List<String>> beforeLaunch, Account account, Version version,
+        Path runDir, Path minecraftDir, long minMem, long maxMem, Set<String> jvmFlags, boolean exitAfterLaunch
+    ) throws Exception {
+        this.process = launcher.launch(beforeLaunch, account, version, runDir, minecraftDir, minMem, maxMem, jvmFlags, exitAfterLaunch);
+
+        new ProcessReader(this.process).read(line -> {
+            this.readProcessOutput(line, account);
+        });
+
+        try {
+            return this.process.waitFor();
+        } catch (InterruptedException e) {
+            throw new IOException("Unable to wait for process to end");
+        }
+    }
+
+    private void readProcessOutput(String line, Account account) {
+        if (account instanceof MicrosoftAccount) {
+            line = line.replace(account.getAccessToken(), "**ACCESSTOKEN**");
+        }
+        line = line.replace(account.getUsername(), "**USERNAME**");
+        line = line.replace(account.getUuid().toString(), "**UUID**");
+
+        MinecraftError.checkForError(line);
+
+        Log.minecraft(line);
     }
 
     private void checkMinecraftInstallation(boolean useDialog, Path versionsDir, Path assetsDir, Path librariesDir,
