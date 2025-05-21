@@ -268,7 +268,7 @@ public class PlayView extends JPanel {
                 });
                 popupMenu.add(openInstanceFolder);
 
-                JMenuItem openCosmicFolder = new JMenuItem(language.getString("gui.instanceItem.contextMenu.openCosmicFolder"), SvgIcon.get("open"));
+                JMenuItem openCosmicFolder = new JMenuItem(language.getString("gui.instanceItem.contextMenu.openMinecraftFolder"), SvgIcon.get("open"));
                 openCosmicFolder.addActionListener(open -> {
                     OperatingSystem.open(instance.getMinecraftDir());
                 });

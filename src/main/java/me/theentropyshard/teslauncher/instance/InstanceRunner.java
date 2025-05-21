@@ -41,6 +41,7 @@ import me.theentropyshard.teslauncher.utils.json.Json;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.model.ZipParameters;
 
+import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -181,7 +182,12 @@ public class InstanceRunner extends Thread {
                 }
             }
 
-            Log.info("Minecraft process finished with exit code " + exitCode);
+            String exitMessage = "Minecraft process finished with exit code " + exitCode;
+            if (exitCode == 0) {
+                Log.info(exitMessage);
+            } else {
+                Log.error(exitMessage);
+            }
 
             long seconds = (end - start) / 1000;
             String timePlayed = TimeUtils.getHoursMinutesSeconds(seconds);
@@ -191,6 +197,12 @@ public class InstanceRunner extends Thread {
 
             this.instance.updatePlaytime(seconds);
             this.instance.save();
+
+            TESLauncher.getInstance().getInstanceManager().increaseTotalPlaytime(seconds);
+
+            SwingUtilities.invokeLater(() -> {
+                TESLauncher.getInstance().getGui().updateStats();
+            });
 
             if (exitCode == 0 && exitsOption == 1) {
                 TESLauncher.getInstance().shutdown();

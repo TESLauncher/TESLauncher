@@ -226,7 +226,7 @@ public class Gui {
     }
 
     public void updateStats() {
-        LanguageSection section = TESLauncher.getInstance().getLanguage().getSection("statsLabel");
+        LanguageSection section = TESLauncher.getInstance().getLanguage().getSection("gui.general.statsLabel");
 
         InstanceManager instanceManager = TESLauncher.getInstance().getInstanceManager();
         int instancesCount = instanceManager.getInstancesCount();
