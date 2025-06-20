@@ -141,7 +141,7 @@ public class MinecraftLauncher {
         } else {
             argumentMap.put("auth_uuid", account.getUuid().toString());
             argumentMap.put("auth_access_token", account.getAccessToken());
-            argumentMap.put("auth_session", "-");
+            argumentMap.put("auth_session", account.getAccessToken());
             argumentMap.put("user_properties", "-");
             argumentMap.put("game_directory", minecraftDir.toAbsolutePath().toString());
             argumentMap.put("version_type", version.getType().getJsonName());

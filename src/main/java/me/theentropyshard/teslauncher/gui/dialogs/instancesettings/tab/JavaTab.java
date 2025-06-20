@@ -39,6 +39,7 @@ public class JavaTab extends SettingsTab {
     private final JTextField javaPathTextField;
     private final JTextField minMemoryField;
     private final JTextField maxMemoryField;
+    private final JTextField javaAgentPathTextField;
     private final JTextArea flagsArea;
 
     public JavaTab(String name, MinecraftInstance instance, JDialog dialog) {
@@ -93,6 +94,19 @@ public class JavaTab extends SettingsTab {
 
         gbc.gridy++;
         root.add(memorySettings, gbc);
+
+        JPanel javaAgentSettings = new JPanel(new GridLayout(1, 1));
+        javaAgentSettings.setBorder(BorderFactory.createTitledBorder("Java Agent Path"));
+
+        JPanel javaAgentBorderPanel = new JPanel(new BorderLayout());
+        javaAgentSettings.add(javaAgentBorderPanel);
+
+        this.javaAgentPathTextField = new JTextField();
+        javaAgentBorderPanel.add(this.javaAgentPathTextField, BorderLayout.CENTER);
+        javaAgentBorderPanel.add(new JButton("Browse..."), BorderLayout.EAST);
+
+        gbc.gridy++;
+        root.add(javaAgentSettings, gbc);
 
         JPanel otherSettings = new JPanel(new GridLayout(0, 1));
         otherSettings.setBorder(BorderFactory.createTitledBorder("JVM Arguments"));
