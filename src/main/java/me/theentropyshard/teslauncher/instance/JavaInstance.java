@@ -22,6 +22,7 @@ import java.util.Set;
 
 public abstract class JavaInstance extends Instance {
     private String javaPath;
+    private String javaAgentPath;
     private int minimumMemoryMegabytes;
     private int maximumMemoryMegabytes;
     private Set<String> customJvmFlags;
@@ -36,6 +37,14 @@ public abstract class JavaInstance extends Instance {
 
     public void setJavaPath(String javaPath) {
         this.javaPath = javaPath;
+    }
+
+    public String getJavaAgentPath() {
+        return this.javaAgentPath;
+    }
+
+    public void setJavaAgentPath(String javaAgentPath) {
+        this.javaAgentPath = javaAgentPath;
     }
 
     public int getMinimumMemoryMegabytes() {

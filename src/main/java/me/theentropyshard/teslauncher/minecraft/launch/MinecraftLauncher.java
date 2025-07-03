@@ -48,14 +48,17 @@ public class MinecraftLauncher {
     private final Path runtimesDir;
     private final Path nativesDir;
     private final String overrideJavaExecutable;
+    private final String javaAgentPath;
 
     private final List<String> classpath;
 
-    public MinecraftLauncher(Path librariesDir, Path runtimesDir, Path nativesDir, String overrideJavaExecutable) {
+    public MinecraftLauncher(Path librariesDir, Path runtimesDir, Path nativesDir, String overrideJavaExecutable,
+                             String javaAgentPath) {
         this.librariesDir = librariesDir;
         this.runtimesDir = runtimesDir;
         this.nativesDir = nativesDir;
         this.overrideJavaExecutable = overrideJavaExecutable;
+        this.javaAgentPath = javaAgentPath;
 
         this.classpath = new ArrayList<>();
     }
@@ -251,6 +254,11 @@ public class MinecraftLauncher {
             Log.info("Using custom JRE: " + this.overrideJavaExecutable);
             command.add(this.overrideJavaExecutable);
         }
+
+        if (this.javaAgentPath != null && !this.javaAgentPath.trim().isEmpty()) {
+            command.add("-javaagent:" + this.javaAgentPath);
+        }
+
         command.addAll(arguments);
 
         return command;
@@ -263,7 +271,7 @@ public class MinecraftLauncher {
             .map(s -> (account instanceof MicrosoftAccount) ? s.replace(account.getAccessToken(), "**ACCESSTOKEN**") : s)
             .map(s -> s.replace(account.getUsername(), "**USERNAME**"))
             .map(s -> s.replace(account.getUuid().toString(), "**UUID**"))
-            .collect(Collectors.toList());
+            .toList();
         Log.info("Running: " + censoredCommand);
 
         ProcessBuilder processBuilder = new ProcessBuilder(command);

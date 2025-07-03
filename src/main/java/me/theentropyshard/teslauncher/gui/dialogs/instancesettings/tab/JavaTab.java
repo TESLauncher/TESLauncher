@@ -173,6 +173,7 @@ public class JavaTab extends SettingsTab {
         MinecraftInstance instance = this.getInstance();
 
         instance.setJavaPath(this.javaPathTextField.getText());
+        instance.setJavaAgentPath(this.javaAgentPathTextField.getText());
         instance.setCustomJvmFlags(new LinkedHashSet<>(Arrays.asList(this.flagsArea.getText().split("\\s"))));
         instance.setMinimumMemoryMegabytes(Integer.parseInt(this.minMemoryField.getText()));
         instance.setMaximumMemoryMegabytes(Integer.parseInt(this.maxMemoryField.getText()));
