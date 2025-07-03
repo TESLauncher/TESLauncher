@@ -27,7 +27,7 @@ import me.theentropyshard.teslauncher.gui.laf.LightLauncherLaf;
 import me.theentropyshard.teslauncher.gui.utils.SvgIcon;
 import me.theentropyshard.teslauncher.gui.utils.SwingUtils;
 import me.theentropyshard.teslauncher.gui.view.AboutView;
-import me.theentropyshard.teslauncher.gui.view.SettingsView;
+import me.theentropyshard.teslauncher.gui.view.settings.SettingsView;
 import me.theentropyshard.teslauncher.gui.view.accountsview.AccountItem;
 import me.theentropyshard.teslauncher.gui.view.accountsview.AccountsView;
 import me.theentropyshard.teslauncher.gui.view.accountsview.AddAccountItem;
@@ -45,7 +45,6 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.List;
 
 public class Gui {
     public static final String OPEN_LAUNCHER_FOLDER = "gui.general.openLauncherFolder";
