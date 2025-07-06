@@ -37,12 +37,22 @@ public class MinecraftInstance extends JavaInstance {
     private static final String MINECRAFT_DIR_NAME = OperatingSystem.isMacOS() ? "minecraft" : ".minecraft";
     private static final String JARMODS_DIR_NAME = "jarmods";
 
+    private static final String FABRIC_MODS_DIR = "fabric-mods";
+    private static final String DISABLED_FABRIC_MODS_DIR = "disabled-fabric-mods";
+
     private String minecraftVersion;
     private int minecraftWindowWidth;
     private int minecraftWindowHeight;
     private String customWindowString;
     private boolean autoUpdateToLatest;
+
     private final List<JarMod> jarMods;
+
+    private ModLoader modLoader = ModLoader.NONE;
+
+    private String fabricVersion;
+    private final List<Mod> fabricMods;
+
     private transient volatile boolean running;
 
     public MinecraftInstance() {
@@ -58,6 +68,60 @@ public class MinecraftInstance extends JavaInstance {
         this.setMaximumMemoryMegabytes(2048);
 
         this.jarMods = new ArrayList<>();
+        this.fabricMods = new ArrayList<>();
+    }
+
+    public Path getCurrentModPath(Mod mod) {
+        return this.getModPath(mod, this.modLoader);
+    }
+
+    public Path getModPath(Mod mod, ModLoader loader) {
+        if (mod.isActive()) {
+            return this.getModsDir(loader).resolve(mod.getFileName());
+        } else {
+            return this.getDisabledModsDir(loader).resolve(mod.getFileName());
+        }
+    }
+
+    public List<Mod> getCurrentMods() {
+        return this.getMods(this.modLoader);
+    }
+
+    public List<Mod> getMods(ModLoader loader) {
+        return switch (this.modLoader) {
+            case FABRIC -> this.fabricMods;
+            case NONE -> throw new RuntimeException("Cannot get mods for vanilla instance");
+        };
+    }
+
+    public Path getCurrentModsDir() {
+        return this.getModsDir(this.modLoader);
+    }
+
+    public Path getModsDir(ModLoader loader) {
+        return switch (loader) {
+            case FABRIC -> this.getFabricModsDir();
+            case NONE -> throw new RuntimeException("Cannot get mods dir for vanilla instance");
+        };
+    }
+
+    public Path getCurrentDisabledModsDir() {
+        return this.getDisabledModsDir(this.modLoader);
+    }
+
+    public Path getDisabledModsDir(ModLoader loader) {
+        return switch (loader) {
+            case FABRIC -> this.getDisabledFabricModsDir();
+            case NONE -> throw new RuntimeException("Cannot get disabled mods dir for vanilla instance");
+        };
+    }
+
+    public Path getFabricModsDir() {
+        return this.getWorkDir().resolve(MinecraftInstance.FABRIC_MODS_DIR);
+    }
+
+    public Path getDisabledFabricModsDir() {
+        return this.getWorkDir().resolve(MinecraftInstance.DISABLED_FABRIC_MODS_DIR);
     }
 
     public JarMod addJarMod(Path file) throws IOException {
