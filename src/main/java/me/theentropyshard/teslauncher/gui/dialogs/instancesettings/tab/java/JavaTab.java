@@ -16,10 +16,12 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.gui.dialogs.instancesettings.tab;
+package me.theentropyshard.teslauncher.gui.dialogs.instancesettings.tab.java;
 
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.ui.FlatScrollPaneBorder;
+
+import me.theentropyshard.teslauncher.gui.dialogs.instancesettings.tab.SettingsTab;
 import me.theentropyshard.teslauncher.gui.utils.IntegerDocumentFilter;
 import me.theentropyshard.teslauncher.gui.utils.MessageBox;
 import me.theentropyshard.teslauncher.minecraft.MinecraftInstance;
@@ -42,8 +44,8 @@ public class JavaTab extends SettingsTab {
     private final JTextField javaAgentPathTextField;
     private final JTextArea flagsArea;
 
-    public JavaTab(String name, MinecraftInstance instance, JDialog dialog) {
-        super(name, instance, dialog);
+    public JavaTab(MinecraftInstance instance, JDialog dialog) {
+        super("Java", instance, dialog);
 
         JPanel root = this.getRoot();
         root.setLayout(new GridBagLayout());

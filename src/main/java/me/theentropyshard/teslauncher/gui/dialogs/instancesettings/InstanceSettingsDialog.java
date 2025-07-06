@@ -21,9 +21,10 @@ package me.theentropyshard.teslauncher.gui.dialogs.instancesettings;
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.gui.components.InstanceItem;
 import me.theentropyshard.teslauncher.gui.dialogs.AppDialog;
-import me.theentropyshard.teslauncher.gui.dialogs.instancesettings.tab.JarModsTab;
-import me.theentropyshard.teslauncher.gui.dialogs.instancesettings.tab.JavaTab;
+import me.theentropyshard.teslauncher.gui.dialogs.instancesettings.tab.jarMods.JarModsTab;
+import me.theentropyshard.teslauncher.gui.dialogs.instancesettings.tab.java.JavaTab;
 import me.theentropyshard.teslauncher.gui.dialogs.instancesettings.tab.SettingsTab;
+import me.theentropyshard.teslauncher.gui.dialogs.instancesettings.tab.mods.ModsTab;
 import me.theentropyshard.teslauncher.gui.view.playview.InstancesPanel;
 import me.theentropyshard.teslauncher.minecraft.MinecraftInstance;
 
@@ -61,7 +62,8 @@ public class InstanceSettingsDialog extends AppDialog {
 
         this.tabs = new ArrayList<>();
 
-        this.addTab(new JavaTab("Java", instance, this.getDialog()));
+        this.addTab(new JavaTab(instance, this.getDialog()));
+        this.addTab(new ModsTab(instance, this.getDialog()));
         this.addTab(new JarModsTab(instance, this.getDialog()));
 
         this.getDialog().addWindowListener(new WindowAdapter() {
