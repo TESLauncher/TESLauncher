@@ -25,6 +25,7 @@ import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -171,6 +172,16 @@ public final class FileUtils {
 
         try (Stream<Path> pathStream = Files.list(dir)) {
             return pathStream.collect(Collectors.toList());
+        }
+    }
+
+    public static List<Path> list(Path dir, Predicate<Path> tester) throws IOException {
+        if (FileUtils.existsButIsNotADirectory(dir)) {
+            throw new IOException(dir + " exists, but is not a directory");
+        }
+
+        try (Stream<Path> pathStream = Files.list(dir)) {
+            return pathStream.filter(tester).collect(Collectors.toList());
         }
     }
 
