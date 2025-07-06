@@ -19,6 +19,14 @@
 package me.theentropyshard.teslauncher.gui;
 
 import com.formdev.flatlaf.FlatLaf;
+import net.miginfocom.swing.MigLayout;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
 import me.theentropyshard.teslauncher.Settings;
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.gui.console.LauncherConsole;
@@ -27,24 +35,17 @@ import me.theentropyshard.teslauncher.gui.laf.LightLauncherLaf;
 import me.theentropyshard.teslauncher.gui.utils.SvgIcon;
 import me.theentropyshard.teslauncher.gui.utils.SwingUtils;
 import me.theentropyshard.teslauncher.gui.view.AboutView;
-import me.theentropyshard.teslauncher.gui.view.settings.SettingsView;
 import me.theentropyshard.teslauncher.gui.view.accountsview.AccountItem;
 import me.theentropyshard.teslauncher.gui.view.accountsview.AccountsView;
 import me.theentropyshard.teslauncher.gui.view.accountsview.AddAccountItem;
 import me.theentropyshard.teslauncher.gui.view.playview.InstancesPanel;
 import me.theentropyshard.teslauncher.gui.view.playview.PlayView;
+import me.theentropyshard.teslauncher.gui.view.settings.SettingsView;
 import me.theentropyshard.teslauncher.instance.InstanceManager;
 import me.theentropyshard.teslauncher.language.LanguageSection;
 import me.theentropyshard.teslauncher.logging.Log;
 import me.theentropyshard.teslauncher.utils.OperatingSystem;
 import me.theentropyshard.teslauncher.utils.TimeUtils;
-import net.miginfocom.swing.MigLayout;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 
 public class Gui {
     public static final String OPEN_LAUNCHER_FOLDER = "gui.general.openLauncherFolder";
@@ -111,14 +112,6 @@ public class Gui {
         }));
 
         TESLauncher.frame = this.frame = new JFrame(title);
-        /*this.frame.setIconImages(
-            List.of(
-                SwingUtils.getImage("/assets/images/icons/logo/icon_silver_16x.png"),
-                SwingUtils.getImage("/assets/images/icons/logo/icon_silver_32x.png"),
-                SwingUtils.getImage("/assets/images/icons/logo/icon_silver_64x.png"),
-                SwingUtils.getImage("/assets/images/icons/logo/icon_silver_128x.png")
-            )
-        );*/
         console.getFrame().setIconImages(this.frame.getIconImages());
         this.frame.add(this.viewSelector, BorderLayout.CENTER);
 
@@ -300,23 +293,21 @@ public class Gui {
     }
 
     public void showGui() {
-        SwingUtilities.invokeLater(() -> {
-            this.playView = new PlayView();
-            this.accountsView = new AccountsView();
-            this.settingsView = new SettingsView();
-            this.aboutView = new AboutView();
+        this.playView = new PlayView();
+        this.accountsView = new AccountsView();
+        this.settingsView = new SettingsView();
+        this.aboutView = new AboutView();
 
-            LanguageSection section = TESLauncher.getInstance().getLanguage().getSection("gui.general.tab");
+        LanguageSection section = TESLauncher.getInstance().getLanguage().getSection("gui.general.tab");
 
-            this.viewSelector.addTab(section.getString("play"), this.playView);
-            this.viewSelector.addTab(section.getString("accounts"), this.accountsView);
-            this.viewSelector.addTab(section.getString("settings"), this.settingsView);
-            this.viewSelector.addTab(section.getString("about"), this.aboutView);
+        this.viewSelector.addTab(section.getString("play"), this.playView);
+        this.viewSelector.addTab(section.getString("accounts"), this.accountsView);
+        this.viewSelector.addTab(section.getString("settings"), this.settingsView);
+        this.viewSelector.addTab(section.getString("about"), this.aboutView);
 
-            this.frame.setVisible(true);
+        this.frame.setVisible(true);
 
-            this.initialized = true;
-        });
+        this.initialized = true;
     }
 
     public JFrame getFrame() {

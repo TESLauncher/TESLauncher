@@ -34,6 +34,7 @@ import okhttp3.Protocol;
 
 import javax.swing.*;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.concurrent.ExecutorService;
@@ -69,7 +70,7 @@ public class TESLauncher {
 
     private final ExecutorService taskPool;
 
-    private final Gui gui;
+    private Gui gui;
 
     private volatile boolean shutdown;
 
@@ -143,10 +144,22 @@ public class TESLauncher {
 
         this.taskPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
-        this.gui = new Gui(BuildConfig.APP_NAME, this.settings.darkTheme);
-        this.gui.getFrame().addWindowListener(new WindowClosingListener(e -> TESLauncher.this.shutdown()));
+        try {
+            SwingUtilities.invokeAndWait(() -> {
+                this.gui = new Gui(BuildConfig.APP_NAME, this.settings.darkTheme);
+                this.gui.getFrame().addWindowListener(new WindowClosingListener(e -> TESLauncher.this.shutdown()));
 
-        this.gui.showGui();
+                this.gui.showGui();
+            });
+        } catch (InterruptedException e) {
+            Log.error("Could not wait for GUI to show", e);
+
+            this.shutdown(1);
+        } catch (InvocationTargetException e) {
+            Log.error("There was an error creating the GUI", e);
+
+            this.shutdown(1);
+        }
     }
 
     private void createDirectories() {
@@ -169,6 +182,10 @@ public class TESLauncher {
     }
 
     public void shutdown() {
+        this.shutdown(0);
+    }
+
+    public void shutdown(int code) {
         if (this.shutdown) {
             return;
         }
@@ -195,7 +212,7 @@ public class TESLauncher {
 
         this.settings.save(this.settingsFile);
 
-        System.exit(0);
+        System.exit(code);
     }
 
     private static TESLauncher instance;
