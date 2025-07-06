@@ -25,6 +25,7 @@ import me.theentropyshard.teslauncher.minecraft.MinecraftInstance;
 import me.theentropyshard.teslauncher.logging.Log;
 
 import javax.swing.*;
+import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -42,12 +43,11 @@ public class JarModsTab extends SettingsTab {
 
         JPanel root = this.getRoot();
         root.setLayout(new BorderLayout());
-
-        JButton addJarMod = new JButton("Add jar mod");
-        root.add(addJarMod, BorderLayout.NORTH);
+        root.setBorder(new TitledBorder("Mods"));
 
         this.jarModsTableModel = new JarModsTableModel(instance);
 
+        JButton addJarMod = new JButton("Add jar mod");
         addJarMod.addActionListener(e -> {
             new SwingWorker<JarMod, Void>() {
                 @Override
@@ -151,7 +151,11 @@ public class JarModsTab extends SettingsTab {
             }.execute();
         });
 
-        root.add(this.deleteModButton, BorderLayout.SOUTH);
+        JPanel buttonsPanel = new JPanel(new GridLayout(1, 2));
+        buttonsPanel.add(addJarMod);
+        buttonsPanel.add(this.deleteModButton);
+
+        root.add(buttonsPanel, BorderLayout.SOUTH);
     }
 
     @Override
