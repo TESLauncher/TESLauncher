@@ -18,6 +18,10 @@
 
 package me.theentropyshard.teslauncher.utils;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class MavenArtifact {
     private final String groupId;
     private final String artifactId;
@@ -40,7 +44,12 @@ public class MavenArtifact {
     }
 
     public String createPath(String extension) {
-        return this.groupId + "/" + this.artifactId + "/" + this.version + "/" + this.artifactId + "-" + this.version + "." + extension;
+        List<String> parts = new ArrayList<>(Arrays.asList(this.groupId.split("\\.")));
+        parts.add(this.artifactId);
+        parts.add(this.version);
+        parts.add(this.artifactId + "-" + this.version + "." + extension);
+
+        return String.join("/", parts);
     }
 
     public String createJarUrl(String repositoryBase) {
