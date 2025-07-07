@@ -18,22 +18,28 @@
 
 package me.theentropyshard.teslauncher.gui.dialogs.instanceSettings.tab.jarMods;
 
-import me.theentropyshard.teslauncher.Settings;
-import me.theentropyshard.teslauncher.TESLauncher;
-import me.theentropyshard.teslauncher.gui.dialogs.instanceSettings.tab.SettingsTab;
-import me.theentropyshard.teslauncher.instance.JarMod;
-import me.theentropyshard.teslauncher.minecraft.MinecraftInstance;
-import me.theentropyshard.teslauncher.logging.Log;
-
 import javax.swing.*;
-import javax.swing.border.TitledBorder;
+import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.concurrent.ExecutionException;
+
+import me.theentropyshard.teslauncher.Settings;
+import me.theentropyshard.teslauncher.TESLauncher;
+import me.theentropyshard.teslauncher.gui.dialogs.instanceSettings.tab.SettingsTab;
+import me.theentropyshard.teslauncher.gui.utils.SwingUtils;
+import me.theentropyshard.teslauncher.instance.JarMod;
+import me.theentropyshard.teslauncher.logging.Log;
+import me.theentropyshard.teslauncher.minecraft.MinecraftInstance;
+import me.theentropyshard.teslauncher.utils.FileUtils;
+import me.theentropyshard.teslauncher.utils.OperatingSystem;
 
 public class JarModsTab extends SettingsTab {
     private final JarModsTableModel jarModsTableModel;
@@ -44,15 +50,15 @@ public class JarModsTab extends SettingsTab {
 
         JPanel root = this.getRoot();
         root.setLayout(new BorderLayout());
-        root.setBorder(new TitledBorder("Mods"));
+        root.setBorder(new EmptyBorder(0, 0, 2, 0));
 
         this.jarModsTableModel = new JarModsTableModel(instance);
 
-        JButton addJarMod = new JButton("Add jar mod");
+        JButton addJarMod = new JButton("Add JAR mod");
         addJarMod.addActionListener(e -> {
             new SwingWorker<JarMod, Void>() {
                 @Override
-                protected JarMod doInBackground() throws Exception {
+                protected JarMod doInBackground() {
                     UIManager.put("FileChooser.readOnly", Boolean.TRUE);
                     JFileChooser fileChooser = new JFileChooser();
                     fileChooser.setFileFilter(new FileNameExtensionFilter("Archives (*.zip, *.jar)", "zip", "jar"));
@@ -105,9 +111,15 @@ public class JarModsTab extends SettingsTab {
             }.execute();
         });
 
-        this.deleteModButton = new JButton("Delete jar mod");
+        this.deleteModButton = new JButton("Delete JAR mod");
 
         JTable jarModsTable = new JTable(this.jarModsTableModel);
+        jarModsTable.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                SwingUtils.setJTableColumnsWidth(jarModsTable, 90, 10);
+            }
+        });
         jarModsTable.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -124,7 +136,6 @@ public class JarModsTab extends SettingsTab {
         scrollPane.setBorder(null);
         root.add(scrollPane, BorderLayout.CENTER);
 
-
         this.deleteModButton.setEnabled(false);
         this.deleteModButton.addActionListener(e -> {
             int selectedRow = jarModsTable.getSelectedRow();
@@ -135,7 +146,7 @@ public class JarModsTab extends SettingsTab {
 
             new SwingWorker<Void, Void>() {
                 @Override
-                protected Void doInBackground() throws Exception {
+                protected Void doInBackground() {
                     try {
                         instance.removeJarMod(jarMod.getUuid().toString());
                     } catch (IOException e) {
@@ -152,9 +163,23 @@ public class JarModsTab extends SettingsTab {
             }.execute();
         });
 
-        JPanel buttonsPanel = new JPanel(new GridLayout(1, 2));
+        JButton openJarModsDirButton = new JButton("Open mods folder");
+        openJarModsDirButton.addActionListener(e -> {
+            Path jarModsDir = instance.getJarModsDir();
+
+            try {
+                FileUtils.createDirectoryIfNotExists(jarModsDir);
+            } catch (IOException ex) {
+                Log.error("Could not create JAR mods dir", ex);
+            }
+
+            OperatingSystem.open(jarModsDir);
+        });
+
+        JPanel buttonsPanel = new JPanel(new GridLayout(1, 3));
         buttonsPanel.add(addJarMod);
         buttonsPanel.add(this.deleteModButton);
+        buttonsPanel.add(openJarModsDirButton);
 
         root.add(buttonsPanel, BorderLayout.SOUTH);
     }
