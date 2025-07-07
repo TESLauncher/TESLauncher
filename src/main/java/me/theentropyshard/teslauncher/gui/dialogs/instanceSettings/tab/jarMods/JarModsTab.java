@@ -16,11 +16,11 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.gui.dialogs.instancesettings.tab.jarMods;
+package me.theentropyshard.teslauncher.gui.dialogs.instanceSettings.tab.jarMods;
 
 import me.theentropyshard.teslauncher.Settings;
 import me.theentropyshard.teslauncher.TESLauncher;
-import me.theentropyshard.teslauncher.gui.dialogs.instancesettings.tab.SettingsTab;
+import me.theentropyshard.teslauncher.gui.dialogs.instanceSettings.tab.SettingsTab;
 import me.theentropyshard.teslauncher.instance.JarMod;
 import me.theentropyshard.teslauncher.minecraft.MinecraftInstance;
 import me.theentropyshard.teslauncher.logging.Log;

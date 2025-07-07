@@ -16,12 +16,12 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.gui.dialogs.instancesettings.tab.mods;
+package me.theentropyshard.teslauncher.gui.dialogs.instanceSettings.tab.mods;
 
 import javax.swing.*;
 import java.io.IOException;
 
-import me.theentropyshard.teslauncher.gui.dialogs.instancesettings.tab.SettingsTab;
+import me.theentropyshard.teslauncher.gui.dialogs.instanceSettings.tab.SettingsTab;
 import me.theentropyshard.teslauncher.minecraft.MinecraftInstance;
 
 public class ModsTab extends SettingsTab {

@@ -16,15 +16,15 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.gui.dialogs.instancesettings;
+package me.theentropyshard.teslauncher.gui.dialogs.instanceSettings;
 
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.gui.components.InstanceItem;
 import me.theentropyshard.teslauncher.gui.dialogs.AppDialog;
-import me.theentropyshard.teslauncher.gui.dialogs.instancesettings.tab.jarMods.JarModsTab;
-import me.theentropyshard.teslauncher.gui.dialogs.instancesettings.tab.java.JavaTab;
-import me.theentropyshard.teslauncher.gui.dialogs.instancesettings.tab.SettingsTab;
-import me.theentropyshard.teslauncher.gui.dialogs.instancesettings.tab.mods.ModsTab;
+import me.theentropyshard.teslauncher.gui.dialogs.instanceSettings.tab.jarMods.JarModsTab;
+import me.theentropyshard.teslauncher.gui.dialogs.instanceSettings.tab.java.JavaTab;
+import me.theentropyshard.teslauncher.gui.dialogs.instanceSettings.tab.SettingsTab;
+import me.theentropyshard.teslauncher.gui.dialogs.instanceSettings.tab.mods.ModsTab;
 import me.theentropyshard.teslauncher.gui.view.playview.InstancesPanel;
 import me.theentropyshard.teslauncher.minecraft.MinecraftInstance;
 

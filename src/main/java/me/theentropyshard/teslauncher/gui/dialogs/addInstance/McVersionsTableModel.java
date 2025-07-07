@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.gui.dialogs.addinstance;
+package me.theentropyshard.teslauncher.gui.dialogs.addInstance;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;

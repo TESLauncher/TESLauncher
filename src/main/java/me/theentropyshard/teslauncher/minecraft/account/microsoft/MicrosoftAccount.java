@@ -20,7 +20,7 @@ package me.theentropyshard.teslauncher.minecraft.account.microsoft;
 
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.gui.dialogs.ProgressDialog;
-import me.theentropyshard.teslauncher.gui.dialogs.addaccount.MicrosoftAccountCreationView;
+import me.theentropyshard.teslauncher.gui.dialogs.addAccount.MicrosoftAccountCreationView;
 import me.theentropyshard.teslauncher.gui.utils.MessageBox;
 import me.theentropyshard.teslauncher.gui.view.accountsview.AccountItem;
 import me.theentropyshard.teslauncher.logging.Log;

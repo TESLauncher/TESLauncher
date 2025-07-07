@@ -16,12 +16,12 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.gui.dialogs.instancesettings.tab.java;
+package me.theentropyshard.teslauncher.gui.dialogs.instanceSettings.tab.java;
 
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.ui.FlatScrollPaneBorder;
 
-import me.theentropyshard.teslauncher.gui.dialogs.instancesettings.tab.SettingsTab;
+import me.theentropyshard.teslauncher.gui.dialogs.instanceSettings.tab.SettingsTab;
 import me.theentropyshard.teslauncher.gui.utils.IntegerDocumentFilter;
 import me.theentropyshard.teslauncher.gui.utils.MessageBox;
 import me.theentropyshard.teslauncher.minecraft.MinecraftInstance;
