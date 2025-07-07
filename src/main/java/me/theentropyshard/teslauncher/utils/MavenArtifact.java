@@ -44,7 +44,7 @@ public class MavenArtifact {
     }
 
     public String createJarUrl(String repositoryBase) {
-        return repositoryBase + "/" + this.createPath("jar");
+        return repositoryBase + this.createPath("jar");
     }
 
     @Override
