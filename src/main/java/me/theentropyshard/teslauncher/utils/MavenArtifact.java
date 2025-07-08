@@ -26,28 +26,37 @@ public class MavenArtifact {
     private final String groupId;
     private final String artifactId;
     private final String version;
+    private final String classifier;
 
-    public MavenArtifact(String groupId, String artifactId, String version) {
+    public MavenArtifact(String groupId, String artifactId, String version, String classifier) {
         this.groupId = groupId;
         this.artifactId = artifactId;
         this.version = version;
+        this.classifier = classifier;
     }
 
     public static MavenArtifact parse(String s) {
         String[] parts = s.split(":");
 
-        if (parts.length != 3) {
-            throw new IllegalArgumentException("Unsupported maven notation: " + s);
+        if (parts.length == 3) {
+            return new MavenArtifact(parts[0], parts[1], parts[2], null);
+        } else if (parts.length == 4) {
+            return new MavenArtifact(parts[0], parts[1], parts[2], parts[3]);
+        } else {
+            throw new IllegalArgumentException("Unsupported Maven notation: " + s);
         }
-
-        return new MavenArtifact(parts[0], parts[1], parts[2]);
     }
 
     public String createPath(String extension) {
         List<String> parts = new ArrayList<>(Arrays.asList(this.groupId.split("\\.")));
         parts.add(this.artifactId);
         parts.add(this.version);
-        parts.add(this.artifactId + "-" + this.version + "." + extension);
+
+        if (this.classifier == null) {
+            parts.add(this.artifactId + "-" + this.version + "." + extension);
+        } else {
+            parts.add(this.artifactId + "-" + this.version + "-" + this.classifier + "." + extension);
+        }
 
         return String.join("/", parts);
     }
@@ -58,7 +67,7 @@ public class MavenArtifact {
 
     @Override
     public String toString() {
-        return this.groupId + ":" + this.artifactId + ":" + this.version;
+        return this.groupId + ":" + this.artifactId + ":" + this.version + (this.classifier == null ? "" : ":" + this.classifier);
     }
 
     public String getGroupId() {
@@ -71,5 +80,9 @@ public class MavenArtifact {
 
     public String getVersion() {
         return this.version;
+    }
+
+    public String getClassifier() {
+        return this.classifier;
     }
 }
