@@ -20,6 +20,8 @@ package me.theentropyshard.teslauncher.minecraft.data;
 
 import me.theentropyshard.teslauncher.minecraft.data.argument.Argument;
 import me.theentropyshard.teslauncher.minecraft.data.argument.ArgumentType;
+import me.theentropyshard.teslauncher.utils.ListUtils;
+import me.theentropyshard.teslauncher.utils.MavenArtifact;
 
 import java.time.OffsetDateTime;
 import java.util.EnumMap;
@@ -42,6 +44,18 @@ public class Version {
 
     public Version() {
 
+    }
+
+    public void addLibrary(Library library) {
+        MavenArtifact artifact = MavenArtifact.parse(library.getName());
+
+        this.libraries.removeIf(l -> {
+            MavenArtifact a = MavenArtifact.parse(l.getName());
+
+            return a.getGroupId().equals(artifact.getGroupId()) && a.getArtifactId().equals(artifact.getArtifactId());
+        });
+
+        this.libraries.add(library);
     }
 
     public AssetIndex getAssetIndex() {

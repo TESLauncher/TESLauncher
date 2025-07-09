@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.theentropyshard.teslauncher.minecraft;
+package me.theentropyshard.teslauncher.minecraft.mods;
 
 import java.util.HashMap;
 import java.util.Map;

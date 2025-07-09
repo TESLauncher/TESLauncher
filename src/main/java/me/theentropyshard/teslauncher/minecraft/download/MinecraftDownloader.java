@@ -19,19 +19,6 @@
 package me.theentropyshard.teslauncher.minecraft.download;
 
 import com.google.gson.JsonObject;
-import me.theentropyshard.teslauncher.TESLauncher;
-import me.theentropyshard.teslauncher.logging.Log;
-import me.theentropyshard.teslauncher.minecraft.ApiUrls;
-import me.theentropyshard.teslauncher.minecraft.data.*;
-import me.theentropyshard.teslauncher.network.HttpRequest;
-import me.theentropyshard.teslauncher.network.download.DownloadList;
-import me.theentropyshard.teslauncher.network.download.HttpDownload;
-import me.theentropyshard.teslauncher.network.progress.ProgressNetworkInterceptor;
-import me.theentropyshard.teslauncher.utils.FileUtils;
-import me.theentropyshard.teslauncher.utils.HashUtils;
-import me.theentropyshard.teslauncher.utils.ListUtils;
-import me.theentropyshard.teslauncher.utils.OperatingSystem;
-import me.theentropyshard.teslauncher.utils.json.Json;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.model.FileHeader;
 import okhttp3.OkHttpClient;
@@ -48,6 +35,21 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+
+import me.theentropyshard.teslauncher.TESLauncher;
+import me.theentropyshard.teslauncher.logging.Log;
+import me.theentropyshard.teslauncher.minecraft.ApiUrls;
+import me.theentropyshard.teslauncher.minecraft.data.*;
+import me.theentropyshard.teslauncher.minecraft.data.argument.ArgumentType;
+import me.theentropyshard.teslauncher.minecraft.data.gson.VersionDeserializer;
+import me.theentropyshard.teslauncher.minecraft.mods.ModLoaderInfo;
+import me.theentropyshard.teslauncher.minecraft.mods.fabric.FabricMetaAPI;
+import me.theentropyshard.teslauncher.network.HttpRequest;
+import me.theentropyshard.teslauncher.network.download.DownloadList;
+import me.theentropyshard.teslauncher.network.download.HttpDownload;
+import me.theentropyshard.teslauncher.network.progress.ProgressNetworkInterceptor;
+import me.theentropyshard.teslauncher.utils.*;
+import me.theentropyshard.teslauncher.utils.json.Json;
 
 public class MinecraftDownloader {
     private static final Duration MANIFEST_UPDATE_INTERVAL = Duration.ofHours(12);
@@ -74,7 +76,7 @@ public class MinecraftDownloader {
         this.downloadJava = downloadJava;
     }
 
-    public void downloadMinecraft(String versionId) throws IOException {
+    public Version downloadMinecraft(String versionId, ModLoaderInfo loaderInfo) throws IOException {
         FileUtils.createDirectoryIfNotExists(this.versionsDir.resolve(versionId));
 
         Log.info("Getting Manifest...");
@@ -87,7 +89,7 @@ public class MinecraftDownloader {
         VersionManifest.Version manifestVersion = ListUtils.search(manifest.getVersions(), v -> v.getId().equals(versionId));
         if (manifestVersion == null) {
             Log.warn("Unable to find Minecraft " + versionId);
-            return;
+            return null;
         }
 
         Log.info("Found Minecraft " + versionId);
@@ -97,7 +99,7 @@ public class MinecraftDownloader {
             this.minecraftDownloadListener.onProgress(0, 0);
             this.minecraftDownloadListener.onStageChanged("Downloading client");
             DownloadList clientList = new DownloadList(this.minecraftDownloadListener::onProgress);
-            Version version = this.downloadClient(manifestVersion, clientList);
+            Version version = this.downloadClient(manifestVersion, clientList, loaderInfo);
             clientList.downloadAll();
 
             Log.info("Downloading libraries...");
@@ -131,12 +133,14 @@ public class MinecraftDownloader {
             }
 
             this.minecraftDownloadListener.onFinish();
+
+            return version;
         } else {
             this.minecraftDownloadListener.onProgress(0, 0);
             DownloadList list = new DownloadList(this.minecraftDownloadListener::onProgress);
 
             Log.info("Downloading client...");
-            Version version = this.downloadClient(manifestVersion, list);
+            Version version = this.downloadClient(manifestVersion, list, loaderInfo);
 
             Log.info("Downloading libraries...");
             List<Library> nativeLibraries = this.downloadLibraries(version, list);
@@ -157,6 +161,8 @@ public class MinecraftDownloader {
             list.downloadAll();
 
             this.minecraftDownloadListener.onFinish();
+
+            return version;
         }
     }
 
@@ -239,7 +245,7 @@ public class MinecraftDownloader {
         }
     }
 
-    private Version downloadClient(VersionManifest.Version manifestVersion, DownloadList clientList) throws IOException {
+    private Version downloadClient(VersionManifest.Version manifestVersion, DownloadList clientList, ModLoaderInfo loaderInfo) throws IOException {
         Version version;
 
         Path jsonFile = this.versionsDir.resolve(manifestVersion.getId()).resolve(manifestVersion.getId() + ".json");
@@ -272,6 +278,21 @@ public class MinecraftDownloader {
             .build();
 
         clientList.add(download);
+
+        if (loaderInfo != null) {
+            switch (loaderInfo.getLoader()) {
+                case FABRIC -> {
+                    JsonObject fabricVersion = new FabricMetaAPI().getLauncherProfile(version.getId(), loaderInfo.getVersion());
+
+                    version.setMainClass(fabricVersion.get("mainClass").getAsString());
+                    Arrays.asList(Json.parse(fabricVersion.get("libraries"), Library[].class)).forEach(version::addLibrary);
+                    JsonObject args = Json.parse(fabricVersion.get("arguments"), JsonObject.class);
+                    version.getArguments().get(ArgumentType.JVM).addAll(VersionDeserializer.processArgs(
+                        args.get("jvm").getAsJsonArray(), Json::parse
+                    ));
+                }
+            }
+        }
 
         return version;
     }
@@ -332,15 +353,25 @@ public class MinecraftDownloader {
                 continue;
             }
 
-            if (!OperatingSystem.isArm()) {
-                if (OperatingSystem.is64Bit() && library.getName().endsWith("arm64")) {
-                    continue;
-                } else if (library.getName().endsWith("x86")) {
-                    continue;
+            Library.DownloadList downloads = library.getDownloads();
+
+            if (downloads == null) {
+                MavenArtifact artifact = MavenArtifact.parse(library.getName());
+
+                Path jarFile = this.librariesDir.resolve(artifact.createPath("jar"));
+
+                if (!Files.exists(jarFile)) {
+                    HttpDownload download = new HttpDownload.Builder()
+                        .httpClient(TESLauncher.getInstance().getHttpClient())
+                        .url(artifact.createJarUrl(library.getUrl()))
+                        .saveAs(jarFile)
+                        .build();
+                    librariesList.add(download);
                 }
+
+                continue;
             }
 
-            Library.DownloadList downloads = library.getDownloads();
             Library.Artifact artifact = downloads.getArtifact();
 
             if (artifact != null) {
@@ -359,6 +390,7 @@ public class MinecraftDownloader {
             }
 
             Library.Artifact classifier = this.getClassifier(library);
+
             if (classifier != null) {
                 nativeLibraries.add(library);
                 Path filePath = this.librariesDir.resolve(classifier.getPath());

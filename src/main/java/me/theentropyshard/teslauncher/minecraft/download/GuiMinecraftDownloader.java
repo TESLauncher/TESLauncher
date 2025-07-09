@@ -19,6 +19,8 @@
 package me.theentropyshard.teslauncher.minecraft.download;
 
 import me.theentropyshard.teslauncher.gui.dialogs.ProgressDialog;
+import me.theentropyshard.teslauncher.minecraft.data.Version;
+import me.theentropyshard.teslauncher.minecraft.mods.ModLoaderInfo;
 
 import javax.swing.*;
 import java.io.IOException;
@@ -34,9 +36,11 @@ public class GuiMinecraftDownloader extends MinecraftDownloader {
     }
 
     @Override
-    public void downloadMinecraft(String versionId) throws IOException {
+    public Version downloadMinecraft(String versionId, ModLoaderInfo loaderInfo) throws IOException {
         SwingUtilities.invokeLater(() -> this.dialog.setVisible(true));
-        super.downloadMinecraft(versionId);
+        Version v = super.downloadMinecraft(versionId, loaderInfo);
         SwingUtilities.invokeLater(() -> this.dialog.getDialog().dispose());
+
+        return v;
     }
 }

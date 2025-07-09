@@ -128,13 +128,13 @@ public class InstanceRunner extends Thread {
             if (javaPath == null || javaPath.isEmpty()) {
                 javaPath = null;
             }
-            this.checkMinecraftInstallation(useDialog, versionsDir, assetsDir, librariesDir, nativesDir, runtimesDir, minecraftDir,
+            Version version = this.checkMinecraftInstallation(useDialog, versionsDir, assetsDir, librariesDir, nativesDir, runtimesDir, minecraftDir,
                 minecraftVersion, javaPath == null);
 
             String javaAgentPath = this.instance.getJavaAgentPath();
 
-            Path clientJson = versionsDir.resolve(minecraftVersion).resolve(minecraftVersion + ".json");
-            Version version = Json.parse(FileUtils.readUtf8(clientJson), Version.class);
+            /*Path clientJson = versionsDir.resolve(minecraftVersion).resolve(minecraftVersion + ".json");
+            Version version = Json.parse(FileUtils.readUtf8(clientJson), Version.class);*/
 
             MinecraftLauncher launcher = new MinecraftLauncher(librariesDir, runtimesDir, nativesDir, javaPath, javaAgentPath);
 
@@ -248,7 +248,7 @@ public class InstanceRunner extends Thread {
         Log.minecraft(line);
     }
 
-    private void checkMinecraftInstallation(boolean useDialog, Path versionsDir, Path assetsDir, Path librariesDir,
+    private Version checkMinecraftInstallation(boolean useDialog, Path versionsDir, Path assetsDir, Path librariesDir,
                                             Path nativesDir, Path runtimesDir, Path minecraftDir, String minecraftVersion,
                                             boolean downloadJava) throws IOException {
 
@@ -277,7 +277,7 @@ public class InstanceRunner extends Thread {
             );
         }
 
-        downloader.downloadMinecraft(minecraftVersion);
+        return downloader.downloadMinecraft(minecraftVersion, this.instance.createLoaderInfo());
     }
 
     private void deleteTempClient() {

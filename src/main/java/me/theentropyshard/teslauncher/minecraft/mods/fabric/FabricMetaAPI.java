@@ -18,50 +18,37 @@
 
 package me.theentropyshard.teslauncher.minecraft.mods.fabric;
 
+import com.google.gson.JsonObject;
 import okhttp3.HttpUrl;
 import okhttp3.Request;
 import okhttp3.Response;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.utils.json.Json;
 
 public class FabricMetaAPI {
-    public static final String OFFICIAL_URL = "https://meta.fabricmc.net/";
+    public static final String OFFICIAL_FABRIC_URL = "https://meta.fabricmc.net/";
 
     private final String url;
 
-    private final Map<String, FabricLoaderInfo[]> cache;
-
     public FabricMetaAPI() {
-        this(FabricMetaAPI.OFFICIAL_URL);
+        this(FabricMetaAPI.OFFICIAL_FABRIC_URL);
     }
 
     public FabricMetaAPI(String url) {
         this.url = url;
-
-        this.cache = new HashMap<>();
     }
 
-    public FabricLoaderInfo[] getLoaderInfo(String minecraftVersion) throws IOException {
-        if (this.cache.containsKey(minecraftVersion)) {
-            return this.cache.get(minecraftVersion);
-        }
-
+    public JsonObject getLauncherProfile(String minecraftVersion, String loaderVersion) throws IOException {
         Request request = new Request.Builder()
-            .url(HttpUrl.get(this.url + "v2/versions/loader/" + minecraftVersion))
+            .url(HttpUrl.get(this.url + "v2/versions/loader/" + minecraftVersion + "/" + loaderVersion + "/profile/json"))
             .build();
 
         try (Response response = TESLauncher.getInstance().getHttpClient().newCall(request).execute()) {
-            FabricLoaderInfo[] infos = Json.parse(Objects.requireNonNull(response.body()).string(), FabricLoaderInfo[].class);
-
-            this.cache.put(minecraftVersion, infos);
-
-            return infos;
+            return Json.parse(Objects.requireNonNull(response.body()).string(), JsonObject.class);
         }
     }
 }

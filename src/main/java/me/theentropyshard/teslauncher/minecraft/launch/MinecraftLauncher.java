@@ -29,6 +29,7 @@ import me.theentropyshard.teslauncher.minecraft.data.Version;
 import me.theentropyshard.teslauncher.minecraft.data.argument.Argument;
 import me.theentropyshard.teslauncher.minecraft.data.argument.ArgumentType;
 import me.theentropyshard.teslauncher.utils.FileUtils;
+import me.theentropyshard.teslauncher.utils.MavenArtifact;
 import me.theentropyshard.teslauncher.utils.OperatingSystem;
 import me.theentropyshard.teslauncher.utils.ProcessReader;
 import me.theentropyshard.teslauncher.utils.json.Json;
@@ -77,7 +78,18 @@ public class MinecraftLauncher {
 
     private void resolveClasspath(Version version, Path librariesDir) {
         for (Library library : version.getLibraries()) {
-            Library.Artifact artifact = library.getDownloads().getArtifact();
+            Library.DownloadList downloads = library.getDownloads();
+
+            if (downloads == null) {
+                this.classpath.add(librariesDir.resolve(
+                    MavenArtifact.parse(library.getName())
+                        .createPath("jar")).toAbsolutePath().toString());
+
+                continue;
+            }
+
+            Library.Artifact artifact = downloads.getArtifact();
+
             if (artifact == null) {
                 continue;
             }

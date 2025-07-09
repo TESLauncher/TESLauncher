@@ -19,12 +19,14 @@
 package me.theentropyshard.teslauncher.minecraft.data;
 
 import me.theentropyshard.teslauncher.minecraft.data.rule.Rule;
+import me.theentropyshard.teslauncher.utils.OperatingSystem;
 
 import java.util.List;
 import java.util.Map;
 
 public class Library implements Ruleable {
     private String name;
+    private String url;
     private DownloadList downloads;
     private List<Rule> rules;
     private Map<String, String> natives;
@@ -32,6 +34,19 @@ public class Library implements Ruleable {
 
     public Library() {
 
+    }
+
+    @Override
+    public boolean applyOnThisPlatform() {
+        if (!OperatingSystem.isArm()) {
+            if (OperatingSystem.is64Bit() && this.getName().endsWith("arm64")) {
+                return false;
+            } else if (this.getName().endsWith("x86")) {
+                return false;
+            }
+        }
+
+        return Ruleable.super.applyOnThisPlatform();
     }
 
     @Override
@@ -47,6 +62,10 @@ public class Library implements Ruleable {
 
     public String getName() {
         return this.name;
+    }
+
+    public String getUrl() {
+        return this.url;
     }
 
     public DownloadList getDownloads() {

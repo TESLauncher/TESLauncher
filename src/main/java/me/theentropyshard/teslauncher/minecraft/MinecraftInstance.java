@@ -20,6 +20,8 @@ package me.theentropyshard.teslauncher.minecraft;
 
 import me.theentropyshard.teslauncher.instance.JarMod;
 import me.theentropyshard.teslauncher.instance.JavaInstance;
+import me.theentropyshard.teslauncher.minecraft.mods.ModLoader;
+import me.theentropyshard.teslauncher.minecraft.mods.ModLoaderInfo;
 import me.theentropyshard.teslauncher.utils.FileUtils;
 import me.theentropyshard.teslauncher.utils.ListUtils;
 import me.theentropyshard.teslauncher.utils.OperatingSystem;
@@ -50,7 +52,7 @@ public class MinecraftInstance extends JavaInstance {
 
     private ModLoader modLoader = ModLoader.NONE;
 
-    private String fabricVersion;
+    private String fabricVersion = "0.16.14";
     private final List<Mod> fabricMods;
 
     private transient volatile boolean running;
@@ -69,6 +71,34 @@ public class MinecraftInstance extends JavaInstance {
 
         this.jarMods = new ArrayList<>();
         this.fabricMods = new ArrayList<>();
+    }
+
+    public ModLoaderInfo createLoaderInfo() {
+        return switch (this.modLoader) {
+            case FABRIC -> new ModLoaderInfo(this.modLoader, this.fabricVersion);
+
+            default -> null;
+        };
+    }
+
+    public ModLoader getModLoader() {
+        return this.modLoader;
+    }
+
+    public void setModLoader(ModLoader modLoader) {
+        this.modLoader = modLoader;
+    }
+
+    public String getFabricVersion() {
+        return this.fabricVersion;
+    }
+
+    public void setFabricVersion(String fabricVersion) {
+        this.fabricVersion = fabricVersion;
+    }
+
+    public List<Mod> getFabricMods() {
+        return this.fabricMods;
     }
 
     public Path getCurrentModPath(Mod mod) {
