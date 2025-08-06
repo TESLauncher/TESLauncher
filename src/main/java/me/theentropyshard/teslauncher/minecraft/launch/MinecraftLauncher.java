@@ -284,7 +284,7 @@ public class MinecraftLauncher {
             .map(s -> s.replace(account.getUsername(), "**USERNAME**"))
             .map(s -> s.replace(account.getUuid().toString(), "**UUID**"))
             .toList();
-        Log.info("Running: " + censoredCommand);
+        Log.info("Running: " + String.join(" ", censoredCommand));
 
         ProcessBuilder processBuilder = new ProcessBuilder(command);
         processBuilder.environment().put("APPDATA", runDir.toString());
