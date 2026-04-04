@@ -33,9 +33,6 @@ public class Rule {
     @SerializedName("features")
     private FeaturesFilter features;
 
-    @SerializedName("versionRange")
-    private VersionRangeFilter versionRange;
-
     public Rule() {
 
     }
@@ -46,7 +43,6 @@ public class Rule {
             "action=" + this.action +
             ", operatingSystem=" + this.operatingSystem +
             ", features=" + this.features +
-            ", versionRange=" + this.versionRange +
             '}';
     }
 
@@ -60,10 +56,6 @@ public class Rule {
 
     public FeaturesFilter getFeatures() {
         return this.features;
-    }
-
-    public VersionRangeFilter getVersionRange() {
-        return this.versionRange;
     }
 
     public enum Action {

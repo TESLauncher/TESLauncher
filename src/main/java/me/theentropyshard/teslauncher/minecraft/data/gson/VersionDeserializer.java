@@ -72,13 +72,14 @@ public class VersionDeserializer implements JsonDeserializer<Version> {
         version.setLibraries(ctx.deserialize(jsonObject.get("libraries"), new TypeToken<List<Library>>() {}.getType()));
 
         if (jsonObject.has("arguments")) {
-            EnumMap<ArgumentType, List<Argument>> processedArguments = new EnumMap<>(ArgumentType.class);
+            EnumMap<ArgumentType, JsonArray> unprocessed = ctx.deserialize(jsonObject.get("arguments"), new TypeToken<EnumMap<ArgumentType, JsonArray>>() {}.getType());
 
-            EnumMap<ArgumentType, JsonArray> unprocessedArguments = ctx.deserialize(jsonObject.get("arguments"), new TypeToken<EnumMap<ArgumentType, JsonArray>>() {}.getType());
-            processedArguments.put(ArgumentType.JVM, VersionDeserializer.processArgs(unprocessedArguments.get(ArgumentType.JVM), ctx));
-            processedArguments.put(ArgumentType.GAME, VersionDeserializer.processArgs(unprocessedArguments.get(ArgumentType.GAME), ctx));
+            EnumMap<ArgumentType, List<Argument>> processed = new EnumMap<>(ArgumentType.class);
+            processed.put(ArgumentType.DEFAULT_USER_JVM, VersionDeserializer.processArgs(unprocessed.get(ArgumentType.DEFAULT_USER_JVM), ctx));
+            processed.put(ArgumentType.JVM, VersionDeserializer.processArgs(unprocessed.get(ArgumentType.JVM), ctx));
+            processed.put(ArgumentType.GAME, VersionDeserializer.processArgs(unprocessed.get(ArgumentType.GAME), ctx));
 
-            version.setArguments(processedArguments);
+            version.setArguments(processed);
         }
 
         return version;

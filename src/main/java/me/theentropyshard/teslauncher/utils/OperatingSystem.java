@@ -19,6 +19,9 @@
 package me.theentropyshard.teslauncher.utils;
 
 import com.sun.jna.Platform;
+import com.sun.jna.platform.win32.Kernel32;
+import com.sun.jna.platform.win32.WinNT;
+
 import me.theentropyshard.teslauncher.logging.Log;
 import me.theentropyshard.teslauncher.utils.datatransfer.TransferableFile;
 import me.theentropyshard.teslauncher.utils.datatransfer.TransferableImage;
@@ -36,7 +39,7 @@ public enum OperatingSystem {
     MACOS,
     UNKNOWN;
 
-    
+    public static SemanticVersion windowsVersion;
 
     public String getJavaExecutableName() {
         if (this == OperatingSystem.WINDOWS) {
@@ -152,5 +155,15 @@ public enum OperatingSystem {
 
     public static boolean is64Bit() {
         return Platform.is64Bit();
+    }
+
+    static {
+        if (OperatingSystem.isWindows()) {
+            WinNT.OSVERSIONINFOEX info = new WinNT.OSVERSIONINFOEX();
+
+            if (Kernel32.INSTANCE.GetVersionEx(info)) {
+                OperatingSystem.windowsVersion = new SemanticVersion(info.getMajor(), info.getMinor(), info.getBuildNumber());
+            }
+        }
     }
 }

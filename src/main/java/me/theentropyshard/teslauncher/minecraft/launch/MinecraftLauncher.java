@@ -31,7 +31,6 @@ import me.theentropyshard.teslauncher.minecraft.data.argument.ArgumentType;
 import me.theentropyshard.teslauncher.utils.FileUtils;
 import me.theentropyshard.teslauncher.utils.MavenArtifact;
 import me.theentropyshard.teslauncher.utils.OperatingSystem;
-import me.theentropyshard.teslauncher.utils.ProcessReader;
 import me.theentropyshard.teslauncher.utils.json.Json;
 import org.apache.commons.text.StringSubstitutor;
 
@@ -40,7 +39,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 public class MinecraftLauncher {
 
@@ -119,6 +117,12 @@ public class MinecraftLauncher {
                 }
 
                 arguments.add(flag);
+            }
+        } else {
+            for (Argument argument : version.getArguments().get(ArgumentType.DEFAULT_USER_JVM)) {
+                if (argument.applyOnThisPlatform()) {
+                    arguments.addAll(argument.getValue());
+                }
             }
         }
 

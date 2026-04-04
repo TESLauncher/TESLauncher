@@ -22,6 +22,7 @@ public class OperatingSystemFilter {
     private String name;
     private String version;
     private String arch;
+    private VersionRangeFilter versionRange;
 
     public OperatingSystemFilter() {
 
@@ -39,12 +40,17 @@ public class OperatingSystemFilter {
         return this.arch;
     }
 
+    public VersionRangeFilter getVersionRange() {
+        return this.versionRange;
+    }
+
     @Override
     public String toString() {
         return "OperatingSystemFilter{" +
-                "name='" + this.name + '\'' +
-                ", version='" + this.version + '\'' +
-                ", arch='" + this.arch + '\'' +
-                '}';
+            "name='" + this.name + '\'' +
+            ", version='" + this.version + '\'' +
+            ", arch='" + this.arch + '\'' +
+            ", versionRange=" + this.versionRange +
+            '}';
     }
 }

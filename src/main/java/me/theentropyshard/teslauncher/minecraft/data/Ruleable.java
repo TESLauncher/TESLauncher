@@ -18,13 +18,15 @@
 
 package me.theentropyshard.teslauncher.minecraft.data;
 
-import me.theentropyshard.teslauncher.minecraft.download.MinecraftDownloader;
-import me.theentropyshard.teslauncher.minecraft.data.rule.OperatingSystemFilter;
-import me.theentropyshard.teslauncher.minecraft.data.rule.Rule;
-import me.theentropyshard.teslauncher.utils.OperatingSystem;
-
 import java.util.List;
 import java.util.regex.Pattern;
+
+import me.theentropyshard.teslauncher.minecraft.data.rule.OperatingSystemFilter;
+import me.theentropyshard.teslauncher.minecraft.data.rule.Rule;
+import me.theentropyshard.teslauncher.minecraft.data.rule.VersionRangeFilter;
+import me.theentropyshard.teslauncher.minecraft.download.MinecraftDownloader;
+import me.theentropyshard.teslauncher.utils.OperatingSystem;
+import me.theentropyshard.teslauncher.utils.SemanticVersion;
 
 public interface Ruleable {
     List<Rule> getRules();
@@ -41,11 +43,43 @@ public interface Ruleable {
                 if (os == null) {
                     lastAction = rule.getAction();
                 } else {
-                    boolean versionMatches = os.getVersion() != null &&
+                    if (MinecraftDownloader.getMcName().equals(os.getName())) {
+                        boolean versionMatches = os.getVersion() != null &&
                             Pattern.compile(os.getVersion()).matcher(OperatingSystem.getVersion()).matches();
-                    if (MinecraftDownloader.getMcName().equals(os.getName()) ||
-                            versionMatches || OperatingSystem.getArch().equals(os.getArch())) {
-                        lastAction = rule.getAction();
+
+                        boolean archMatches = os.getArch() != null &&
+                            OperatingSystem.getArch().equals(os.getArch());
+
+                        VersionRangeFilter versionRange = os.getVersionRange();
+                        boolean windowsVersionMatches = false;
+
+                        if (OperatingSystem.isWindows() && versionRange != null) {
+                            // Assuming here that min is inclusive and max is exclusive, otherwise, for example,
+                            // two garbage collectors would be selected which is incorrect
+
+                            if (versionRange.getMin() != null) {
+                                SemanticVersion minVersion = SemanticVersion.parse(versionRange.getMin());
+                                if (OperatingSystem.windowsVersion.equals(minVersion) || OperatingSystem.windowsVersion.isHigherThan(minVersion)) {
+                                    windowsVersionMatches = true;
+                                }
+                            } else if (versionRange.getMax() != null) {
+                                SemanticVersion maxVersion = SemanticVersion.parse(versionRange.getMax());
+                                if (OperatingSystem.windowsVersion.isLowerThan(maxVersion)) {
+                                    windowsVersionMatches = true;
+                                }
+                            } else if (versionRange.getMin() != null && versionRange.getMax() != null) {
+                                SemanticVersion minVersion = SemanticVersion.parse(versionRange.getMin());
+                                SemanticVersion maxVersion = SemanticVersion.parse(versionRange.getMin());
+                                if ((OperatingSystem.windowsVersion.equals(minVersion) || OperatingSystem.windowsVersion.isHigherThan(minVersion))
+                                    && OperatingSystem.windowsVersion.isLowerThan(maxVersion)) {
+                                    windowsVersionMatches = true;
+                                }
+                            }
+                        }
+
+                        if (versionMatches || archMatches || windowsVersionMatches) {
+                            lastAction = rule.getAction();
+                        }
                     }
                 }
             }
