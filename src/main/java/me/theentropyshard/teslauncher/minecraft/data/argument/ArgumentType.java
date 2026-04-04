@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum ArgumentType {
+    DEFAULT_USER_JVM("default-user-jvm"),
     JVM("jvm"),
     GAME("game");
 
