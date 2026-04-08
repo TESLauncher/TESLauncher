@@ -18,6 +18,14 @@
 
 package me.theentropyshard.teslauncher.minecraft.launch;
 
+import org.apache.commons.text.StringSubstitutor;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.*;
+import java.util.function.Consumer;
+
 import me.theentropyshard.teslauncher.BuildConfig;
 import me.theentropyshard.teslauncher.TESLauncher;
 import me.theentropyshard.teslauncher.logging.Log;
@@ -32,13 +40,6 @@ import me.theentropyshard.teslauncher.utils.FileUtils;
 import me.theentropyshard.teslauncher.utils.MavenArtifact;
 import me.theentropyshard.teslauncher.utils.OperatingSystem;
 import me.theentropyshard.teslauncher.utils.json.Json;
-import org.apache.commons.text.StringSubstitutor;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.*;
-import java.util.function.Consumer;
 
 public class MinecraftLauncher {
 
@@ -63,7 +64,7 @@ public class MinecraftLauncher {
     }
 
     public Process launch(Consumer<List<String>> beforeLaunch, Account account, Version version,
-                      Path runDir, Path minecraftDir, long minMem, long maxMem, Set<String> jvmFlags, boolean exitAfterLaunch) throws IOException {
+                          Path runDir, Path minecraftDir, long minMem, long maxMem, Set<String> jvmFlags, boolean exitAfterLaunch) throws IOException {
         this.classpath.clear();
 
         beforeLaunch.accept(this.classpath);
@@ -118,7 +119,7 @@ public class MinecraftLauncher {
 
                 arguments.add(flag);
             }
-        } else {
+        } else if (version.getArguments() != null && version.getArguments().containsKey(ArgumentType.DEFAULT_USER_JVM)) {
             for (Argument argument : version.getArguments().get(ArgumentType.DEFAULT_USER_JVM)) {
                 if (argument.applyOnThisPlatform()) {
                     arguments.addAll(argument.getValue());
