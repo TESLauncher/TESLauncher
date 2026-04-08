@@ -44,6 +44,12 @@ public interface Ruleable {
                     lastAction = rule.getAction();
                 } else {
                     if (MinecraftDownloader.getMcName().equals(os.getName())) {
+                        if (os.getVersion() == null && os.getArch() == null && os.getVersionRange() == null) {
+                            lastAction = rule.getAction();
+
+                            continue;
+                        }
+
                         boolean versionMatches = os.getVersion() != null &&
                             Pattern.compile(os.getVersion()).matcher(OperatingSystem.getVersion()).matches();
 
