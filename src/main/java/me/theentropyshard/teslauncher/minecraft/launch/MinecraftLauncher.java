@@ -149,6 +149,7 @@ public class MinecraftLauncher {
         if (newFormat) {
             argumentMap.put("client", "-");
             argumentMap.put("auth_xuid", "-");
+            argumentMap.put("clientid", "-");
             argumentMap.put("auth_player_name", account.getUsername());
             argumentMap.put("version_name", version.getId());
             argumentMap.put("game_directory", minecraftDir.toAbsolutePath().toString());
