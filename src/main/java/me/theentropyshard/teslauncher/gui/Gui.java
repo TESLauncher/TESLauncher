@@ -181,7 +181,19 @@ public class Gui {
 
         this.frame.getContentPane().setPreferredSize(new Dimension(TESLauncher.WIDTH, TESLauncher.HEIGHT));
         this.frame.pack();
-        SwingUtils.centerWindow(this.frame, 0);
+        SwingUtils.centerWindow(this.frame, settings.lastDisplay);
+    }
+
+    public int getCurrentDisplayIndex() {
+        GraphicsDevice[] devices = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
+
+        for (int i = 0; i < devices.length; i++) {
+            if (devices[i].equals(this.frame.getGraphicsConfiguration().getDevice())) {
+                return i;
+            }
+        }
+
+        return -1;
     }
 
     public void reloadLanguage() {

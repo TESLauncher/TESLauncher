@@ -37,6 +37,7 @@ public class Settings {
     public boolean useDownloadDialog = true;
     public String lastInstanceGroup = "<default>";
     public boolean dialogRelativeToParent = true;
+    public int lastDisplay;
     public boolean writePrettyJson = false;
     public boolean showAmountOfTime = false;
     public int whenMCLaunchesOption = 0;

@@ -209,6 +209,7 @@ public class TESLauncher {
         });
 
         this.settings.lastInstanceGroup = String.valueOf(this.gui.getPlayView().getModel().getSelectedItem());
+        this.settings.lastDisplay = this.gui.getCurrentDisplayIndex();
 
         this.settings.save(this.settingsFile);
 
