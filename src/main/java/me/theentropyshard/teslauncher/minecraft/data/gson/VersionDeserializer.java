@@ -75,9 +75,12 @@ public class VersionDeserializer implements JsonDeserializer<Version> {
             EnumMap<ArgumentType, JsonArray> unprocessed = ctx.deserialize(jsonObject.get("arguments"), new TypeToken<EnumMap<ArgumentType, JsonArray>>() {}.getType());
 
             EnumMap<ArgumentType, List<Argument>> processed = new EnumMap<>(ArgumentType.class);
-            processed.put(ArgumentType.DEFAULT_USER_JVM, VersionDeserializer.processArgs(unprocessed.get(ArgumentType.DEFAULT_USER_JVM), ctx));
-            processed.put(ArgumentType.JVM, VersionDeserializer.processArgs(unprocessed.get(ArgumentType.JVM), ctx));
-            processed.put(ArgumentType.GAME, VersionDeserializer.processArgs(unprocessed.get(ArgumentType.GAME), ctx));
+
+            for (ArgumentType argType : ArgumentType.values()) {
+                if (unprocessed.containsKey(argType)) {
+                    processed.put(argType, VersionDeserializer.processArgs(unprocessed.get(argType), ctx));
+                }
+            }
 
             version.setArguments(processed);
         }
